@@ -30,52 +30,12 @@ $Branch  = 'main'
 $ApiBase = "https://api.github.com/repos/$Owner/$Repo"
 $RawBase = "https://raw.githubusercontent.com/$Owner/$Repo/$Branch"
 
-# ── Standard Skills ───────────────────────────────────────────────────────────
-# Edit this list to change which skills appear in the "Standard Skills" group.
+# ── Manifest URL ──────────────────────────────────────────────────────────────
+# The manifest.json at repo root contains all skill/instruction metadata:
+# categories, descriptions, standard skills list. One fetch replaces both the
+# hardcoded category map and the per-skill description API calls.
 
-$StandardSkills = @(
-    'code-review',
-    'git-cleanup',
-    'project-manager',
-    'release-to-main',
-    'ship-to-dev',
-    'skills-manager'
-)
-
-# ── Skill Category Map ───────────────────────────────────────────────────────
-
-$CategoryMap = [ordered]@{
-    'Foundations'         = @('base', 'code-deduplication', 'commit-hygiene', 'existing-repo',
-                              'iterative-development', 'session-management', 'team-coordination',
-                              'tdd-workflow', 'workspace')
-    'Code Quality'        = @('codex-review', 'gemini-review', 'requesting-code-review',
-                              'security', 'security-review', 'subagent-driven-development')
-    'Languages'           = @('android-java', 'android-kotlin', 'flutter', 'nodejs-backend',
-                              'python', 'react-best-practices', 'react-native', 'react-web',
-                              'typescript')
-    'Frontend & UI'       = @('design-taste-frontend', 'frontend-design', 'playwright-testing',
-                              'pwa-development', 'ui-mobile', 'ui-testing', 'ui-web',
-                              'web-design-guidelines')
-    'Databases'           = @('aws-aurora', 'aws-dynamodb', 'azure-cosmosdb', 'cloudflare-d1',
-                              'database-schema', 'firebase', 'supabase', 'supabase-nextjs',
-                              'supabase-node', 'supabase-python')
-    'AI & LLM'            = @('agentic-development', 'ai-models', 'llm-patterns')
-    'DevOps & Tooling'    = @('add-remote-installer', 'chrome-extension-builder',
-                              'project-tooling', 'publish-github', 'remote-installer',
-                              'start-app', 'using-git-worktrees', 'visual-explainer')
-    'Workflow'            = @('add-feature', 'composition-patterns', 'create-feature-spec',
-                              'doc-coauthoring', 'explain-code', 'feature-start',
-                              'finishing-a-development-branch', 'fix-start', 'guide-assistant',
-                              'pre-pr', 'retro-fit-spec', 'spec-align')
-    'Commerce'            = @('klaviyo', 'medusa', 'reddit-ads', 'shopify-apps',
-                              'web-payments', 'woocommerce')
-    'Content & Marketing' = @('aeo-optimization', 'credentials', 'ms-teams-apps',
-                              'posthog-analytics', 'reddit-api', 'site-architecture',
-                              'user-journeys', 'web-content')
-    'Specialized'         = @('logo-restylizer', 'vercel-deploy-claimable',
-                              'worldview-layer-scaffold', 'worldview-shader-preset',
-                              'youtube-prd-forensics')
-}
+$ManifestUrl = "$RawBase/manifest.json"
 
 # ── Deploy Path Defaults ─────────────────────────────────────────────────────
 
@@ -100,30 +60,9 @@ function Invoke-GitHubApi {
     }
 }
 
-function Get-RawContent {
-    param([string]$RepoPath)
-    try {
-        Invoke-RestMethod -Uri "$RawBase/$RepoPath" -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
-    } catch { $null }
-}
-
-function Read-FrontmatterField {
-    param([string]$Content, [string]$Field)
-    if ($Content -and $Content -match "(?m)^${Field}:\s*(.+)$") { return $Matches[1].Trim() }
-    return $null
-}
-
-$script:DescCache = @{}
-
-function Get-CachedDescription {
-    param([string]$RepoPath)
-    if ($script:DescCache.ContainsKey($RepoPath)) { return $script:DescCache[$RepoPath] }
-    $content = Get-RawContent $RepoPath
-    $raw     = Read-FrontmatterField $content 'description'
-    $desc    = if ($raw) { $raw } else { '(no description)' }
-    $script:DescCache[$RepoPath] = $desc
-    return $desc
-}
+# Manifest data (populated in Phase 4)
+$script:Manifest = $null
+$script:DescLookup = @{}
 
 # ── Simple Checkbox Picker (for platform/type selection) ──────────────────────
 
@@ -300,8 +239,6 @@ function Invoke-Selector {
         [string]   $Title,
         [string[]] $Available,
         [string[]] $Installed,
-        [string]   $DescPathPrefix,    # e.g. "claude/skills" or "claude/instructions"
-        [string]   $DescFileSuffix,    # e.g. "SKILL.md" or file name itself (empty for instructions)
         [System.Collections.Specialized.OrderedDictionary]$Categories  # $null for flat list
     )
 
@@ -312,7 +249,6 @@ function Invoke-Selector {
     # Build category map (flat list = single "All" category)
     $allCats = [ordered]@{}
     if ($Categories) {
-        $allCats['Standard Skills'] = @($StandardSkills | Where-Object { $Available -contains $_ })
         foreach ($k in $Categories.Keys) { $allCats[$k] = $Categories[$k] }
     } else {
         $allCats['All'] = @($Available)
@@ -344,15 +280,8 @@ function Invoke-Selector {
         if ($cursor -ne $lastCursor) {
             $lastCursor = $cursor
             if ($cur.type -eq 'skill') {
-                $desc = '(loading...)'
-                Show-CategorySelector -Items $items -Selected $selected -Expanded $expanded `
-                    -Cursor $cursor -ViewportTop $viewTop -Description $desc `
-                    -Title $Title -ViewportSize $viewSize -Width $width
-                if ($DescFileSuffix) {
-                    $desc = Get-CachedDescription "$DescPathPrefix/$($cur.name)/$DescFileSuffix"
-                } else {
-                    $desc = Get-CachedDescription "$DescPathPrefix/$($cur.name).md"
-                }
+                $d = $script:DescLookup[$cur.name]
+                $desc = if ($d) { $d } else { '(no description)' }
             } else {
                 $desc = "$($cur.skills.Count) items  [Space] toggle all  [Enter] expand"
             }
@@ -530,9 +459,18 @@ foreach ($platform in $selectedPlatforms) {
     }
 }
 
-# ── Phase 4: Fetch + Select ──────────────────────────────────────────────────
+# ── Phase 4: Fetch Manifest + Select ─────────────────────────────────────────
 
-# Accumulate all changes across all platform+type combos
+Write-Host ''
+Write-Host '  Fetching manifest from GitHub...' -ForegroundColor Cyan
+
+try {
+    $script:Manifest = Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
+} catch {
+    Write-Warning "Could not fetch manifest.json - falling back to API listing"
+    $script:Manifest = $null
+}
+
 $allChanges = [System.Collections.Generic.List[hashtable]]::new()
 
 foreach ($platform in $selectedPlatforms) {
@@ -540,83 +478,95 @@ foreach ($platform in $selectedPlatforms) {
         $key        = "${platform}_${assetType}"
         $installDir = $deployPaths[$key]
 
-        Write-Host ''
-        Write-Host "  Fetching $platform $assetType from GitHub..." -ForegroundColor Cyan
+        # Try manifest first, fall back to API listing
+        $available     = @()
+        $categories    = $null
+        $script:DescLookup = @{}
 
+        if ($script:Manifest -and $script:Manifest.platforms.$platform) {
+            $pData = $script:Manifest.platforms.$platform
+
+            if ($assetType -eq 'skills' -and $pData.skills) {
+                $available = @($pData.skills.PSObject.Properties.Name | Sort-Object)
+
+                # Build description lookup
+                foreach ($prop in $pData.skills.PSObject.Properties) {
+                    $script:DescLookup[$prop.Name] = $prop.Value.description
+                }
+
+                # Build category map from manifest
+                $catMap = [ordered]@{}
+                $standardList = @($script:Manifest.standard_skills | Where-Object { $available -contains $_ })
+                if ($standardList.Count -gt 0) { $catMap['Standard Skills'] = $standardList }
+                foreach ($catName in $script:Manifest.categories) {
+                    $catSkills = @($pData.skills.PSObject.Properties |
+                        Where-Object { $_.Value.category -eq $catName } |
+                        ForEach-Object { $_.Name } | Sort-Object)
+                    if ($catSkills.Count -gt 0) { $catMap[$catName] = $catSkills }
+                }
+                $categories = $catMap
+
+            } elseif ($assetType -eq 'instructions' -and $pData.instructions) {
+                $available = @($pData.instructions.PSObject.Properties.Name | Sort-Object)
+                foreach ($prop in $pData.instructions.PSObject.Properties) {
+                    $script:DescLookup[$prop.Name] = $prop.Value.description
+                }
+            }
+        }
+
+        # Fallback: API listing if manifest didn't have this platform/type
+        if ($available.Count -eq 0) {
+            Write-Host "  Fetching $platform $assetType from API..." -ForegroundColor DarkGray
+
+            if ($assetType -eq 'skills') {
+                $apiItems = Invoke-GitHubApi "contents/$platform/skills"
+                if ($apiItems) {
+                    $available = @($apiItems | Where-Object { $_.type -eq 'dir' } | Select-Object -ExpandProperty name | Sort-Object)
+                }
+            } else {
+                $apiItems = Invoke-GitHubApi "contents/$platform/instructions"
+                if ($apiItems) {
+                    $available = @($apiItems | Where-Object { $_.type -eq 'file' -and $_.name -like '*.md' -and $_.name -ne '.gitkeep' } |
+                        ForEach-Object { $_.name -replace '\.md$', '' } | Sort-Object)
+                }
+            }
+        }
+
+        if ($available.Count -eq 0) {
+            Write-Host "    No $assetType found for $platform." -ForegroundColor DarkGray
+            continue
+        }
+
+        # Detect installed
         if ($assetType -eq 'skills') {
-            $apiItems = Invoke-GitHubApi "contents/$platform/skills"
-            if (-not $apiItems) {
-                Write-Host "    No skills found for $platform." -ForegroundColor DarkGray
-                continue
-            }
-            $available = @($apiItems | Where-Object { $_.type -eq 'dir' } | Select-Object -ExpandProperty name | Sort-Object)
             $installed = @(Get-ChildItem -Path $installDir -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
-
-            Write-Host "  Found $($available.Count) skills." -ForegroundColor DarkGray
-
-            $platformTitle = $platform.Substring(0,1).ToUpper() + $platform.Substring(1)
-            $selected = Invoke-Selector `
-                -Title "$platformTitle Skills" `
-                -Available $available `
-                -Installed $installed `
-                -DescPathPrefix "$platform/skills" `
-                -DescFileSuffix 'SKILL.md' `
-                -Categories $CategoryMap
-
-            $toInstall = @($available | Where-Object { $selected[$_]  -and ($installed -notcontains $_) })
-            $toRemove  = @($available | Where-Object { -not $selected[$_] -and ($installed -contains $_) })
-
-            if ($toInstall.Count -gt 0 -or $toRemove.Count -gt 0) {
-                $allChanges.Add(@{
-                    platform   = $platform
-                    assetType  = 'skills'
-                    installDir = $installDir
-                    toInstall  = $toInstall
-                    toRemove   = $toRemove
-                })
-            }
-
         } else {
-            # Instructions: flat .md files
-            $apiItems = Invoke-GitHubApi "contents/$platform/instructions"
-            if (-not $apiItems) {
-                Write-Host "    No instructions found for $platform." -ForegroundColor DarkGray
-                continue
-            }
-            $available = @($apiItems | Where-Object { $_.type -eq 'file' -and $_.name -like '*.md' -and $_.name -ne '.gitkeep' } |
-                ForEach-Object { $_.name -replace '\.md$', '' } | Sort-Object)
-
-            if ($available.Count -eq 0) {
-                Write-Host "    No instructions found for $platform." -ForegroundColor DarkGray
-                continue
-            }
-
             $installed = @(Get-ChildItem -Path $installDir -Filter '*.md' -File -ErrorAction SilentlyContinue |
                 ForEach-Object { $_.Name -replace '\.md$', '' })
+        }
 
-            Write-Host "  Found $($available.Count) instructions." -ForegroundColor DarkGray
+        Write-Host "  Found $($available.Count) $assetType for $platform." -ForegroundColor DarkGray
 
-            $platformTitle = $platform.Substring(0,1).ToUpper() + $platform.Substring(1)
-            $selected = Invoke-Selector `
-                -Title "$platformTitle Instructions" `
-                -Available $available `
-                -Installed $installed `
-                -DescPathPrefix "$platform/instructions" `
-                -DescFileSuffix '' `
-                -Categories $null
+        $platformTitle = $platform.Substring(0,1).ToUpper() + $platform.Substring(1)
+        $assetLabel    = if ($assetType -eq 'skills') { 'Skills' } else { 'Instructions' }
 
-            $toInstall = @($available | Where-Object { $selected[$_]  -and ($installed -notcontains $_) })
-            $toRemove  = @($available | Where-Object { -not $selected[$_] -and ($installed -contains $_) })
+        $selected = Invoke-Selector `
+            -Title "$platformTitle $assetLabel" `
+            -Available $available `
+            -Installed $installed `
+            -Categories $categories
 
-            if ($toInstall.Count -gt 0 -or $toRemove.Count -gt 0) {
-                $allChanges.Add(@{
-                    platform   = $platform
-                    assetType  = 'instructions'
-                    installDir = $installDir
-                    toInstall  = $toInstall
-                    toRemove   = $toRemove
-                })
-            }
+        $toInstall = @($available | Where-Object { $selected[$_]  -and ($installed -notcontains $_) })
+        $toRemove  = @($available | Where-Object { -not $selected[$_] -and ($installed -contains $_) })
+
+        if ($toInstall.Count -gt 0 -or $toRemove.Count -gt 0) {
+            $allChanges.Add(@{
+                platform   = $platform
+                assetType  = $assetType
+                installDir = $installDir
+                toInstall  = $toInstall
+                toRemove   = $toRemove
+            })
         }
     }
 }

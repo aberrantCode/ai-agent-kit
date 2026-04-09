@@ -1,0 +1,864 @@
+{
+  "generated": "2026-04-09",
+  "standard_skills": [
+    "code-review",
+    "git-cleanup",
+    "project-manager",
+    "release-to-main",
+    "ship-to-dev",
+    "skills-manager"
+  ],
+  "categories": [
+    "Foundations & Workflow",
+    "Code Quality",
+    "Languages",
+    "Frontend & UI",
+    "Databases",
+    "AI & LLM",
+    "DevOps & Tooling",
+    "Commerce",
+    "Content & Marketing",
+    "Specialized"
+  ],
+  "platforms": {
+    "claude": {
+      "skills": {
+        "add-feature": {
+          "description": "",
+          "category": "Foundations & Workflow"
+        },
+        "add-remote-installer": {
+          "description": "Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install directory, then applies the remote-installer skill to implement both artifacts correctly.",
+          "category": "DevOps & Tooling"
+        },
+        "aeo-optimization": {
+          "description": "AI Engine Optimization - semantic triples, page templates, content clusters for AI citations",
+          "category": "Content & Marketing"
+        },
+        "agentic-development": {
+          "description": "Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js)",
+          "category": "AI & LLM"
+        },
+        "ai-models": {
+          "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
+          "category": "AI & LLM"
+        },
+        "android-java": {
+          "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
+          "category": "Languages"
+        },
+        "android-kotlin": {
+          "description": "Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing",
+          "category": "Languages"
+        },
+        "aws-aurora": {
+          "description": "AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling",
+          "category": "Databases"
+        },
+        "aws-dynamodb": {
+          "description": "AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python",
+          "category": "Databases"
+        },
+        "azure-cosmosdb": {
+          "description": "Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns",
+          "category": "Databases"
+        },
+        "base": {
+          "description": "Universal coding patterns, constraints, TDD workflow, atomic todos",
+          "category": "Foundations & Workflow"
+        },
+        "chrome-extension-builder": {
+          "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
+          "category": "Frontend & UI"
+        },
+        "cloudflare-d1": {
+          "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
+          "category": "Databases"
+        },
+        "code-deduplication": {
+          "description": "Prevent semantic code duplication with capability index and check-before-write",
+          "category": "Foundations & Workflow"
+        },
+        "code-review": {
+          "description": "Mandatory code reviews via /code-review before commits and deploys",
+          "category": "Code Quality"
+        },
+        "codex-review": {
+          "description": "OpenAI Codex CLI code review with GPT-5.2-Codex, CI/CD integration",
+          "category": "Code Quality"
+        },
+        "commit-hygiene": {
+          "description": "Atomic commits, PR size limits, commit thresholds, stacked PRs",
+          "category": "Foundations & Workflow"
+        },
+        "composition-patterns": {
+          "description": "React composition patterns that scale. Use when refactoring components with",
+          "category": "Foundations & Workflow"
+        },
+        "create-feature-spec": {
+          "description": "Create a comprehensive feature specification from a single sentence description",
+          "category": "Foundations & Workflow"
+        },
+        "credentials": {
+          "description": "Centralized API key management from Access.txt",
+          "category": "Content & Marketing"
+        },
+        "database-schema": {
+          "description": "Schema awareness - read before coding, type generation, prevent column errors",
+          "category": "Databases"
+        },
+        "design-taste-frontend": {
+          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
+          "category": "Frontend & UI"
+        },
+        "doc-coauthoring": {
+          "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
+          "category": "Foundations & Workflow"
+        },
+        "existing-repo": {
+          "description": "Analyze existing repositories, maintain structure, setup guardrails and best practices",
+          "category": "Foundations & Workflow"
+        },
+        "explain-code": {
+          "description": "Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks \"how does this work?\"",
+          "category": "Foundations & Workflow"
+        },
+        "feature-start": {
+          "description": "Use when starting any HomeRadar feature \u2014 before reading code, writing plans, or creating a worktree",
+          "category": "Foundations & Workflow",
+          "has_commands": true
+        },
+        "finishing-a-development-branch": {
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+          "category": "Foundations & Workflow"
+        },
+        "firebase": {
+          "description": "Firebase Firestore, Auth, Storage, real-time listeners, security rules",
+          "category": "Databases"
+        },
+        "fix-start": {
+          "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
+          "category": "Foundations & Workflow",
+          "has_commands": true
+        },
+        "flutter": {
+          "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
+          "category": "Languages"
+        },
+        "frontend-design": {
+          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+          "category": "Frontend & UI"
+        },
+        "gemini-review": {
+          "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
+          "category": "Code Quality"
+        },
+        "git-cleanup": {
+          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
+          "category": "Foundations & Workflow"
+        },
+        "guide-assistant": {
+          "description": "",
+          "category": "Foundations & Workflow"
+        },
+        "iterative-development": {
+          "description": "Ralph Wiggum loops - self-referential TDD iteration until tests pass",
+          "category": "Foundations & Workflow"
+        },
+        "klaviyo": {
+          "description": "Klaviyo email/SMS marketing - profiles, events, flows, segmentation",
+          "category": "Commerce"
+        },
+        "llm-patterns": {
+          "description": "AI-first application patterns, LLM testing, prompt management",
+          "category": "AI & LLM"
+        },
+        "logo-restylizer": {
+          "description": "Restylize, retheme, or transform an existing logo or icon into a new visual variant. Use this skill whenever the user wants to: create a variation of an existing logo, change logo colors or style, apply a new theme or effect to an icon, make a dark/light/neon/flat/outlined version, apply new branding to an existing mark, generate a restyled copy of any SVG or image file, or modify a logo's visual treatment. Triggers on phrases like \"restyle logo\", \"transform icon\", \"make a dark version\", \"change the colors on\", \"apply X style to\", \"create a variant of\", or any request that combines an existing image with a desired visual outcome. Always invoke before attempting to modify an image file manually.",
+          "category": "Specialized"
+        },
+        "medusa": {
+          "description": "Medusa headless commerce - modules, workflows, API routes, admin UI",
+          "category": "Commerce"
+        },
+        "ms-teams-apps": {
+          "description": "Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API",
+          "category": "Content & Marketing"
+        },
+        "nodejs-backend": {
+          "description": "Node.js backend patterns with Express/Fastify, repositories",
+          "category": "Languages"
+        },
+        "playwright-testing": {
+          "description": "E2E testing with Playwright - Page Objects, cross-browser, CI/CD",
+          "category": "Code Quality"
+        },
+        "posthog-analytics": {
+          "description": "PostHog analytics, event tracking, feature flags, dashboards",
+          "category": "Content & Marketing"
+        },
+        "pre-pr": {
+          "description": "Use before opening any HomeRadar pull request \u2014 three self-gates must all pass",
+          "category": "Foundations & Workflow",
+          "has_commands": true
+        },
+        "project-manager": {
+          "description": "",
+          "category": "AI & LLM",
+          "has_commands": true,
+          "has_sub_skills": true
+        },
+        "project-tooling": {
+          "description": "gh, vercel, supabase, render CLI and deployment platform setup",
+          "category": "DevOps & Tooling"
+        },
+        "publish-github": {
+          "description": "",
+          "category": "DevOps & Tooling"
+        },
+        "pwa-development": {
+          "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
+          "category": "Frontend & UI"
+        },
+        "python": {
+          "description": "Python development with ruff, mypy, pytest - TDD and type safety",
+          "category": "Languages"
+        },
+        "react-best-practices": {
+          "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
+          "category": "Languages"
+        },
+        "react-native": {
+          "description": "React Native and Expo patterns, platform-specific code, list performance, animations, and navigation best practices",
+          "category": "Languages"
+        },
+        "react-web": {
+          "description": "React web development with hooks, React Query, Zustand",
+          "category": "Languages"
+        },
+        "reddit-ads": {
+          "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
+          "category": "Commerce"
+        },
+        "reddit-api": {
+          "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
+          "category": "Content & Marketing"
+        },
+        "release-to-main": {
+          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
+          "category": "Foundations & Workflow"
+        },
+        "remote-installer": {
+          "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
+          "category": "DevOps & Tooling"
+        },
+        "requesting-code-review": {
+          "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+          "category": "Foundations & Workflow"
+        },
+        "retro-fit-spec": {
+          "description": "Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section",
+          "category": "Foundations & Workflow",
+          "has_commands": true
+        },
+        "security": {
+          "description": "OWASP security patterns, secrets management, security testing",
+          "category": "Code Quality"
+        },
+        "security-review": {
+          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+          "category": "Code Quality"
+        },
+        "session-management": {
+          "description": "Context preservation, tiered summarization, resumability",
+          "category": "Foundations & Workflow"
+        },
+        "ship-to-dev": {
+          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
+          "category": "Foundations & Workflow"
+        },
+        "shopify-apps": {
+          "description": "Shopify app development - Remix, Admin API, checkout extensions",
+          "category": "Commerce"
+        },
+        "site-architecture": {
+          "description": "Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals",
+          "category": "Content & Marketing"
+        },
+        "skills-manager": {
+          "description": "",
+          "category": "DevOps & Tooling",
+          "has_commands": true
+        },
+        "spec-align": {
+          "description": "Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec \u2014 from gap analysis through implementation, tests, and merge to dev",
+          "category": "Foundations & Workflow",
+          "has_commands": true
+        },
+        "start-app": {
+          "description": "Start any type of modern application \u2014 web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says \"start the app\", \"run it\", \"boot it up\", \"kick it off\", \"get it running\", \"spin it up\", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. \"start the Next.js app\", \"run the FastAPI server\", \"launch the Docker stack\").",
+          "category": "DevOps & Tooling"
+        },
+        "subagent-driven-development": {
+          "description": "Use when executing implementation plans with independent tasks in the current session",
+          "category": "Foundations & Workflow"
+        },
+        "supabase": {
+          "description": "Core Supabase CLI, migrations, RLS, Edge Functions",
+          "category": "Databases"
+        },
+        "supabase-nextjs": {
+          "description": "Next.js with Supabase and Drizzle ORM",
+          "category": "Databases"
+        },
+        "supabase-node": {
+          "description": "Express/Hono with Supabase and Drizzle ORM",
+          "category": "Databases"
+        },
+        "supabase-python": {
+          "description": "FastAPI with Supabase and SQLAlchemy/SQLModel",
+          "category": "Databases"
+        },
+        "tdd-workflow": {
+          "description": "Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.",
+          "category": "Foundations & Workflow"
+        },
+        "team-coordination": {
+          "description": "Multi-person projects - shared state, todo claiming, handoffs",
+          "category": "Foundations & Workflow"
+        },
+        "typescript": {
+          "description": "TypeScript strict mode with eslint and jest",
+          "category": "Languages"
+        },
+        "ui-mobile": {
+          "description": "Mobile UI patterns - React Native, iOS/Android, touch targets",
+          "category": "Frontend & UI"
+        },
+        "ui-testing": {
+          "description": "Visual testing - catch invisible buttons, broken layouts, contrast",
+          "category": "Frontend & UI"
+        },
+        "ui-web": {
+          "description": "Web UI - glassmorphism, Tailwind, dark mode, accessibility",
+          "category": "Frontend & UI"
+        },
+        "user-journeys": {
+          "description": "User experience flows - journey mapping, UX validation, error recovery",
+          "category": "Content & Marketing"
+        },
+        "using-git-worktrees": {
+          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+          "category": "Foundations & Workflow"
+        },
+        "vercel-deploy-claimable": {
+          "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",
+          "category": "DevOps & Tooling"
+        },
+        "visual-explainer": {
+          "description": "Generate beautiful, self-contained HTML pages that visually explain systems, code changes, plans, and data. Use when the user asks for a diagram, architecture overview, diff review, plan review, project recap, comparison table, or any visual explanation of technical concepts. Also use proactively when you are about to render a complex ASCII table (4+ rows or 3+ columns) \u2014 present it as a styled HTML page instead.",
+          "category": "DevOps & Tooling"
+        },
+        "web-content": {
+          "description": "SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization",
+          "category": "Content & Marketing"
+        },
+        "web-design-guidelines": {
+          "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+          "category": "Frontend & UI"
+        },
+        "web-payments": {
+          "description": "Stripe Checkout, subscriptions, webhooks, customer portal",
+          "category": "Commerce"
+        },
+        "woocommerce": {
+          "description": "WooCommerce REST API - products, orders, customers, webhooks",
+          "category": "Commerce"
+        },
+        "workspace": {
+          "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
+          "category": "Foundations & Workflow"
+        },
+        "worldview-layer-scaffold": {
+          "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
+          "category": "Specialized"
+        },
+        "worldview-shader-preset": {
+          "description": "Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, exposes adjustable parameters in the right panel, persists its settings per mode, and integrates with the SCENES shot-sequencer.",
+          "category": "Specialized"
+        },
+        "youtube-prd-forensics": {
+          "description": "Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments, keyframe evidence, and embedded screenshots persisted in the project.",
+          "category": "Specialized"
+        }
+      },
+      "instructions": {
+        "architect": {
+          "description": "Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.",
+          "model": "opus"
+        },
+        "backend-api-developer": {
+          "description": "Use this agent when working on backend API development tasks in the monorepo, including implementing FastAPI routes, creating or modifying SQLModel/Pydantic models, running database migrations with Alembic, writing or debugging pytest tests, running linters (ruff, black, mypy), troubleshooting Python/database issues, or setting up local development environment for apps/api. Examples:\\n\\n<example>\\nContext: User wants to add a new API endpoint for updating company information.\\nuser: \"Add a PATCH endpoint to update Company partial fields\"\\nassistant: \"I'll use the backend-api-developer agent to implement this endpoint with proper Pydantic models and handle any necessary database migrations.\"\\n<commentary>\\nSince the user is requesting backend API work involving endpoint creation, model changes, and potentially database migrations, use the backend-api-developer agent to handle this comprehensively.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User is experiencing test failures in the backend.\\nuser: \"My pytest tests are failing, can you help?\"\\nassistant: \"Let me use the backend-api-developer agent to run the tests, analyze failures, and provide solutions.\"\\n<commentary>\\nBackend test troubleshooting and pytest execution falls within the backend-api-developer agent's core responsibilities.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User just wrote a new service class and wants code quality checks.\\nuser: \"Run linting and type checking on my changes\"\\nassistant: \"I'll use the backend-api-developer agent to run ruff, black, and mypy on your backend changes and fix any issues.\"\\n<commentary>\\nCode quality tasks for Python backend code should be handled by the backend-api-developer agent.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User needs to set up their local development environment.\\nuser: \"How do I get the API running locally?\"\\nassistant: \"I'll use the backend-api-developer agent to guide you through t"
+        },
+        "build-error-resolver": {
+          "description": "Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quickly.",
+          "model": "opus"
+        },
+        "code-reviewer": {
+          "description": "Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.",
+          "model": "opus"
+        },
+        "doc-updater": {
+          "description": "Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides.",
+          "model": "opus"
+        },
+        "docs-test-engineer": {
+          "description": "Use this agent when you need to create or update documentation, write unit or integration tests, design test plans, or establish QA guidance for the monorepo. This includes writing README files, API documentation, test suites for Python/FastAPI backend or React/TypeScript WebUI code, and creating comprehensive test strategies. Examples of when to invoke this agent:\\n\\n<example>\\nContext: User has just implemented a new API endpoint and needs tests.\\nuser: \"I just added a new /companies endpoint to the API, can you write tests for it?\"\\nassistant: \"I'll use the docs-test-engineer agent to create comprehensive unit and integration tests for the new /companies endpoint.\"\\n<commentary>\\nSince the user needs tests written for new backend code, use the Task tool to launch the docs-test-engineer agent to create pytest-based tests following the project's testing patterns.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants documentation for a new feature.\\nuser: \"Please document the workflow engine's new scheduling feature\"\\nassistant: \"I'll use the docs-test-engineer agent to create clear documentation for the scheduling feature.\"\\n<commentary>\\nSince the user is requesting documentation, use the docs-test-engineer agent to write technical documentation following the project's documentation standards and place it appropriately in the docs structure.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User has completed a WebUI component and needs tests.\\nuser: \"Write Vitest tests for the CompanyCard component I just created\"\\nassistant: \"I'll launch the docs-test-engineer agent to write comprehensive Vitest tests for the CompanyCard component.\"\\n<commentary>\\nSince the user needs WebUI component tests, use the docs-test-engineer agent to create TypeScript/Vitest tests following the WebUI testing patterns.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants a test plan for a new feature.\\nuser: \"Create a QA test plan"
+        },
+        "e2e-runner": {
+          "description": "End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ensures critical user flows work.",
+          "model": "opus"
+        },
+        "non-blocking-loading": {
+          "description": ""
+        },
+        "planner": {
+          "description": "Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.",
+          "model": "opus"
+        },
+        "refactor-cleaner": {
+          "description": "Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it.",
+          "model": "opus"
+        },
+        "security-reviewer": {
+          "description": "Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities.",
+          "model": "opus"
+        },
+        "ship-to-prod": {
+          "description": ""
+        },
+        "ship-to-uat": {
+          "description": ""
+        },
+        "tdd-guide": {
+          "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
+          "model": "opus"
+        },
+        "webui-developer": {
+          "description": "Use this agent when working on the React/TypeScript WebUI application located in apps/webui. This includes component development, Storybook stories, linting, testing, build issues, and local development environment setup. Also use this agent for creating cross-platform helper scripts for Windows PowerShell and Unix shells, troubleshooting npm/node_modules issues, and ensuring CI/CD parity with local development commands.\\n\\nExamples:\\n\\n<example>\\nContext: User wants to add a new component to the webui\\nuser: \"I need to create a new DataTable component for displaying company information\"\\nassistant: \"I'll use the webui-developer agent to help create this component with proper TypeScript types, tests, and Storybook stories.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User is experiencing npm install failures\\nuser: \"npm install keeps failing in the webui project\"\\nassistant: \"Let me use the webui-developer agent to diagnose and fix this npm installation issue.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User wants to run tests before committing\\nuser: \"How do I run the webui tests?\"\\nassistant: \"I'll launch the webui-developer agent to provide the correct testing commands and ensure they match CI expectations.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User needs a development script for Windows\\nuser: \"Can you create a PowerShell script to start the dev server?\"\\nassistant: \"I'll use the webui-developer agent to create a cross-platform helper script in scripts/dev.ps1.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: Storybook won't start\\nuser: \"Storybook is failing to start with a port error\"\\nassistant: \"Let me engage the webui-developer agent to troubleshoot the Storybook configuration and port issues.\"\\n<Task tool call to webui-developer agent>\\n</example>",
+          "model": "sonnet"
+        }
+      }
+    },
+    "codex": {
+      "skills": {
+        "add-feature": {
+          "description": "",
+          "category": "Foundations & Workflow"
+        },
+        "add-remote-installer": {
+          "description": "Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install directory, then applies the remote-installer skill to implement both artifacts correctly.",
+          "category": "DevOps & Tooling"
+        },
+        "aeo-optimization": {
+          "description": "AI Engine Optimization - semantic triples, page templates, content clusters for AI citations",
+          "category": "Content & Marketing"
+        },
+        "agentic-development": {
+          "description": "Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js)",
+          "category": "AI & LLM"
+        },
+        "ai-models": {
+          "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
+          "category": "AI & LLM"
+        },
+        "android-java": {
+          "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
+          "category": "Languages"
+        },
+        "android-kotlin": {
+          "description": "Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing",
+          "category": "Languages"
+        },
+        "aws-aurora": {
+          "description": "AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling",
+          "category": "Databases"
+        },
+        "aws-dynamodb": {
+          "description": "AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python",
+          "category": "Databases"
+        },
+        "azure-cosmosdb": {
+          "description": "Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns",
+          "category": "Databases"
+        },
+        "base": {
+          "description": "Universal coding patterns, constraints, TDD workflow, atomic todos",
+          "category": "Foundations & Workflow"
+        },
+        "chrome-extension-builder": {
+          "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
+          "category": "Frontend & UI"
+        },
+        "cloudflare-d1": {
+          "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
+          "category": "Databases"
+        },
+        "code-deduplication": {
+          "description": "Prevent semantic code duplication with capability index and check-before-write",
+          "category": "Foundations & Workflow"
+        },
+        "code-review": {
+          "description": "Mandatory code reviews via /code-review before commits and deploys",
+          "category": "Code Quality"
+        },
+        "codex-review": {
+          "description": "OpenAI Codex CLI code review with GPT-5.2-Codex, CI/CD integration",
+          "category": "Code Quality"
+        },
+        "commit-hygiene": {
+          "description": "Atomic commits, PR size limits, commit thresholds, stacked PRs",
+          "category": "Foundations & Workflow"
+        },
+        "composition-patterns": {
+          "description": "React composition patterns that scale. Use when refactoring components with",
+          "category": "Foundations & Workflow"
+        },
+        "create-feature-spec": {
+          "description": "Create a comprehensive feature specification from a single sentence description",
+          "category": "Foundations & Workflow"
+        },
+        "credentials": {
+          "description": "Centralized API key management from Access.txt",
+          "category": "Content & Marketing"
+        },
+        "database-schema": {
+          "description": "Schema awareness - read before coding, type generation, prevent column errors",
+          "category": "Databases"
+        },
+        "design-taste-frontend": {
+          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
+          "category": "Frontend & UI"
+        },
+        "doc-coauthoring": {
+          "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
+          "category": "Foundations & Workflow"
+        },
+        "existing-repo": {
+          "description": "Analyze existing repositories, maintain structure, setup guardrails and best practices",
+          "category": "Foundations & Workflow"
+        },
+        "explain-code": {
+          "description": "Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks \"how does this work?\"",
+          "category": "Foundations & Workflow"
+        },
+        "feature-start": {
+          "description": "Use when starting any HomeRadar feature \u2014 before reading code, writing plans, or creating a worktree",
+          "category": "Foundations & Workflow"
+        },
+        "finishing-a-development-branch": {
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+          "category": "Foundations & Workflow"
+        },
+        "firebase": {
+          "description": "Firebase Firestore, Auth, Storage, real-time listeners, security rules",
+          "category": "Databases"
+        },
+        "fix-start": {
+          "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
+          "category": "Foundations & Workflow"
+        },
+        "flutter": {
+          "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
+          "category": "Languages"
+        },
+        "frontend-design": {
+          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+          "category": "Frontend & UI"
+        },
+        "gemini-review": {
+          "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
+          "category": "Code Quality"
+        },
+        "git-cleanup": {
+          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
+          "category": "Foundations & Workflow"
+        },
+        "guide-assistant": {
+          "description": "",
+          "category": "Foundations & Workflow"
+        },
+        "iterative-development": {
+          "description": "Ralph Wiggum loops - self-referential TDD iteration until tests pass",
+          "category": "Foundations & Workflow"
+        },
+        "klaviyo": {
+          "description": "Klaviyo email/SMS marketing - profiles, events, flows, segmentation",
+          "category": "Commerce"
+        },
+        "llm-patterns": {
+          "description": "AI-first application patterns, LLM testing, prompt management",
+          "category": "AI & LLM"
+        },
+        "logo-restylizer": {
+          "description": "Restylize, retheme, or transform an existing logo or icon into a new visual variant. Use this skill whenever the user wants to: create a variation of an existing logo, change logo colors or style, apply a new theme or effect to an icon, make a dark/light/neon/flat/outlined version, apply new branding to an existing mark, generate a restyled copy of any SVG or image file, or modify a logo's visual treatment. Triggers on phrases like \"restyle logo\", \"transform icon\", \"make a dark version\", \"change the colors on\", \"apply X style to\", \"create a variant of\", or any request that combines an existing image with a desired visual outcome. Always invoke before attempting to modify an image file manually.",
+          "category": "Specialized"
+        },
+        "medusa": {
+          "description": "Medusa headless commerce - modules, workflows, API routes, admin UI",
+          "category": "Commerce"
+        },
+        "ms-teams-apps": {
+          "description": "Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API",
+          "category": "Content & Marketing"
+        },
+        "nodejs-backend": {
+          "description": "Node.js backend patterns with Express/Fastify, repositories",
+          "category": "Languages"
+        },
+        "playwright-testing": {
+          "description": "E2E testing with Playwright - Page Objects, cross-browser, CI/CD",
+          "category": "Code Quality"
+        },
+        "posthog-analytics": {
+          "description": "PostHog analytics, event tracking, feature flags, dashboards",
+          "category": "Content & Marketing"
+        },
+        "pre-pr": {
+          "description": "Use before opening any HomeRadar pull request \u2014 three self-gates must all pass",
+          "category": "Foundations & Workflow"
+        },
+        "project-manager": {
+          "description": "",
+          "category": "AI & LLM"
+        },
+        "project-tooling": {
+          "description": "gh, vercel, supabase, render CLI and deployment platform setup",
+          "category": "DevOps & Tooling"
+        },
+        "publish-github": {
+          "description": "",
+          "category": "DevOps & Tooling"
+        },
+        "pwa-development": {
+          "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
+          "category": "Frontend & UI"
+        },
+        "python": {
+          "description": "Python development with ruff, mypy, pytest - TDD and type safety",
+          "category": "Languages"
+        },
+        "react-best-practices": {
+          "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
+          "category": "Languages"
+        },
+        "react-native": {
+          "description": "React Native mobile patterns, platform-specific code",
+          "category": "Languages"
+        },
+        "react-web": {
+          "description": "React web development with hooks, React Query, Zustand",
+          "category": "Languages"
+        },
+        "reddit-ads": {
+          "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
+          "category": "Commerce"
+        },
+        "reddit-api": {
+          "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
+          "category": "Content & Marketing"
+        },
+        "release-to-main": {
+          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
+          "category": "Foundations & Workflow"
+        },
+        "remote-installer": {
+          "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
+          "category": "DevOps & Tooling"
+        },
+        "requesting-code-review": {
+          "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+          "category": "Foundations & Workflow"
+        },
+        "retro-fit-spec": {
+          "description": "Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section",
+          "category": "Foundations & Workflow"
+        },
+        "security": {
+          "description": "OWASP security patterns, secrets management, security testing",
+          "category": "Code Quality"
+        },
+        "security-review": {
+          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+          "category": "Code Quality"
+        },
+        "session-management": {
+          "description": "Context preservation, tiered summarization, resumability",
+          "category": "Foundations & Workflow"
+        },
+        "ship-to-dev": {
+          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
+          "category": "Foundations & Workflow"
+        },
+        "shopify-apps": {
+          "description": "Shopify app development - Remix, Admin API, checkout extensions",
+          "category": "Commerce"
+        },
+        "site-architecture": {
+          "description": "Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals",
+          "category": "Content & Marketing"
+        },
+        "skills-manager": {
+          "description": "",
+          "category": "DevOps & Tooling"
+        },
+        "spec-align": {
+          "description": "Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec \u2014 from gap analysis through implementation, tests, and merge to dev",
+          "category": "Foundations & Workflow"
+        },
+        "start-app": {
+          "description": "Start any type of modern application \u2014 web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says \"start the app\", \"run it\", \"boot it up\", \"kick it off\", \"get it running\", \"spin it up\", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. \"start the Next.js app\", \"run the FastAPI server\", \"launch the Docker stack\").",
+          "category": "DevOps & Tooling"
+        },
+        "subagent-driven-development": {
+          "description": "Use when executing implementation plans with independent tasks in the current session",
+          "category": "Foundations & Workflow"
+        },
+        "supabase": {
+          "description": "Core Supabase CLI, migrations, RLS, Edge Functions",
+          "category": "Databases"
+        },
+        "supabase-nextjs": {
+          "description": "Next.js with Supabase and Drizzle ORM",
+          "category": "Databases"
+        },
+        "supabase-node": {
+          "description": "Express/Hono with Supabase and Drizzle ORM",
+          "category": "Databases"
+        },
+        "supabase-python": {
+          "description": "FastAPI with Supabase and SQLAlchemy/SQLModel",
+          "category": "Databases"
+        },
+        "tdd-workflow": {
+          "description": "Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.",
+          "category": "Foundations & Workflow"
+        },
+        "team-coordination": {
+          "description": "Multi-person projects - shared state, todo claiming, handoffs",
+          "category": "Foundations & Workflow"
+        },
+        "typescript": {
+          "description": "TypeScript strict mode with eslint and jest",
+          "category": "Languages"
+        },
+        "ui-mobile": {
+          "description": "Mobile UI patterns - React Native, iOS/Android, touch targets",
+          "category": "Frontend & UI"
+        },
+        "ui-testing": {
+          "description": "Visual testing - catch invisible buttons, broken layouts, contrast",
+          "category": "Frontend & UI"
+        },
+        "ui-web": {
+          "description": "Web UI - glassmorphism, Tailwind, dark mode, accessibility",
+          "category": "Frontend & UI"
+        },
+        "user-journeys": {
+          "description": "User experience flows - journey mapping, UX validation, error recovery",
+          "category": "Content & Marketing"
+        },
+        "using-git-worktrees": {
+          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+          "category": "Foundations & Workflow"
+        },
+        "vercel-deploy-claimable": {
+          "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",
+          "category": "DevOps & Tooling"
+        },
+        "visual-explainer": {
+          "description": "Generate beautiful, self-contained HTML pages that visually explain systems, code changes, plans, and data. Use when the user asks for a diagram, architecture overview, diff review, plan review, project recap, comparison table, or any visual explanation of technical concepts. Also use proactively when you are about to render a complex ASCII table (4+ rows or 3+ columns) \u2014 present it as a styled HTML page instead.",
+          "category": "DevOps & Tooling"
+        },
+        "web-content": {
+          "description": "SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization",
+          "category": "Content & Marketing"
+        },
+        "web-design-guidelines": {
+          "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+          "category": "Frontend & UI"
+        },
+        "web-payments": {
+          "description": "Stripe Checkout, subscriptions, webhooks, customer portal",
+          "category": "Commerce"
+        },
+        "woocommerce": {
+          "description": "WooCommerce REST API - products, orders, customers, webhooks",
+          "category": "Commerce"
+        },
+        "workspace": {
+          "description": "Dynamic multi-repo and monorepo awareness - analyze workspace topology, track API contracts, and maintain cross-repo context",
+          "category": "Foundations & Workflow"
+        },
+        "worldview-layer-scaffold": {
+          "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
+          "category": "Specialized"
+        },
+        "worldview-shader-preset": {
+          "description": "Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, exposes adjustable parameters in the right panel, persists its settings per mode, and integrates with the SCENES shot-sequencer.",
+          "category": "Specialized"
+        },
+        "youtube-prd-forensics": {
+          "description": "Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments, keyframe evidence, and embedded screenshots persisted in the project.",
+          "category": "Specialized"
+        }
+      },
+      "instructions": {
+        "architect": {
+          "description": "Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions."
+        },
+        "code-reviewer": {
+          "description": "Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes."
+        },
+        "tdd-guide": {
+          "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage."
+        }
+      }
+    },
+    "gemini": {
+      "skills": {
+        "chrome-extension-builder": {
+          "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
+          "category": "Frontend & UI"
+        },
+        "project-manager": {
+          "description": "",
+          "category": "AI & LLM"
+        },
+        "security-review": {
+          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+          "category": "Code Quality"
+        },
+        "skills-manager": {
+          "description": "",
+          "category": "DevOps & Tooling"
+        },
+        "tdd-workflow": {
+          "description": "Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.",
+          "category": "Foundations & Workflow"
+        }
+      },
+      "instructions": {
+        "architect": {
+          "description": "Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions."
+        },
+        "code-reviewer": {
+          "description": "Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes."
+        },
+        "tdd-guide": {
+          "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage."
+        }
+      }
+    }
+  }
+}
