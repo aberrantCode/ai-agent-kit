@@ -386,6 +386,17 @@ Read these lazily, only when the relevant decision branch fires:
 - `references/backlog-templates.md` — starter `backlog.md` and `backlog-archive.md` contents.
 - `references/what-next-schema.md` — full schema of the `docs/what-next.md` cache file.
 
-## Diagram
+## Supporting visuals
 
-[View diagram](diagram.html)
+- [Decision flow](diagram.html) — master 9-step pipeline (Steps 1–9 above).
+- [Solution architecture](diagrams/solution.html) — components, runtime state, and invariants.
+- [Feature matrix](diagrams/features.html) — capabilities grouped by domain, with iter-2 deltas highlighted.
+- [Development plan](diagrams/plan.html) — iteration history + proposed iteration 3+ work.
+
+## Evaluation harness
+
+Any change to this file or `references/*.md` should be re-graded before shipping.
+See [evals/README.md](evals/README.md) for the 7-step loop
+(`setup_iteration.py` → spawn subagents → `save_timing.py` → `grade.py` →
+`migrate_layout.py` → aggregate → review viewer). Past benchmarks are kept in
+`evals/benchmarks/`.

@@ -110,7 +110,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 22 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup |
+| Foundations & Workflow | 23 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, **what-next** |
 | Languages & Runtimes | 3 | typescript, python, nodejs-backend |
 | Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
@@ -151,6 +151,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`retro-fit-spec`](claude/skills/retro-fit-spec/) | Foundations & Workflow | Add capability IDs to feature specs missing them | ✓ | ✓ | |
 | [`spec-align`](claude/skills/spec-align/) | Foundations & Workflow | Align codebase to a feature spec — gap analysis through implementation | ✓ | ✓ | |
 | [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Conversational workflow to produce feature specifications | ✓ | ✓ | |
+| [`what-next`](claude/skills/what-next/) | Foundations & Workflow | Universal next-action decider — detects the PM framework, prioritises pending work, delegates to the right specialist. Ships with [solution](claude/skills/what-next/diagrams/solution.html) / [feature](claude/skills/what-next/diagrams/features.html) / [plan](claude/skills/what-next/diagrams/plan.html) diagrams and a reusable [eval harness](claude/skills/what-next/evals/). | ✓ | | |
 | [`code-deduplication`](claude/skills/code-deduplication/) | Foundations & Workflow | Prevent semantic duplication with capability index | ✓ | ✓ | |
 | [`typescript`](claude/skills/typescript/) | Languages & Runtimes | TypeScript strict mode with eslint and jest | ✓ | ✓ | |
 | [`python`](claude/skills/python/) | Languages & Runtimes | Python with ruff, mypy, pytest — TDD and type safety | ✓ | ✓ | |
@@ -294,8 +295,38 @@ Slash commands available globally in Claude Code. Most delegate to a specialized
 | [`/plan-review`](claude/commands/plan-review.md) | Visual HTML plan review with risk assessment |
 | [`/project-recap`](claude/commands/project-recap.md) | Visual project recap — architecture, decisions, debt |
 | [`/skills-manager`](claude/commands/skills-manager.md) | Full skill lifecycle — find, sync, install, update, import, push, search, audit |
+| [`/what-next`](claude/skills/what-next/commands/what-next.md) | Decide what to work on next in the current repo |
+| [`/what-next-update`](claude/skills/what-next/commands/what-next-update.md) | Force refresh of `docs/what-next.md` cache + backlog reconciliation |
 
 </details>
+
+---
+
+## Skill evaluation framework
+
+The [`what-next`](claude/skills/what-next/) skill ships with a **reusable evaluation harness**
+that is the canonical template for measuring any skill's behaviour against a set of synthetic
+test scenarios. Use it as a starting point when building evals for other skills.
+
+- [`evals/README.md`](claude/skills/what-next/evals/README.md) — 7-step run guide (setup →
+  spawn subagents → timing → grade → migrate → aggregate → review) and a recipe for adding a
+  new eval.
+- [`evals/fixtures/`](claude/skills/what-next/evals/fixtures/) — committed synthetic repos, one
+  per eval. Each fixture captures a scenario, not an expected output.
+- [`evals/harness/`](claude/skills/what-next/evals/harness/) — four small, parameterised
+  Python scripts that do all the mechanical work.
+- [`evals/benchmarks/`](claude/skills/what-next/evals/benchmarks/) — iteration-1 and
+  iteration-2 benchmark summaries preserved as historical record.
+- Generated workspace artefacts (transcripts, per-run grading, review HTML) land at
+  `claude/skills/<skill>-workspace/iteration-N/` and are **gitignored** — only the
+  benchmark summaries enter git.
+
+Supporting diagrams for the what-next skill itself:
+
+- [Decision flow](claude/skills/what-next/diagram.html) — master 9-step pipeline.
+- [Solution architecture](claude/skills/what-next/diagrams/solution.html) — components + invariants.
+- [Feature matrix](claude/skills/what-next/diagrams/features.html) — capabilities grouped by domain.
+- [Development plan](claude/skills/what-next/diagrams/plan.html) — iteration history + roadmap.
 
 ---
 

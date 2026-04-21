@@ -1,62 +1,65 @@
 {
   "skill_name": "what-next",
+  "notes": "Assertion texts are the canonical source of truth; graders in harness/grade.py key off them. Update in tandem.",
   "evals": [
     {
       "id": 1,
-      "prompt": "Hey, I'm coming back to this project after a two-week break. I honestly can't remember where we left off — what should I work on next?",
+      "name": "returning-user-vague",
+      "prompt": "Hey, I'm coming back to this project after a two-week break. I honestly can't remember where we left off - what should I work on next?",
       "expected_output": "Skill walks the decision tree. If docs/what-next.md exists and fingerprints match, uses the cache. Otherwise analyses the repo, detects PM framework, reads the task store, prioritises with weighted heuristic, presents top 3 via AskUserQuestion. No prose prompts, no silent rewrites.",
-      "files": [],
+      "fixture_root": "fixtures/eval-1-returning-user-vague",
       "assertions": [
-        {"text": "AskUserQuestion tool is invoked at least once (never prose prompts)", "check": "transcript-contains-AskUserQuestion"},
-        {"text": "docs/what-next.md is read or written", "check": "touches-cache-file"},
-        {"text": "When top three are presented, the reason each ranked that way is included in the option description", "check": "option-descriptions-include-ranking-reason"},
-        {"text": "No task is started without user confirmation", "check": "no-agent-spawn-before-user-choice"}
+        {"text": "Skill reads backlog.md rather than re-analysing the repo from scratch"},
+        {"text": "Top three tasks are surfaced and ranked by the weighted heuristic"},
+        {"text": "AUTH-001 is ranked #1 (it has p1 + blocks others)"},
+        {"text": "SEC-001 is in the top three (security +35 weight)"},
+        {"text": "The skill records or references AskUserQuestion as the prompting mechanism (not prose)"},
+        {"text": "No agent is spawned before the user picks from the top three"},
+        {"text": "AUTH-002 is NOT in the top-three (implicitly blocked by AUTH-001 per iteration-2 -15 penalty)"}
       ]
     },
     {
       "id": 2,
+      "name": "project-manager-present",
       "prompt": "/what-next",
-      "expected_output": "In a repo with docs/features/*.md and docs/plans/*.md present, the skill detects the project-manager convention, declines to create backlog.md, and AskUserQuestion whether to invoke /continue-tasks or /review-tasks. docs/what-next.md records pm_framework: project-manager.",
-      "files": [
-        "docs/features/auth.md",
-        "docs/features/payments.md",
-        "docs/plans/auth-plan.md",
-        "docs/plans/payments-plan.md"
-      ],
+      "expected_output": "Delegation rule fires: project-manager detected, no backlog.md created, docs/plans/*.md parsed, top 3 specific plan todos surfaced (IDs like `auth P1-T3`) alongside /review-tasks and /continue-tasks escape-hatch options.",
+      "fixture_root": "fixtures/eval-2-project-manager-present",
       "assertions": [
-        {"text": "project-manager framework is detected (pm_framework: project-manager in cache)", "check": "cache-has-pm-framework-project-manager"},
-        {"text": "backlog.md is NOT created when project-manager is already present", "check": "no-backlog-md-created"},
-        {"text": "User is asked whether to delegate to /continue-tasks or /review-tasks", "check": "options-mention-continue-or-review-tasks"}
+        {"text": "Skill detects pm_framework: project-manager (docs/features/ + docs/plans/ both present)"},
+        {"text": "Skill does NOT create a backlog.md file"},
+        {"text": "Skill recommends delegating to /continue-tasks or /review-tasks"},
+        {"text": "docs/what-next.md is written with pm_framework: project-manager"},
+        {"text": "Top tasks surfaced are specific plan task IDs (not placeholders) — at least one P1-T or P2-T ID appears"}
       ]
     },
     {
       "id": 3,
+      "name": "bare-repo-bootstrap",
       "prompt": "/what-next please help me figure out what to do in this repo",
-      "expected_output": "In a bare repo with no PM artefacts, the skill analyses structure, detects no framework, and AskUserQuestion with four bootstrap options: /project-manager setup, create backlog.md, run code analysis, manual input. On backlog creation, area-scoped IDs are derived from top-level folders and the user is shown the inferred prefix map for confirmation.",
-      "files": [
-        "src/auth/login.ts",
-        "src/ui/button.tsx",
-        "src/api/orders.ts",
-        "package.json"
-      ],
+      "expected_output": "In a bare repo, skill detects no framework, offers four bootstrap options via AskUserQuestion, infers area prefixes from top-level folders (AUTH/UI/API), confirms the area map before creating backlog.md, captures infra-gap observations (no test runner / no CI / no lint).",
+      "fixture_root": "fixtures/eval-3-bare-repo-bootstrap",
       "assertions": [
-        {"text": "Four bootstrap options are offered: /project-manager, backlog.md, code analysis, manual", "check": "all-four-bootstrap-options-present"},
-        {"text": "Inferred area map includes AUTH, UI, API prefixes (from src/auth, src/ui, src/api)", "check": "area-map-includes-expected-prefixes"},
-        {"text": "User is shown the area map for confirmation before first backlog item is written", "check": "area-map-confirmation-asked"}
+        {"text": "Skill detects pm_framework: none (no task store, no project-manager convention)"},
+        {"text": "User is offered four bootstrap options: /project-manager, create backlog.md, code analysis, manual input"},
+        {"text": "Inferred area map includes AUTH, UI, API prefixes"},
+        {"text": "Area map is presented to the user for confirmation before first backlog item"},
+        {"text": "No backlog.md is written until the user's choice has been recorded"},
+        {"text": "Observations list captures at least one infrastructure gap (no test runner / no CI / no linter)"}
       ]
     },
     {
       "id": 4,
+      "name": "update-flow",
       "prompt": "/what-next update",
-      "expected_output": "Update Flow: forces repo re-analysis even if fingerprints match. Reconciles backlog against current repo — tasks whose referenced files no longer exist are marked 'stale' (not closed). A short diff summary is printed before presenting top three.",
-      "files": [
-        "backlog.md",
-        "docs/what-next.md"
-      ],
+      "expected_output": "Update flow refreshes fingerprints (regardless of cached values), reconciles backlog against current files, marks tasks referencing deleted files as stale (never auto-closes them), prints a one-line diff summary, excludes stale tasks from the top-three via the iteration-2 -25 penalty.",
+      "fixture_root": "fixtures/eval-4-update-flow",
       "assertions": [
-        {"text": "Fingerprints are re-computed and written regardless of match", "check": "fingerprints-refreshed"},
-        {"text": "A diff summary (areas added/removed, tasks added/archived) is printed", "check": "diff-summary-present"},
-        {"text": "Stale tasks (referencing deleted files) are not auto-closed", "check": "stale-tasks-preserved-not-closed"}
+        {"text": "Skill recomputes fingerprints for all tracked files regardless of cached values"},
+        {"text": "Stale task LEGACY-001 (references deleted file) is marked stale, NOT auto-closed"},
+        {"text": "A short diff summary is printed (areas/tasks added or archived)"},
+        {"text": "docs/what-next.md is rewritten with fresh fingerprints and updated date"},
+        {"text": "After refresh, the skill proceeds to present top-three via AskUserQuestion"},
+        {"text": "LEGACY-001 is NOT in the top-three (stale -25 penalty applied in iteration-2)"}
       ]
     }
   ]
