@@ -75,20 +75,43 @@ If rebase produces conflicts after the pull:
 
 ---
 
-### Step 3 — Stage all changes
+### Step 3 — Stage changes (preview, then add)
+
+**Never run `git add --all` blind.** The working tree often holds pre-existing WIP from
+other sessions or branches; sweeping all of it into one commit is the most destructive
+thing this workflow can do. Preview, then decide.
+
+**Preview what would be staged:**
 
 ```bash
-git add --all
+git status --short
+git diff --stat
+TO_STAGE=$(git status --short | grep -c . || true)
+echo "Would stage $TO_STAGE file(s)."
 ```
 
-Show a summary to the user before continuing:
+If `$TO_STAGE` is 0 → stop and tell the user there is nothing to ship.
+
+**Decision:**
+
+- **`$TO_STAGE` ≤ 10 AND every listed file relates to this session's work** → proceed
+  with `git add --all`. State briefly which files are being staged.
+
+- **`$TO_STAGE` > 10, OR any file looks unrelated to this session, OR you cannot
+  account for any path** → ask the user what to stage:
+  - "Stage everything (`git add --all`)"
+  - "Stage only these paths: …" (have the user list paths/globs, then `git add <paths>`)
+  - "Abort — let me clean up the working tree first"
+
+**After staging — final summary before commit:**
 
 ```bash
 git status --short
 git diff --cached --stat
 ```
 
-If the staging area is empty (nothing to commit), stop and tell the user there is nothing to ship.
+If the staging area is empty after that (e.g. user picked a subset that matched nothing),
+stop and tell the user.
 
 ---
 
