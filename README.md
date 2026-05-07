@@ -42,7 +42,7 @@ llm_skills/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 100 | 90 | 5 | 195 |
+| Skills | 103 | 90 | 5 | 198 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 27 | — | — | 27 |
 
@@ -111,19 +111,19 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Category | Count | Examples |
 |----------|:-----:|---------|
 | Foundations & Workflow | 23 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, **what-next** |
-| Languages | Languages & Runtimes | 3 | Runtimes | 4 | typescript, python, nodejs-backend |
+| Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
 | UI & Design | 9 | ui-web, frontend-design, visual-explainer |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 6 | code-review, codex-review, gemini-review, playwright-testing |
-| Security & Credentials | 3 | security, credentials, security-review |
+| Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
 | AI & LLM | 4 | agentic-development, llm-patterns, ai-models, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
-| Tooling | Tooling & DevOps | 8 | DevOps | 9 | project-tooling, publish-github, skills-manager, start-app |
-| Research | Research & OSINT | 4 | OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
+| Tooling & DevOps | 11 | ac-opbta-ops, project-tooling, publish-github, skills-manager, start-app |
+| Research & OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
 <summary><strong>Full skill list (100 Claude skills)</strong></summary>
@@ -195,6 +195,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`security`](claude/skills/security/) | Security & Credentials | OWASP patterns, secrets management, security testing | ✓ | ✓ | |
 | [`credentials`](claude/skills/credentials/) | Security & Credentials | Centralized API key management from Access.txt | ✓ | ✓ | |
 | [`security-review`](claude/skills/security-review/) | Security & Credentials | OWASP Top 10 checklist for auth, input, payments | ✓ | ✓ | ✓ |
+| [`sops-secrets`](claude/skills/sops-secrets/) | Security & Credentials | SOPS-encrypted secrets — reading service logins, rotating credentials, KeePass sync | ✓ | | |
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
 | [`ai-models`](claude/skills/ai-models/) | AI & LLM | Latest AI models reference — Claude, OpenAI, Gemini | ✓ | ✓ | |
@@ -211,9 +212,11 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`site-architecture`](claude/skills/site-architecture/) | SEO & Web Presence | Technical SEO — robots.txt, sitemap, Core Web Vitals | ✓ | ✓ | |
 | [`web-content`](claude/skills/web-content/) | SEO & Web Presence | SEO and AI discovery (GEO) — schema optimization | ✓ | ✓ | |
 | [`aeo-optimization`](claude/skills/aeo-optimization/) | SEO & Web Presence | AI Engine Optimization — semantic triples, content clusters | ✓ | ✓ | |
+| [`ac-opbta-ops`](claude/skills/ac-opbta-ops/) | Tooling & DevOps | Operator knowledge for AC_OPBTA home-network repo — Ansible, Proxmox, SOPS, OPNsense, VLANs | ✓ | | |
+| [`add-remote-installer`](claude/skills/add-remote-installer/) | Tooling & DevOps | Add remote install script to a PowerShell repository | ✓ | ✓ | |
+| [`content-aware-file-renaming`](claude/skills/content-aware-file-renaming/) | Tooling & DevOps | Rename file batches by content — documents, downloads, archives with structured formula | ✓ | | |
 | [`project-tooling`](claude/skills/project-tooling/) | Tooling & DevOps | gh, vercel, supabase, render CLI setup | ✓ | ✓ | |
 | [`workspace`](claude/skills/workspace/) | Tooling & DevOps | Multi-repo topology analysis and contract tracking | ✓ | ✓ | |
-| [`add-remote-installer`](claude/skills/add-remote-installer/) | Tooling & DevOps | Add remote install script to a PowerShell repository | ✓ | ✓ | |
 | [`publish-github`](claude/skills/publish-github/) | Tooling & DevOps | Publish to GitHub with branch protection and gitleaks | ✓ | ✓ | |
 | [`remote-installer`](claude/skills/remote-installer/) | Tooling & DevOps | Remote PowerShell installer domain expertise | ✓ | ✓ | |
 | [`skills-manager`](claude/skills/skills-manager/) | Tooling & DevOps | Full skill lifecycle — find, sync, install, audit | ✓ | ✓ | ✓ |
