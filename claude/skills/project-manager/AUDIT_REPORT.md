@@ -271,6 +271,170 @@ Incomplete or missing:
 - Hard scope enforcement against task allowed-files lists
 - Conflict resolution between standalone `/add-feature` and project-manager `/add-feature`
 
+## Comparative Review of Other LLM Project-Management Workflows
+
+External review date: 2026-05-19
+
+Sources reviewed:
+
+- [CCPM — The Project Manager Agent](https://github.com/automazeio/ccpm)
+- [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management)
+- [APM Workflow Overview](https://agentic-project-management.dev/docs/workflow-overview/)
+- [APM Agent Types](https://agentic-project-management.dev/docs/agent-types/)
+- [TICK.md](https://www.tick.md/)
+- [Codepakt/cpk](https://github.com/codepakt/cpk)
+- [CommonTools task-management skill](https://raw.githubusercontent.com/commontoolsinc/labs/main/skills/task-management/SKILL.md)
+- [Sub-Agents Skills](https://github.com/shinpr/sub-agents-skills)
+
+### Command and Sub-Skill Comparison
+
+| System | Command / Skill Surface | Agent Roles / Sub-Skills | State Model | Relevant Ideas |
+|--------|--------------------------|---------------------------|-------------|----------------|
+| This project-manager skill | `/init-project`, `/init-features`, `/add-feature`, `/analyze-features`, `/continue-tasks`, `/update-tasks`, `/review-tasks`, `/reinit` | Command-specific sub-skills plus role mapping to planner, tdd-guide, reviewer, security, build, e2e, docs, refactor | Markdown under `docs/` | Strong spec-to-plan-to-task traceability; conservative serial execution |
+| CCPM | Natural language triggers for PRD, epic parse, task breakdown, GitHub sync, issue start, status, standup, blocked, merge | Reference modules: plan, structure, sync, execute, track, conventions; deterministic script helpers | `.claude/prds`, `.claude/epics`, GitHub issues, worktrees | Script-first status/validation, GitHub issue sync, explicit parallel stream analysis, file-scope conflict rules |
+| APM | `/apm-1-initiate-planner`, `/apm-2-initiate-manager`, worker check/report commands, handoff/recover/summarize commands | Planner, Manager, Workers, archive explorer, debug subagents | `.apm/` planning docs, tracker, message bus, report bus, memory index, task logs | Context-scoped agents, structured handoff, message/report bus, manager review of worker logs, stage-level verification |
+| TICK.md | `tick next`, `tick claim`, `tick comment`, `tick done`, `tick sync` | Agent roster in task file rather than named sub-skills | Single Markdown task protocol with YAML metadata and append-only history | Atomic claim/release protocol, agent roster, append-only history, JSON schema validation |
+| Codepakt/cpk | `cpk init`, `task add/list/show/update/pickup/done/block/unblock/mine`, `docs write/search/list/read`, `board status`, `generate` | Agent names are dynamic; protocol generated into AGENTS/CLAUDE files | SQLite-backed per-project board plus generated agent docs | Atomic pickup, explicit review state before done, blocked/unblocked lifecycle, searchable decisions/learnings knowledge base |
+| CommonTools task-management | Skill guidance around Linear, `bd` issues, local todos, `FOCUS.md` | Session-level task management rather than full project orchestrator | Beads issues plus `FOCUS.md` | Lightweight resumability: current focus, subtasks, decisions, and handoff-friendly notes |
+| Sub-Agents Skills | `$runner:sub-agents` and markdown agent definitions with `run-agent` backend | Portable task-specific agents across Codex, Claude Code, Cursor, Gemini | Skill-local runner and markdown agent definitions | Cross-LLM backend routing for specialized work |
+
+### New Recommendations from Comparative Review
+
+#### 13. Deterministic Status and Validation Commands Are Missing
+
+Severity: Medium
+
+CCPM separates reasoning-heavy work from deterministic reporting by using scripts for status,
+standup, search, next, blocked, and validate operations. The current project-manager skill asks the
+LLM to reconstruct status by reading markdown every time.
+
+Impact:
+
+- Status reports can vary between runs.
+- Validation of artifact shape is implicit and model-dependent.
+- Large projects can spend unnecessary context and latency on mechanical scans.
+
+Recommended fix:
+
+- Add optional `references/scripts/` helpers for project-manager installs:
+  - `pm-status`
+  - `pm-next`
+  - `pm-blocked`
+  - `pm-validate`
+  - `pm-stale`
+- Keep scripts read-only and deterministic.
+- Update `/review-tasks` and `/update-tasks` to prefer scripts when present and fall back to manual
+  markdown scanning.
+
+#### 14. No Explicit Task Claim / Lock Protocol
+
+Severity: Medium
+
+TICK.md and Codepakt both make claiming work a first-class operation. This project-manager skill
+assumes one orchestrator and one active task stream, but installed repositories can still be touched
+by multiple users or agents.
+
+Impact:
+
+- Two orchestrators could create or reconcile active task files concurrently.
+- A stale active task may be overwritten or duplicated instead of claimed/released.
+- Future parallel execution would be unsafe without locks.
+
+Recommended fix:
+
+- Add claim metadata to task files: `claimed_by`, `claimed_at`, `lease_expires_at`.
+- Add a lock file convention under `docs/tasks/locks/`.
+- Define release behavior for success, failure, blocked, stale, and manual cancellation.
+- Teach `/review-tasks` to report expired leases.
+
+#### 15. No Durable Memory / Handoff Layer Beyond Archived Tasks
+
+Severity: Medium
+
+APM uses a Memory Index, Task Logs, Report Bus, and Handoff artifacts so new manager/worker sessions
+can recover context without rereading all raw history. The CommonTools task-management skill uses
+`FOCUS.md` plus issue state for similar resumability.
+
+Impact:
+
+- Long projects require repeated rediscovery from specs, plans, and archived task files.
+- Important implementation decisions may be buried in completion notes.
+- Context pressure has no formal handoff/recovery path.
+
+Recommended fix:
+
+- Add `docs/workflow/FOCUS.md` for current project focus and active decisions.
+- Add `docs/workflow/INDEX.md` for durable observations and cross-feature decisions.
+- Add per-task logs under `docs/tasks/logs/` or a structured appendix in archived tasks.
+- Add `/handoff` or fold handoff behavior into `/review-tasks` and `/continue-tasks` when context
+  pressure is detected.
+
+#### 16. Optional External Tracker Sync Is Not Defined
+
+Severity: Low
+
+CCPM syncs epics/tasks to GitHub issues and uses comments as a shared audit trail. The current
+project-manager skill intentionally remains local markdown only, which is appropriate as a default,
+but it has no documented optional bridge for teams that already live in GitHub issues, Linear, or
+similar systems.
+
+Impact:
+
+- Team visibility is limited to repo markdown unless users manually mirror tasks.
+- PR traceability stops at local files.
+- Multi-human collaboration is harder than necessary.
+
+Recommended fix:
+
+- Keep local markdown as the source of truth.
+- Add an optional `/sync-tracker` command that can mirror approved plans/tasks to GitHub issues when
+  `gh` is authenticated.
+- Store external IDs in plan/task frontmatter (`external_issue`, `external_url`).
+- Make sync idempotent and append-only where possible.
+
+#### 17. Parallel Execution Model Is Underdeveloped
+
+Severity: Low
+
+This skill currently chooses serial execution, which is safer for correctness. CCPM and APM show a
+more advanced path: parallelize only after explicit stream analysis, file-scope assignment,
+dependency checks, and conflict rules.
+
+Impact:
+
+- Large independent phases may take longer than necessary.
+- Users may manually parallelize without the workflow's safety constraints.
+
+Recommended fix:
+
+- Preserve serial execution as the default.
+- Add an explicit future `/analyze-parallelism` or `/continue-tasks --parallel` workflow.
+- Require task metadata: `parallel: true`, `conflicts_with`, `files_allowed`, `files_shared`,
+  `depends_on_tasks`.
+- Use isolated worktrees for parallel streams.
+- Require merge/review coordination before marking a parallel batch complete.
+
+#### 18. Validation Should Include Schema-Level Checks
+
+Severity: Medium
+
+TICK.md advertises JSON Schema validation for its protocol. Project-manager templates are currently
+human-readable but not machine-validated.
+
+Impact:
+
+- Malformed frontmatter, status values, CAP-IDs, dependency slugs, and completion sentinels can drift
+  until an LLM notices.
+- Installer and command changes are harder to regression-test.
+
+Recommended fix:
+
+- Add JSON Schema or equivalent validation references for specs, plans, task files, and completion
+  blocks.
+- Add fixture-based tests for approved/draft specs, dependency cycles, blocked tasks, malformed
+  sentinels, stale tasks, and verification backlog.
+- Wire schema validation into `pm-validate` and the repository's manifest generation checks.
+
 ## Recommended Priority
 
 1. Fix installation of `references/`.
@@ -283,3 +447,8 @@ Incomplete or missing:
 8. Align roadmap behavior and documentation.
 9. Expand thin operational sub-skills.
 10. Improve manifest description generation.
+11. Add deterministic status/validation helpers.
+12. Add claim/lease metadata before enabling any parallel execution.
+13. Add durable memory/handoff artifacts.
+14. Add optional external tracker sync.
+15. Add schema-level validation and fixtures.
