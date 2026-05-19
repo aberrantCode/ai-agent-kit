@@ -29,8 +29,8 @@ Before writing anything:
    - `docs/features/template.md`, `docs/features/README.md`
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
-   - `docs/tasks/active/`, `docs/tasks/archive/`
-   - `docs/issues/`, `docs/workflow/SDLC.md`
+   - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
+   - `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -69,6 +69,12 @@ For every directory and file from the discovery list that does **not** already e
 - **`.github/pull_request_template.md`** — If absent, copy from template (no substitution). If present, leave it.
 - **`ROADMAP.md`** — If absent, copy from template with substitutions. If present, leave it.
 - **`docs/workflow/SDLC.md`** — If absent, copy from template. If present, leave it.
+- **`docs/workflow/FOCUS.md`** — If absent, copy from template. If present, leave it.
+- **`docs/workflow/INDEX.md`** — If absent, copy from template. If present, leave it.
+- **`docs/tasks/locks/`** — Create the directory and seed `.gitkeep`. Lock records are runtime
+  artifacts using `references/init-project/task-lock.md.template` as their shape.
+- **`docs/tasks/logs/`** — Create the directory and seed `.gitkeep`. Task logs use
+  `references/init-project/task-log.md.template` as their shape.
 - **`docs/features/README.md`** — If absent, copy from template. If present, leave it.
 
 Always create directory parents implicitly. Always preserve LF line endings on POSIX-targeted files and CRLF on Windows-only files.
@@ -116,8 +122,12 @@ Created:
   docs/tasks/template.md
   docs/tasks/active/.gitkeep
   docs/tasks/archive/.gitkeep
+  docs/tasks/locks/.gitkeep
+  docs/tasks/logs/.gitkeep
   docs/issues/.gitkeep
   docs/workflow/SDLC.md
+  docs/workflow/FOCUS.md
+  docs/workflow/INDEX.md
   AGENTS.md
   ROADMAP.md
   scripts/guard-pm-flow.ps1

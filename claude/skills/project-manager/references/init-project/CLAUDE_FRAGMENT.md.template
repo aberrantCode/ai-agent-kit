@@ -31,7 +31,7 @@ docs/
 - Feature specs are the final authority on scope; only the user may change them
 - Plans are orchestrator-owned; worker agents do not edit plan files
 - Every implementation change must trace to an active task file in `docs/tasks/active/`
-- Completion sentinels (`## Completion` block at the bottom of a task file) are the wire protocol between agents and the orchestrator
+- Completion sentinels (a final `## Completion` block at the bottom of a task file with `Status:`) are the wire protocol between agents and the orchestrator
 
 **Before opening a PR:**
 

@@ -1,0 +1,26 @@
+---
+task: "{{task-id}}"
+feature: "{{feature-slug}}"
+claimed_by: "{{agent-or-user}}"
+claimed_at: "{{TIMESTAMP}}"
+lease_expires_at: "{{TIMESTAMP}}"
+status: active        # active | released | expired | cancelled
+reason: "{{reason}}"
+---
+
+# Task Lock - {{task-id}}
+
+This file records a non-authoritative coordination lock. The task file and plan remain the source of
+truth. Expired locks are reported by `/review-tasks` but are not deleted automatically.
+
+## Release
+
+Set `status: released` when the task is archived after success, failure, or blocked reconciliation.
+
+## Manual Cancellation
+
+Set `status: cancelled`, add the reason below, and leave the file in place for audit history.
+
+## Notes
+
+- ...

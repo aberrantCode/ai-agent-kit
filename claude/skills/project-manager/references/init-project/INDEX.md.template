@@ -1,0 +1,30 @@
+# Project Manager Index - {{PROJECT_NAME}}
+
+> Durable memory for decisions, discoveries, and cross-feature observations. Keep entries concise,
+> append-only, and link to specs, plans, task logs, issues, or PRs.
+
+**Created:** {{TODAY}}
+
+---
+
+## Decisions
+
+| Date | Decision | Why | Links |
+|------|----------|-----|-------|
+| {{TODAY}} | Project-manager workflow initialized | Establish shared implementation state | `docs/workflow/SDLC.md` |
+
+---
+
+## Discoveries
+
+| Date | Finding | Impact | Links |
+|------|---------|--------|-------|
+| _none_ | | | |
+
+---
+
+## Cross-Feature Notes
+
+| Date | Note | Affected features | Links |
+|------|------|-------------------|-------|
+| _none_ | | | |

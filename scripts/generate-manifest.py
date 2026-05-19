@@ -42,7 +42,8 @@ CATEGORIES = {
         'supabase-node', 'supabase-python',
     ],
     'AI & LLM': [
-        'agentic-development', 'ai-models', 'llm-patterns', 'project-manager',
+        'agentic-development', 'ai-models', 'csv-driven-llm-pipeline',
+        'llm-patterns', 'project-manager',
     ],
     'DevOps & Tooling': [
         'add-remote-installer', 'project-tooling', 'publish-github',
@@ -77,14 +78,50 @@ for cat, skills in CATEGORIES.items():
             skill_to_cat[s] = cat
 
 
-def read_frontmatter(path, max_bytes=2000):
+def read_frontmatter(path, max_bytes=10000):
     with open(path, encoding='utf-8') as f:
         content = f.read(max_bytes)
+
+    if not content.startswith('---'):
+        return {}
+
+    end = re.search(r'(?m)^---\s*$', content[3:])
+    if not end:
+        return {}
+
+    frontmatter = content[3:3 + end.start()]
     fields = {}
-    for field in ('description', 'name', 'model'):
-        m = re.search(rf'(?m)^{field}:\s*(.+)', content)
-        if m:
-            fields[field] = m.group(1).strip().lstrip('> ').strip()
+    lines = frontmatter.splitlines()
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        m = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', line)
+        if not m:
+            i += 1
+            continue
+
+        key, value = m.group(1), m.group(2).strip()
+        if value in ('>', '>-', '>+', '|', '|-', '|+'):
+            style = value[0]
+            block = []
+            i += 1
+            while i < len(lines):
+                next_line = lines[i]
+                if re.match(r'^[A-Za-z0-9_-]+:\s*', next_line):
+                    break
+                block.append(next_line.strip())
+                i += 1
+
+            if style == '>':
+                fields[key] = ' '.join(part for part in block if part).strip()
+            else:
+                fields[key] = '\n'.join(block).strip()
+            continue
+
+        fields[key] = value.strip().strip('"\'')
+        i += 1
+
     return fields
 
 

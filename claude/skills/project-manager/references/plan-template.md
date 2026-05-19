@@ -3,6 +3,8 @@ feature: "{{feature-slug}}"
 status: in-progress      # not-started | in-progress | done | blocked
 failures: 0              # used by the Error Recovery Loop; do not edit by hand
 last_updated: "{{TODAY}}"
+external_issue: ""
+external_url: ""
 ---
 
 # Plan — {{feature-slug}}
@@ -60,5 +62,24 @@ last_updated: "{{TODAY}}"
 |---------------|-------------------------------------------------------|
 | `todo`        | Eligible to be picked up by `/continue-tasks`         |
 | `in-progress` | Task file exists in `docs/tasks/active/`              |
-| `done`        | Completion sentinel observed; task file archived      |
-| `blocked`     | Surfaced to user; do not auto-retry                   |
+| `done`        | Completion sentinel observed, required verification passed, task file archived |
+| `blocked`     | Blocker issue written and surfaced to user; do not auto-retry |
+
+Implementation, API, build, security, UI, and other code-changing tasks require verification before
+they are final. If the plan does not already include a matching review, test, or quality task for the
+same CAP-ID, `/continue-tasks` inserts one after the implementation task succeeds.
+
+## Optional task metadata
+
+Use these fields in generated task files, or in plan notes when planning future work, only when they
+are needed:
+
+| Field | Meaning |
+|-------|---------|
+| `external_issue` / `external_url` | Optional GitHub issue mirror maintained by `/sync-tracker`; local markdown remains authoritative |
+| `claimed_by`, `claimed_at`, `lease_expires_at` | Coordination lease for active work |
+| `parallel` | Defaults to `false`; only `true` after explicit parallelism analysis |
+| `depends_on_tasks` | Local task ids that must be complete first |
+| `conflicts_with` | Local task ids that cannot run in the same batch |
+| `files_allowed` | File globs this task may own |
+| `files_shared` | File globs requiring batch-level coordination |

@@ -208,8 +208,11 @@ After the user responds, apply only the authorized changes:
 - For each fix that modifies a capability, AC, or data model field, note the change in `## Change History`
 
 ### If plan generation is authorized:
-- For specs with no plan: generate a plan file at `docs/plans/{slug}-plan.md` using the plan
-  template from `docs/plans/` references. Cover all CAP-IDs.
+- Generate or update plans only for specs whose frontmatter `status` is `approved`. For draft,
+  deprecated, malformed, or implemented specs, report that no plan was generated and explain the
+  required next action.
+- For approved specs with no plan: generate a plan file at `docs/plans/{slug}-plan.md` using the
+  plan template from `docs/plans/` references. Cover all CAP-IDs.
 - For specs with partial plans: add missing CAP-IDs as tasks to the existing plan.
 
 ---

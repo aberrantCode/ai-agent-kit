@@ -30,7 +30,7 @@ docs/features/*.md                    ← scope authority
 docs/plans/*.md                       ← phased checklist
         ↓ (/continue-tasks Step 3-5)
 docs/tasks/active/*.md                ← one per active worker
-        ↓ (agent appends ## Completion)
+        ↓ (agent appends final ## Completion)
 docs/tasks/archive/*.md
 ```
 
@@ -43,7 +43,7 @@ Every artifact flows one direction. **Never** edit a downstream artifact to "fix
 - **Feature specs are the final authority on scope.** They may only be changed by the user directly, or by an agent that has used `AskUserQuestion` to confirm the change with the user. Never silently rewrite a spec to match what you built. If the build diverged from the spec, surface the divergence in your task's `## Completion` `Notes:` field.
 - **Plans are orchestrator-owned.** Worker agents do not edit plan files. The orchestrator updates `Status` columns in response to completion sentinels.
 - **One task at a time per feature.** Do not work on multiple tasks of the same feature in parallel. The orchestration loop processes tasks serially for a reason.
-- **Completion sentinel is non-negotiable.** Every task file must end with a `## Completion` block matching the format in `docs/tasks/template.md`. The orchestrator polls for this heading; without it, the task never archives and the plan never advances.
+- **Completion sentinel is non-negotiable.** Every task file must end with a final `## Completion` block matching the format in `docs/tasks/template.md`. The orchestrator ignores template instructions and only reconciles a final completion block with a parseable `Status:` field.
 - **No new dependencies without listing them.** If you add a package or external service, name it in the task's `Notes:` field. The orchestrator can then create a follow-up review task.
 
 ---

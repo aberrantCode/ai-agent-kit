@@ -71,6 +71,7 @@ All paths are prompted at runtime — press Enter to accept the default or type 
 | `SKILL.md` | yes | Main skill content |
 | `commands/*.md` | no | Companion slash commands |
 | `sub-skills/*/SKILL.md` | no | Delegate sub-skills |
+| `references/**` | no | Skill-local templates and support files |
 
 Instructions are single `.md` files — no bundles.
 
@@ -150,7 +151,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`pre-pr`](claude/skills/pre-pr/) | Foundations & Workflow | Three self-gates before opening a pull request | ✓ | ✓ | |
 | [`retro-fit-spec`](claude/skills/retro-fit-spec/) | Foundations & Workflow | Add capability IDs to feature specs missing them | ✓ | ✓ | |
 | [`spec-align`](claude/skills/spec-align/) | Foundations & Workflow | Align codebase to a feature spec — gap analysis through implementation | ✓ | ✓ | |
-| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Conversational workflow to produce feature specifications | ✓ | ✓ | |
+| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Standalone conversational feature spec workflow; defers to project-manager:add-feature inside project-manager repositories | ✓ | ✓ | |
 | [`what-next`](claude/skills/what-next/) | Foundations & Workflow | Universal next-action decider — detects the PM framework, prioritises pending work, delegates to the right specialist. Ships with [solution](claude/skills/what-next/diagrams/solution.html) / [feature](claude/skills/what-next/diagrams/features.html) / [plan](claude/skills/what-next/diagrams/plan.html) diagrams and a reusable [eval harness](claude/skills/what-next/evals/). | ✓ | | |
 | [`code-deduplication`](claude/skills/code-deduplication/) | Foundations & Workflow | Prevent semantic duplication with capability index | ✓ | ✓ | |
 | [`typescript`](claude/skills/typescript/) | Languages & Runtimes | TypeScript strict mode with eslint and jest | ✓ | ✓ | |
@@ -199,7 +200,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
 | [`ai-models`](claude/skills/ai-models/) | AI & LLM | Latest AI models reference — Claude, OpenAI, Gemini | ✓ | ✓ | |
-| [`project-manager`](claude/skills/project-manager/) | AI & LLM | Feature-driven development orchestrator with sub-skills | ✓ | ✓ | ✓ |
+| [`project-manager`](claude/skills/project-manager/) | AI & LLM | Feature-driven development orchestrator with bundled commands, sub-skills, and references | ✓ | ✓ | ✓ |
 | [`shopify-apps`](claude/skills/shopify-apps/) | Commerce & Payments | Shopify apps — Remix, Admin API, checkout extensions | ✓ | ✓ | |
 | [`woocommerce`](claude/skills/woocommerce/) | Commerce & Payments | WooCommerce REST API — products, orders, webhooks | ✓ | ✓ | |
 | [`medusa`](claude/skills/medusa/) | Commerce & Payments | Medusa headless commerce — modules, workflows | ✓ | ✓ | |
@@ -275,6 +276,14 @@ Agent instructions configure specialized sub-agents with specific tools, models,
 Slash commands available globally in Claude Code. Most delegate to a specialized instruction above.
 
 > All commands live in `claude/commands/`.
+> Some skills also ship bundled command wrappers under `claude/skills/<skill>/commands/`; these are
+> installed with the skill bundle rather than listed as global archive commands.
+
+The `project-manager` skill ships bundled commands for its markdown-driven lifecycle:
+`/init-project`, `/init-features`, `/add-feature`, `/analyze-features`, `/continue-tasks`,
+`/update-tasks`, `/review-tasks`, `/reinit`, `/sync-tracker`, and `/analyze-parallelism`. Its
+`references/` bundle includes templates plus read-only helper scripts for deterministic status,
+next-task, blocked, stale, and validation reports.
 
 <details>
 <summary><strong>Full command list (27)</strong></summary>

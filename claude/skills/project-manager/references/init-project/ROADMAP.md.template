@@ -1,6 +1,8 @@
 # Roadmap — {{PROJECT_NAME}}
 
-> Auto-renderable from `docs/features/` and `docs/plans/`. Run `/review-tasks` to refresh this section, or use `/continue-tasks` to advance the live state.
+> Report-only summary seeded by `/init-project`. `/review-tasks` prints the current project status
+> without modifying this file. Update ROADMAP.md manually after reviewing that report, or use
+> `/continue-tasks` to advance the live state.
 
 **Last refreshed:** {{TODAY}}
 
@@ -23,10 +25,10 @@
 
 | Feature | CAP prefix | Spec status | Plan | Progress | Owner |
 |---------|------------|-------------|------|----------|-------|
-| _(populated by `/review-tasks`)_ | | | | | |
+| _(update from `/review-tasks` report)_ | | | | | |
 
 ---
 
 ## Next Recommended Action
 
-_(populated by `/review-tasks`)_
+_(update from `/review-tasks` report)_

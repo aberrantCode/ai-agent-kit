@@ -36,14 +36,25 @@ docs/
       {feature-slug}-p{N}-t{M}.md
     archive/
       {feature-slug}-p{N}-t{M}.md
+    locks/                   # Claim/lease records for active work
+      {feature-slug}-p{N}-t{M}.lock.md
+    logs/                    # Append-only task timeline and handoff notes
+      {feature-slug}-p{N}-t{M}.md
   guides/                    # Supporting docs, architecture notes (optional)
   issues/                    # Logged failures and blockers
+  workflow/
+    FOCUS.md                 # Current focus and next action
+    INDEX.md                 # Durable decisions and discoveries
 ```
 
 Read `references/feature-spec-template.md`, `references/plan-template.md`, and
 `references/task-file-template.md` for the exact file formats to use. These templates ship with
 the skill and are also copied into target projects by `/init-project` (as `docs/features/template.md`,
 `docs/plans/template.md`, and `docs/tasks/template.md`).
+
+When present, read-only helpers under `references/scripts/` provide deterministic status,
+next-task, blocked, stale, and validation reports. Prefer those helpers for mechanical scans and
+fall back to markdown scanning when they are unavailable.
 
 ---
 
@@ -96,15 +107,29 @@ Check whether `docs/features/` contains any `.md` files.
 - If **complete**: skip to Step 2.
 
 **Step 2 — Plan generation**
-For each feature spec that does not yet have a matching plan in `docs/plans/`:
+Run `references/scripts/pm-validate.ps1` first when present. If validation reports errors, stop and
+surface them before mutating plans. If helpers are missing, perform the markdown checks manually.
+
+Classify specs by frontmatter status before planning. Only specs with `status: approved` are
+eligible. Report `draft`, `deprecated`, `implemented`, malformed, and dependency-blocked specs
+separately with the next action for each.
+
+For each eligible approved feature spec that does not yet have a matching plan in `docs/plans/`:
 - Read the feature spec
+- Build the `depends_on` graph first; skip specs with incomplete dependencies, missing dependency
+  slugs, or dependency cycles
 - Generate a phased plan (see plan template) and write it to `docs/plans/{feature-slug}-plan.md`
 - Plans must include: phases, task list per phase, role/agent-type per task, expected outcome, and
   a status column (todo / in-progress / done / blocked)
+- Plans should include explicit review/test tasks where implementation-heavy phases are known.
 
 **Step 3 — Find next task**
-Scan all plan files for the first task with status `todo`. Pick the highest-priority incomplete
-task (earlier phase > earlier feature alphabetically).
+Run `references/scripts/pm-next.ps1` when present and use its output as the deterministic first pass;
+then verify any selected task against the current plan before writing files.
+
+Scan eligible approved plans for the first task with status `todo`. Pick the highest-priority
+incomplete task by dependency order, priority, phase, then feature slug. Skip tasks whose feature
+dependencies are incomplete.
 
 If no `todo` tasks remain: report "All plans complete." and stop.
 
@@ -112,7 +137,14 @@ If no `todo` tasks remain: report "All plans complete." and stop.
 Create `docs/tasks/active/{feature-slug}-p{N}-t{M}.md` using the task file template. Include:
 - The full task description and expected outcome from the plan
 - Relevant context: feature spec excerpt, plan phase goals, any related completed tasks
-- The completion sentinel instructions (agent must write `## Completion` at the bottom)
+- The completion sentinel instructions (agent must append a final `## Completion` block at the bottom)
+- Claim metadata (`claimed_by`, `claimed_at`, `lease_expires_at`)
+- Optional tracker fields (`external_issue`, `external_url`)
+- Future parallelism fields, defaulting to serial execution (`parallel: false`)
+
+Also create `docs/tasks/locks/{task-id}.lock.md` and `docs/tasks/logs/{task-id}.md` when those
+directories exist. Claims are advisory coordination artifacts: expired leases are reported and
+require an operator decision; they are not automatically deleted or stolen.
 
 Update the plan: mark the task as `in-progress`.
 
@@ -133,16 +165,24 @@ Map the task's `role` field to an agent type using this table:
 
 Spawn the agent with the task file path and this instruction:
 > "Read the task file at `{path}`. Perform all actions described. When complete, append a
-> `## Completion` sentinel to the task file exactly as specified in the template. Do not delete or
+> final `## Completion` sentinel to the task file exactly as specified in the template. Do not delete or
 > modify any existing content above the sentinel."
 
 **Step 6 — Monitor completion**
-Poll the task file for the presence of a `## Completion` heading. When found:
+Poll the task file for a valid completion block. Ignore `## Completion Instructions`. A task is
+complete only when the final `## Completion` heading has a parseable `Status:` field after it.
 
 - Read the sentinel block for `Status:` field
-- If **success**: archive the task file (move to `docs/tasks/archive/`), update plan task to `done`,
-  log any notes from the sentinel into the plan, then return to Step 3.
+- If **success**: parse `Artifacts:`, `Tests:`, and `Notes:`. If tests are failing, create
+  corrective build/test work and do not mark the implementation final. If the task changed code and
+  no matching verification task exists, insert a review/test task and mark the implementation
+  `verification pending`. Mark work `done` only after required verification succeeds, archive the
+  task file, log notes into the plan, then return to Step 3.
 - If **failure**: enter the **Error Recovery Loop** (see below).
+- If **blocked**: mark the plan task `blocked`, write a blocker issue in `docs/issues/`, archive the
+  task with blocked status preserved, report the decision needed, and pause.
+- If the sentinel is malformed or the active task is stale (older than 24 hours with no valid
+  sentinel), report it and pause without changing plan state.
 
 ---
 
@@ -162,21 +202,44 @@ When a task fails, do NOT retry the same task blindly. Instead:
 
 ---
 
+### Verification Gate
+
+Implementation, API, build, security, UI, backend/frontend/database, migration, refactor, cleanup,
+and other code-changing tasks require verification before final completion. A plan task is not
+final until a matching review/test/security/e2e task covering the same CAP-ID and artifacts succeeds.
+If no such task exists, `/continue-tasks` inserts one after implementation success.
+
+If a completion block reports `Tests: passing: false`, create corrective build/test work and do not
+mark the implementation done.
+
+---
+
 ### `/review-tasks` — Dry-Run Analysis (no agents spawned)
 
 Produce a read-only status report. Do not modify any files.
 
+If `references/scripts/pm-status.ps1`, `pm-blocked.ps1`, `pm-stale.ps1`, and `pm-validate.ps1` are
+present, run them first and summarize their output. If they are unavailable, perform the markdown
+scan below.
+
 1. Count feature specs in `docs/features/`
 2. Count plans in `docs/plans/` and identify specs missing a plan
-3. For each plan: count tasks by status (todo / in-progress / done / blocked)
-4. List any active task files in `docs/tasks/active/`
-5. List any open issues in `docs/issues/`
-6. Output a structured markdown report showing:
+3. Report spec statuses: draft, approved, implemented, deprecated, malformed
+4. Report dependency blockers, missing dependency slugs, and dependency cycles
+5. For each plan: count tasks by status (todo / in-progress / done / blocked)
+6. List active task files in `docs/tasks/active/`, including stale or malformed completion blocks
+7. List verification backlog and open issues in `docs/issues/`
+8. Report claim/lease state from task frontmatter and `docs/tasks/locks/`, including expired leases
+9. Report handoff readiness from `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, and recent
+   `docs/tasks/logs/` entries
+10. Report optional tracker sync coverage from `external_issue` / `external_url`
+11. Output a structured markdown report showing:
    - Overall completion percentage
    - Per-feature progress table
    - Next recommended action
 
-This command is safe to run at any time to get a project snapshot.
+This command is safe to run at any time to get a project snapshot. It is read-only and does not
+refresh `ROADMAP.md`; update the roadmap manually from the report if desired.
 
 ---
 
@@ -184,16 +247,40 @@ This command is safe to run at any time to get a project snapshot.
 
 Use this when you suspect task agents have completed work but the plan hasn't been updated yet.
 
+Run `references/scripts/pm-validate.ps1` before mutating plans when present. If validation reports
+errors unrelated to the active completion being reconciled, surface them and avoid broad plan edits.
+
 1. Read every file in `docs/tasks/active/`
-2. For each file, check for a `## Completion` sentinel
+2. For each file, check for a final `## Completion` sentinel with parseable `Status:`
 3. If found:
-   - Parse the `Status:` and `Summary:` fields
-   - Update the corresponding plan task status
-   - Archive the task file
-   - Log any notes
-4. Report what was updated
+   - Parse the `Status:`, `Summary:`, `Artifacts:`, `Tests:`, and `Notes:` fields
+   - Apply success, failure, blocked, verification-pending, and failing-test rules from
+     `/continue-tasks`
+   - Archive reconciled task files
+   - Release the matching lock and append a task-log summary
+   - Leave malformed or stale files active and report them
+4. Run `pm-validate.ps1` again when present and report any remaining warnings/errors.
+5. Report what was updated and what still needs user or worker attention
 
 This command is idempotent — safe to run multiple times.
+
+---
+
+### `/sync-tracker` — Optional External Tracker Mirror
+
+Use only when the user wants GitHub issue visibility. It requires `gh auth status` to pass and keeps
+local markdown authoritative. It creates or updates GitHub issues idempotently, records issue
+identity in `external_issue` and `external_url`, and never imports remote changes into local
+markdown without user approval. Detailed flow lives in `sub-skills/sync-tracker/SKILL.md`.
+
+---
+
+### `/analyze-parallelism` — Read-Only Future Parallelism Check
+
+Serial execution remains the default. This command only analyzes whether todo tasks have enough
+metadata for a future explicit parallel batch: `parallel`, `depends_on_tasks`, `conflicts_with`,
+`files_allowed`, and `files_shared`. It does not spawn agents. Detailed flow lives in
+`sub-skills/analyze-parallelism/SKILL.md`.
 
 ---
 
@@ -321,6 +408,8 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /continue-tasks      →  generate plans, spawn agents, iterate
 /update-tasks        →  reconcile active task files with plan statuses
 /review-tasks        →  read-only progress snapshot
+/sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative
+/analyze-parallelism →  read-only opt-in future parallel batch analysis
 /reinit              →  archive legacy state, normalize, then run /continue-tasks
 ```
 

@@ -6,15 +6,30 @@ description: >
   spec", "write a feature specification", "plan a new feature", "document a feature idea", "let's
   design a feature", or "I have a feature idea". Walks through a structured 7-phase conversational
   workflow that produces a thorough feature spec saved to /docs/features/ with a date-prefixed filename.
-  After saving, automatically generates a visual diagram of the spec and offers to create an
-  implementation plan. Use this proactively whenever a user describes a feature they want to build,
-  even if they don't explicitly say "spec" or "specification".
+  If project-manager scaffolding is present, defer to project-manager:add-feature instead so the
+  canonical CAP-ID workflow is used. After saving, automatically generates a visual diagram of the
+  spec and offers to create an implementation plan. Use this proactively whenever a user describes a
+  feature they want to build, even if they don't explicitly say "spec" or "specification".
 ---
 
 # Add Feature Spec
 
 Guide the user through a structured, conversational 7-phase workflow to produce a thorough feature
 specification document saved to `/docs/features/`.
+
+## Project-Manager Repositories
+
+Before starting this standalone workflow, check whether the current repository is managed by the
+`project-manager` skill. If all of these exist, stop this workflow and invoke
+`project-manager:add-feature` instead:
+
+- `docs/workflow/SDLC.md`
+- `docs/features/template.md`
+- `docs/tasks/`
+
+Project-manager repositories require CAP-ID prefixes, approved-spec gating, feature index updates,
+and plan-compatible frontmatter. The standalone date-prefixed spec format is not compatible with
+that lifecycle.
 
 Work through phases **in order**. Use `AskUserQuestion` for structured choices at each phase.
 Briefly summarize what you captured after each phase before moving on — this catches misunderstandings

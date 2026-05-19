@@ -1,5 +1,5 @@
 {
-  "_comment": "Drop-in fragment for .claude/settings.json (installed by /init-project). Merges into the existing settings; do not overwrite the whole file. Runs the project-manager guard before any Edit/Write tool call, blocking changes to source files when no active task file exists.",
+  "_comment": "Drop-in fragment for .claude/settings.json (installed by /init-project). Merges into the existing settings; do not overwrite the whole file. Runs the project-manager guard before Edit/Write tool calls in advisory mode. Git pre-commit remains the hard enforcement gate.",
   "hooks": {
     "PreToolUse": [
       {

@@ -1,0 +1,23 @@
+---
+task: "{{task-id}}"
+feature: "{{feature-slug}}"
+created: "{{TODAY}}"
+---
+
+# Task Log - {{task-id}}
+
+Append short, factual notes that make the task recoverable by a later session.
+
+## Timeline
+
+| Time | Actor | Event |
+|------|-------|-------|
+| {{TODAY}} | {{author}} | Log created |
+
+## Artifacts
+
+- ...
+
+## Handoff Notes
+
+- ...

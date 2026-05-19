@@ -336,6 +336,32 @@ function Invoke-Selector {
 
 # ── Install Helpers ───────────────────────────────────────────────────────────
 
+function Install-GitHubDirectory {
+    param(
+        [string]$ApiPath,
+        [string]$Destination
+    )
+
+    $items = Invoke-GitHubApi "contents/$ApiPath"
+    if (-not $items) { return $false }
+
+    if (-not (Test-Path -LiteralPath $Destination)) {
+        New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    }
+
+    foreach ($item in $items) {
+        $destPath = Join-Path $Destination $item.name
+        if ($item.type -eq 'file' -and $item.download_url) {
+            Invoke-WebRequest -Uri $item.download_url -OutFile $destPath `
+                -UseBasicParsing -ErrorAction Stop
+        } elseif ($item.type -eq 'dir') {
+            Install-GitHubDirectory -ApiPath "$ApiPath/$($item.name)" -Destination $destPath | Out-Null
+        }
+    }
+
+    return $true
+}
+
 function Install-SkillBundle {
     param([string]$SkillName, [string]$Platform, [string]$InstallDir)
 
@@ -351,33 +377,19 @@ function Install-SkillBundle {
     }
 
     try {
-        $commandsApi = Invoke-GitHubApi "contents/$Platform/skills/$SkillName/commands"
-        if ($commandsApi) {
-            $cmdDir = Join-Path $skillDir 'commands'
-            if (-not (Test-Path $cmdDir)) { New-Item -ItemType Directory -Path $cmdDir -Force | Out-Null }
-            foreach ($item in ($commandsApi | Where-Object { $_.type -eq 'file' -and $_.download_url })) {
-                Invoke-WebRequest -Uri $item.download_url -OutFile (Join-Path $cmdDir $item.name) `
-                    -UseBasicParsing -ErrorAction Stop
-            }
-        }
+        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/commands" `
+            -Destination (Join-Path $skillDir 'commands') | Out-Null
     } catch { Write-Warning "    commands/ incomplete for $SkillName" }
 
     try {
-        $subApi = Invoke-GitHubApi "contents/$Platform/skills/$SkillName/sub-skills"
-        if ($subApi) {
-            $subRoot = Join-Path $skillDir 'sub-skills'
-            if (-not (Test-Path $subRoot)) { New-Item -ItemType Directory -Path $subRoot -Force | Out-Null }
-            foreach ($subDir in ($subApi | Where-Object { $_.type -eq 'dir' })) {
-                $subDest = Join-Path $subRoot $subDir.name
-                if (-not (Test-Path $subDest)) { New-Item -ItemType Directory -Path $subDest -Force | Out-Null }
-                $subFiles = Invoke-GitHubApi "contents/$Platform/skills/$SkillName/sub-skills/$($subDir.name)"
-                foreach ($file in ($subFiles | Where-Object { $_.type -eq 'file' -and $_.name -like '*.md' -and $_.download_url })) {
-                    Invoke-WebRequest -Uri $file.download_url -OutFile (Join-Path $subDest $file.name) `
-                        -UseBasicParsing -ErrorAction Stop
-                }
-            }
-        }
+        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/sub-skills" `
+            -Destination (Join-Path $skillDir 'sub-skills') | Out-Null
     } catch { Write-Warning "    sub-skills/ incomplete for $SkillName" }
+
+    try {
+        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/references" `
+            -Destination (Join-Path $skillDir 'references') | Out-Null
+    } catch { Write-Warning "    references/ incomplete for $SkillName" }
 
     return $true
 }
