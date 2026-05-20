@@ -3,8 +3,8 @@ name: project-manager
 description: >
   Automated project implementation orchestrator that drives feature-driven development from a single
   initial prompt through to completed code. Use this skill when the user invokes /init-project,
-  /init-features, /add-feature, /continue-tasks, /review-tasks, /update-tasks, /analyze-features,
-  or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says
+  /init-features, /add-feature, /continue-tasks, /continue-new-session, /review-tasks, /update-tasks,
+  /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says
   anything like "move forward", "keep building", "what's next", "continue the implementation",
   or "start working on the project", AND when the user says "set up project management",
   "bootstrap a new project", "initialize the project workflow", or "make sure agents follow the
@@ -214,6 +214,21 @@ mark the implementation done.
 
 ---
 
+### `/continue-new-session` — Generate a Session-Handoff Prompt
+
+Use when the user wants to pause this session and resume the recommended next action in a brand new
+session (typically because the current context is getting long or they want to switch runtime — e.g.,
+hand off from Claude Code to Codex or Gemini).
+
+Reads this session's own most recent recap to extract the "next step" recommendation, resolves the
+relevant feature spec / plan / active task paths, and prints a single copy-ready Markdown code block
+containing the handoff prompt. Reference-style — paths plus 2–3 line excerpts, no large inline
+content. Read-only: never modifies project state. If no recap recommendation exists (e.g., first
+turn of the session), falls back to `docs/workflow/FOCUS.md`, then `pm-next.ps1`, then the
+highest-priority unblocked `todo` task. Detailed flow lives in `sub-skills/continue-new-session/SKILL.md`.
+
+---
+
 ### `/review-tasks` — Dry-Run Analysis (no agents spawned)
 
 Produce a read-only status report. Do not modify any files.
@@ -406,6 +421,7 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /add-feature         →  add a new spec at any later point
 /analyze-features    →  audit specs for template/CAP-ID/plan-coverage gaps
 /continue-tasks      →  generate plans, spawn agents, iterate
+/continue-new-session →  emit a copy-ready prompt to resume the recap's next action in a fresh session
 /update-tasks        →  reconcile active task files with plan statuses
 /review-tasks        →  read-only progress snapshot
 /sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative
