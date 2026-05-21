@@ -212,6 +212,15 @@ If no such task exists, `/continue-tasks` inserts one after implementation succe
 If a completion block reports `Tests: passing: false`, create corrective build/test work and do not
 mark the implementation done.
 
+**Runner awareness.** The gate reads `docs/workflow/runners.md` (populated by `/init-project` and
+refreshed by `/reinit`) as the source of truth for which test runners exist and where they live —
+this matters in monorepos where pytest, npm test, cargo test, etc. are nested under `backend/`,
+`frontend/`, `packages/*`, `apps/*`, or `services/*` rather than at the repo root. When inserting a
+verification task, the orchestrator quotes the relevant runner command(s) from `runners.md` into the
+task body so the verifier doesn't re-guess. If `runners.md` is missing or empty, the gate runs
+`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warns the user that the
+runner list should be confirmed via `/reinit` for deterministic future runs.
+
 ---
 
 ### `/continue-new-session` — Generate a Session-Handoff Prompt

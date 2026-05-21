@@ -77,7 +77,22 @@ Print a summary table:
 Also report archived plan/task files and any specs that still need `/analyze-features` before they
 can be approved.
 
-## Step 5 - Launch
+## Step 5 - Refresh Runner Discovery
+
+The Verification Gate consults `docs/workflow/runners.md` to confirm a code-changing task's `Tests: passing: true` claim. Repository layout drifts (a new `backend/` subtree, a renamed `services/api/`, etc.), so reinit must reconfirm:
+
+1. Read repo signals (`README.md`, `CLAUDE.md`, `AGENTS.md`, workspace files like `pnpm-workspace.yaml` / `turbo.json` / `go.work`).
+2. Run `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo root.
+3. Diff the discovered candidates against the existing rows in `docs/workflow/runners.md`. Categorize each candidate as:
+   - **Already confirmed** — present in the file with `Confirmed: yes`, evidence still on disk. Leave alone.
+   - **New candidate** — discovered but not in the file. Surface via `AskUserQuestion`.
+   - **Stale confirmed** — present with `Confirmed: yes` but evidence path no longer exists. Surface via `AskUserQuestion` so the user can confirm removal.
+4. Use `AskUserQuestion` to resolve new and stale rows. Default to keeping confirmed rows untouched unless the user explicitly opts to remove them.
+5. Persist the resolved table back to `docs/workflow/runners.md`, updating `last_updated` and setting `discovered_by: reinit`.
+
+If `docs/workflow/runners.md` does not exist yet (the repo was init'd before this phase existed), copy the template from `references/init-project/runners.md.template` first and then run steps 1-5 as if it were a fresh discovery.
+
+## Step 6 - Launch
 
 Run the `/continue-tasks` workflow from its bootstrap step. The launched loop must still enforce:
 

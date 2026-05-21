@@ -111,6 +111,15 @@ Verification-required categories include roles or task text containing:
 Verification tasks must review the artifacts listed in the completion block, confirm tests, check
 spec alignment for covered CAP-IDs, and append their own `## Completion` block.
 
+**Runner sourcing.** Before writing a verification task file, read `docs/workflow/runners.md`. For
+every confirmed row whose `Subtree` overlaps any path in the implementation task's `Artifacts:`
+list, include the row's `Command` verbatim in the verification task body under a `### Required test
+commands` heading. This is how the gate works in monorepos: a row with `Subtree: backend` and
+`Command: cd backend; uv run pytest` is the only thing that surfaces a nested `backend/pyproject.toml`
+runner to the verifier. If `runners.md` is missing, run `references/scripts/pm-test-runners.ps1
+-DiscoverOnly` as a fallback, include all discovered commands, and warn the user in the
+orchestrator output that they should run `/reinit` to confirm and persist the list.
+
 ### `Status: failure`
 
 Read `Error:` and diagnose the missing prerequisite.
