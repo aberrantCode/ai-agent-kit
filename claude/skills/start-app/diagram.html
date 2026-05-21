@@ -29,6 +29,8 @@
     --red-dim: rgba(220,38,38,0.1);
     --amber: #d97706;
     --amber-dim: rgba(217,119,6,0.1);
+    --purple: #7c3aed;
+    --purple-dim: rgba(124,58,237,0.1);
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -41,6 +43,7 @@
       --orange: #fb923c; --orange-dim: rgba(251,146,60,0.1);
       --red: #f87171; --red-dim: rgba(248,113,113,0.1);
       --amber: #fbbf24; --amber-dim: rgba(251,191,36,0.1);
+      --purple: #a78bfa; --purple-dim: rgba(167,139,250,0.12);
     }
   }
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -113,6 +116,28 @@
   .case-c { border-color: var(--blue-dim); background: var(--blue-dim); }
   .case-c h4 { color: var(--blue); }
 
+  .ms-0 .ms-num { background: var(--purple-dim); color: var(--purple); border: 2px solid var(--purple); }
+  .ms-0 .ms-line { background: linear-gradient(to bottom, var(--purple), transparent); }
+  .ms-0 .ms-title { color: var(--purple); }
+  .cache-path {
+    font-family: var(--font-mono); font-size: 11.5px;
+    background: var(--purple-dim); border-radius: 6px; padding: 6px 10px;
+    color: var(--purple); display: inline-block; margin-top: 2px;
+  }
+  .modes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .mode-box {
+    border-radius: 8px; padding: 12px 14px;
+    border: 1px solid; font-size: 12px;
+  }
+  .mode-box h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .mode-box p { color: var(--text-dim); line-height: 1.55; }
+  .mode-use { border-color: var(--green-dim); background: var(--green-dim); }
+  .mode-use h4 { color: var(--green); }
+  .mode-gen { border-color: var(--teal-dim); background: var(--teal-dim); }
+  .mode-gen h4 { color: var(--teal); }
+  .mode-upd { border-color: var(--amber-dim); background: var(--amber-dim); }
+  .mode-upd h4 { color: var(--amber); }
+
   .ms-1 .ms-num { background: var(--teal-dim); color: var(--teal); border: 2px solid var(--teal); }
   .ms-1 .ms-line { background: linear-gradient(to bottom, var(--teal), transparent); }
   .ms-1 .ms-title { color: var(--teal); }
@@ -174,6 +199,7 @@
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
   @media (max-width: 700px) {
     .cases { grid-template-columns: 1fr; }
+    .modes { grid-template-columns: 1fr; }
     .stack-grid { grid-template-columns: 1fr 1fr; }
     h1 { font-size: 28px; }
   }
@@ -184,13 +210,37 @@
   <div class="header">
     <div class="skill-tag">SKILL / START-APP</div>
     <h1>Start App</h1>
-    <p class="subtitle">End-to-end workflow for discovering, selecting, and executing the correct startup procedure for any modern application — then validating success and recovering from failures across every major stack.</p>
+    <p class="subtitle">End-to-end workflow for discovering, selecting, and executing the correct startup procedure for any modern application — then validating success and recovering from failures across every major stack. Persists confirmed startup intelligence to <code style="font-family:var(--font-mono);font-size:12px;color:var(--purple);background:var(--purple-dim);padding:1px 6px;border-radius:4px">docs/framework/start-app.md</code> so subsequent runs skip the discovery pass.</p>
   </div>
 
   <div class="main-steps">
 
+    <!-- STEP 0 — INTELLIGENCE CACHE -->
+    <div class="main-step ms-0" style="--i:0">
+      <div class="ms-left"><div class="ms-num">0</div><div class="ms-line"></div></div>
+      <div class="ms-card">
+        <div class="ms-title">Check the Intelligence Cache</div>
+        <div class="ms-desc">Before any discovery work, read the per-solution cache. It stores the confirmed start command, services, ports, env requirements, and known failure recoveries so subsequent runs skip Steps 1–2 entirely.</div>
+        <span class="cache-path">docs/framework/start-app.md</span>
+        <div class="modes">
+          <div class="mode-box mode-use">
+            <h4>MODE 1 — USE (fast path)</h4>
+            <p>Cache exists and is fresh (no <code style="font-family:var(--font-mono);font-size:10.5px">invalidation-watches</code> path newer than <code style="font-family:var(--font-mono);font-size:10.5px">generated</code>). Read the default command (or matching variant) and jump straight to Step 3.</p>
+          </div>
+          <div class="mode-box mode-gen">
+            <h4>MODE 2 — GENERATE</h4>
+            <p>Cache is absent. Run Steps 1–3 normally, then write the cache from scratch on success using the template documented in <code style="font-family:var(--font-mono);font-size:10.5px">SKILL.md</code>.</p>
+          </div>
+          <div class="mode-box mode-upd">
+            <h4>MODE 3 — UPDATE</h4>
+            <p>User asked to refresh/update, or a watched file is newer than the cache. Re-run Steps 1–3 seeded with prior answers, then rewrite the cache and append a <code style="font-family:var(--font-mono);font-size:10.5px">Change log</code> row.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- STEP 1 -->
-    <div class="main-step ms-1" style="--i:0">
+    <div class="main-step ms-1" style="--i:1">
       <div class="ms-left"><div class="ms-num">1</div><div class="ms-line"></div></div>
       <div class="ms-card">
         <div class="ms-title">Discover Existing Scripts</div>
@@ -199,7 +249,7 @@
     </div>
 
     <!-- STEP 2 -->
-    <div class="main-step ms-2" style="--i:1">
+    <div class="main-step ms-2" style="--i:2">
       <div class="ms-left"><div class="ms-num">2</div><div class="ms-line"></div></div>
       <div class="ms-card">
         <div class="ms-title">Match Candidates to Intent</div>
@@ -222,7 +272,7 @@
     </div>
 
     <!-- STEP 3 -->
-    <div class="main-step ms-3" style="--i:2">
+    <div class="main-step ms-3" style="--i:3">
       <div class="ms-left"><div class="ms-num">3</div></div>
       <div class="ms-card">
         <div class="ms-title">Execute and Inspect Results</div>

@@ -1,0 +1,34 @@
+# Roadmap — {{PROJECT_NAME}}
+
+> Report-only summary seeded by `/init-project`. `/review-tasks` prints the current project status
+> without modifying this file. Update ROADMAP.md manually after reviewing that report, or use
+> `/continue-tasks` to advance the live state.
+
+**Last refreshed:** {{TODAY}}
+
+---
+
+## Overall Progress
+
+| Metric                | Value      |
+|-----------------------|------------|
+| Feature specs         | 0          |
+| Specs with plans      | 0          |
+| Tasks total           | 0          |
+| Tasks done            | 0          |
+| Overall completion    | 0%         |
+| Open issues           | 0          |
+
+---
+
+## Features
+
+| Feature | CAP prefix | Spec status | Plan | Progress | Owner |
+|---------|------------|-------------|------|----------|-------|
+| _(update from `/review-tasks` report)_ | | | | | |
+
+---
+
+## Next Recommended Action
+
+_(update from `/review-tasks` report)_

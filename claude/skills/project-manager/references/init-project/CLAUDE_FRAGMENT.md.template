@@ -1,0 +1,41 @@
+<!-- BEGIN project-manager fragment -->
+
+## Project Management
+
+This project uses the `project-manager` skill from the LLM Skills archive. All feature work flows through markdown files in `docs/`:
+
+```
+docs/
+  INITIAL_PROMPT.md       Source of truth for product intent (never modified)
+  features/*.md           Feature specs — scope authority
+  features/template.md    Canonical spec template
+  plans/*.md              One plan per feature spec
+  tasks/active/*.md       One file per in-flight task
+  tasks/archive/*.md      Completed tasks
+  issues/*.md             Logged failures and blockers
+  workflow/SDLC.md        CAP-ID Feature Abbreviation Registry
+```
+
+**Primary commands** (run with leading slash in Claude Code):
+
+- `/continue-tasks` — full orchestration loop (picks next todo task → spawns agent → monitors completion → archives)
+- `/review-tasks` — read-only status snapshot
+- `/update-tasks` — sync active task files that may have completed
+- `/init-features` — capture feature specs from INITIAL_PROMPT.md
+- `/add-feature` — add a new feature spec after init
+- `/analyze-features` — audit specs for template/CAP-ID/plan-coverage gaps
+- `/reinit` — recover from inconsistent state
+
+**Working principles** (also enforced in `AGENTS.md`):
+
+- Feature specs are the final authority on scope; only the user may change them
+- Plans are orchestrator-owned; worker agents do not edit plan files
+- Every implementation change must trace to an active task file in `docs/tasks/active/`
+- Completion sentinels (a final `## Completion` block at the bottom of a task file with `Status:`) are the wire protocol between agents and the orchestrator
+
+**Before opening a PR:**
+
+1. Confirm the change is covered by an archived task file (or that the user explicitly authorized out-of-band work)
+2. Reference the relevant CAP-IDs in the PR description (template at `.github/pull_request_template.md`)
+
+<!-- END project-manager fragment -->

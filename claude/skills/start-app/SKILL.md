@@ -7,6 +7,48 @@ description: Start any type of modern application — web apps, APIs, full-stack
 
 Provides the end-to-end workflow for discovering, selecting, and executing the correct startup procedure for any modern application — then validating success and recovering from failures.
 
+The skill also maintains a per-solution **intelligence cache** at `docs/framework/start-app.md` so subsequent runs skip the expensive discovery pass and go straight to execution. Always begin with **Step 0** below; it decides whether Steps 1–3 are needed at all.
+
+---
+
+## Step 0 — Check the Intelligence Cache
+
+The cache lives at `docs/framework/start-app.md` (repo-relative). It captures every answer the skill previously confirmed for this solution: the authoritative start command, named variants, service URLs/ports, env requirements, success signals, and known failure recoveries. See [Cache file — purpose and structure](#cache-file--purpose-and-structure) at the bottom of this document for the full schema.
+
+Every invocation begins here and resolves into exactly one of three modes.
+
+### Decide the mode
+
+1. Is the file `docs/framework/start-app.md` present in the repo?
+   - **No** → **Mode 2 — Generate** (fall through to Step 1, then write the cache at the end of a successful run).
+2. Does the user's prompt explicitly request a refresh or update?
+   - Match on intents like `--refresh`, `--update`, `regenerate`, `rebuild cache`, `ignore the cached start-app docs`, `my solution changed`, `reinvestigate` → **Mode 3 — Update** (fall through to Step 1 seeded with the existing cache, then rewrite).
+3. Read the cache frontmatter. Compare the `generated` timestamp against the mtime of every path listed in `invalidation-watches`. If any watched path is newer, or any is missing entirely, the cache is **stale** → **Mode 3 — Update**.
+4. Otherwise the cache is **fresh** → **Mode 1 — Use** (fast path).
+
+### Mode 1 — Use (fast path)
+
+This is the whole point of the cache. When it is fresh:
+
+1. If the user's prompt names a variant (e.g. "start in prod mode", "backend only", "rebuild"), look up the matching row in the *Startup variants* section of the cache. Otherwise use the *Default startup command*.
+2. Skip Steps 1 and 2 entirely. Proceed directly to **Step 3 — Execute and Inspect Results** using that command.
+3. On success, touch only the cache's `generated` timestamp and append a `Change log` row noting the run. Do not rewrite the rest of the file — its answers are still valid.
+4. On failure, consult the cache's *Known failure recoveries* table first. If the error matches a known pattern, apply the recorded fix and retry. If it does not match, treat this as drift and fall through to **Mode 3 — Update**.
+
+Announce the fast path to the user: "Using cached start command from `docs/framework/start-app.md` — run `<command>`." This is how the user learns the cache exists and can intervene if it looks wrong.
+
+### Mode 2 — Generate
+
+The cache does not exist yet. Run Steps 1–3 normally. On a successful start, write `docs/framework/start-app.md` using the template in [Cache file — purpose and structure](#cache-file--purpose-and-structure). Create the `docs/framework/` directory if it does not exist.
+
+### Mode 3 — Update
+
+The cache exists but must be rewritten. Run Steps 1–3 seeded with the previous cache — already-known services, ports, and commands become the working hypothesis rather than a blank slate, so the update is usually faster than a from-scratch generation. On success, rewrite the cache, preserving the existing `Change log` and appending a new row that describes what changed and why.
+
+### When the cache is absent by design
+
+Some repos should not have the cache checked in — e.g. ephemeral sandboxes or scratch repos. If `docs/framework/` is explicitly gitignored or the user says "don't write a cache for this repo", skip the persist step at the end of Step 3b and note the choice in the run summary. Do not create the file silently.
+
 ---
 
 ## Step 1 — Discover Existing Scripts
@@ -202,6 +244,16 @@ Report the success clearly:
 - Which URL/port the app is running on
 - Which services/processes were started
 - Any relevant next steps (e.g. open browser, run migrations first, available API docs)
+
+**Then persist the intelligence cache.** Which write to perform depends on the mode Step 0 resolved to:
+
+| Mode | Action |
+|---|---|
+| Mode 1 — Use | Update the `generated` timestamp in the frontmatter; append one row to *Change log* describing the run (e.g. `used cached command (variant: dev)`). Leave everything else untouched. |
+| Mode 2 — Generate | Create `docs/framework/start-app.md` from scratch using the template in [Cache file — purpose and structure](#cache-file--purpose-and-structure). Populate every section with what was just observed during Steps 1–3. |
+| Mode 3 — Update | Rewrite the cache, carrying the prior *Change log* forward and adding a new dated row explaining what changed (new service, changed port, different package manager, newly seen failure recovery, etc.). |
+
+If a new failure pattern was recovered during Step 3a, always add it to the cache's *Known failure recoveries* table — that is the mechanism by which the cache gets smarter over time.
 
 Exit gracefully — do not keep polling or output anything further unless the user asks.
 
@@ -826,6 +878,144 @@ Write-Host ""
 ### When to use native processes instead of Docker Compose
 
 If `docker-compose.yml` does not exist in the project root, replace the Docker Compose blocks with native process management (see the commented `NATIVE PROCESS VARIANT` section in the template above). Use `Start-Job` for background services and run the UI in the foreground so `Ctrl-C` is the natural stop mechanism.
+
+## Cache file — purpose and structure
+
+### Location
+
+Always `docs/framework/start-app.md` relative to the repo root. The `docs/framework/` directory is the canonical home for framework-level operational docs in this workstation; placing the cache there keeps it alongside other runbook-style artefacts rather than cluttering repo root. Create the directory if it does not exist.
+
+### Purpose
+
+The cache exists to **eliminate redundant discovery inference on every run**. Steps 1–2 are expensive — filesystem scans, manifest parsing, and disambiguation dialogs — and their answers are stable until the solution itself changes. By writing those answers to a durable, human-readable file, every subsequent run becomes a two-step flow: read the cache, execute the command.
+
+It is also a communication artefact. Because it is plain markdown checked into the repo, it travels with the project: a new contributor, a CI script, or a future invocation of this skill on a different machine all see the same confirmed startup intelligence without re-running the investigation.
+
+### Structure
+
+The file is a single markdown document with YAML frontmatter for structured data plus named prose sections. Every cache must include these sections in this order:
+
+| Section | Purpose |
+|---|---|
+| YAML frontmatter | Structured metadata — `schema`, `generated`, `generated-by`, `project`, `project-root`, `stack` (list), `invalidation-watches` (list of repo-relative paths whose mtime invalidates the cache). |
+| **How to use this file** | One paragraph telling the next reader (human or skill) how to consume, refresh, or update the cache. Keep this stable across regenerations so documentation links don't rot. |
+| **Default startup command** | The single authoritative command used when no variant is requested. Fenced code block, one command. |
+| **Startup variants** | Table of named variants (`dev`, `prod`, `backend-only`, `rebuild`, …). Columns: variant label → command → when to use. Omit the table if no variants exist. |
+| **Services** | Table of services discovered during investigation. Columns: service name → role (`infra` / `api` / `web` / `worker`) → URL → port → health endpoint. |
+| **Environment** | `.env` file location, required secret keys, setup script (if any). |
+| **Runtime dependencies** | External tools that must be installed or running (Docker Desktop, Node.js 20+, PowerShell 7+, specific DB clients, etc.). |
+| **Success signals** | Output patterns that confirm a successful start for *this* solution — these are more specific than the generic list in Step 3 of this skill. |
+| **Known failure recoveries** | Table of errors previously seen for this solution and the fix that worked. Grows over time as Mode 1 / Mode 3 runs encounter and resolve new failures. |
+| **Notes** | Free-form prose for quirks, first-run timing, caveats that don't fit the structured sections. |
+| **Change log** | Dated table of cache writes and the reason. Every successful run appends a row; keep the most recent 20 rows and drop older ones to prevent unbounded growth. |
+
+### The `invalidation-watches` field
+
+This is the field that determines whether Mode 1 is safe. List every repo-relative path whose change could invalidate any answer in the cache. A correct watch list typically includes:
+
+- The startup script itself (e.g. `scripts/Start-App.ps1`)
+- `docker-compose.yml` / `docker-compose.yaml` (services, ports, profiles)
+- Every `package.json` that contributes a service (workspace-style monorepos have several)
+- `pyproject.toml`, `requirements.txt`, `uv.lock`, `poetry.lock` (Python stacks)
+- `.env.example` (required-secret list)
+- Any `Makefile` or `Procfile` whose targets are referenced in the cache
+- The `scripts/` directory *contents* if the cache's *Default startup command* delegates to one
+
+Err on the side of including too many paths rather than too few — a spurious Mode 3 trigger costs one extra investigation, but a missed invalidation makes Mode 1 execute a wrong command.
+
+### Cache template
+
+When generating or updating the cache, use this structure exactly. Replace every `<placeholder>` with a real value for the current solution; remove rows and sections that do not apply.
+
+````markdown
+---
+schema: start-app/v1
+generated: <ISO-8601 UTC timestamp, e.g. 2026-04-21T14:12:00Z>
+generated-by: start-app skill
+project: <repo name>
+project-root: <absolute path to repo root>
+stack:
+  - <docker-compose | node | python | dotnet | go | rust | rails | java | php | ...>
+invalidation-watches:
+  - <repo-relative path>
+  - <repo-relative path>
+---
+
+# Start-App Intelligence Cache
+
+Generated by the `start-app` skill. This file records everything needed to
+launch this solution without re-investigating on every run.
+
+## How to use this file
+
+- **Fast path**: If this file is fresh (no watched path newer than `generated`),
+  run the *Default startup command* and skip discovery.
+- **Refresh**: Delete this file or invoke `/start-app --refresh` to force a
+  full re-investigation.
+- **Update**: Invoke `/start-app --update` (or tell the skill "my solution
+  changed") to diff against the current repo and rewrite.
+
+## Default startup command
+
+```
+<single shell command, run from repo root>
+```
+
+## Startup variants
+
+| Variant | Command | When to use |
+|---|---|---|
+| <name> | `<command>` | <one-line description> |
+
+## Services
+
+| Service | Role | URL | Port | Health endpoint |
+|---|---|---|---|---|
+| <name> | <infra / api / web / worker> | <url> | <port> | <path or "docker healthcheck"> |
+
+## Environment
+
+- `.env` file: `<path>`
+- Required secrets: `<KEY_1>`, `<KEY_2>`, ...
+- Setup script: `<path or "none">`
+
+## Runtime dependencies
+
+- <tool> <required version / state>
+- ...
+
+## Success signals
+
+- <output pattern observed on a successful start>
+- ...
+
+## Known failure recoveries
+
+| Error | Fix |
+|---|---|
+| <pattern> | <resolution that worked> |
+
+## Notes
+
+<free-form prose — first-run timing, quirks, ordering caveats>
+
+## Change log
+
+| Date | Change | Reason |
+|---|---|---|
+| <YYYY-MM-DD> | <short description> | <what prompted the change> |
+````
+
+### Writing checklist
+
+Before saving a generated or updated cache, verify:
+
+- [ ] `generated` is a UTC ISO-8601 timestamp, not a local-time or human-readable string
+- [ ] `invalidation-watches` includes every file whose change could alter any answer above (startup script, compose file, package manifests, `.env.example`)
+- [ ] *Default startup command* is the exact command the skill would run — no ambiguity, no commentary
+- [ ] Every row in *Services* lists a URL/port that was actually observed responding during Step 3
+- [ ] *Known failure recoveries* has no duplicate rows carried over from prior runs
+- [ ] *Change log* has a new row describing the current write
 
 ## Diagram
 

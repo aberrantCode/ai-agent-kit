@@ -1,0 +1,41 @@
+# Focus - {{PROJECT_NAME}}
+
+> Current handoff snapshot for resuming work without rereading the whole project. Update this before
+> long pauses, after `/continue-tasks` creates or reconciles active work, and after manual operator
+> decisions.
+
+**Last updated:** {{TODAY}}
+**Current mode:** planning | executing | verifying | blocked | idle
+
+---
+
+## Active Work
+
+| Task | Owner | Lease expires | State | Next action |
+|------|-------|---------------|-------|-------------|
+| _none_ | | | | |
+
+---
+
+## Current Focus
+
+- Feature:
+- Plan:
+- CAP-IDs:
+- Why this matters now:
+
+---
+
+## Blockers
+
+| Blocker | Decision needed | Owner | Since |
+|---------|-----------------|-------|-------|
+| _none_ | | | |
+
+---
+
+## Next Action
+
+1. Run `/review-tasks`.
+2. If active tasks exist, run `/update-tasks`.
+3. If the report is clean, run `/continue-tasks`.

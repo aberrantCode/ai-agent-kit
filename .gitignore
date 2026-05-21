@@ -1,0 +1,21 @@
+# Skill evaluation workspaces — per-iteration run artefacts (transcripts,
+# per-run grading, review HTMLs, review server caches). Only the summarised
+# benchmark files under claude/skills/<skill>/evals/benchmarks/ enter git.
+claude/skills/*-workspace/
+codex/skills/*-workspace/
+gemini/skills/*-workspace/
+
+# Byte-compiled Python caches (harness scripts are run ad-hoc)
+__pycache__/
+*.pyc
+
+# OS + editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Local shell helpers / scratch
+*.local
+*.local.*

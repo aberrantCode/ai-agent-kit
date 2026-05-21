@@ -117,6 +117,43 @@ When a task fails, do NOT retry the same task blindly. Instead:
 
 ---
 
+### `continue-new-session` — Generate a Session-Handoff Prompt
+
+Use when the user wants to pause this session and resume the recommended next action in a brand new
+session (typically because the current context is getting long or they want to switch runtime).
+
+Read-only. Produces a single copy-ready Markdown code block the user can paste into a fresh session.
+
+**Step 1 — Locate the recap-recommended next action**
+Scan your own most recent assistant turn for an explicit "next step" / "next" / "follow-up"
+recommendation in its recap. Capture: the action verb + object, the plan/feature/task identifier
+if mentioned, and any follow-on guidance.
+
+**Step 2 — Resolve file paths**
+For each identifier, resolve (without reading full content): feature spec at `docs/features/{slug}.md`,
+plan at `docs/plans/{slug}-plan.md`, active task at `docs/tasks/active/{slug}-p{N}-t{M}.md` (if it
+exists). Also include `docs/workflow/FOCUS.md` and `docs/workflow/INDEX.md` when present. Capture a
+2–3 line excerpt of each. Note any path that does not exist.
+
+**Step 3 — Emit the prompt**
+Print a single fenced Markdown code block with: the recap-recommended action restated as an
+imperative, the project pointers (with excerpts), the work pointers (with excerpts), explicit
+instructions for the new session (read pointers in full, follow project-manager conventions, only
+one active task at a time, append `## Completion` sentinel when done, never edit specs without user
+confirmation), and constraints (stay on current branch, do not regenerate existing plans, do not
+skip verification).
+
+**Fallback** — if no recap recommendation exists (e.g., first turn of the session), derive a
+substitute from `docs/workflow/FOCUS.md`, then from the first unblocked `todo` task in the
+highest-priority approved feature's plan. Prefix the prompt's action line with
+`(derived from {source})` so the receiving session knows the provenance. If no candidate exists,
+print "No recap recommendation found and no eligible next task exists. Run `review-tasks` for a
+project snapshot or `init-features` if specs are missing." and stop without emitting a prompt block.
+
+Never modify project state. Never embed full file contents — paths plus 2–3 line excerpts only.
+
+---
+
 ### `review-tasks` — Dry-Run Analysis (no agents spawned)
 
 Produce a read-only status report. Do not modify any files.

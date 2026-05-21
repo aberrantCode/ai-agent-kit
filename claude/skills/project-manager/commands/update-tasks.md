@@ -1,5 +1,5 @@
 ---
-description: Update the HomeRadar task list — mark tasks complete, add new tasks, or reorder priorities
+description: Sync active task files — parse completion sentinels in docs/tasks/active/, update plan statuses, archive completed tasks. Idempotent.
 ---
 
-Invoke the `homeradar:update-tasks` skill and follow it exactly.
+Invoke the `project-manager:update-tasks` skill and follow it exactly.

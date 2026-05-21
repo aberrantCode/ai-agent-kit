@@ -1,5 +1,5 @@
 ---
-description: Reinitialize the HomeRadar project context — reload specs, plans, and task state at the start of a session
+description: Archive legacy plans and tasks, normalize feature specs to the canonical template, then launch the orchestration loop. Use when recovering from inconsistent state.
 ---
 
-Invoke the `homeradar:reinit` skill and follow it exactly.
+Invoke the `project-manager:reinit` skill and follow it exactly.

@@ -1,0 +1,106 @@
+# Software Development Lifecycle — {{PROJECT_NAME}}
+
+> Defines how work moves from idea to merged code in this repository. Owned by the project-manager skill; do not edit by hand unless updating the Feature Abbreviation Registry (see below).
+
+---
+
+## Phases
+
+```
+INITIAL_PROMPT.md   →   feature specs   →   plans   →   tasks (active)   →   tasks (archive)
+                        (scope authority)   (checklist)   (one per agent)     (completed)
+```
+
+| Phase | Owner            | Trigger                          | Output                          |
+|-------|------------------|----------------------------------|---------------------------------|
+| Capture | User + `init-features`   | `INITIAL_PROMPT.md` exists | `docs/features/*.md`           |
+| Approve | User             | Review                           | `status: approved` in spec      |
+| Plan    | `continue-tasks` | Approved spec without plan       | `docs/plans/<slug>-plan.md`    |
+| Execute | Agent (per task) | `Status: todo` in plan           | Claimed task lease + code change + final `## Completion` |
+| Verify  | `code-reviewer` / verifier task | Code-changing task reports success | Review/test result, then plan task → `done` |
+| Merge   | User             | All P0 tasks done                | PR merged to `dev`              |
+
+---
+
+## Feature Abbreviation Registry
+
+Two-letter prefixes used in CAP-IDs (`[XX-CAP-NN]`). Each row must be unique. Add a row when you create a new feature spec.
+
+| Prefix | Feature slug             | Description                                |
+|--------|--------------------------|--------------------------------------------|
+| _(no features yet)_ |  |  |
+
+---
+
+## Status Vocabulary
+
+| Status        | Used by         | Meaning                                                  |
+|---------------|-----------------|----------------------------------------------------------|
+| `draft`       | Feature spec    | Not yet approved; do not generate a plan                 |
+| `approved`    | Feature spec    | Ready for plan generation                                |
+| `implemented` | Feature spec    | All P0 capabilities verified                             |
+| `deprecated`  | Feature spec    | No longer in scope; preserved for history                |
+| `todo`        | Plan task       | Eligible for `/continue-tasks` pickup                    |
+| `in-progress` | Plan task       | Task file exists in `docs/tasks/active/`                 |
+| `done`        | Plan task       | Completion sentinel observed, required verification passed, task archived |
+| `blocked`     | Plan task       | Blocker issue written and surfaced to user; do not auto-retry |
+
+---
+
+## Priority Vocabulary
+
+| Tag    | Meaning                                                |
+|--------|--------------------------------------------------------|
+| `[P0]` | Launch-blocking. Must be in the first merged version.  |
+| `[P1]` | High value. Targeted for next iteration after launch.  |
+| `[P2]` | Nice to have. Backlog candidate.                       |
+| `[P3]` | Speculative / research. Not yet committed.             |
+
+---
+
+## Failure Budget
+
+The Error Recovery Loop (in `project-manager:continue-tasks`) tolerates up to **5 failures per plan** before escalating to the user. Each failure adds 1-3 corrective tasks rather than retrying the failed task blindly. After 5 failures, the plan is paused and a detailed issue is written to `docs/issues/`.
+
+## Verification Gate
+
+Implementation, API, build, security, UI, and other code-changing tasks are not final until they have
+an explicit verification result. If a plan already contains a review, quality, test, security, or e2e
+task covering the same CAP-ID, that task satisfies the gate when it succeeds. Otherwise the
+orchestrator inserts a follow-up verification task that reviews the changed artifacts and test result
+reported in the implementation task's completion block.
+
+If `Tests: passing: false` is reported, the orchestrator creates corrective build/test work and does
+not mark the implementation complete.
+
+## Claims, Leases, and Handoff
+
+Active task files include `claimed_by`, `claimed_at`, and `lease_expires_at`. The orchestrator also
+creates a matching lock record under `docs/tasks/locks/` when claiming work.
+
+- **Claim**: create or update the task file metadata, create a lock file, and write an initial task
+  log entry.
+- **Renew**: extend `lease_expires_at` in both the task metadata and lock record when the same owner
+  is still working.
+- **Release**: mark the lock `released` after success, failure, or blocked reconciliation archives
+  the active task.
+- **Expire**: expired leases are reported as stale coordination state. They are not deleted
+  automatically.
+- **Manual cancellation**: set the lock `status: cancelled`, record the reason, leave the task file
+  active unless the user explicitly chooses to archive it.
+
+Use `docs/workflow/FOCUS.md` for current resumability state and `docs/workflow/INDEX.md` for durable
+decisions, discoveries, and cross-feature notes. Use `docs/tasks/logs/{task-id}.md` for task-local
+timeline and handoff notes.
+
+## Optional Tracker Sync
+
+`/sync-tracker` may mirror approved local plans and tasks to GitHub issues using `gh`. Local
+markdown remains authoritative. Store issue identity in `external_issue` and `external_url`.
+
+## Parallel Execution
+
+Serial execution is the default. Parallel work is opt-in and requires an explicit read-only analysis
+with task metadata for `parallel`, `depends_on_tasks`, `conflicts_with`, `files_allowed`, and
+`files_shared`. Parallel batches require isolated worktrees and a single verification/merge
+checkpoint before plan rows are final.

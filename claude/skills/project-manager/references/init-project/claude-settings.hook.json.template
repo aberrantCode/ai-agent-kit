@@ -1,0 +1,17 @@
+{
+  "_comment": "Drop-in fragment for .claude/settings.json (installed by /init-project). Merges into the existing settings; do not overwrite the whole file. Runs the project-manager guard before Edit/Write tool calls in advisory mode. Git pre-commit remains the hard enforcement gate.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File scripts/guard-pm-flow.ps1 --stage pre-tool || exit 0",
+            "_note": "Guard runs in advisory mode at pre-tool — Git pre-commit is still the hard gate. Pre-tool exits 0 unconditionally so it does not break interactive editing; it just prints a warning when an Edit lands outside an active task scope."
+          }
+        ]
+      }
+    ]
+  }
+}

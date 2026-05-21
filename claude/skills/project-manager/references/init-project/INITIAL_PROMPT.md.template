@@ -1,0 +1,29 @@
+# {{PROJECT_NAME}} — Initial Prompt
+
+> **Source of truth for product intent.** This file is never modified after the project is initialized. If product direction changes, deprecate features (set `status: deprecated`) and create new ones rather than rewriting this prompt.
+
+---
+
+## What we are building
+
+_(One paragraph. Who is the user, what is the problem, what is the proposed solution.)_
+
+## Why now
+
+_(One paragraph. What changed that makes this worth building.)_
+
+## Non-negotiable constraints
+
+- _(Technical, regulatory, performance — anything that cannot be traded off.)_
+
+## Explicit non-goals
+
+- _(Things we are deliberately not building, even if they seem related.)_
+
+## Success looks like
+
+- _(2-4 observable outcomes. These will become acceptance criteria seeds.)_
+
+---
+
+_Written: {{TODAY}}_

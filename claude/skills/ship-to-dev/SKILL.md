@@ -95,6 +95,45 @@ echo "Current branch: $CURRENT_BRANCH  Commits ahead of dev: $AHEAD"
   **skip Steps 1–3 (Ask for branch/commit info, Pull latest if behind, Stage all changes)**, jumping to Step 4 (still run the test/coverage gate before pushing).
 - Otherwise → continue to Step 1 as normal.
 
+**Dirty working-tree check** — count uncommitted files and surface them. In pre-committed
+mode they would be silently left behind; in normal mode Step 3's `git add --all` would
+sweep them in. Either way, the user must see what's there:
+
+```bash
+DIRTY_COUNT=$(git status --short | grep -c . || true)
+if [ "$DIRTY_COUNT" -gt 0 ]; then
+  echo ""
+  echo "Working tree is dirty — $DIRTY_COUNT uncommitted file(s):"
+  git status --short | head -20
+  [ "$DIRTY_COUNT" -gt 20 ] && echo "  ... and $((DIRTY_COUNT - 20)) more"
+  echo ""
+fi
+```
+
+- **Pre-committed mode AND `$DIRTY_COUNT > 0`** → the dirty files would NOT ship. Use
+  **AskUserQuestion** to confirm the user actually wants this:
+
+  ```
+  AskUserQuestion(
+    questions: [{
+      question: "Branch $CURRENT_BRANCH has $AHEAD commit(s) ahead of dev, and $DIRTY_COUNT uncommitted file(s) in the working tree. How should I proceed?",
+      header: "Pre-committed",
+      options: [
+        { label: "Ship only the committed work", description: "Skip Steps 1–3; the dirty files stay behind on this branch" },
+        { label: "Include the dirty files as a new commit", description: "Run Steps 1–3 first to add them to this branch before pushing" },
+        { label: "Abort", description: "Stop the workflow — let me sort out the working tree first" }
+      ]
+    }]
+  )
+  ```
+
+  - "Ship only" → continue with Step 4.
+  - "Include" → un-set the pre-committed shortcut and continue with Step 1 as normal.
+  - "Abort" → stop the workflow.
+
+- **Normal mode AND `$DIRTY_COUNT > 0`** → defer the gate to Step 3, which will list
+  the files and ask for confirmation when the count is high.
+
 ```bash
 echo "step_detect_end $(date +%s%3N)" >> "$TIMING_TMP"
 ```
@@ -187,24 +226,64 @@ echo "step_pull_end $(date +%s%3N)" >> "$TIMING_TMP"
 
 ---
 
-### Step 3 — Stage all changes
+### Step 3 — Stage changes (preview, then add)
 
 ```bash
 echo "step_stage_start $(date +%s%3N)" >> "$TIMING_TMP"
 ```
 
+**Never run `git add --all` blind.** The working tree often contains pre-existing WIP from
+other sessions, debug edits, or unrelated branches — sweeping all of it into one commit is
+the most destructive thing this workflow can do. Preview first, then decide.
+
+**Preview what would be staged:**
+
 ```bash
-git add --all
+git status --short
+git diff --stat
+TO_STAGE=$(git status --short | grep -c . || true)
+echo "Would stage $TO_STAGE file(s)."
 ```
 
-Show a summary to the user before continuing:
+If `$TO_STAGE` is 0 → stop and tell the user there is nothing to ship.
+
+**Decision:**
+
+- **`$TO_STAGE` ≤ 10 AND the file list visibly relates to what was discussed in this
+  session** → proceed with `git add --all`. State briefly which files are being staged
+  and why they belong together.
+
+- **`$TO_STAGE` > 10, OR the list contains files not touched in this session, OR you
+  cannot account for any single path** → stop and use **AskUserQuestion**:
+
+  ```
+  AskUserQuestion(
+    questions: [{
+      question: "Staging would sweep $TO_STAGE file(s). Some may not belong to this PR. How should I proceed?",
+      header: "Staging",
+      options: [
+        { label: "Stage everything (`git add --all`)", description: "All $TO_STAGE files go into one commit" },
+        { label: "Stage a specific subset", description: "I'll tell you which paths/globs to add" },
+        { label: "Abort — let me clean up the working tree first", description: "Stop the workflow" }
+      ]
+    }]
+  )
+  ```
+
+  - "Stage everything" → `git add --all`.
+  - "Stage subset" → ask the user for the path/glob list, then `git add <paths>`. Re-run
+    `git status --short` and `git diff --cached --stat` so the user can confirm.
+  - "Abort" → stop the workflow.
+
+**After staging — final summary before commit:**
 
 ```bash
 git status --short
 git diff --cached --stat
 ```
 
-If the staging area is empty (nothing to commit), stop and tell the user there is nothing to ship.
+If the staging area is empty after all that (e.g. user picked a subset that matched nothing),
+stop and tell the user.
 
 ```bash
 echo "step_stage_end $(date +%s%3N)" >> "$TIMING_TMP"
@@ -235,7 +314,9 @@ For **pre-committed branches** (branch already ahead of `dev`):
 CHANGED_FILES=$(git diff origin/dev...HEAD --name-only)
 ```
 
-Categorise by stack:
+Categorise by stack — these patterns target a specific monorepo layout (`api/src/`,
+`web/src/`, `extension/src/`). They are intentionally narrow; an empty result just means
+"this repo isn't that layout, skip the per-stack gates":
 
 ```bash
 API_SRC=$(echo "$CHANGED_FILES" | grep '^api/src/'       | grep '\.py$'        || true)
@@ -243,24 +324,82 @@ WEB_SRC=$(echo "$CHANGED_FILES" | grep '^web/src/'       | grep -E '\.[jt]sx?$' 
 EXT_SRC=$(echo "$CHANGED_FILES" | grep '^extension/src/' | grep -E '\.[jt]sx?$' || true)
 ```
 
-Skip any stack whose variable is empty (no source files changed there).
+- If a stack variable is non-empty → run its per-stack checks (4-C, 4-D, 4-E sections).
+- If **all three are empty** → the repo doesn't match this layout (e.g. it's an Ansible
+  / infra / docs / tooling repo). Skip 4-C, 4-D, and the per-stack parts of 4-E. The
+  whole-repo runner in 4-B is still mandatory and will pick the right tool for the repo.
 
 ---
 
-#### 4-B  Run the full test suite
+#### 4-B  Run the project test runner
+
+The runner is detected from the repo, not hardcoded. First match wins; later matches
+are ignored. If nothing matches, the gate is skipped with a notice — explicit so the
+user knows no automated check ran.
 
 ```bash
 echo "step_tests_start $(date +%s%3N)" >> "$TIMING_TMP"
-TIMING_LOG_PS=$(cygpath -w "$REPO_ROOT/logs/timing.jsonl" 2>/dev/null || echo "$REPO_ROOT/logs/timing.jsonl")
-pwsh -NonInteractive -File "$REPO_ROOT/scripts/Start-Tests.ps1" -NoPrompt -Parallel -SkipE2E -TimingLog "$TIMING_LOG_PS"
-TEST_EXIT=$?
+
+TEST_EXIT=0
+RUNNER="(none detected)"
+
+if [ -f "$REPO_ROOT/scripts/Start-Tests.ps1" ]; then
+  RUNNER="pwsh Start-Tests.ps1"
+  TIMING_LOG_PS=$(cygpath -w "$REPO_ROOT/logs/timing.jsonl" 2>/dev/null || echo "$REPO_ROOT/logs/timing.jsonl")
+  pwsh -NonInteractive -File "$REPO_ROOT/scripts/Start-Tests.ps1" -NoPrompt -Parallel -SkipE2E -TimingLog "$TIMING_LOG_PS"
+  TEST_EXIT=$?
+
+elif [ -f "$REPO_ROOT/Makefile" ] && grep -qE '^test:' "$REPO_ROOT/Makefile"; then
+  RUNNER="make test"
+  ( cd "$REPO_ROOT" && make test )
+  TEST_EXIT=$?
+
+elif [ -f "$REPO_ROOT/package.json" ] && grep -qE '"test"[[:space:]]*:' "$REPO_ROOT/package.json"; then
+  RUNNER="npm test"
+  ( cd "$REPO_ROOT" && npm test )
+  TEST_EXIT=$?
+
+elif [ -d "$REPO_ROOT/playbooks" ] && command -v ansible-playbook >/dev/null 2>&1; then
+  # Ansible / infra repo: syntax-check only the playbooks that changed in this branch.
+  PLAYBOOKS_CHANGED=$(echo "$CHANGED_FILES" | grep -E '^playbooks/.*\.ya?ml$' || true)
+  if [ -n "$PLAYBOOKS_CHANGED" ]; then
+    RUNNER="ansible-playbook --syntax-check (changed playbooks)"
+    while IFS= read -r pb; do
+      [ -z "$pb" ] && continue
+      ( cd "$REPO_ROOT" && ansible-playbook --syntax-check "$pb" ) || TEST_EXIT=$?
+    done <<< "$PLAYBOOKS_CHANGED"
+  else
+    RUNNER="ansible repo, no playbooks changed — nothing to check"
+  fi
+
+elif command -v pytest >/dev/null 2>&1 && { [ -f "$REPO_ROOT/pytest.ini" ] || [ -f "$REPO_ROOT/pyproject.toml" ] || [ -d "$REPO_ROOT/tests" ]; }; then
+  RUNNER="pytest"
+  ( cd "$REPO_ROOT" && pytest )
+  TEST_EXIT=$?
+
+else
+  echo "[Step 4-B] No recognized test runner — skipping the test gate."
+  echo "  Looked for, in order:"
+  echo "    scripts/Start-Tests.ps1"
+  echo "    Makefile with a 'test:' target"
+  echo "    package.json with a 'test' script"
+  echo "    playbooks/ + ansible-playbook on PATH"
+  echo "    pytest + (pytest.ini | pyproject.toml | tests/)"
+  echo "  If this repo has tests run a different way, add a Makefile 'test:' target"
+  echo "  or a 'test' script in package.json so this gate can find them."
+fi
+
 echo "step_tests_end $(date +%s%3N)" >> "$TIMING_TMP"
-exit $TEST_EXIT
+echo "[Step 4-B] runner: $RUNNER  exit: $TEST_EXIT"
+[ $TEST_EXIT -ne 0 ] && exit $TEST_EXIT
 ```
 
-**If `$TEST_EXIT` is non-zero — STOP.** Do not proceed. Report which suites failed
-(the script prints a summary table; echo it to the user) and ask them to fix the
-failures before retrying `/ship-to-dev`.
+**If `$TEST_EXIT` is non-zero — STOP.** Do not proceed. Echo the runner output to the
+user and ask them to fix the failures before retrying `/ship-to-dev`.
+
+**If the runner was skipped ("none detected") — proceed, but state explicitly that
+no automated test gate ran for this repo.** The user can then decide whether to ship
+without one.
 
 ---
 
@@ -673,7 +812,7 @@ echo "step_pr_create_end $(date +%s%3N)" >> "$TIMING_TMP"
 
 ---
 
-### Step 8 — Merge the PR (squash merge)
+### Step 8 — Merge the PR (merge commit)
 
 **Important:** `gh pr merge` will attempt to switch the local working tree to `dev`
 after merging. Two things can block that checkout:
@@ -711,7 +850,7 @@ if [ "$IN_WORKTREE" = "true" ]; then
 fi
 
 gh pr merge $BRANCH \
-  --squash \
+  --merge \
   --delete-branch \
   --subject "$MSG"
 ```
@@ -733,7 +872,7 @@ echo "step_merge_end $(date +%s%3N)" >> "$TIMING_TMP"
 echo "step_cleanup_start $(date +%s%3N)" >> "$TIMING_TMP"
 ```
 
-All cleanup runs from `$REPO_ROOT`. `gh pr merge --squash` may have already switched
+All cleanup runs from `$REPO_ROOT`. `gh pr merge --merge` may have already switched
 the local working tree to `dev` and deleted the local feature branch; both operations
 must be **conditional** to avoid errors:
 
@@ -846,15 +985,21 @@ PYEOF
 ## Quick Reference
 
 ```
-0.      Detect context (worktree? already committed?)  git rev-parse --show-toplevel; git branch; git rev-list
+0.      Detect context (worktree? pre-committed? dirty tree?)
+                                                 git rev-parse --show-toplevel; git branch; git rev-list;
+                                                 git status --short → AskUserQuestion if pre-committed AND dirty
 1.      Ask for $BRANCH and $MSG (skip if already committed on feature branch)
 2.      Fetch + pull only if behind             git fetch origin && [check BEHIND count] && git stash / pull / pop
-3.      Stage all changes                        git add --all
-4.      Test, coverage + clean-build gate         pwsh Start-Tests.ps1 -NoPrompt -Parallel -SkipE2E; verify test files exist; check ≥80% coverage (4-D); ruff/mypy/eslint/tsc/build warnings (4-E) — all must pass
+3.      Preview, then stage                     git status --short → AskUserQuestion if >10 files OR unrelated;
+                                                 git add --all (or subset)
+4.      Test + coverage + clean-build gate       4-A categorise (api/web/extension; empty = skip per-stack);
+                                                 4-B project runner (Start-Tests.ps1 → make test → npm test →
+                                                     ansible syntax-check → pytest → skip with notice);
+                                                 4-C/4-D/4-E run only for non-empty stacks
 5.      Create feature branch + commit           git checkout -b $BRANCH && git commit
 6.      Push                                     git push -u origin $BRANCH
 7.      Open PR into DEV                         gh pr create --base dev
-8.      Merge PR (squash) from REPO_ROOT         cd $REPO_ROOT; [stash if dirty]; gh pr merge --squash --delete-branch
+8.      Merge PR (merge commit) from REPO_ROOT    cd $REPO_ROOT; [stash if dirty]; gh pr merge --merge --delete-branch
 9 & 10. Conditional cleanup + sync DEV           [if not on dev] checkout dev; [if branch exists] branch -d;
                                                  [if worktree] git worktree prune && rm -rf $WORKTREE_PATH;
                                                  git pull origin dev; [if stashed] git stash pop
@@ -879,6 +1024,9 @@ PYEOF
 | `local changes would be overwritten by checkout` | Stash before `gh pr merge` (Step 8 now does this automatically); the PR may have already merged on GitHub even if the command errored — check with `gh pr view` before retrying |
 | PR already merged (second `gh pr merge` attempt) | Verify with `gh pr view $BRANCH --json state --jq '.state'`; if `"MERGED"`, skip to cleanup |
 | `gh pr create` exits 1: "already exists" | Step 7 detects this automatically, extracts the existing PR URL, and continues to Step 8 — no manual intervention needed |
+| Pre-committed branch + dirty working tree | Step 0 surfaces the dirty count and uses **AskUserQuestion** to choose: ship only the committed work, include the dirty files as a new commit, or abort. Never silently drop the dirty files |
+| Step 3 about to sweep unrelated WIP into one commit | Pre-existing modified files in the working tree get swept by `git add --all`. Step 3 now previews `git status --short` and uses **AskUserQuestion** when the count is high or any file looks unrelated. Choose "Stage subset" to add only the paths that belong to this PR |
+| Step 4-B: no recognized test runner in this repo | The detection chain (Start-Tests.ps1 → Makefile → npm → ansible-playbook → pytest) found nothing. Step 4-B prints which paths it looked for and continues. To make tests run on the next ship, add a `test:` target to `Makefile` or a `"test"` script to `package.json` |
 
 ## Diagram
 

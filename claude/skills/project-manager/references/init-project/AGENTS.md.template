@@ -1,0 +1,81 @@
+# Agent Operating Rules — {{PROJECT_NAME}}
+
+> **Mandatory reading for every agent invoked in this repository.** These rules govern how implementation work flows through the project-manager skill. They override generic agent defaults when they conflict.
+
+---
+
+## The Iron Law
+
+**No code change exists outside an active task file.**
+
+If you are about to edit a file under the project's source tree (anything that isn't `docs/`, `scripts/`, or top-level config), there must be a corresponding file under `docs/tasks/active/` that names you as the owning agent and whose `Status:` is `in-progress`.
+
+If that task file does not exist:
+
+1. **Stop.**
+2. Tell your invoker that no active task authorizes this change.
+3. Suggest running `/continue-tasks` to enter the orchestration loop, which will create the task file for you.
+
+This rule exists because untracked changes break the orchestration loop, leave plans out-of-sync with reality, and create merge conflicts when multiple agents touch the same feature in parallel.
+
+---
+
+## The Flow
+
+```
+docs/INITIAL_PROMPT.md
+        ↓ (/init-features)
+docs/features/*.md                    ← scope authority
+        ↓ (/continue-tasks Step 2)
+docs/plans/*.md                       ← phased checklist
+        ↓ (/continue-tasks Step 3-5)
+docs/tasks/active/*.md                ← one per active worker
+        ↓ (agent appends final ## Completion)
+docs/tasks/archive/*.md
+```
+
+Every artifact flows one direction. **Never** edit a downstream artifact to "fix" a problem that originated upstream — fix the upstream artifact and let the flow propagate.
+
+---
+
+## Hard Constraints
+
+- **Feature specs are the final authority on scope.** They may only be changed by the user directly, or by an agent that has used `AskUserQuestion` to confirm the change with the user. Never silently rewrite a spec to match what you built. If the build diverged from the spec, surface the divergence in your task's `## Completion` `Notes:` field.
+- **Plans are orchestrator-owned.** Worker agents do not edit plan files. The orchestrator updates `Status` columns in response to completion sentinels.
+- **One task at a time per feature.** Do not work on multiple tasks of the same feature in parallel. The orchestration loop processes tasks serially for a reason.
+- **Completion sentinel is non-negotiable.** Every task file must end with a final `## Completion` block matching the format in `docs/tasks/template.md`. The orchestrator ignores template instructions and only reconciles a final completion block with a parseable `Status:` field.
+- **No new dependencies without listing them.** If you add a package or external service, name it in the task's `Notes:` field. The orchestrator can then create a follow-up review task.
+
+---
+
+## What to Read Before Coding
+
+When you spawn into a task:
+
+1. Read your task file at `docs/tasks/active/{filename}.md` in full.
+2. Read the source feature spec at `docs/features/{feature-slug}.md` (path is in the task file's `feature:` frontmatter).
+3. Read the relevant plan section in `docs/plans/{feature-slug}-plan.md`.
+4. Read related archived task files in `docs/tasks/archive/` for the same feature (list provided in the task file).
+5. Only then read source code.
+
+Embedding the spec excerpt and plan excerpt directly in the task file is the orchestrator's job, but reading the originals is yours — they catch any drift.
+
+---
+
+## Red Flags — STOP and Surface
+
+Surface to the user (via the calling agent's `## Completion Notes:` field) when you encounter:
+
+- A capability needed by the task that has no CAP-ID in the spec
+- An acceptance criterion that can't be tested as written
+- A dependency between tasks not reflected in the plan
+- An existing implementation that contradicts the spec
+- A pre-existing test that fails before you started
+
+Do not silently work around any of these. The orchestrator's Error Recovery Loop is designed to handle them — let it.
+
+---
+
+## When AGENTS.md Conflicts With User Instructions
+
+User instructions always win. If the user says "skip the task file, just edit this one line", do as asked but note in the affected feature's plan `Notes` column that work was done outside the orchestration loop.

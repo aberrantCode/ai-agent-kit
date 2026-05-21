@@ -1,0 +1,87 @@
+# scripts/guard-pm-flow.ps1
+# Pre-commit guard: rejects commits that touch source files when there is no
+# active task file authorizing the change.
+#
+# Installed by /init-project. Intended to be wired into Git's pre-commit hook
+# and (optionally) Claude Code's PreToolUse hook for Edit/Write.
+#
+# Bypass: set $env:PM_GUARD_BYPASS = "1" before committing. Bypasses are logged
+# to docs/issues/guard-bypass.log so they're not silent.
+
+#requires -Version 5.1
+
+$ErrorActionPreference = 'Stop'
+
+function Get-StagedFiles {
+    $output = git diff --cached --name-only --diff-filter=ACMR 2>$null
+    if (-not $output) { return @() }
+    return @($output -split "`n" | Where-Object { $_ })
+}
+
+function Test-IsDocsFile {
+    param([string]$Path)
+    return $Path -match '^(docs/|scripts/|\.github/|\.claude/|AGENTS\.md$|CLAUDE\.md$|README\.md$|ROADMAP\.md$)'
+}
+
+function Get-ActiveTaskScope {
+    $taskDir = 'docs/tasks/active'
+    if (-not (Test-Path $taskDir)) { return $null }
+
+    $taskFiles = Get-ChildItem -Path $taskDir -Filter '*.md' -File -ErrorAction SilentlyContinue
+    if (-not $taskFiles) { return $null }
+
+    $covers = @()
+    foreach ($f in $taskFiles) {
+        $content = Get-Content -Path $f.FullName -Raw
+        if ($content -match '(?ms)^covers:\s*\[(.*?)\]') {
+            $covers += $Matches[1]
+        }
+    }
+    return $covers
+}
+
+function Write-BypassLog {
+    param([string]$Reason, [string[]]$Files)
+    $logPath = 'docs/issues/guard-bypass.log'
+    $dir = Split-Path $logPath -Parent
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $stamp = Get-Date -Format 'yyyy-MM-ddTHH:mm:ssK'
+    $line = "$stamp | $Reason | $($Files -join ',')"
+    Add-Content -Path $logPath -Value $line
+}
+
+# --- Main ---
+
+$staged = Get-StagedFiles
+if ($staged.Count -eq 0) { exit 0 }
+
+$sourceChanges = @($staged | Where-Object { -not (Test-IsDocsFile $_) })
+if ($sourceChanges.Count -eq 0) { exit 0 }
+
+$activeScope = Get-ActiveTaskScope
+
+if ($env:PM_GUARD_BYPASS -eq '1') {
+    Write-BypassLog -Reason 'PM_GUARD_BYPASS=1' -Files $sourceChanges
+    Write-Host 'project-manager guard: BYPASSED (logged to docs/issues/guard-bypass.log)' -ForegroundColor Yellow
+    exit 0
+}
+
+if ($null -eq $activeScope -or $activeScope.Count -eq 0) {
+    Write-Host ''
+    Write-Host 'project-manager guard: commit blocked.' -ForegroundColor Red
+    Write-Host ''
+    Write-Host 'You are committing changes to source files but there is no active task file' -ForegroundColor Red
+    Write-Host 'in docs/tasks/active/.' -ForegroundColor Red
+    Write-Host ''
+    Write-Host 'Changed source files:' -ForegroundColor Red
+    $sourceChanges | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    Write-Host ''
+    Write-Host 'Options:' -ForegroundColor Yellow
+    Write-Host '  1. Run /continue-tasks to enter the orchestration loop and have a task file generated' -ForegroundColor Yellow
+    Write-Host '  2. Move the changes into docs/ if they are documentation only' -ForegroundColor Yellow
+    Write-Host '  3. Set $env:PM_GUARD_BYPASS=1 to bypass (logged to docs/issues/guard-bypass.log)' -ForegroundColor Yellow
+    Write-Host ''
+    exit 1
+}
+
+exit 0

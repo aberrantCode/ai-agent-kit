@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Next? — Solution Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Fragment+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --font-body: 'Bricolage Grotesque', system-ui, sans-serif;
+      --font-mono: 'Fragment Mono', 'Courier New', monospace;
+      --bg: #0e0f11; --surface: #16181c; --surface-recessed: #0b0c0e;
+      --border: rgba(255,255,255,0.06); --border-bright: rgba(255,255,255,0.12);
+      --text: #e8eaf0; --text-dim: #6e7280;
+      --accent: #e8a04a; --green: #4ade80; --blue: #60a5fa; --red: #f87171; --purple: #c084fc;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f6f4; --surface: #ffffff; --surface-recessed: #eeece8;
+        --border: rgba(0,0,0,0.07); --border-bright: rgba(0,0,0,0.14);
+        --text: #1a1810; --text-dim: #6b6454;
+        --accent: #b45309; --green: #16a34a; --blue: #1d4ed8; --red: #dc2626; --purple: #9333ea;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      background-image: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(232,160,74,0.02) 40px, rgba(232,160,74,0.02) 41px);
+      color: var(--text); min-height: 100vh; padding: 48px 24px;
+    }
+    .page-wrap { max-width: 1200px; margin: 0 auto; }
+    .page-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    h1 { font-size: clamp(28px, 4vw, 46px); font-weight: 700; margin-bottom: 10px; line-height: 1.1; }
+    .subtitle { font-size: 15px; color: var(--text-dim); max-width: 720px; line-height: 1.65; margin-bottom: 48px; }
+    .section { margin-bottom: 44px; }
+    .section-label {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border-bright); }
+    .diagram-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 32px; overflow-x: auto;
+    }
+    .component-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+    }
+    .component-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+    }
+    .component-card .tier {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+      color: var(--accent); margin-bottom: 8px; text-transform: uppercase;
+    }
+    .component-card h3 { font-size: 16px; margin-bottom: 6px; font-weight: 600; }
+    .component-card .path { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 10px; word-break: break-all; }
+    .component-card p { font-size: 13px; line-height: 1.55; color: var(--text-dim); }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); }
+    .legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+    .lg-accent::before { background: var(--accent); }
+    .lg-green::before  { background: var(--green);  }
+    .lg-blue::before   { background: var(--blue);   }
+    .lg-purple::before { background: var(--purple); }
+    .lg-red::before    { background: var(--red);    }
+    code { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="page-label">Skill · What Next?</div>
+    <h1>Solution Architecture</h1>
+    <p class="subtitle">
+      Three tiers of state: the <strong>archive</strong> is the source of truth; the
+      <strong>global profile</strong> deploys the skill to every project; the
+      <strong>target repo</strong> is where the skill actually runs. The skill itself is
+      progressive-disclosure markdown — references load only when their branch fires.
+    </p>
+
+    <div class="section">
+      <div class="section-label">Data Flow &amp; Components</div>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart LR
+    subgraph ARCHIVE["Archive · llm_skills repo"]
+        direction TB
+        ASKILL[SKILL.md<br/>master decision flow]
+        AREFS[references/<br/>fingerprint · area-inference<br/>priority-weights · templates · schema]
+        ACMDS[commands/<br/>what-next.md · what-next-update.md]
+        ADIAG[diagram.html + diagrams/<br/>solution · features · plan]
+        AEVALS[evals/<br/>fixtures + harness + benchmarks]
+        AMAN[manifest.json<br/>installer registry]
+    end
+
+    subgraph GLOBAL["~/.claude/ · global profile"]
+        direction TB
+        GSKILL[skills/what-next/<br/>SKILL.md · references/]
+        GCMDS[commands/<br/>/what-next · /what-next-update]
+    end
+
+    subgraph REPO["Target repo · runtime"]
+        direction TB
+        RCACHE[docs/what-next.md<br/>cache · fingerprints · observations]
+        RBACKLOG[backlog.md + backlog-archive.md<br/>task store]
+        RPMPLANS[docs/features/ + docs/plans/<br/>project-manager state]
+    end
+
+    subgraph AGENTS["Specialist agents · hand-off targets"]
+        direction TB
+        AG1[planner · tdd-guide · code-reviewer]
+        AG2[security-reviewer · architect · refactor-cleaner]
+        AG3[e2e-runner · build-error-resolver · doc-updater]
+    end
+
+    ARCHIVE -->|/push-skill| GLOBAL
+    ARCHIVE -->|install-skills.ps1| GLOBAL
+    GLOBAL  -->|Skill tool loads| REPO
+    REPO    -->|read + mutate in place| RBACKLOG
+    REPO    -->|read-only| RPMPLANS
+    REPO    -->|read + write cache| RCACHE
+    REPO    -->|Step 8 hand-off| AGENTS
+
+    classDef archive fill:#16181c,stroke:#e8a04a,color:#e8eaf0;
+    classDef global  fill:#16181c,stroke:#60a5fa,color:#e8eaf0;
+    classDef repo    fill:#16181c,stroke:#4ade80,color:#e8eaf0;
+    classDef agents  fill:#16181c,stroke:#c084fc,color:#e8eaf0;
+
+    class ASKILL,AREFS,ACMDS,ADIAG,AEVALS,AMAN archive;
+    class GSKILL,GCMDS global;
+    class RCACHE,RBACKLOG,RPMPLANS repo;
+    class AG1,AG2,AG3 agents;
+        </pre>
+        <div class="legend">
+          <span class="lg-accent">Archive (source of truth)</span>
+          <span class="lg-blue">Global profile (deployment)</span>
+          <span class="lg-green">Target repo (runtime state)</span>
+          <span class="lg-purple">Specialist agents</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Skill Bundle — what ships inside the skill directory</div>
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="tier">Level 1 · always in context</div>
+          <h3>SKILL.md</h3>
+          <div class="path">claude/skills/what-next/SKILL.md</div>
+          <p>Frontmatter + master decision flow. Under 500 lines. Body loads whenever the skill triggers; references load only when their branch fires.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Level 2 · lazy</div>
+          <h3>references/</h3>
+          <div class="path">references/*.md</div>
+          <p>Five specialised docs: fingerprint algorithm, area inference, priority weights, backlog templates, what-next.md schema. Loaded only when the corresponding decision branch fires.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Level 2 · trigger</div>
+          <h3>commands/</h3>
+          <div class="path">commands/what-next.md<br/>commands/what-next-update.md</div>
+          <p>Thin slash-command wrappers that invoke the skill. Pushed to <code>~/.claude/commands/</code> for global availability.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Level 3 · development-time only</div>
+          <h3>evals/</h3>
+          <div class="path">evals/{fixtures,harness,benchmarks}/</div>
+          <p>Committed fixtures + reusable grader + benchmark history. Never read at skill-runtime; used only when a developer runs a new evaluation iteration.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Documentation</div>
+          <h3>diagram.html + diagrams/</h3>
+          <div class="path">diagram.html (decision flow)<br/>diagrams/{solution,features,plan}.html</div>
+          <p>Decision-flow diagram lives at the skill root per repo convention; supporting visuals live in <code>diagrams/</code>. All self-contained HTML, openable in a browser.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Registry</div>
+          <h3>manifest.json (repo-level)</h3>
+          <div class="path">manifest.json</div>
+          <p>Remote installer reads this to know which skills exist and what category each belongs to. <code>what-next</code> is registered under Foundations &amp; Workflow.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Runtime state in the target repo</div>
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="tier">Cache</div>
+          <h3>docs/what-next.md</h3>
+          <div class="path">docs/what-next.md (created on first run)</div>
+          <p>Machine-readable YAML frontmatter (pm_framework, areas, fingerprints, observations, current_task) plus a human-readable project snapshot. Fingerprint check at Step 1 decides whether to re-analyse.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Task store</div>
+          <h3>backlog.md + backlog-archive.md</h3>
+          <div class="path">repo root</div>
+          <p>Used only when no project-manager convention exists. Checklist format with area-scoped IDs; completed items move to backlog-archive.md under a <code>## YYYY-MM-DD</code> heading. IDs never reused.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Delegated</div>
+          <h3>docs/features/ + docs/plans/</h3>
+          <div class="path">project-manager's own state</div>
+          <p>When detected, <code>/what-next</code> reads these, applies the priority heuristic to todo rows, surfaces top 3, and lets the user pick a task (direct hand-off) or <code>/review-tasks</code> / <code>/continue-tasks</code> (full PM loop). Never creates a parallel backlog.md.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Cross-cutting invariants</div>
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="tier">Invariant · user interaction</div>
+          <h3>AskUserQuestion only</h3>
+          <p>Every branching decision — which bootstrap option to take, which top-three task to pick, whether to refresh a stale cache — goes through the <code>AskUserQuestion</code> tool. No prose prompts. Option labels and descriptions carry the ranking reasons.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Invariant · no competing stores</div>
+          <h3>Delegate, don't duplicate</h3>
+          <p>If project-manager state exists, <code>/what-next</code> reads and surfaces it, but never creates a parallel <code>backlog.md</code>. Plans remain the single source of truth; mutation happens in place.</p>
+        </div>
+        <div class="component-card">
+          <div class="tier">Invariant · no destructive actions</div>
+          <h3>Stale, not auto-closed</h3>
+          <p>Tasks referencing deleted files get a <code>-25</code> priority penalty and a stale marker. The skill never closes them on the user's behalf — only the user decides whether to retire or rewrite.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', themeVariables: { fontFamily: "'Bricolage Grotesque', sans-serif" } });
+  </script>
+</body>
+</html>

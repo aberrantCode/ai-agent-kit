@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>youtube-extraction — recreate-files pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME — Blueprint (deep slate/blue + gold) ============ */
+  :root {
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --surface-elev: #fafbfd;
+    --border: rgba(30, 58, 95, 0.10);
+    --border-bright: rgba(30, 58, 95, 0.20);
+    --text: #1e3a5f;
+    --text-dim: #6b7d96;
+
+    --primary: #1e3a5f;        /* sub-skills */
+    --primary-dim: rgba(30, 58, 95, 0.08);
+    --gold: #b8862c;           /* decision diamonds */
+    --gold-dim: rgba(184, 134, 44, 0.10);
+    --sage: #4a7c59;           /* artifacts */
+    --sage-dim: rgba(74, 124, 89, 0.10);
+    --rose: #a8324a;           /* AskUserQuestion / conflict */
+    --rose-dim: rgba(168, 50, 74, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1220;
+      --surface: #131c30;
+      --surface-elev: #1a2540;
+      --border: rgba(212, 167, 58, 0.10);
+      --border-bright: rgba(212, 167, 58, 0.22);
+      --text: #e6ecf7;
+      --text-dim: #8a9bb8;
+
+      --primary: #6ea8ff;
+      --primary-dim: rgba(110, 168, 255, 0.14);
+      --gold: #d4a73a;
+      --gold-dim: rgba(212, 167, 58, 0.16);
+      --sage: #84d091;
+      --sage-dim: rgba(132, 208, 145, 0.14);
+      --rose: #f17b8f;
+      --rose-dim: rgba(241, 123, 143, 0.14);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 48px 32px 64px;
+    min-height: 100vh;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+
+  /* ============ ANIMATION ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: fadeUp 0.45s ease-out both; animation-delay: calc(var(--i, 0) * 0.07s); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ============ HEADER ============ */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: inline-block;
+    padding: 4px 10px;
+    border: 1px solid var(--border-bright);
+    border-radius: 3px;
+    background: var(--gold-dim);
+  }
+
+  h1 {
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: -0.8px;
+    margin-bottom: 8px;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  h1 .accent { color: var(--gold); }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    margin-bottom: 28px;
+    letter-spacing: 0.2px;
+  }
+
+  .description {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    max-width: 760px;
+  }
+
+  .description code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--primary);
+    background: var(--primary-dim);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  /* ============ MERMAID CONTAINER ============ */
+  .diagram-shell { position: relative; margin-bottom: 36px; }
+  .diagram-shell__hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    opacity: 0.75;
+    letter-spacing: 0.3px;
+  }
+
+  .mermaid-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 28px 20px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 480px;
+    box-shadow: 0 1px 3px rgba(30, 58, 95, 0.04);
+  }
+  .mermaid-wrap { cursor: grab; }
+  .mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
+
+  .mermaid-viewport {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+  }
+  .mermaid-canvas { position: absolute; top: 0; left: 0; }
+
+  .zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 2px;
+    z-index: 10;
+    background: var(--surface-elev);
+    border: 1px solid var(--border-bright);
+    border-radius: 3px;
+    padding: 2px;
+  }
+  .zoom-controls button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .zoom-controls button:hover { background: var(--primary-dim); color: var(--primary); }
+  .zoom-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 0 8px;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  /* ============ MERMAID SVG OVERRIDES ============ */
+  .mermaid .nodeLabel {
+    font-family: var(--font-body) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+  }
+  .mermaid .edgeLabel {
+    font-family: var(--font-mono) !important;
+    font-size: 12px !important;
+  }
+  .mermaid .node rect,
+  .mermaid .node polygon,
+  .mermaid .node circle {
+    stroke-width: 1.5px !important;
+  }
+
+  /* ============ LEGEND ============ */
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 36px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    border: 1px solid var(--border-bright);
+  }
+  .legend-swatch.diamond {
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    border-radius: 1px;
+  }
+
+  /* ============ ARTIFACTS PANEL ============ */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: var(--sage);
+    border-radius: 50%;
+  }
+
+  .artifacts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .artifact {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--sage);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 16px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .artifact:hover {
+    border-left-color: var(--gold);
+    transform: translateX(2px);
+  }
+  .artifact--transient {
+    border-left-color: var(--rose);
+    background: var(--rose-dim);
+  }
+  .artifact--transient:hover { border-left-color: var(--rose); }
+
+  .artifact__path {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    word-break: break-all;
+  }
+  .artifact__desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .artifact__tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    color: var(--rose);
+    background: var(--rose-dim);
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+  }
+  .artifact__tag--persist {
+    color: var(--sage);
+    background: var(--sage-dim);
+  }
+
+  /* ============ CALLOUT ============ */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    padding: 18px 22px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  .callout strong { color: var(--text); }
+  .callout code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--primary);
+    background: var(--primary-dim);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  /* ============ FOOTER META ============ */
+  .footer-meta {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--border-bright);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 24px 16px 40px; }
+    h1 { font-size: 28px; }
+    .mermaid-wrap { padding: 16px 8px; min-height: 380px; }
+    .legend { gap: 14px; padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <span class="eyebrow animate" style="--i:0">claude / skills / youtube-extraction</span>
+
+  <h1 class="animate" style="--i:1">
+    <span class="accent">/</span>recreate-files <span style="color:var(--text-dim); font-weight:400;">— pipeline</span>
+  </h1>
+  <p class="subtitle animate" style="--i:2">orchestrator → 7 sub-skills → reconstructed files on disk</p>
+
+  <p class="description animate" style="--i:3">
+    The thin command <code>/recreate-files</code> takes a YouTube <code>url</code> and a free-text
+    <code>request</code>. If either is missing, the parent skill uses <code>AskUserQuestion</code>
+    before proceeding. Once both parameters are resolved, seven sub-skills run in order — acquiring
+    the video, transcript, and comments; extracting frames; recognising file content via
+    multimodal vision; stitching frames into canonical files using line-level LCS without
+    duplication; and emitting a markdown report. Only the working <code>frames/</code> directory
+    is deleted at cleanup.
+  </p>
+
+  <section class="diagram-shell animate" style="--i:4">
+    <p class="diagram-shell__hint">
+      Ctrl/Cmd + wheel to zoom · drag to pan · double-click to fit · ⛶ opens full-size
+    </p>
+    <div class="mermaid-wrap">
+      <div class="zoom-controls">
+        <button type="button" data-action="zoom-in" title="Zoom in">+</button>
+        <button type="button" data-action="zoom-out" title="Zoom out">&minus;</button>
+        <button type="button" data-action="zoom-fit" title="Smart fit">&#8634;</button>
+        <button type="button" data-action="zoom-one" title="1:1 zoom">1:1</button>
+        <button type="button" data-action="zoom-expand" title="Open full size">&#x26F6;</button>
+        <span class="zoom-label">Loading…</span>
+      </div>
+      <div class="mermaid-viewport">
+        <div class="mermaid mermaid-canvas"></div>
+      </div>
+    </div>
+    <script type="text/plain" class="diagram-source">
+      flowchart TD
+        Entry["/recreate-files<br/><span style='font-size:11px'>url + request</span>"]:::entry
+        Validate{"both<br/>url &amp; request<br/>provided?"}:::decision
+        Ask["AskUserQuestion<br/><span style='font-size:11px'>elicit missing</span>"]:::ask
+
+        VA["video-acquisition<br/><span style='font-size:11px'>yt-dlp · 1080p</span>"]:::sub
+        TA["transcript-acquisition<br/><span style='font-size:11px'>auto-subs / Whisper</span>"]:::sub
+        CH["comment-harvesting<br/><span style='font-size:11px'>yt-dlp --write-comments</span>"]:::sub
+        FE["frame-extraction<br/><span style='font-size:11px'>ffmpeg · scene + 1 fps</span>"]:::sub
+        FCR["frame-content-recognition<br/><span style='font-size:11px'>multimodal vision</span>"]:::sub
+        FR["file-reconstruction<br/><span style='font-size:11px'>LCS stitch · cross-check</span>"]:::sub
+        Conflict{"on-disk file<br/>differs?"}:::decision
+        AskC["AskUserQuestion<br/><span style='font-size:11px'>overwrite / side-by-side / skip</span>"]:::ask
+        Write["write file"]:::write
+        ER["extraction-reporting<br/><span style='font-size:11px'>EXTRACTION.md</span>"]:::sub
+        Cleanup["cleanup<br/><span style='font-size:11px'>delete frames/ only</span>"]:::cleanup
+
+        Entry --> Validate
+        Validate -->|"no"| Ask
+        Ask -->|"loop"| Validate
+        Validate -->|"yes"| VA
+        VA --> TA
+        TA --> CH
+        CH --> FE
+        FE --> FCR
+        FCR --> FR
+        FR --> Conflict
+        Conflict -->|"yes"| AskC
+        AskC -->|"resolve"| Write
+        Conflict -->|"no"| Write
+        Write --> ER
+        ER --> Cleanup
+
+        classDef entry fill:#1e3a5f15,stroke:#1e3a5f,stroke-width:2px,color:#1e3a5f
+        classDef decision fill:#b8862c20,stroke:#b8862c,stroke-width:2px,color:#7a5616
+        classDef ask fill:#a8324a18,stroke:#a8324a,stroke-width:1.5px,color:#7a233a
+        classDef sub fill:#1e3a5f10,stroke:#1e3a5f,stroke-width:1.5px,color:#1e3a5f
+        classDef write fill:#4a7c5915,stroke:#4a7c59,stroke-width:1.5px,color:#345a40
+        classDef cleanup fill:#6b7d9615,stroke:#6b7d96,stroke-width:1.5px,color:#3d4a5e
+    </script>
+  </section>
+
+  <div class="legend animate" style="--i:5">
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--primary-dim); border-color:var(--primary)"></div> sub-skill</div>
+    <div class="legend-item"><div class="legend-swatch diamond" style="background:var(--gold-dim); border-color:var(--gold)"></div> decision</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--rose-dim); border-color:var(--rose)"></div> AskUserQuestion</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--sage-dim); border-color:var(--sage)"></div> write / persist</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:rgba(107,125,150,0.15); border-color:var(--text-dim)"></div> cleanup</div>
+  </div>
+
+  <span class="section-label animate" style="--i:6">workspace · docs/youtube-extraction/&lt;basename&gt;/</span>
+
+  <div class="artifacts-grid animate" style="--i:7">
+    <div class="artifact">
+      <div class="artifact__path">video.&lt;ext&gt;<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Downloaded video at highest practical resolution (≥1080p) for OCR fidelity.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">metadata.json<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">yt-dlp info-json — title, channel, duration, publish date, tags.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">description.txt<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Video description — frequently holds canonical repo URLs and file paths.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">transcript.md<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Timestamped markdown <code style="font-family:var(--font-mono);font-size:11px">**[mm:ss]** text</code> from auto-subs or Whisper.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">comments.json<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Full comments + threads, plus a summary subset (creator, pinned, filename mentions).</div>
+    </div>
+    <div class="artifact artifact--transient">
+      <div class="artifact__path">frames/<span class="artifact__tag">transient</span></div>
+      <div class="artifact__desc">ffmpeg scene-change + 1 fps anchors. Deleted after reporting.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">files/<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Reconstructed source files mirroring the calling repo's folder structure.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">screenshots/<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">5–10 anchor frames moved out of <code style="font-family:var(--font-mono);font-size:11px">frames/</code> before cleanup.</div>
+    </div>
+    <div class="artifact">
+      <div class="artifact__path">EXTRACTION.md<span class="artifact__tag artifact__tag--persist">persist</span></div>
+      <div class="artifact__desc">Final report — files reconstructed, evidence map, gaps, reproduction command.</div>
+    </div>
+  </div>
+
+  <div class="callout animate" style="--i:8">
+    <strong>Stitching without duplicates.</strong> Scrolling IDE panes produce overlapping
+    frames where each line appears in N consecutive captures. <code>file-reconstruction</code>
+    merges using a <strong>line-level longest common subsequence</strong> alignment: for each
+    new frame, it finds the contiguous tail of the accumulated buffer that matches a contiguous
+    head of the new frame, then appends only what's after the overlap. Verbatim quotes in
+    <code>transcript.md</code> and creator code blocks in <code>comments.json</code> fill gaps
+    where the camera cut past unread lines.
+  </div>
+
+  <div class="footer-meta animate" style="--i:9">
+    <span>archive · claude/skills/youtube-extraction/diagram.html</span>
+    <span>aesthetic · blueprint · IBM Plex · slate &amp; gold</span>
+  </div>
+
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+  const config = {
+    fitPadding: 28,
+    minHeight: 480,
+    maxHeightPx: 1100,
+    maxHeightVh: 0.86,
+    maxInitialZoom: 1.7,
+    minZoom: 0.08,
+    maxZoom: 6.5,
+    zoomStep: 0.14,
+    readabilityFloor: 0.6
+  };
+
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+
+  let activeDrag = null;
+  addEventListener('mousemove', (e) => activeDrag?.onMove(e));
+  addEventListener('mouseup', () => { activeDrag?.onEnd(); activeDrag = null; });
+
+  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+
+  mermaid.registerLayoutLoaders(elkLayouts);
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    look: 'classic',
+    layout: 'elk',
+    themeVariables: {
+      fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
+      fontSize: '15px',
+      primaryColor: isDark ? '#1a2540' : '#eef2f8',
+      primaryBorderColor: isDark ? '#6ea8ff' : '#1e3a5f',
+      primaryTextColor: isDark ? '#e6ecf7' : '#1e3a5f',
+      secondaryColor: isDark ? '#2a2316' : '#fff8e8',
+      secondaryBorderColor: isDark ? '#d4a73a' : '#b8862c',
+      secondaryTextColor: isDark ? '#e6ecf7' : '#7a5616',
+      tertiaryColor: isDark ? '#28182a' : '#fbeef1',
+      tertiaryBorderColor: isDark ? '#f17b8f' : '#a8324a',
+      tertiaryTextColor: isDark ? '#e6ecf7' : '#7a233a',
+      lineColor: isDark ? '#8a9bb8' : '#6b7d96',
+      noteBkgColor: isDark ? '#1a2540' : '#fafbfd',
+      noteTextColor: isDark ? '#e6ecf7' : '#1e3a5f',
+      noteBorderColor: isDark ? '#d4a73a' : '#b8862c'
+    }
+  });
+
+  function initDiagram(shell) {
+    const wrap = shell.querySelector('.mermaid-wrap');
+    const viewport = shell.querySelector('.mermaid-viewport');
+    const canvas = shell.querySelector('.mermaid-canvas');
+    const source = shell.querySelector('.diagram-source');
+    const label = shell.querySelector('.zoom-label');
+    if (!wrap || !viewport || !canvas || !source || !label) return;
+
+    let zoom = 1, fitMode = 'contain', panX = 0, panY = 0, svgW = 0, svgH = 0;
+    let sx = 0, sy = 0, spx = 0, spy = 0, touchDist = 0, touchCx = 0, touchCy = 0;
+
+    function constrainPan() {
+      const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
+      const rW = svgW * zoom, rH = svgH * zoom, pad = config.fitPadding;
+      panX = (rW + pad * 2 <= vpW) ? (vpW - rW) / 2 : clamp(panX, vpW - rW - pad, pad);
+      panY = (rH + pad * 2 <= vpH) ? (vpH - rH) / 2 : clamp(panY, vpH - rH - pad, pad);
+    }
+    function applyTransform() {
+      const svg = canvas.querySelector('svg');
+      if (!svg || !svgW) return;
+      constrainPan();
+      svg.style.width = (svgW * zoom) + 'px';
+      svg.style.height = (svgH * zoom) + 'px';
+      canvas.style.transform = `translate(${panX}px, ${panY}px)`;
+      label.textContent = Math.round(zoom * 100) + '% — ' + fitMode;
+    }
+    function canPan() {
+      const rW = svgW * zoom, rH = svgH * zoom;
+      return rW + config.fitPadding * 2 > viewport.clientWidth
+          || rH + config.fitPadding * 2 > viewport.clientHeight;
+    }
+    function computeSmartFit() {
+      const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
+      const aW = Math.max(80, vpW - config.fitPadding * 2);
+      const aH = Math.max(80, vpH - config.fitPadding * 2);
+      const contain = Math.min(aW / svgW, aH / svgH);
+      let z = contain, mode = 'contain';
+      if (contain < config.readabilityFloor) {
+        const chartR = svgH / svgW, vpR = vpH / Math.max(vpW, 1);
+        if (chartR >= vpR) { z = aW / svgW; mode = 'width-priority'; }
+        else { z = aH / svgH; mode = 'height-priority'; }
+      }
+      return { zoom: clamp(z, config.minZoom, config.maxInitialZoom), mode };
+    }
+    function fitDiagram() {
+      if (!svgW) return;
+      const fit = computeSmartFit();
+      zoom = fit.zoom; fitMode = fit.mode;
+      panX = (viewport.clientWidth - svgW * zoom) / 2;
+      panY = (viewport.clientHeight - svgH * zoom) / 2;
+      applyTransform();
+    }
+    function setOneToOne() {
+      zoom = clamp(1, config.minZoom, config.maxZoom); fitMode = '1:1';
+      panX = (viewport.clientWidth - svgW * zoom) / 2;
+      panY = (viewport.clientHeight - svgH * zoom) / 2;
+      applyTransform();
+    }
+    function zoomAround(factor, cx, cy) {
+      const next = clamp(zoom * factor, config.minZoom, config.maxZoom);
+      const ratio = next / zoom;
+      panX = cx - ratio * (cx - panX);
+      panY = cy - ratio * (cy - panY);
+      zoom = next; fitMode = 'custom';
+      applyTransform();
+    }
+    function readSvgNaturalSize(svg) {
+      let w = 0, h = 0;
+      if (svg.viewBox?.baseVal?.width > 0) { w = svg.viewBox.baseVal.width; h = svg.viewBox.baseVal.height; }
+      if (!w) { w = parseFloat(svg.getAttribute('width')) || 0; h = parseFloat(svg.getAttribute('height')) || 0; }
+      if (!w) { const b = svg.getBBox(); w = b.width; h = b.height; }
+      if (!w) { const r = svg.getBoundingClientRect(); w = r.width || 1000; h = r.height || 700; }
+      if (!svg.getAttribute('viewBox')) svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      return { w, h };
+    }
+    function setAdaptiveHeight() {
+      if (!svgW) return;
+      const usableW = Math.max(280, wrap.getBoundingClientRect().width - 2);
+      const idealH = (svgH / svgW) * usableW + config.fitPadding * 2;
+      const maxVp = Math.floor(innerHeight * config.maxHeightVh);
+      const hardMax = Math.min(config.maxHeightPx, Math.max(config.minHeight + 40, maxVp));
+      wrap.style.height = Math.round(clamp(idealH, config.minHeight, hardMax)) + 'px';
+    }
+    function openInNewTab() {
+      const svg = canvas.querySelector('svg');
+      if (!svg) return;
+      const clone = svg.cloneNode(true);
+      clone.style.width = ''; clone.style.height = '';
+      const bg = isDark ? '#0b1220' : '#f4f6fa';
+      const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>youtube-extraction · diagram</title><style>
+        body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+        background:${bg};padding:40px;box-sizing:border-box}
+        svg{max-width:100%;max-height:90vh;height:auto}
+        </style></head><body>${clone.outerHTML}</body></html>`;
+      open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank');
+    }
+    async function render() {
+      try {
+        const code = source.textContent.trim();
+        if (!code) { label.textContent = 'Error: empty source'; return; }
+        const id = 'diagram-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        const { svg } = await mermaid.render(id, code);
+        canvas.innerHTML = svg;
+        const svgNode = canvas.querySelector('svg');
+        if (!svgNode) { label.textContent = 'Error: no SVG'; return; }
+        const size = readSvgNaturalSize(svgNode);
+        svgW = size.w; svgH = size.h;
+        svgNode.removeAttribute('width'); svgNode.removeAttribute('height');
+        svgNode.style.maxWidth = 'none'; svgNode.style.display = 'block';
+        setAdaptiveHeight();
+        fitDiagram();
+      } catch (err) {
+        console.error('Mermaid render failed:', err);
+        label.textContent = 'Error: ' + (err.message || 'render failed');
+      }
+    }
+    const actions = {
+      'zoom-in': () => zoomAround(1 + config.zoomStep, viewport.clientWidth / 2, viewport.clientHeight / 2),
+      'zoom-out': () => zoomAround(1 / (1 + config.zoomStep), viewport.clientWidth / 2, viewport.clientHeight / 2),
+      'zoom-fit': fitDiagram,
+      'zoom-one': setOneToOne,
+      'zoom-expand': openInNewTab
+    };
+    Object.entries(actions).forEach(([action, handler]) => {
+      wrap.querySelector(`[data-action="${action}"]`)?.addEventListener('click', handler);
+    });
+    viewport.addEventListener('dblclick', fitDiagram);
+    viewport.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const rect = viewport.getBoundingClientRect();
+        const factor = e.deltaY < 0 ? 1 + config.zoomStep : 1 / (1 + config.zoomStep);
+        zoomAround(factor, e.clientX - rect.left, e.clientY - rect.top);
+        return;
+      }
+      if (canPan()) { e.preventDefault(); panX -= e.deltaX; panY -= e.deltaY; applyTransform(); }
+    }, { passive: false });
+    viewport.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.zoom-controls') || !canPan()) return;
+      wrap.classList.add('is-panning');
+      sx = e.clientX; sy = e.clientY; spx = panX; spy = panY;
+      e.preventDefault();
+      activeDrag = {
+        onMove: (ev) => { panX = spx + (ev.clientX - sx); panY = spy + (ev.clientY - sy); applyTransform(); },
+        onEnd: () => { wrap.classList.remove('is-panning'); }
+      };
+    });
+    viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; spx = panX; spy = panY;
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchDist = Math.sqrt(dx * dx + dy * dy);
+        const r = viewport.getBoundingClientRect();
+        touchCx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left;
+        touchCy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top;
+      }
+    }, { passive: true });
+    viewport.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && canPan()) {
+        if (touchDist > 0) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; spx = panX; spy = panY; touchDist = 0; }
+        e.preventDefault();
+        panX = spx + (e.touches[0].clientX - sx);
+        panY = spy + (e.touches[0].clientY - sy);
+        applyTransform();
+      } else if (e.touches.length === 2 && touchDist > 0) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        zoomAround(d / touchDist, touchCx, touchCy);
+        touchDist = d;
+      }
+    }, { passive: false });
+    new ResizeObserver(() => { if (svgW) { setAdaptiveHeight(); fitDiagram(); } }).observe(wrap);
+    render();
+  }
+
+  document.querySelectorAll('.diagram-shell').forEach(initDiagram);
+</script>
+
+</body>
+</html>

@@ -60,7 +60,7 @@ Read the `## Capabilities` section. For each capability item, verify:
 - **Single-sentence, testable**: not vague ("improve performance"), not compound
   (two capabilities in one bullet)
 - **Logical coherence**: capability makes sense in the context of the feature and the overall
-  HomeRadar solution (a property tracking / alerts / extension tool)
+  product (read `docs/INITIAL_PROMPT.md` for product intent)
 
 Flag each deficient capability with a specific, actionable improvement suggestion.
 Also flag if the capability set has **obvious gaps** — e.g., a data model feature with no
@@ -208,8 +208,11 @@ After the user responds, apply only the authorized changes:
 - For each fix that modifies a capability, AC, or data model field, note the change in `## Change History`
 
 ### If plan generation is authorized:
-- For specs with no plan: generate a plan file at `docs/plans/{slug}-plan.md` using the plan
-  template from `docs/plans/` references. Cover all CAP-IDs.
+- Generate or update plans only for specs whose frontmatter `status` is `approved`. For draft,
+  deprecated, malformed, or implemented specs, report that no plan was generated and explain the
+  required next action.
+- For approved specs with no plan: generate a plan file at `docs/plans/{slug}-plan.md` using the
+  plan template from `docs/plans/` references. Cover all CAP-IDs.
 - For specs with partial plans: add missing CAP-IDs as tasks to the existing plan.
 
 ---

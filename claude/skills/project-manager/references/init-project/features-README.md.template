@@ -1,0 +1,33 @@
+# Features — {{PROJECT_NAME}}
+
+Index of all feature specs. Each row links to a spec under `docs/features/`. Categories are project-specific — adjust as features land.
+
+> **Maintenance.** `/add-feature` appends a row here automatically. If you add a spec manually, add the row yourself.
+
+---
+
+## Core Features
+
+| Feature | Description | Capabilities |
+|---------|-------------|--------------|
+| _(none yet)_ | | |
+
+## Supporting Features
+
+| Feature | Description | Capabilities |
+|---------|-------------|--------------|
+| _(none yet)_ | | |
+
+## Integrations
+
+| Feature | Description | Capabilities |
+|---------|-------------|--------------|
+| _(none yet)_ | | |
+
+---
+
+**Conventions**
+
+- Spec filename: kebab-case, descriptive. Example: `notification-center.md`.
+- CAP-ID prefix: 2 letters, recorded in `docs/workflow/SDLC.md`. Example: `NC`.
+- A spec must reach `status: approved` before a plan is generated for it.

@@ -1,5 +1,5 @@
 ---
-description: Review the current HomeRadar task list — show status, progress, and any blockers
+description: Dry-run project status report — show feature/plan/task status, completion percentage, and the next recommended action without modifying anything
 ---
 
-Invoke the `homeradar:review-tasks` skill and follow it exactly.
+Invoke the `project-manager:review-tasks` skill and follow it exactly.

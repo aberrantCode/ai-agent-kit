@@ -1,5 +1,5 @@
 ---
-description: Run the full HomeRadar project orchestration loop — picks up the next todo task, spawns the appropriate agent, and iterates until all tasks are complete
+description: Run the full project orchestration loop — pick up the next todo task, spawn the appropriate agent, and iterate until all tasks complete
 ---
 
-Invoke the `homeradar:continue-tasks` skill and follow it exactly.
+Invoke the `project-manager:continue-tasks` skill and follow it exactly.

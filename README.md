@@ -30,7 +30,7 @@ llm_skills/
 ├── claude/
 │   ├── instructions/     # 15 agent instructions
 │   ├── commands/         # 27 slash commands
-│   └── skills/           # 90 domain-specific knowledge modules
+│   └── skills/           # 91 domain-specific knowledge modules
 ├── codex/
 │   ├── instructions/     # Agent instructions for Codex CLI
 │   └── skills/           # 90 domain-specific knowledge modules
@@ -42,7 +42,7 @@ llm_skills/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 90 | 90 | 5 | 185 |
+| Skills | 103 | 90 | 5 | 198 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 27 | — | — | 27 |
 
@@ -71,6 +71,7 @@ All paths are prompted at runtime — press Enter to accept the default or type 
 | `SKILL.md` | yes | Main skill content |
 | `commands/*.md` | no | Companion slash commands |
 | `sub-skills/*/SKILL.md` | no | Delegate sub-skills |
+| `references/**` | no | Skill-local templates and support files |
 
 Instructions are single `.md` files — no bundles.
 
@@ -110,23 +111,23 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 22 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup |
-| Languages & Runtimes | 3 | typescript, python, nodejs-backend |
+| Foundations & Workflow | 23 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, **what-next** |
+| Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
 | UI & Design | 9 | ui-web, frontend-design, visual-explainer |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 6 | code-review, codex-review, gemini-review, playwright-testing |
-| Security & Credentials | 3 | security, credentials, security-review |
+| Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
 | AI & LLM | 4 | agentic-development, llm-patterns, ai-models, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
-| Tooling & DevOps | 8 | project-tooling, publish-github, skills-manager, start-app |
-| Research & OSINT | 3 | youtube-prd-forensics, worldview-layer-scaffold |
+| Tooling & DevOps | 11 | ac-opbta-ops, project-tooling, publish-github, skills-manager, start-app |
+| Research & OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (90 Claude skills)</strong></summary>
+<summary><strong>Full skill list (100 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
@@ -150,10 +151,12 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`pre-pr`](claude/skills/pre-pr/) | Foundations & Workflow | Three self-gates before opening a pull request | ✓ | ✓ | |
 | [`retro-fit-spec`](claude/skills/retro-fit-spec/) | Foundations & Workflow | Add capability IDs to feature specs missing them | ✓ | ✓ | |
 | [`spec-align`](claude/skills/spec-align/) | Foundations & Workflow | Align codebase to a feature spec — gap analysis through implementation | ✓ | ✓ | |
-| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Conversational workflow to produce feature specifications | ✓ | ✓ | |
+| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Standalone conversational feature spec workflow; defers to project-manager:add-feature inside project-manager repositories | ✓ | ✓ | |
+| [`what-next`](claude/skills/what-next/) | Foundations & Workflow | Universal next-action decider — detects the PM framework, prioritises pending work, delegates to the right specialist. Ships with [solution](claude/skills/what-next/diagrams/solution.html) / [feature](claude/skills/what-next/diagrams/features.html) / [plan](claude/skills/what-next/diagrams/plan.html) diagrams and a reusable [eval harness](claude/skills/what-next/evals/). | ✓ | | |
 | [`code-deduplication`](claude/skills/code-deduplication/) | Foundations & Workflow | Prevent semantic duplication with capability index | ✓ | ✓ | |
 | [`typescript`](claude/skills/typescript/) | Languages & Runtimes | TypeScript strict mode with eslint and jest | ✓ | ✓ | |
 | [`python`](claude/skills/python/) | Languages & Runtimes | Python with ruff, mypy, pytest — TDD and type safety | ✓ | ✓ | |
+| [`marko`](claude/skills/marko/) | Languages & Runtimes | Template engine and component system for node.js | ✓ | ✓ |  |
 | [`nodejs-backend`](claude/skills/nodejs-backend/) | Languages & Runtimes | Node.js backend patterns with Express/Fastify | ✓ | ✓ | |
 | [`react-web`](claude/skills/react-web/) | Frontend Frameworks | React web with hooks, React Query, Zustand | ✓ | ✓ | |
 | [`react-native`](claude/skills/react-native/) | Frontend Frameworks | React Native and Expo patterns, performance, animations | ✓ | ✓ | |
@@ -193,10 +196,11 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`security`](claude/skills/security/) | Security & Credentials | OWASP patterns, secrets management, security testing | ✓ | ✓ | |
 | [`credentials`](claude/skills/credentials/) | Security & Credentials | Centralized API key management from Access.txt | ✓ | ✓ | |
 | [`security-review`](claude/skills/security-review/) | Security & Credentials | OWASP Top 10 checklist for auth, input, payments | ✓ | ✓ | ✓ |
+| [`sops-secrets`](claude/skills/sops-secrets/) | Security & Credentials | SOPS-encrypted secrets — reading service logins, rotating credentials, KeePass sync | ✓ | | |
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
 | [`ai-models`](claude/skills/ai-models/) | AI & LLM | Latest AI models reference — Claude, OpenAI, Gemini | ✓ | ✓ | |
-| [`project-manager`](claude/skills/project-manager/) | AI & LLM | Feature-driven development orchestrator with sub-skills | ✓ | ✓ | ✓ |
+| [`project-manager`](claude/skills/project-manager/) | AI & LLM | Feature-driven development orchestrator with bundled commands, sub-skills, and references | ✓ | ✓ | ✓ |
 | [`shopify-apps`](claude/skills/shopify-apps/) | Commerce & Payments | Shopify apps — Remix, Admin API, checkout extensions | ✓ | ✓ | |
 | [`woocommerce`](claude/skills/woocommerce/) | Commerce & Payments | WooCommerce REST API — products, orders, webhooks | ✓ | ✓ | |
 | [`medusa`](claude/skills/medusa/) | Commerce & Payments | Medusa headless commerce — modules, workflows | ✓ | ✓ | |
@@ -209,18 +213,29 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`site-architecture`](claude/skills/site-architecture/) | SEO & Web Presence | Technical SEO — robots.txt, sitemap, Core Web Vitals | ✓ | ✓ | |
 | [`web-content`](claude/skills/web-content/) | SEO & Web Presence | SEO and AI discovery (GEO) — schema optimization | ✓ | ✓ | |
 | [`aeo-optimization`](claude/skills/aeo-optimization/) | SEO & Web Presence | AI Engine Optimization — semantic triples, content clusters | ✓ | ✓ | |
+| [`ac-opbta-ops`](claude/skills/ac-opbta-ops/) | Tooling & DevOps | Operator knowledge for AC_OPBTA home-network repo — Ansible, Proxmox, SOPS, OPNsense, VLANs | ✓ | | |
+| [`add-remote-installer`](claude/skills/add-remote-installer/) | Tooling & DevOps | Add remote install script to a PowerShell repository | ✓ | ✓ | |
+| [`content-aware-file-renaming`](claude/skills/content-aware-file-renaming/) | Tooling & DevOps | Rename file batches by content — documents, downloads, archives with structured formula | ✓ | | |
 | [`project-tooling`](claude/skills/project-tooling/) | Tooling & DevOps | gh, vercel, supabase, render CLI setup | ✓ | ✓ | |
 | [`workspace`](claude/skills/workspace/) | Tooling & DevOps | Multi-repo topology analysis and contract tracking | ✓ | ✓ | |
-| [`add-remote-installer`](claude/skills/add-remote-installer/) | Tooling & DevOps | Add remote install script to a PowerShell repository | ✓ | ✓ | |
 | [`publish-github`](claude/skills/publish-github/) | Tooling & DevOps | Publish to GitHub with branch protection and gitleaks | ✓ | ✓ | |
 | [`remote-installer`](claude/skills/remote-installer/) | Tooling & DevOps | Remote PowerShell installer domain expertise | ✓ | ✓ | |
 | [`skills-manager`](claude/skills/skills-manager/) | Tooling & DevOps | Full skill lifecycle — find, sync, install, audit | ✓ | ✓ | ✓ |
 | [`start-app`](claude/skills/start-app/) | Tooling & DevOps | Discover and run the correct startup command | ✓ | ✓ | |
 | [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/) | Tooling & DevOps | Deploy to Vercel with claimable preview URLs | ✓ | ✓ | |
+| [`usage-limit-reducer`](claude/skills/usage-limit-reducer/) | Tooling & DevOps | Optimize resource usage and reduce API rate limit consumption | ✓ |  |  |
+| [`youtube-extraction`](claude/skills/youtube-extraction/) [(diagram)](claude/skills/youtube-extraction/diagram.html) | Research & OSINT | Reconstruct files, transcripts, and artifacts from a YouTube video — ships with `/recreate-files` | ✓ | | |
 | [`youtube-prd-forensics`](claude/skills/youtube-prd-forensics/) | Research & OSINT | Create PRDs from YouTube demo videos | ✓ | ✓ | |
 | [`worldview-layer-scaffold`](claude/skills/worldview-layer-scaffold/) | Research & OSINT | Scaffold WorldView GEOINT data layers | ✓ | ✓ | |
+| [`video-acquisition`](claude/skills/video-acquisition/) | Research & OSINT | Download and manage video files with metadata | ✓ |  |  |
 | [`worldview-shader-preset`](claude/skills/worldview-shader-preset/) | Research & OSINT | Scaffold WorldView post-processing presets | ✓ | ✓ | |
+| [`transcript-acquisition`](claude/skills/transcript-acquisition/) | Research & OSINT | Fetch and process video transcripts from multiple sources | ✓ |  |  |
 
+| [`frame-extraction`](claude/skills/frame-extraction/) | Research & OSINT | Extract frames and images from video content | ✓ |  |  |
+| [`frame-content-recognition`](claude/skills/frame-content-recognition/) | Research & OSINT | Identify and classify visual content in video frames | ✓ |  |  |
+| [`file-reconstruction`](claude/skills/file-reconstruction/) | Research & OSINT | Reconstruct files from extracted or partial data | ✓ |  |  |
+| [`extraction-reporting`](claude/skills/extraction-reporting/) | Research & OSINT | Generate comprehensive reports from extracted content | ✓ |  |  |
+| [`comment-harvesting`](claude/skills/comment-harvesting/) | Research & OSINT | Extract and process comments from video platforms | ✓ |  |  |
 </details>
 
 ---
@@ -261,6 +276,14 @@ Agent instructions configure specialized sub-agents with specific tools, models,
 Slash commands available globally in Claude Code. Most delegate to a specialized instruction above.
 
 > All commands live in `claude/commands/`.
+> Some skills also ship bundled command wrappers under `claude/skills/<skill>/commands/`; these are
+> installed with the skill bundle rather than listed as global archive commands.
+
+The `project-manager` skill ships bundled commands for its markdown-driven lifecycle:
+`/init-project`, `/init-features`, `/add-feature`, `/analyze-features`, `/continue-tasks`,
+`/update-tasks`, `/review-tasks`, `/reinit`, `/sync-tracker`, and `/analyze-parallelism`. Its
+`references/` bundle includes templates plus read-only helper scripts for deterministic status,
+next-task, blocked, stale, and validation reports.
 
 <details>
 <summary><strong>Full command list (27)</strong></summary>
@@ -294,8 +317,38 @@ Slash commands available globally in Claude Code. Most delegate to a specialized
 | [`/plan-review`](claude/commands/plan-review.md) | Visual HTML plan review with risk assessment |
 | [`/project-recap`](claude/commands/project-recap.md) | Visual project recap — architecture, decisions, debt |
 | [`/skills-manager`](claude/commands/skills-manager.md) | Full skill lifecycle — find, sync, install, update, import, push, search, audit |
+| [`/what-next`](claude/skills/what-next/commands/what-next.md) | Decide what to work on next in the current repo |
+| [`/what-next-update`](claude/skills/what-next/commands/what-next-update.md) | Force refresh of `docs/what-next.md` cache + backlog reconciliation |
 
 </details>
+
+---
+
+## Skill evaluation framework
+
+The [`what-next`](claude/skills/what-next/) skill ships with a **reusable evaluation harness**
+that is the canonical template for measuring any skill's behaviour against a set of synthetic
+test scenarios. Use it as a starting point when building evals for other skills.
+
+- [`evals/README.md`](claude/skills/what-next/evals/README.md) — 7-step run guide (setup →
+  spawn subagents → timing → grade → migrate → aggregate → review) and a recipe for adding a
+  new eval.
+- [`evals/fixtures/`](claude/skills/what-next/evals/fixtures/) — committed synthetic repos, one
+  per eval. Each fixture captures a scenario, not an expected output.
+- [`evals/harness/`](claude/skills/what-next/evals/harness/) — four small, parameterised
+  Python scripts that do all the mechanical work.
+- [`evals/benchmarks/`](claude/skills/what-next/evals/benchmarks/) — iteration-1 and
+  iteration-2 benchmark summaries preserved as historical record.
+- Generated workspace artefacts (transcripts, per-run grading, review HTML) land at
+  `claude/skills/<skill>-workspace/iteration-N/` and are **gitignored** — only the
+  benchmark summaries enter git.
+
+Supporting diagrams for the what-next skill itself:
+
+- [Decision flow](claude/skills/what-next/diagram.html) — master 9-step pipeline.
+- [Solution architecture](claude/skills/what-next/diagrams/solution.html) — components + invariants.
+- [Feature matrix](claude/skills/what-next/diagrams/features.html) — capabilities grouped by domain.
+- [Development plan](claude/skills/what-next/diagrams/plan.html) — iteration history + roadmap.
 
 ---
 
