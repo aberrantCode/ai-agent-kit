@@ -30,7 +30,7 @@ Before writing anything:
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
    - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
-   - `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`
+   - `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -71,6 +71,7 @@ For every directory and file from the discovery list that does **not** already e
 - **`docs/workflow/SDLC.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/FOCUS.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/INDEX.md`** — If absent, copy from template. If present, leave it.
+- **`docs/workflow/runners.md`** — If absent, copy from `references/init-project/runners.md.template`. Phase 3.5 (Runner Discovery) fills in the table; this step only creates the file with the placeholder row so the path exists for downstream code.
 - **`docs/tasks/locks/`** — Create the directory and seed `.gitkeep`. Lock records are runtime
   artifacts using `references/init-project/task-lock.md.template` as their shape.
 - **`docs/tasks/logs/`** — Create the directory and seed `.gitkeep`. Task logs use
@@ -107,6 +108,33 @@ Other tokens (`{{feature-slug}}`, `{{XX-CAP-NN}}`, etc.) are intentionally left 
 
 ---
 
+## Runner Discovery (Phase 3.5)
+
+The Verification Gate (see `project-manager:continue-tasks` and `SKILL.md`) checks that a code-changing task's claim of `Tests: passing: true` is grounded in a real runner. In monorepos with `backend/`, `frontend/`, `packages/*`, or `apps/*` subtrees, the runner often lives nested rather than at the repo root. This phase builds a confirmed list of runners and persists it to `docs/workflow/runners.md` so the gate is deterministic on subsequent runs.
+
+1. **Read repo signals to infer layout.** Open the following files (when present) and harvest stack hints:
+   - `README.md` — look for "stack", "monorepo", "backend", "frontend", "packages", "apps", "services" headings or callouts.
+   - `CLAUDE.md` and `AGENTS.md` — stack tables, working-directory notes.
+   - Top-level workspace files: `pnpm-workspace.yaml`, `turbo.json`, `lerna.json`, `nx.json`, `Cargo.toml` (workspace members), `go.work`.
+
+2. **Run automated discovery.** Execute `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo. The script walks up to 4 levels deep, skipping `node_modules`, `.venv`, `target`, `dist`, `.git`, etc., and emits a markdown table of candidate runners with evidence.
+
+3. **Merge signals into a candidate list.** For each `(Subtree, Runner)` pair found by either the README hints OR the discovery walk, build a row with a proposed test command (e.g., `cd backend; uv run pytest`, `cd frontend; npm test`, `pytest`, `make test`).
+
+4. **Confirm with the user via `AskUserQuestion`.** Use one multi-select question per discovered subtree if more than one was found, OR one single-select if zero/one were found, OR `AskUserQuestion` with the candidate table in the preview pane. The user picks which rows to mark `Confirmed: yes`, may edit the `Command` value via `AskUserQuestion` follow-ups, and may add manual rows (e.g., a project-specific `task test-all` command).
+
+5. **Persist the confirmed list.** Overwrite `docs/workflow/runners.md` with the resolved table:
+   - `last_updated:` → today
+   - `discovered_by:` → `init-project`
+   - One row per confirmed `(Subtree, Runner, Command)` triple with `Confirmed: yes`
+   - Optionally retain rejected candidates as rows with `Confirmed: no` for audit trail (off by default; only include when the user asks)
+
+6. **Greenfield handling.** If neither the README nor the discovery walk found anything, write the template's placeholder row (`Confirmed: no`) and tell the user: "No runners detected yet. Re-run `/reinit` or `pm-test-runners.ps1 -DiscoverOnly` once you add tests."
+
+7. **Never edit existing rows silently.** If `docs/workflow/runners.md` already has confirmed rows from a previous init/reinit, surface them in the `AskUserQuestion` preview and require explicit selection to overwrite. Default to keeping existing rows.
+
+---
+
 ## Reporting (Phase 4)
 
 Print a structured summary to the user:
@@ -128,6 +156,7 @@ Created:
   docs/workflow/SDLC.md
   docs/workflow/FOCUS.md
   docs/workflow/INDEX.md
+  docs/workflow/runners.md         (2 confirmed runners)
   AGENTS.md
   ROADMAP.md
   scripts/guard-pm-flow.ps1

@@ -3,8 +3,8 @@ name: project-manager
 description: >
   Automated project implementation orchestrator that drives feature-driven development from a single
   initial prompt through to completed code. Use this skill when the user invokes /init-project,
-  /init-features, /add-feature, /continue-tasks, /continue-new-session, /review-tasks, /update-tasks,
-  /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says
+  /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks,
+  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says
   anything like "move forward", "keep building", "what's next", "continue the implementation",
   or "start working on the project", AND when the user says "set up project management",
   "bootstrap a new project", "initialize the project workflow", or "make sure agents follow the
@@ -212,6 +212,15 @@ If no such task exists, `/continue-tasks` inserts one after implementation succe
 If a completion block reports `Tests: passing: false`, create corrective build/test work and do not
 mark the implementation done.
 
+**Runner awareness.** The gate reads `docs/workflow/runners.md` (populated by `/init-project` and
+refreshed by `/reinit`) as the source of truth for which test runners exist and where they live —
+this matters in monorepos where pytest, npm test, cargo test, etc. are nested under `backend/`,
+`frontend/`, `packages/*`, `apps/*`, or `services/*` rather than at the repo root. When inserting a
+verification task, the orchestrator quotes the relevant runner command(s) from `runners.md` into the
+task body so the verifier doesn't re-guess. If `runners.md` is missing or empty, the gate runs
+`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warns the user that the
+runner list should be confirmed via `/reinit` for deterministic future runs.
+
 ---
 
 ### `/continue-new-session` — Generate a Session-Handoff Prompt
@@ -226,6 +235,38 @@ containing the handoff prompt. Reference-style — paths plus 2–3 line excerpt
 content. Read-only: never modifies project state. If no recap recommendation exists (e.g., first
 turn of the session), falls back to `docs/workflow/FOCUS.md`, then `pm-next.ps1`, then the
 highest-priority unblocked `todo` task. Detailed flow lives in `sub-skills/continue-new-session/SKILL.md`.
+
+---
+
+### `/iterate-tasks` — Self-Perpetuating Subagent Iteration
+
+Use when the user wants the pipeline to keep advancing one atomic unit at a time without the user
+having to hand-write the next prompt each turn. Each invocation handles **exactly one** iteration:
+
+1. **Reads this session's prior turn** for the recap-recommended next action (same primitive as
+   `/continue-new-session` Step 1) and any pending PR signal.
+2. **Optionally merges a pending PR** via the global `ship-to-dev` skill. Always confirmed via
+   `AskUserQuestion` first — per the global `git-workflow.md`, a one-time skill invocation does
+   not authorize unattended destructive merges. PRs with red CI or conflicts are surfaced as the
+   next action rather than merged.
+3. **Dispatches the next action as a fresh subagent** via the `Agent` tool, so each unit of work
+   runs in its own clean context window. The parent only sees the returned summary, which keeps
+   parent context growth bounded across many iterations. This is the closest the harness lets us
+   get to "auto-clear context per iteration."
+4. **Reconciles via `/update-tasks`** after the subagent returns.
+5. **Emits the next-next prompt** verbatim from the subagent's `## Next-session prompt` block,
+   so the user (or `/loop`) can immediately fire another iteration.
+
+The dispatched subagent is given a RECURSION CLAUSE in its brief: after completing its task and
+opening any PR, it must end its final message with a `## Next-session prompt` fenced block in the
+same shape it received. This contract is what makes the loop self-perpetuating without parent
+context growth.
+
+Pair with the global `/loop` skill (`/loop /iterate-tasks`) for unattended cadence. For true
+context wiping between iterations, use the emit-and-paste workflow with a fresh session — Claude
+Code does not let a slash command clear its own context mid-execution.
+
+Detailed flow lives in `sub-skills/iterate-tasks/SKILL.md`.
 
 ---
 
@@ -422,6 +463,7 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /analyze-features    →  audit specs for template/CAP-ID/plan-coverage gaps
 /continue-tasks      →  generate plans, spawn agents, iterate
 /continue-new-session →  emit a copy-ready prompt to resume the recap's next action in a fresh session
+/iterate-tasks       →  one self-perpetuating iteration: merge pending PR, dispatch next action as fresh subagent, emit next-next prompt
 /update-tasks        →  reconcile active task files with plan statuses
 /review-tasks        →  read-only progress snapshot
 /sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative

@@ -206,7 +206,11 @@ Move every file currently in `docs/tasks/active/` to `docs/tasks/archive/`. Move
 task files sitting directly in `docs/tasks/` (not in a subdirectory) to `docs/tasks/archive/`
 as well. Do not delete any files.
 
-**Step 3 — Normalize feature specs**
+**Step 3 — Audit feature specs (report by default)**
+
+Reinit is recovery tooling. Mass-rewriting specs in place is surprising and hard to undo,
+so this step audits and reports first, and only rewrites with explicit user consent.
+
 For each `.md` file in `docs/features/` that is not `README.md` and not `template.md`:
 
 1. Read the file in full.
@@ -214,30 +218,54 @@ For each `.md` file in `docs/features/` that is not `README.md` and not `templat
    `feature`, `slug`, `status`, `priority`, `area`, `depends_on`, `last_updated`.
 3. Check whether it has all required sections:
    `## Overview`, `## Capabilities`, `## Requirements`, `## Acceptance Criteria`, `## Out of Scope`.
-4. If **fully conforming**: mark as `ok`, skip.
-5. If **non-conforming**: rewrite the file using the template structure. Rules:
-   - **Never discard content.** Every sentence, table, list, code block, and edge-case note from
-     the original must appear somewhere in the rewritten file.
-   - Map existing content to the nearest matching section. If it doesn't fit cleanly into any
-     required section, place it in a `## Notes` section at the bottom.
-   - Infer missing frontmatter fields from the file's content and filename:
-     - `slug` → derive from filename (strip `.md`)
-     - `status` → look for a `Status` field in a `## Metadata` table or similar; default `draft`
-     - `priority` → look for explicit priority signal; default `p2`
-     - `area` → infer from the feature name or existing metadata
-     - `depends_on` → look for dependency references in the text; default `[]`
-     - `last_updated` → today's date
-   - Keep the `## Capabilities` section as a checklist (`- [ ] ...`), promoting bullet lists
-     from the original where needed.
-   - Keep `## Acceptance Criteria` as Given/When/Then bullets where possible.
-6. After rewriting, report the file as `normalized`.
+4. Classify each file as `ok` (fully conforming) or `non-conforming`, and record the specific
+   gaps (missing frontmatter fields, missing sections) for the report.
 
-Report a summary table when done:
+Do **not** rewrite anything yet. Print the audit table:
+
+| File | Result | Missing frontmatter | Missing sections |
+|------|--------|---------------------|------------------|
+| auth.md | ok | — | — |
+| property-data-model.md | non-conforming | `priority`, `area` | `## Out of Scope` |
+
+If every spec is `ok`, continue to Step 4.
+
+If one or more specs are `non-conforming`, ask the user how to proceed. Default
+(first / recommended) option must be `report-only`:
+
+- **report-only** — leave all specs untouched and continue to Step 4. Downstream
+  `continue-tasks` only operates on `status: approved` specs, so non-conforming specs are
+  effectively quarantined until the user fixes them.
+- **rewrite-selected** — present the list of non-conforming files and let the user pick which
+  ones to normalize using the rules below.
+- **rewrite-all** — normalize every non-conforming spec using the rules below.
+
+Only files explicitly selected by the user are rewritten. `ok` files are never rewritten.
+
+Normalization rules (apply only to user-selected rewrites):
+
+- **Never discard content.** Every sentence, table, list, code block, and edge-case note from
+  the original must appear somewhere in the rewritten file.
+- Map existing content to the nearest matching section. If it doesn't fit cleanly into any
+  required section, place it in a `## Notes` section at the bottom.
+- Infer missing frontmatter fields from the file's content and filename:
+  - `slug` → derive from filename (strip `.md`)
+  - `status` → look for a `Status` field in a `## Metadata` table or similar; default `draft`
+  - `priority` → look for explicit priority signal; default `p2`
+  - `area` → infer from the feature name or existing metadata
+  - `depends_on` → look for dependency references in the text; default `[]`
+  - `last_updated` → today's date
+- Keep the `## Capabilities` section as a checklist (`- [ ] ...`), promoting bullet lists
+  from the original where needed.
+- Keep `## Acceptance Criteria` as Given/When/Then bullets where possible.
+
+Report a final summary table that reflects the actual disposition of each spec:
 
 | File | Result | Notes |
 |------|--------|-------|
 | auth.md | ok | already conforming |
-| property-data-model.md | normalized | added frontmatter, remapped Metadata table |
+| property-data-model.md | normalized | user-selected rewrite; added frontmatter, remapped Metadata table |
+| legacy.md | reported only | non-conforming; user opted not to rewrite |
 
 **Step 4 — Launch**
 Run `continue-tasks` from Step 1 (bootstrap check).

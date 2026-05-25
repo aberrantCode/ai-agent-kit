@@ -140,6 +140,10 @@ new session understands the provenance.
 ## Related Commands
 
 - `/continue-tasks` — the orchestration loop the new session will most often invoke
+- `/iterate-tasks` — self-perpetuating subagent variant of this command; reuses Step 1's
+  recap-reading primitive, then dispatches the next action as a fresh subagent and emits the
+  next-next prompt automatically. Use it when you want the loop to keep advancing within the
+  same session instead of paste-into-a-new-session.
 - `/review-tasks` — read-only project snapshot the user can run instead if they want context
   before starting
 - `/update-tasks` — reconcile active task files after the new session finishes a step

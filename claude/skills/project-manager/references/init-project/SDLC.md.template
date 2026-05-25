@@ -73,6 +73,12 @@ reported in the implementation task's completion block.
 If `Tests: passing: false` is reported, the orchestrator creates corrective build/test work and does
 not mark the implementation complete.
 
+**Test runners live in `docs/workflow/runners.md`.** That file is the authoritative list of every
+test runner the gate consults — one row per `(Subtree, Runner, Command)`. Monorepos with nested
+runners (e.g. `backend/pyproject.toml`, `frontend/package.json`) register one row per subtree so the
+gate sees them. The file is populated by `/init-project` (Phase 3.5 Runner Discovery) and refreshed
+by `/reinit`. Refresh ad-hoc with `references/scripts/pm-test-runners.ps1 -DiscoverOnly`.
+
 ## Claims, Leases, and Handoff
 
 Active task files include `claimed_by`, `claimed_at`, and `lease_expires_at`. The orchestrator also
