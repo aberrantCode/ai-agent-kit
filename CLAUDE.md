@@ -1,6 +1,6 @@
-# LLM Skills Archive
+# AI Agent Kit
 
-Single source of truth for all LLM skills across the workstation.
+Single source of truth for all AI agent extensions across the workstation — skills, agent instructions, slash commands (and status lines and prompts as they land).
 Manages domain-specific knowledge modules for Claude Code, OpenAI Codex CLI, and Google Gemini CLI.
 
 ---
@@ -32,7 +32,7 @@ logs/timing.jsonl             — ship-to-dev timing log
 
 - **Never delete** from archive — set `status: deprecated` instead
 - **Flow direction** is always source → archive; only `/import-skill` reverses this
-- **Installed copies** carry `installed-from: llm_skills` frontmatter — skip them during scans
+- **Installed copies** carry `installed-from: ai-agent-kit` frontmatter (legacy copies: `installed-from: llm_skills`) — skip either during scans
 - **Skill bundles** may include optional `sub-skills/` and `commands/` subdirectories
 - **All changes** go through feature branch → PR → `dev` (never commit directly to `dev` or `main`)
 - **README parity** — every archived skill must have a README row; every row must point to a real file
@@ -48,7 +48,7 @@ logs/timing.jsonl             — ship-to-dev timing log
 | `status:` | no | `draft` \| `active` \| `deprecated` — defaults to `active` |
 | `version:` | no | semver or ISO date |
 | `requires:` | no | list of skill names this skill depends on |
-| `installed-from:` | no | set to `llm_skills` on installed copies only |
+| `installed-from:` | no | set to `ai-agent-kit` on installed copies only (legacy: `llm_skills`) |
 
 ---
 

@@ -1,6 +1,6 @@
-# LLM Skills Archive
+# AI Agent Kit
 
-Consolidated archive of skills, agent instructions, and slash commands for **Claude Code**, **OpenAI Codex CLI**, and **Google Gemini CLI**.
+A kit of reusable agent extensions — skills, agent instructions, and slash commands (with status lines and prompts on the way) — for **Claude Code**, **OpenAI Codex CLI**, and **Google Gemini CLI**.
 
 ---
 
@@ -9,7 +9,7 @@ Consolidated archive of skills, agent instructions, and slash commands for **Cla
 Deploy skills and instructions to your local profile with a single command:
 
 ```powershell
-irm 'https://raw.githubusercontent.com/aberrantCode/llm_skills/main/install-skills.ps1' | iex
+irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-skills.ps1' | iex
 ```
 
 The interactive installer walks you through:
@@ -26,7 +26,7 @@ Requires PowerShell 5.1+. Works on Windows, macOS (`pwsh`), and Linux (`pwsh`).
 ## What's Inside
 
 ```
-llm_skills/
+ai-agent-kit/
 ├── claude/
 │   ├── instructions/     # 15 agent instructions
 │   ├── commands/         # 27 slash commands
@@ -80,9 +80,9 @@ Instructions are single `.md` files — no bundles.
 Clone the repo and copy what you need:
 
 ```bash
-git clone https://github.com/aberrantCode/llm_skills.git
-cp -r llm_skills/claude/skills/typescript ~/.claude/skills/typescript
-cp llm_skills/claude/instructions/architect.md ~/.claude/agents/architect.md
+git clone https://github.com/aberrantCode/ai-agent-kit.git
+cp -r ai-agent-kit/claude/skills/typescript ~/.claude/skills/typescript
+cp ai-agent-kit/claude/instructions/architect.md ~/.claude/agents/architect.md
 ```
 
 ### Archive management commands
@@ -363,7 +363,7 @@ description: One-line summary of what this skill does
 status: active          # active | draft | deprecated
 version: 1.0.0          # semver or ISO date (optional)
 requires: [base]         # dependency list (optional)
-installed-from: llm_skills  # set on installed copies only
+installed-from: ai-agent-kit  # set on installed copies only (legacy copies may read: llm_skills)
 ---
 ```
 

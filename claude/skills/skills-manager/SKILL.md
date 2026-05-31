@@ -10,7 +10,7 @@ description: >
 
 # Skills Manager
 
-You are the domain expert for the LLM Skills Archive at `C:\development\llm_skills`. You understand the full lifecycle of skills: discovery, archiving, installation, updating, and importing project-level changes back to the archive.
+You are the domain expert for the AI Agent Kit at `C:\development\ai-agent-kit`. You understand the full lifecycle of skills: discovery, archiving, installation, updating, and importing project-level changes back to the archive.
 
 **Critical constraint:** Every question or confirmation to the user MUST use the `AskUserQuestion` tool. Never prompt via free text, never write "Type yes/no", never use inline markdown questions.
 
@@ -19,7 +19,7 @@ You are the domain expert for the LLM Skills Archive at `C:\development\llm_skil
 ## Core Concepts
 
 ### Archive
-`C:\development\llm_skills` is the single source of truth for all LLM skills, agents, and commands. It consolidates skills from the global Claude profile (`~/.claude/`) and all projects under `C:\development\`.
+`C:\development\ai-agent-kit` is the single source of truth for all LLM skills, agents, and commands. It consolidates skills from the global Claude profile (`~/.claude/`) and all projects under `C:\development\`.
 
 ### Skill Bundle
 A skill directory may contain optional subdirectories that travel with it:
@@ -39,7 +39,7 @@ Deploying a bundle to a repo copies:
 - Each `commands/<cmd>.md` → `<target>/.claude/commands/<cmd>.md`
 
 ### Installed Copy
-A skill file with `installed-from: llm_skills` in its YAML frontmatter is an installed copy from the archive. The sync and find operations skip these — they are not project-developed skills.
+A skill file is an installed copy when its YAML frontmatter carries an `installed-from:` marker pointing at this archive. New installs stamp `installed-from: ai-agent-kit`; copies installed before the repository was renamed carry the legacy value `installed-from: llm_skills`. **Treat either value as an installed copy** — throughout this document, `installed-from: ai-agent-kit` is shorthand for *either the current or the legacy marker*. The sync and find operations skip these — they are not project-developed skills.
 
 ### Source Priority (conflict resolution)
 When the same skill name exists in multiple sources, the highest-priority source wins:
@@ -88,7 +88,7 @@ Discover skills across the workstation that are new or changed relative to the a
      - Proceed only on confirm
 
 2. For each discovered `SKILL.md`:
-   - Read frontmatter — if `installed-from: llm_skills` is present, **skip** (installed copy)
+   - Read frontmatter — if `installed-from: ai-agent-kit` is present, **skip** (installed copy)
    - If `status: deprecated` is present, classify as **Deprecated** regardless of diff — do not treat as New or Changed
    - Compare content against archive counterpart using diff (ignore trailing whitespace)
    - Classify: **New** | **Changed** | **Unchanged** | **Orphan** | **Deprecated**
@@ -117,7 +117,7 @@ Archive a specific skill (or all discovered skills) including its full bundle.
 ### With a skill name
 
 1. Search all canonical source locations for a skill named `name` (match by leaf directory name)
-2. Skip any match where `installed-from: llm_skills` is in frontmatter
+2. Skip any match where `installed-from: ai-agent-kit` is in frontmatter
 3. Apply conflict resolution if multiple sources found — take highest-priority source
 4. Detect companion commands and sub-skills in the same project (see heuristics above)
 5. Write to archive:
@@ -183,7 +183,7 @@ Deploy a skill bundle from the archive into a project.
    - Options: "Yes, install" | "Cancel"
 
 7. On confirm:
-   - Write `<target>/.claude/skills/<name>/SKILL.md`; inject `installed-from: llm_skills` into frontmatter (add after existing fields)
+   - Write `<target>/.claude/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (add after existing fields)
    - Write each sub-skill to `<target>/.claude/skills/<sub>/SKILL.md` with same marker
    - Write each command to `<target>/.claude/commands/<cmd>.md` (no marker — commands are not skills)
 
@@ -197,7 +197,7 @@ Update installed skills in the current project when the archive has newer versio
 
 ### Steps
 
-1. Scan current project's `.claude/skills/` for files with `installed-from: llm_skills` in frontmatter
+1. Scan current project's `.claude/skills/` for files with `installed-from: ai-agent-kit` in frontmatter
 2. If `name` given: filter to that skill only
 
 3. For each installed skill found:
@@ -211,7 +211,7 @@ Update installed skills in the current project when the archive has newer versio
    - Options: "Yes, update" | "Cancel"
 
 5. On confirm:
-   - Overwrite each `SKILL.md`, preserving the `installed-from: llm_skills` marker in frontmatter
+   - Overwrite each `SKILL.md`, preserving the `installed-from: ai-agent-kit` marker in frontmatter
    - Also check `commands/` in the archive bundle — write any new or changed commands to `<project>/.claude/commands/`
    - Also check `sub-skills/` — update any installed sub-skills that are outdated
    - Regenerate the diagram: invoke `visual-explainer:generate-web-diagram` for each updated skill and overwrite `claude/skills/<name>/diagram.html`; update the `## Diagram` section in SKILL.md if the path changed
@@ -228,13 +228,13 @@ Import project-level changes to a skill back into the archive and the global use
 
 1. **Determine scope:**
    - If `name` given: import that skill only
-   - If no `name`: scan current project's `.claude/skills/` for all skills that do NOT have `installed-from: llm_skills` and differ from the archive; use `AskUserQuestion` to confirm:
+   - If no `name`: scan current project's `.claude/skills/` for all skills that do NOT have `installed-from: ai-agent-kit` and differ from the archive; use `AskUserQuestion` to confirm:
      - Question: "Import all N project-developed skills to archive and user profile? (list names)"
      - Options: "Yes, import all" | "Cancel"
      - Proceed only on confirm
 
 2. Locate `<name>/SKILL.md` in the current project's `.claude/skills/`
-3. Check frontmatter: if `installed-from: llm_skills` is present, use `AskUserQuestion` to reject:
+3. Check frontmatter: if `installed-from: ai-agent-kit` is present, use `AskUserQuestion` to reject:
    - Question: "`<name>` was installed from the archive — it is not a project-developed skill. Import would just overwrite the archive with its own content. Proceed anyway?"
    - Options: "Cancel" | "Yes, force import"
    - Default is Cancel; only proceed if user explicitly chooses force
@@ -326,7 +326,7 @@ Run a comprehensive read-only health check across the entire archive. No changes
 2. **README drift — broken links**: rows in the README Skills table whose link target directory does not exist in `claude/skills/`
 3. **README drift — missing rows**: skill directories in `claude/skills/*/` that have no corresponding row in the README Skills table (match by link text)
 4. **Malformed frontmatter**: `SKILL.md` files missing required `name:` or `description:` fields
-5. **Deprecated installs**: scan all projects under `C:\development\` for installed skills (`installed-from: llm_skills`) where the archive copy has `status: deprecated` — list project and skill name
+5. **Deprecated installs**: scan all projects under `C:\development\` for installed skills (`installed-from: ai-agent-kit`) where the archive copy has `status: deprecated` — list project and skill name
 6. **Codex/Gemini parity gaps**: README rows with `✓` only in the Claude column — grouped by subsection, sorted by description length as a proxy for skill complexity (longer = more porting value)
 
 ### Output format
@@ -393,9 +393,9 @@ Push a skill bundle from the archive to the global user profile (`~/.claude/`) s
 
 **Nested paths**: The skill `<name>` is always the leaf directory containing `SKILL.md`. Intermediate path segments (e.g. `homeradar/` in `skills/homeradar/feature-start/SKILL.md`) are discarded.
 
-**Installed-copy filter**: Apply before any classification. Skip any file with `installed-from: llm_skills` in frontmatter.
+**Installed-copy filter**: Apply before any classification. Skip any file with `installed-from: ai-agent-kit` in frontmatter.
 
-**`llm_skills` itself**: Only scan `.claude/` — never recurse into `claude/` (the archive destination). Scanning the archive as a source would create circular copies.
+**`ai-agent-kit` itself**: Only scan `.claude/` — never recurse into `claude/` (the archive destination). Scanning the archive as a source would create circular copies.
 
 **Directories to skip**: `nul`, `emby-opbta.p12`, `fullchain.pem`, `privkey.pem`, `recovery_app`, and any loose files (not directories) at the `C:\development\` root.
 
@@ -432,4 +432,4 @@ If no keywords match: **Uncategorized**. Multiple matches: most keyword hits win
 2. **Flow is always source → archive** — except `/import-skill`, which explicitly reverses this.
 3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
 4. **Toolset is determined by directory, not content.**
-5. **Installed copies are not project-developed skills.** The `installed-from: llm_skills` marker gates this distinction.
+5. **Installed copies are not project-developed skills.** The `installed-from: ai-agent-kit` marker gates this distinction.

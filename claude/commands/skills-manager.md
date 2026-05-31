@@ -4,7 +4,7 @@ description: Scan the Claude profile and all C:\development projects for new or 
 
 # /sync-skills
 
-Apply the `sync-skills` skill to synchronize the LLM Skills Archive.
+Apply the `sync-skills` skill to synchronize the AI Agent Kit.
 
 Using your sync-skills domain expertise, execute the following steps:
 
