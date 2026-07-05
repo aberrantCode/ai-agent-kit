@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 104 | 90 | 5 | 199 |
+| Skills | 106 | 90 | 5 | 201 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 27 | — | — | 27 |
 
@@ -111,7 +111,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 23 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, **what-next** |
+| Foundations & Workflow | 24 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
@@ -123,17 +123,18 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
-| Tooling & DevOps | 11 | ac-opbta-ops, project-tooling, publish-github, skills-manager, start-app |
+| Tooling & DevOps | 12 | ac-opbta-ops, project-tooling, publish-github, skills-manager, start-app, graphify |
 | Research & OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (137 Claude skills)</strong></summary>
+<summary><strong>Full skill list (139 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
 | [`base`](claude/skills/base/) | Foundations & Workflow | Universal coding patterns, constraints, TDD workflow, and atomic todos | ✓ | ✓ | |
 | [`iterative-development`](claude/skills/iterative-development/) | Foundations & Workflow | Self-referential TDD iteration — cycles until tests pass | ✓ | ✓ | |
 | [`session-management`](claude/skills/session-management/) | Foundations & Workflow | Context preservation, tiered summarization, and resumability | ✓ | ✓ | |
+| [`analyze-conversations`](claude/skills/analyze-conversations/) | Foundations & Workflow | Mine Claude Code session transcripts for recurring mistakes and friction, then propose prevention patches (ships bundled extractor) | ✓ | | |
 | [`team-coordination`](claude/skills/team-coordination/) | Foundations & Workflow | Multi-person projects — shared state, todo claiming, handoffs | ✓ | ✓ | |
 | [`existing-repo`](claude/skills/existing-repo/) | Foundations & Workflow | Analyze existing repositories, maintain structure, setup guardrails | ✓ | ✓ | |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/) | Foundations & Workflow | Parallel task execution using sub-agents | ✓ | ✓ | |
@@ -217,6 +218,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`ac-opbta-ops`](claude/skills/ac-opbta-ops/) | Tooling & DevOps | Operator knowledge for AC_OPBTA home-network repo — Ansible, Proxmox, SOPS, OPNsense, VLANs | ✓ | | |
 | [`add-remote-installer`](claude/skills/add-remote-installer/) | Tooling & DevOps | Add remote install script to a PowerShell repository | ✓ | ✓ | |
 | [`content-aware-file-renaming`](claude/skills/content-aware-file-renaming/) | Tooling & DevOps | Rename file batches by content — documents, downloads, archives with structured formula | ✓ | | |
+| [`graphify`](claude/skills/graphify/) | Tooling & DevOps | Turn any folder into a navigable knowledge graph — community detection, GraphRAG JSON, interactive HTML (Windows/PowerShell) | ✓ | | |
 | [`project-tooling`](claude/skills/project-tooling/) | Tooling & DevOps | gh, vercel, supabase, render CLI setup | ✓ | ✓ | |
 | [`workspace`](claude/skills/workspace/) | Tooling & DevOps | Multi-repo topology analysis and contract tracking | ✓ | ✓ | |
 | [`publish-github`](claude/skills/publish-github/) | Tooling & DevOps | Publish to GitHub with branch protection and gitleaks | ✓ | ✓ | |
