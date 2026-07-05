@@ -90,6 +90,13 @@ If no valid sentinel exists and the task is older than 24 hours:
 - **Manual cancellation**: set lock status to `cancelled`, record the reason, and leave the task
   active unless the user authorizes archiving.
 
+## Refresh the tracker
+
+After reconciliation, regenerate `docs/STATUS.md` via the `sync-status` skill so its §2/§3
+(generated progress + outstanding-work) reflect the updated plan rows. Rewrite only the
+`pm:generated:*` fences; never touch the `pm:curated:*` fences (§1 runtime, §4 backlog). This keeps
+the single outstanding-work tracker in sync without a separate manual step.
+
 ## Output
 
 Return a concise report with:
@@ -103,4 +110,5 @@ Return a concise report with:
 - Stale active files
 - Released or expired leases
 - Task logs updated
+- `docs/STATUS.md` regenerated (generated sections only)
 - Features still waiting on user decisions
