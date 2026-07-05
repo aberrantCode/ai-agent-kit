@@ -164,8 +164,8 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`flutter`](claude/skills/flutter/) | Frontend Frameworks | Flutter with Riverpod, Freezed, go_router, mocktail | ✓ | ✓ | |
 | [`pwa-development`](claude/skills/pwa-development/) | Frontend Frameworks | Progressive Web Apps — service workers, caching, Workbox | ✓ | ✓ | |
 | [`chrome-extension-builder`](claude/skills/chrome-extension-builder/) | Frontend Frameworks | Chrome MV3 extensions with WXT + React + TypeScript | ✓ | ✓ | ✓ |
-| [`composition-patterns`](claude/skills/composition-patterns/) | Frontend Frameworks | React composition patterns that scale | ✓ | ✓ | |
-| [`react-best-practices`](claude/skills/react-best-practices/) | Frontend Frameworks | React/Next.js performance optimization from Vercel Engineering | ✓ | ✓ | |
+| [`composition-patterns`](claude/skills/composition-patterns/) | Frontend Frameworks | React composition patterns that scale — ships a 10-rule library | ✓ | ✓ | |
+| [`react-best-practices`](claude/skills/react-best-practices/) | Frontend Frameworks | React/Next.js performance optimization from Vercel Engineering — ships a 57-rule library | ✓ | ✓ | |
 | [`android-java`](claude/skills/android-java/) | Mobile (Native) | Android Java with MVVM, ViewBinding, Espresso | ✓ | ✓ | |
 | [`android-kotlin`](claude/skills/android-kotlin/) | Mobile (Native) | Android Kotlin with Coroutines, Jetpack Compose, Hilt | ✓ | ✓ | |
 | [`ui-mobile`](claude/skills/ui-mobile/) | Mobile (Native) | Mobile UI patterns — touch targets, platform conventions | ✓ | ✓ | |
