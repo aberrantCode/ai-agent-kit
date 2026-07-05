@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-19",
+  "generated": "2026-07-05",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -27,6 +27,10 @@
           "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
           "category": "Other"
         },
+        "accumulated-feature-branch-workflow": {
+          "description": "Use when implementing multiple related enhancements, or a large feature that must be split across risk boundaries, and you need to decide branch/PR structure. Covers accumulating related work on one shared branch with atomic commits per enhancement, splitting risky multi-PR features along risk seams, and safely handling a branch that has both committed and dirty (uncommitted) work when shipping.",
+          "category": "Foundations & Workflow"
+        },
         "add-feature": {
           "description": "Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature or when the user says things like \"I want to add a feature\", \"spec out a feature\", \"create a feature spec\", \"write a feature specification\", \"plan a new feature\", \"document a feature idea\", \"let's design a feature\", or \"I have a feature idea\". Walks through a structured 7-phase conversational workflow that produces a thorough feature spec saved to /docs/features/ with a date-prefixed filename. If project-manager scaffolding is present, defer to project-manager:add-feature instead so the canonical CAP-ID workflow is used. After saving, automatically generates a visual diagram of the spec and offers to create an implementation plan. Use this proactively whenever a user describes a feature they want to build, even if they don't explicitly say \"spec\" or \"specification\".",
           "category": "Foundations & Workflow"
@@ -34,6 +38,10 @@
         "add-remote-installer": {
           "description": "Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install directory, then applies the remote-installer skill to implement both artifacts correctly.",
           "category": "DevOps & Tooling"
+        },
+        "additive-merge-conflict-resolution": {
+          "description": "Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the conflict as a false signal and resolves it as a union-keep-both operation instead of a real semantic merge.",
+          "category": "Foundations & Workflow"
         },
         "aeo-optimization": {
           "description": "AI Engine Optimization - semantic triples, page templates, content clusters for AI citations",
@@ -71,6 +79,10 @@
           "description": "Universal coding patterns, constraints, TDD workflow, atomic todos",
           "category": "Foundations & Workflow"
         },
+        "brand-token-extraction-and-documentation": {
+          "description": "Use when reskinning an app with a real brand's visual identity \u2014 extract the actual palette from a live site's raw CSS (not markdown), recreate logo/icon assets programmatically with documented extraction rationale, and codify everything as versioned, named design tokens rather than one-off hardcoded values.",
+          "category": "Frontend & UI"
+        },
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
           "category": "Frontend & UI"
@@ -107,6 +119,10 @@
           "description": "Use when renaming files into a structured naming formula based on their contents \u2014 especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files (document.pdf, document (1).pdf, IMG_*.jpg, scan*.pdf, untitled.*), bulk extracts from broker/bank portals or email attachments, or zip archives that must be extracted before processing. Triggers when the existing filename does not carry the document's identity and the file's content must be inspected to determine who, what, where, and when. The canonical naming formula is `%who% - %what% - %where% - %when% - %extra%`. Always prompt the user via AskUserQuestion only \u2014 never as plain text.",
           "category": "Other"
         },
+        "conversation-history-mining-for-domain-knowledge": {
+          "description": "Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps \u2014 mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.",
+          "category": "Foundations & Workflow"
+        },
         "create-feature-spec": {
           "description": "Create a comprehensive feature specification from a single sentence description",
           "category": "Foundations & Workflow"
@@ -114,6 +130,14 @@
         "credentials": {
           "description": "Centralized API key management from Access.txt",
           "category": "Content & Marketing"
+        },
+        "crlf-gitattributes-normalization": {
+          "description": "Use when a Windows/Linux-mixed repo shows spurious linter \"Delete \u240d\" warnings, gofmt/prettier flags files as unformatted after a clean rebase, or golden-fixture tests fail on byte-exact CRLF-vs-LF comparisons \u2014 normalizes line endings via .gitattributes rather than reformatting or skipping tests.",
+          "category": "Code Quality"
+        },
+        "css-variables-for-multi-theme-reskin": {
+          "description": "Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to \"reskin\" or \"retheme\" an existing interface without touching its structure or interaction logic.",
+          "category": "Frontend & UI"
         },
         "csv-driven-llm-pipeline": {
           "description": "Build a stateful, resumable batch pipeline driven by CSV files with per-row pipeline-state columns. Use whenever the user wants to iterate over a corpus and do per-row work that may take time, hit external APIs, call an LLM, or need restart-resilience \u2014 even if they don't say \"pipeline\". Triggers on phrases like \"process all the X\", \"for each row do Y\", \"analyze the corpus\", \"batch enrich\", \"add a column tracking whether...\", \"extract X from Y for every Z\", or any task requiring eligibility filtering, idempotent re-runs, rate-limit awareness, or downstream-resumable state. Covers schema design, phase-by-phase execution, deterministic discovery, rate-limited HTTP fetching, iterative LLM prompt engineering with A/B testing, and PowerShell pitfalls.",
@@ -123,9 +147,25 @@
           "description": "Schema awareness - read before coding, type generation, prevent column errors",
           "category": "Databases"
         },
+        "deploy-idempotency-two-pass-gate": {
+          "description": "Use when running any live infrastructure apply (Ansible playbook, Terraform, Docker Compose stack, or similar) \u2014 before declaring a deployment successful or moving on to smoke tests, run the apply twice and require the second pass to report zero changes, so latent non-idempotent tasks are caught before they corrupt future deploys.",
+          "category": "DevOps & Tooling"
+        },
+        "deployment-driver-pin-rewrite-from-release-tag-source-of-truth": {
+          "description": "Use when a deployment or build system has both a human-editable \"intent\" field (a release tag, plan row) and a derived \"pin\" artifact (an image pin file, lockfile) \u2014 ensures edits always go to the source-of-truth field and the driver/loop re-derives the pin, rather than hand-editing the derived artifact.",
+          "category": "DevOps & Tooling"
+        },
+        "design-critique-to-safe-refactor": {
+          "description": "Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.",
+          "category": "Code Quality"
+        },
         "design-taste-frontend": {
           "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
           "category": "Frontend & UI"
+        },
+        "diagnostics-probe-design": {
+          "description": "Use when investigating a service or infrastructure failure and before proposing any fix \u2014 verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.",
+          "category": "DevOps & Tooling"
         },
         "doc-coauthoring": {
           "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
@@ -160,10 +200,18 @@
           "description": "Firebase Firestore, Auth, Storage, real-time listeners, security rules",
           "category": "Databases"
         },
+        "firewall-alias-as-indirection": {
+          "description": "Use when designing or editing firewall rules for a group of devices (e.g. cameras, IoT clusters) \u2014 reference a named alias instead of hardcoded IPs so device-set changes never require rule edits, and use config-tracing (not assumption) to decide whether a public endpoint is actually load-bearing before retiring it.",
+          "category": "DevOps & Tooling"
+        },
         "fix-start": {
           "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
           "category": "Foundations & Workflow",
           "has_commands": true
+        },
+        "fleet-cp1252-mojibake-fix": {
+          "description": "Use when shell scripts (bash/PowerShell) print non-ASCII glyphs like checkmarks, X marks, or box-drawing rules that render as mojibake under Git Bash / Windows cp1252 terminals \u2014 replace runtime output with ASCII equivalents while leaving comments and remote heredocs untouched.",
+          "category": "DevOps & Tooling"
         },
         "flutter": {
           "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
@@ -189,12 +237,28 @@
           "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
           "category": "Foundations & Workflow"
         },
+        "gpu-workload-placement-and-arbitration": {
+          "description": "Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.",
+          "category": "DevOps & Tooling"
+        },
         "grafana-dashboard-engineer": {
           "description": "Production-grade Grafana dashboard engineer. Enables rapid research, design, build, deployment, and validation of observability dashboards across Prometheus, Loki, and custom datasources. Supports IaC (Ansible/PowerShell), application-specific templates, and full git workflow integration for homelab and enterprise environments.",
           "category": "Other"
         },
+        "grafana-dashboard-workflow": {
+          "description": "Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards \u2014 enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.",
+          "category": "DevOps & Tooling"
+        },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. ALWAYS use AskUserQuestion for every prompt to the user \u2014 never just print a question as plain text.",
+          "category": "Foundations & Workflow"
+        },
+        "honcho-deriver-queue-health-diagnostics": {
+          "description": "Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts \u2014 check both the MCP-visible layer and the server-side queue table directly, distinguish \"broken\" from \"contended,\" and audit stored conclusions for pollution.",
+          "category": "DevOps & Tooling"
+        },
+        "iterative-audit-gate-with-streak-reset": {
+          "description": "Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification gates repeatedly, resetting a \"clean streak\" to zero on any finding, until two consecutive rounds come back clean \u2014 forcing convergence instead of accepting the first green result.",
           "category": "Foundations & Workflow"
         },
         "iterative-development": {
@@ -213,6 +277,10 @@
           "description": "Restylize, retheme, or transform an existing logo or icon into a new visual variant. Use this skill whenever the user wants to: create a variation of an existing logo, change logo colors or style, apply a new theme or effect to an icon, make a dark/light/neon/flat/outlined version, apply new branding to an existing mark, generate a restyled copy of any SVG or image file, or modify a logo's visual treatment. Triggers on phrases like \"restyle logo\", \"transform icon\", \"make a dark version\", \"change the colors on\", \"apply X style to\", \"create a variant of\", or any request that combines an existing image with a desired visual outcome. Always invoke before attempting to modify an image file manually.",
           "category": "Specialized"
         },
+        "lvm-thin-pool-diagnostics-recovery": {
+          "description": "Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space \u2014 covers layered diagnosis and safe recovery of the thin pool and any affected filesystems.",
+          "category": "DevOps & Tooling"
+        },
         "marko": {
           "description": "Marko is a grumpy senior code reviewer who critiques code with zero praise inflation and never suggests fixes. Invoke Marko whenever the user addresses him by name to ask for a code opinion \u2014 \"marko?\", \"what do you think marko?\", \"hey marko\", \"marko review this\", \"marko take a look\", \"marko thoughts?\", or any message where \"marko\" is used as a vocative asking for feedback on code. Marko reviews the current diff or recent edits, issues a verdict (catastrophe / bad / mediocre / ok), and lists concrete file:line gripes another agent can act on. Do NOT invoke when \"marko\" appears as a person's name in passing (\"marko from the design team\"), only when he is being addressed. Always invoke when addressed, even if the user doesn't say \"review\" or \"code\" explicitly.",
           "category": "Other"
@@ -225,9 +293,17 @@
           "description": "Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API",
           "category": "Content & Marketing"
         },
+        "multi-perspective-dns-diagnostic-ladder": {
+          "description": "Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any \"mysterious\" networked-service failure needs root-causing \u2014 apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and always verify a fix by re-checking logs after applying it.",
+          "category": "DevOps & Tooling"
+        },
         "nodejs-backend": {
           "description": "Node.js backend patterns with Express/Fastify, repositories",
           "category": "Languages"
+        },
+        "parallel-subagent-fanout": {
+          "description": "Use when a task splits into independent lenses or disjoint-file subtasks \u2014 multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature branch \u2014 to dispatch multiple subagents concurrently and reconcile their results into one verdict.",
+          "category": "Foundations & Workflow"
         },
         "playwright-testing": {
           "description": "E2E testing with Playwright - Page Objects, cross-browser, CI/CD",
@@ -243,10 +319,14 @@
           "has_commands": true
         },
         "project-manager": {
-          "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-feature, /continue-tasks, /review-tasks, /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says anything like \"move forward\", \"keep building\", \"what's next\", \"continue the implementation\", or \"start working on the project\", AND when the user says \"set up project management\", \"bootstrap a new project\", \"initialize the project workflow\", or \"make sure agents follow the project plan\". This skill manages the full lifecycle: scaffolding a new project with enforcement artifacts, extracting feature specs via interview, generating phased implementation plans, spawning typed agents to execute tasks, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as the shared state between orchestrator and worker agents.",
+          "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks, /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says anything like \"move forward\", \"keep building\", \"what's next\", \"continue the implementation\", or \"start working on the project\", AND when the user says \"set up project management\", \"bootstrap a new project\", \"initialize the project workflow\", or \"make sure agents follow the project plan\". This skill manages the full lifecycle: scaffolding a new project with enforcement artifacts, extracting feature specs via interview, generating phased implementation plans, spawning typed agents to execute tasks, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as the shared state between orchestrator and worker agents.",
           "category": "AI & LLM",
           "has_commands": true,
           "has_sub_skills": true
+        },
+        "project-plan-task-reconciliation": {
+          "description": "Use when reconciling a completed worker task against the project plan and backlog \u2014 appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, and auditing for features that shipped without a formal plan/task trail.",
+          "category": "Foundations & Workflow"
         },
         "project-tooling": {
           "description": "gh, vercel, supabase, render CLI and deployment platform setup",
@@ -269,12 +349,24 @@
           "category": "Languages"
         },
         "react-native": {
-          "description": "React Native and Expo patterns, platform-specific code, list performance, animations, and navigation best practices",
+          "description": "React Native and Expo patterns \u2014 project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code",
           "category": "Languages"
+        },
+        "react-virtualization-with-jsdom-measurement": {
+          "description": "Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser.",
+          "category": "Frontend & UI"
         },
         "react-web": {
           "description": "React web development with hooks, React Query, Zustand",
           "category": "Languages"
+        },
+        "reactive-ui-state-with-delegated-event-routing": {
+          "description": "Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-color-scheme/prefers-reduced-motion in a testable way.",
+          "category": "Frontend & UI"
+        },
+        "recursive-batch-handoff": {
+          "description": "Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations \u2014 each batch runs a discovery command to find what's left, executes one coherent chunk, and emits a self-similar handoff prompt so the next session (or run) continues without a central master plan.",
+          "category": "Foundations & Workflow"
         },
         "reddit-ads": {
           "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
@@ -301,17 +393,41 @@
           "category": "Foundations & Workflow",
           "has_commands": true
         },
+        "scanner-plugin-integration": {
+          "description": "Use when importing, fixing, or adding a new provider/scanner plugin (e.g. OSINT lookup services, external-API integrations) into an existing Go-style package tree \u2014 merge orphaned scaffolds into the real package, preserve the plugin interface pattern, keep gating in DryRun not Run, and verify live endpoints before coding against docs.",
+          "category": "Code Quality"
+        },
         "security": {
           "description": "OWASP security patterns, secrets management, security testing",
+          "category": "Code Quality"
+        },
+        "security-aware-persistence-design": {
+          "description": "Use when designing or reviewing a feature that persists user-supplied data (new DB table/API, exposing a service, or writing multi-statement Create/Update/Delete flows) \u2014 apply parameterized queries, PII handling, DoS caps, and transaction safety, and gate any network-exposure decision on real (not speculative) use.",
           "category": "Code Quality"
         },
         "security-review": {
           "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
           "category": "Code Quality"
         },
+        "self-contained-html-artifact-with-inline-assets": {
+          "description": "Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests \u2014 no CDNs, no relative-path assets, no build step \u2014 and correctly render in both light and dark themes.",
+          "category": "Frontend & UI"
+        },
+        "self-paced-loop-iteration": {
+          "description": "Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval \u2014 each iteration completes one bounded unit of work, verifies it, commits, and schedules the next wakeup based on what just happened rather than wall-clock time.",
+          "category": "Foundations & Workflow"
+        },
         "session-management": {
           "description": "Context preservation, tiered summarization, resumability",
           "category": "Foundations & Workflow"
+        },
+        "shell-helper-migration": {
+          "description": "Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) \u2014 extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and preserving exact exit-code and output-contract semantics across a batch of scripts.",
+          "category": "DevOps & Tooling"
+        },
+        "shell-migration-skip-taxonomy": {
+          "description": "Use when deciding whether a shell script can safely be migrated to source a centralized helper library \u2014 classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.",
+          "category": "DevOps & Tooling"
         },
         "ship-to-dev": {
           "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
@@ -320,6 +436,10 @@
         "shopify-apps": {
           "description": "Shopify app development - Remix, Admin API, checkout extensions",
           "category": "Commerce"
+        },
+        "side-effect-free-helper-library": {
+          "description": "Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own validation or exit-code conventions.",
+          "category": "DevOps & Tooling"
         },
         "site-architecture": {
           "description": "Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals",
@@ -339,10 +459,22 @@
           "category": "Foundations & Workflow",
           "has_commands": true
         },
+        "spec-consistency-doc-refactoring-pattern": {
+          "description": "Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) \u2014 atomic, scope-limited fixes that preserve intent and prose without a full re-architecture.",
+          "category": "Foundations & Workflow"
+        },
+        "stale-symbolic-ref-detection-and-repair": {
+          "description": "Use when a script, agent, or session is about to act on a remembered reference \u2014 a git default branch, a cached IP/credential, an \"SSH is broken\" note in memory \u2014 before any destructive or high-stakes operation. Verifies the reference against live state instead of trusting the cache.",
+          "category": "Foundations & Workflow"
+        },
         "start-app": {
           "description": "Start any type of modern application \u2014 web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says \"start the app\", \"run it\", \"boot it up\", \"kick it off\", \"get it running\", \"spin it up\", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. \"start the Next.js app\", \"run the FastAPI server\", \"launch the Docker stack\").",
           "category": "DevOps & Tooling",
           "has_commands": true
+        },
+        "state-file-driven-multi-turn-resumption": {
+          "description": "Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them \u2014 a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one step, records evidence, and ends with a copy-ready resume prompt.",
+          "category": "Foundations & Workflow"
         },
         "subagent-driven-development": {
           "description": "Use when executing implementation plans with independent tasks in the current session",
@@ -376,12 +508,20 @@
           "description": "Domain expertise for obtaining a timestamped transcript of a YouTube video \u2014 first via YouTube's own auto-subs/CC, falling back to local Whisper transcription of the downloaded video. Sub-skill of `youtube-extraction`. Use when the parent skill needs spoken-word evidence aligned to timestamps.",
           "category": "Other"
         },
+        "two-surface-observability-reconciliation": {
+          "description": "Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two candidate sources of truth (a formal tracking framework and a living backlog, or two metrics pipelines) disagree about what's actually going on. Reconciles them into one verdict instead of trusting either alone.",
+          "category": "DevOps & Tooling"
+        },
         "typescript": {
           "description": "TypeScript strict mode with eslint and jest",
           "category": "Languages"
         },
         "ui-mobile": {
           "description": "Mobile UI patterns - React Native, iOS/Android, touch targets",
+          "category": "Frontend & UI"
+        },
+        "ui-redesign-with-snapshot-regeneration": {
+          "description": "Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes \u2014 to avoid masking real regressions as \"just snapshot drift.",
           "category": "Frontend & UI"
         },
         "ui-testing": {
@@ -439,6 +579,10 @@
         },
         "workspace": {
           "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
+          "category": "Foundations & Workflow"
+        },
+        "worktree-isolated-loop": {
+          "description": "Use when running multi-turn or batch agent work (refactoring, feature loops) that must stay isolated from concurrent edits in the primary checkout, and when setting up a self-perpetuating /loop that hands off context between turns via git state rather than chat memory.",
           "category": "Foundations & Workflow"
         },
         "worldview-layer-scaffold": {
