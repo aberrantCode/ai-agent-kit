@@ -47,8 +47,8 @@ content** (the new session will read them itself):
 - Feature spec → `docs/features/{slug}.md`
 - Plan → `docs/plans/{slug}-plan.md`
 - Active task → `docs/tasks/active/{slug}-p{N}-t{M}.md` (only if one already exists)
-- Workflow pointers → `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md` (always include if they
-  exist)
+- Status tracker → `docs/STATUS.md` (always include; §1 is the run state/next action, formerly
+  `docs/workflow/FOCUS.md` which is now a retired stub), plus `docs/workflow/INDEX.md` if it exists
 
 Verify each path exists. If a referenced path does not exist, note that fact in the prompt rather
 than emitting a broken reference.
@@ -72,7 +72,7 @@ You are starting a fresh session to continue a project that uses the **project-m
 
 ## Project pointers
 
-- Workflow focus: `docs/workflow/FOCUS.md`
+- Status tracker (outstanding work + next action): `docs/STATUS.md` (§1 = run state)
   > {excerpt}
 - Workflow index: `docs/workflow/INDEX.md`
   > {excerpt}
@@ -118,7 +118,8 @@ If Step 1 found no recap recommendation (e.g., the previous turn was purely a qu
 the first message of the session), tell the user so explicitly, then derive a substitute next action
 from project state:
 
-1. Read `docs/workflow/FOCUS.md` and use its `## Next Action` heading if present.
+1. Read `docs/STATUS.md` §1 (Next action & run state) and use its NEXT ACTION if present
+   (`docs/workflow/FOCUS.md` is a retired stub pointing there).
 2. Otherwise, if `references/scripts/pm-next.ps1` exists, run it and use its top recommendation.
 3. Otherwise, scan `docs/plans/*.md` for the first `todo` task in the lowest phase of the
    highest-priority approved feature with no dependency blockers.

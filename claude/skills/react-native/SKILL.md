@@ -1,11 +1,13 @@
 ---
 name: react-native
-description: React Native and Expo patterns, platform-specific code, list performance, animations, and navigation best practices
+description: React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code
 ---
 
 # React Native Skill
 
 *Load with: base.md + typescript.md*
+
+> Incorporates the priority-tiered rule taxonomy from Vercel's `react-native-skills` (MIT).
 
 ---
 
@@ -152,6 +154,23 @@ export function useCreateItem() {
 
 ### Show Fallback on First Render
 When data is loading, always show a skeleton or fallback — never render empty containers that cause layout shift.
+
+### Dispatcher Pattern for Callbacks
+Pass a single stable `dispatch` down instead of many individual callbacks — one stable reference beats N changing ones and keeps memoized children from re-rendering.
+
+### React Compiler Compatibility
+The React Compiler auto-memoizes, but only when it can statically analyze your code:
+
+```typescript
+// Good — compiler tracks `refresh` as a stable dependency
+const { refresh } = useHome();
+
+// Avoid — compiler can't see through the object
+const home = useHome();
+```
+
+- **Destructure functions from hooks** so the compiler can follow them.
+- **Reanimated shared values** are mutable refs — read `.value` only inside worklets / `useAnimatedStyle`, never during render, or the compiler's assumptions break.
 
 ---
 
@@ -333,6 +352,18 @@ ref.current?.measure((x, y, w, h) => setHeight(h));
 ### Styling
 Use `StyleSheet.create` for static styles, or Nativewind for Tailwind-style utility classes. Never use inline style objects in render paths that re-render frequently.
 
+### Image Lightboxes — Galeria
+Use `Galeria` for tap-to-expand image galleries — it gives native shared-element zoom transitions instead of a JS modal.
+
+### Native Context Menus
+Use native context-menu libraries (e.g. `zeego`) over custom JS popovers — they inherit OS styling, haptics, and accessibility for free.
+
+### ScrollView Headers — `contentInset`
+Offset content beneath a floating/transparent header with `contentInset`/`contentOffset` (iOS) rather than manual top padding, so scroll indicators and bounce behave natively.
+
+### Text Must Live in `<Text>`
+Every string must be wrapped in a `<Text>` component — a raw string directly under a `<View>` throws at runtime on native.
+
 ---
 
 ## Platform-Specific Code
@@ -425,6 +456,9 @@ import { Button } from '@company/design-system/button';
 import { Button } from '@company/design-system';
 ```
 
+### Hoist `Intl` Formatters
+Constructing `Intl.NumberFormat` / `Intl.DateTimeFormat` is expensive — create them once at module scope, never per render.
+
 ---
 
 ## Anti-Patterns
@@ -446,6 +480,11 @@ import { Button } from '@company/design-system';
 | `measure()` for view dimensions | `onLayout` |
 | Falsy `&&` for conditional rendering | Ternary or explicit comparison |
 | `Image` from react-native | `expo-image` |
+| Many individual callbacks down the tree | Stable `dispatch` dispatcher |
+| Reading shared `.value` in render | Read only inside worklets |
+| Raw strings outside `<Text>` | Wrap every string in `<Text>` |
+| Recreating `Intl` formatters per render | Hoist to module scope |
+| JS popovers for menus | Native context menus (`zeego`) |
 
 ## Diagram
 

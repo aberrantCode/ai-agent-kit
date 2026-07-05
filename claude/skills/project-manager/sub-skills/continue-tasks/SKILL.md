@@ -20,7 +20,7 @@ Load these local artifacts before acting:
 - `docs/tasks/locks/*.md`
 - `docs/tasks/logs/*.md`
 - `docs/issues/*.md`
-- `docs/workflow/FOCUS.md`
+- `docs/STATUS.md` (the single outstanding-work + next-action tracker; §1 is the run state formerly in `docs/workflow/FOCUS.md`, which is now a retired stub)
 - `docs/workflow/INDEX.md`
 - `docs/features/template.md`, `docs/plans/template.md`, `docs/tasks/template.md`
 
@@ -183,9 +183,11 @@ Include:
 Update the plan task status to `in-progress`.
 
 Create `docs/tasks/locks/{task-id}.lock.md` when `docs/tasks/locks/` exists. Create or append
-`docs/tasks/logs/{task-id}.md` when `docs/tasks/logs/` exists. Refresh `docs/workflow/FOCUS.md`
-with the active task, lease expiry, blockers, and next action. Append durable discoveries or
-cross-feature decisions to `docs/workflow/INDEX.md` only when there is a factual note worth keeping.
+`docs/tasks/logs/{task-id}.md` when `docs/tasks/logs/` exists. Update `docs/STATUS.md` §1
+(curated runtime block) with the active task, lease expiry, blockers, and next action, then
+regenerate its §2/§3 via the `sync-status` skill (rewrite only the `pm:generated:*` fences;
+never touch the `pm:curated:*` fences). Append durable discoveries or cross-feature decisions to
+`docs/workflow/INDEX.md` only when there is a factual note worth keeping.
 
 ## Step 8 - Spawn the Worker
 
@@ -214,6 +216,7 @@ Spawn with:
 Poll only the spawned task file. Use the strict completion detection from Step 4. When a valid
 completion block appears, return to Step 5. If the task becomes stale or malformed, report and pause.
 
-Before any long pause, update `docs/workflow/FOCUS.md` with the current task state and the exact next
-command to run. If context-critical information is buried in the task file, append it to the task log
-or `docs/workflow/INDEX.md`.
+Before any long pause, update `docs/STATUS.md` §1 (curated runtime block) with the current task
+state and the exact next command to run, and regenerate its §2/§3 via `sync-status`. If
+context-critical information is buried in the task file, append it to the task log or
+`docs/workflow/INDEX.md`.

@@ -30,7 +30,7 @@ Before writing anything:
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
    - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
-   - `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`
+   - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -68,8 +68,13 @@ For every directory and file from the discovery list that does **not** already e
 - **`.claude/settings.json`** — JSON merge. Read the existing file (or `{}`), shallow-merge the `hooks.PreToolUse` array (do not duplicate entries with the same `command`). Write back with 2-space indentation.
 - **`.github/pull_request_template.md`** — If absent, copy from template (no substitution). If present, leave it.
 - **`ROADMAP.md`** — If absent, copy from template with substitutions. If present, leave it.
+- **`docs/STATUS.md`** — If absent, copy from `references/init-project/STATUS.md.template`. This
+  is the single outstanding-work + next-action tracker: five `##` sections, both `pm:curated:*` and
+  `pm:generated:*` fence pairs, §1 seeded with a "no active run yet" line and §4 empty. If present,
+  leave it.
 - **`docs/workflow/SDLC.md`** — If absent, copy from template. If present, leave it.
-- **`docs/workflow/FOCUS.md`** — If absent, copy from template. If present, leave it.
+- **`docs/workflow/FOCUS.md`** — If absent, copy from template (a one-line retired stub pointing to
+  `docs/STATUS.md` §1 — the runtime/next-action state lives there now, not here). If present, leave it.
 - **`docs/workflow/INDEX.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/runners.md`** — If absent, copy from `references/init-project/runners.md.template`. Phase 3.5 (Runner Discovery) fills in the table; this step only creates the file with the placeholder row so the path exists for downstream code.
 - **`docs/tasks/locks/`** — Create the directory and seed `.gitkeep`. Lock records are runtime
@@ -153,8 +158,9 @@ Created:
   docs/tasks/locks/.gitkeep
   docs/tasks/logs/.gitkeep
   docs/issues/.gitkeep
+  docs/STATUS.md                   (single outstanding-work + next-action tracker)
   docs/workflow/SDLC.md
-  docs/workflow/FOCUS.md
+  docs/workflow/FOCUS.md           (retired stub → points to STATUS.md §1)
   docs/workflow/INDEX.md
   docs/workflow/runners.md         (2 confirmed runners)
   AGENTS.md

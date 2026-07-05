@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 103 | 90 | 5 | 198 |
+| Skills | 104 | 90 | 5 | 199 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 27 | — | — | 27 |
 
@@ -119,7 +119,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 6 | code-review, codex-review, gemini-review, playwright-testing |
 | Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
-| AI & LLM | 4 | agentic-development, llm-patterns, ai-models, project-manager |
+| AI & LLM | 5 | agentic-development, llm-patterns, ai-models, honcho, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
@@ -127,7 +127,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Research & OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (100 Claude skills)</strong></summary>
+<summary><strong>Full skill list (137 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
@@ -159,7 +159,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`marko`](claude/skills/marko/) | Languages & Runtimes | Template engine and component system for node.js | ✓ | ✓ |  |
 | [`nodejs-backend`](claude/skills/nodejs-backend/) | Languages & Runtimes | Node.js backend patterns with Express/Fastify | ✓ | ✓ | |
 | [`react-web`](claude/skills/react-web/) | Frontend Frameworks | React web with hooks, React Query, Zustand | ✓ | ✓ | |
-| [`react-native`](claude/skills/react-native/) | Frontend Frameworks | React Native and Expo patterns, performance, animations | ✓ | ✓ | |
+| [`react-native`](claude/skills/react-native/) | Frontend Frameworks | React Native and Expo — FlashList, Reanimated, React Compiler, native UI primitives, platform-specific code | ✓ | ✓ | |
 | [`flutter`](claude/skills/flutter/) | Frontend Frameworks | Flutter with Riverpod, Freezed, go_router, mocktail | ✓ | ✓ | |
 | [`pwa-development`](claude/skills/pwa-development/) | Frontend Frameworks | Progressive Web Apps — service workers, caching, Workbox | ✓ | ✓ | |
 | [`chrome-extension-builder`](claude/skills/chrome-extension-builder/) | Frontend Frameworks | Chrome MV3 extensions with WXT + React + TypeScript | ✓ | ✓ | ✓ |
@@ -200,7 +200,8 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
 | [`ai-models`](claude/skills/ai-models/) | AI & LLM | Latest AI models reference — Claude, OpenAI, Gemini | ✓ | ✓ | |
-| [`project-manager`](claude/skills/project-manager/) | AI & LLM | Feature-driven development orchestrator with bundled commands, sub-skills, and references | ✓ | ✓ | ✓ |
+| [`honcho`](claude/skills/honcho/) | AI & LLM | Honcho AI-native memory — integrate, migrate the SDK, inspect via CLI, and health-check a self-hosted deployment | ✓ | | |
+| [`project-manager`](claude/skills/project-manager/) [(diagram)](claude/skills/project-manager/diagram.html) | AI & LLM | Feature-driven development orchestrator with bundled commands, sub-skills, and references | ✓ | ✓ | ✓ |
 | [`shopify-apps`](claude/skills/shopify-apps/) | Commerce & Payments | Shopify apps — Remix, Admin API, checkout extensions | ✓ | ✓ | |
 | [`woocommerce`](claude/skills/woocommerce/) | Commerce & Payments | WooCommerce REST API — products, orders, webhooks | ✓ | ✓ | |
 | [`medusa`](claude/skills/medusa/) | Commerce & Payments | Medusa headless commerce — modules, workflows | ✓ | ✓ | |
@@ -236,6 +237,42 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`file-reconstruction`](claude/skills/file-reconstruction/) | Research & OSINT | Reconstruct files from extracted or partial data | ✓ |  |  |
 | [`extraction-reporting`](claude/skills/extraction-reporting/) | Research & OSINT | Generate comprehensive reports from extracted content | ✓ |  |  |
 | [`comment-harvesting`](claude/skills/comment-harvesting/) | Research & OSINT | Extract and process comments from video platforms | ✓ |  |  |
+| [`crlf-gitattributes-normalization`](claude/skills/crlf-gitattributes-normalization/) | Code Quality | Fix CRLF/LF linter and golden-fixture false-positives via repo-level .gitattributes normalization, not reformatting | ✓ |  |  |
+| [`design-critique-to-safe-refactor`](claude/skills/design-critique-to-safe-refactor/) | Code Quality | Turn design critique into safe refactors by preserving test contracts and client-side DOM hooks | ✓ |  |  |
+| [`scanner-plugin-integration`](claude/skills/scanner-plugin-integration/) | Code Quality | Merge orphaned scanner scaffolds into the real package tree, keep gating in DryRun, and template new providers consistently | ✓ |  |  |
+| [`security-aware-persistence-design`](claude/skills/security-aware-persistence-design/) | Code Quality | Parameterized queries, PII/DoS safeguards, real transactions, and use-gated exposure decisions for persistence features | ✓ |  |  |
+| [`deploy-idempotency-two-pass-gate`](claude/skills/deploy-idempotency-two-pass-gate/) | DevOps & Tooling | Gate live infra applies by requiring a second pass to show zero changes before success | ✓ |  |  |
+| [`deployment-driver-pin-rewrite-from-release-tag-source-of-truth`](claude/skills/deployment-driver-pin-rewrite-from-release-tag-source-of-truth/) | DevOps & Tooling | Edit the release-tag source of truth, not the derived image pin file, so deploy drivers re-derive correctly | ✓ |  |  |
+| [`diagnostics-probe-design`](claude/skills/diagnostics-probe-design/) | DevOps & Tooling | Design read-only, multi-hypothesis diagnostic probes to root-cause infra failures before fixing | ✓ |  |  |
+| [`firewall-alias-as-indirection`](claude/skills/firewall-alias-as-indirection/) | DevOps & Tooling | Firewall rules should reference named device aliases, not hardcoded IPs, so inventory churn never touches rules | ✓ |  |  |
+| [`fleet-cp1252-mojibake-fix`](claude/skills/fleet-cp1252-mojibake-fix/) | DevOps & Tooling | Strip non-ASCII glyphs from script runtime output to fix cp1252/Git Bash mojibake without touching comments | ✓ |  |  |
+| [`gpu-workload-placement-and-arbitration`](claude/skills/gpu-workload-placement-and-arbitration/) | DevOps & Tooling | Plan and validate GPU workload placement and VRAM arbitration when services share one card | ✓ |  |  |
+| [`grafana-dashboard-workflow`](claude/skills/grafana-dashboard-workflow/) | DevOps & Tooling | Author/retrofit Grafana dashboards with live-metric probing, a 4-row baseline, and a 4-rung verify ladder | ✓ |  |  |
+| [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/) | DevOps & Tooling | Diagnose stalled Honcho/background queues via direct Postgres checks, falsifiable health criteria, and pollution audits | ✓ |  |  |
+| [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/) | DevOps & Tooling | Layered LVM thin-pool diagnosis and recovery from ENOSPC, emergency_ro, and metadata-pressure write stalls | ✓ |  |  |
+| [`multi-perspective-dns-diagnostic-ladder`](claude/skills/multi-perspective-dns-diagnostic-ladder/) | DevOps & Tooling | Layered DNS/network/dependency-chain probing ladder with mandatory verify-after-apply for root-causing failures | ✓ |  |  |
+| [`shell-helper-migration`](claude/skills/shell-helper-migration/) | DevOps & Tooling | Safely migrate bash scripts' log/fail/die helpers to a shared lib while preserving exit-code contracts | ✓ |  |  |
+| [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/) | DevOps & Tooling | Classify shell scripts by execution context to know which must skip centralized-helper migration | ✓ |  |  |
+| [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/) | DevOps & Tooling | Centralize shell output/logging helpers as a silent-on-source library, validation stays in consumers | ✓ |  |  |
+| [`two-surface-observability-reconciliation`](claude/skills/two-surface-observability-reconciliation/) | DevOps & Tooling | Reconcile two blind observability or source-of-truth surfaces into one trustworthy verdict | ✓ |  |  |
+| [`accumulated-feature-branch-workflow`](claude/skills/accumulated-feature-branch-workflow/) | Foundations & Workflow | Structure multi-PR feature branches by risk seam, ship mixed dirty state safely | ✓ |  |  |
+| [`additive-merge-conflict-resolution`](claude/skills/additive-merge-conflict-resolution/) | Foundations & Workflow | Resolve additive git conflicts on append-only files by keeping both sides | ✓ |  |  |
+| [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/) | Foundations & Workflow | Mine past Claude conversation transcripts to extract domain knowledge and recurring failures | ✓ |  |  |
+| [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/) | Foundations & Workflow | Rerun audits until two consecutive clean rounds, resetting streak on any finding | ✓ |  |  |
+| [`parallel-subagent-fanout`](claude/skills/parallel-subagent-fanout/) | Foundations & Workflow | Fan out subagents by domain lens on disjoint work, then cross-validate and reconcile into one verdict | ✓ |  |  |
+| [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/) | Foundations & Workflow | Reconcile completed tasks against the project plan with verified status and audit gaps | ✓ |  |  |
+| [`recursive-batch-handoff`](claude/skills/recursive-batch-handoff/) | Foundations & Workflow | Split large migrations into batches, each emitting a self-repeating handoff prompt | ✓ |  |  |
+| [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/) | Foundations & Workflow | Self-paced /loop pattern: one gated, verified unit of work per iteration until backlog drains | ✓ |  |  |
+| [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/) | Foundations & Workflow | Atomically fix spec-vs-reality drift and mangled markdown docs without scope creep | ✓ |  |  |
+| [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/) | Foundations & Workflow | Verify cached refs (git default branch, session memory) against live state before destructive ops | ✓ |  |  |
+| [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/) | Foundations & Workflow | Resume multi-session work via a durable state file, one-step turns, and copy-ready handoff prompts | ✓ |  |  |
+| [`worktree-isolated-loop`](claude/skills/worktree-isolated-loop/) | Foundations & Workflow | Isolate multi-turn/batch agent work in git worktrees and drive self-resuming loops from repo state | ✓ |  |  |
+| [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/) | Frontend & UI | Extract real brand colors/logos from raw site CSS and codify them as versioned, documented design tokens | ✓ |  |  |
+| [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/) | Frontend & UI | Build light/dark and multi-brand reskins as pure CSS custom-property token swaps | ✓ |  |  |
+| [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/) | Frontend & UI | Test React list virtualization under jsdom by stubbing getBoundingClientRect and asserting DOM shape | ✓ |  |  |
+| [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/) | Frontend & UI | Delegated event routing and callback-threading patterns for re-rendered UI, plus testable JS media-preference hooks | ✓ |  |  |
+| [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/) | Frontend & UI | Build zero-dependency single-file HTML deliverables with inlined assets that theme-flip correctly | ✓ |  |  |
+| [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/) | Frontend & UI | Stage UI redesigns with gated phases and a two-pass vitest -u regeneration to catch real regressions | ✓ |  |  |
 </details>
 
 ---
@@ -281,7 +318,7 @@ Slash commands available globally in Claude Code. Most delegate to a specialized
 
 The `project-manager` skill ships bundled commands for its markdown-driven lifecycle:
 `/init-project`, `/init-features`, `/add-feature`, `/analyze-features`, `/continue-tasks`,
-`/update-tasks`, `/review-tasks`, `/reinit`, `/sync-tracker`, and `/analyze-parallelism`. Its
+`/update-tasks`, `/review-tasks`, `/reinit`, `/sync-tracker`, `/sync-status`, and `/analyze-parallelism`. Its
 `references/` bundle includes templates plus read-only helper scripts for deterministic status,
 next-task, blocked, stale, and validation reports.
 

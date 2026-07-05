@@ -36,7 +36,7 @@ Never end the turn ambiguously. Either there is a next prompt, or the loop is do
 None. The command derives everything from session state and the repo:
 
 - Previous assistant turn (read from your own conversation history)
-- `docs/workflow/FOCUS.md` and `docs/workflow/INDEX.md` (fallback signals)
+- `docs/STATUS.md` §1 and `docs/workflow/INDEX.md` (fallback signals)
 - `references/scripts/pm-next.ps1` (deterministic next-task helper if present)
 - `gh pr list` (only when a pending PR is suspected)
 
@@ -58,7 +58,7 @@ Capture:
    from the previous iteration
 
 If the previous turn had no recap-recommended action, use the **Fallback** section
-from `project-manager:continue-new-session` (FOCUS.md → `pm-next.ps1` → highest-priority
+from `project-manager:continue-new-session` (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority
 unblocked todo). Prefix the action with `(derived from {source})`.
 
 ## Step 2 — Handle any pending PR
@@ -120,7 +120,7 @@ subagent that has zero conversation history. The brief MUST include:
   > NEXT action that comes after this one — same shape as the prompt you received:
   > Goal / Pointers / Constraints / Workflow / PR handling / RECURSION CLAUSE
   > (including this clause itself, so the chain continues). Pick the next action from
-  > `docs/tasks/backlog.md`, `docs/workflow/FOCUS.md`, or `pm-next.ps1` output —
+  > `docs/tasks/backlog.md`, `docs/STATUS.md` §1, or `pm-next.ps1` output —
   > whichever the project uses. If multiple plausible candidates exist, list them in
   > the prompt and instruct the next session to use `AskUserQuestion` to pick.
 
@@ -171,11 +171,11 @@ Look for a `## Next-session prompt` fenced block in the subagent's returned summ
 own fenced markdown code block so the user can copy it as one unit.
 
 **If absent**: derive a substitute using the `/continue-new-session` fallback chain
-(FOCUS.md → `pm-next.ps1` → highest-priority unblocked todo) and emit it in the same
+(`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority unblocked todo) and emit it in the same
 shape as the contract in Step 3. Prefix the recommended-action line with
 `(derived from {source})` so the next session understands the provenance.
 
-**If nothing eligible remains** (all plans complete, no backlog, no FOCUS next-action):
+**If nothing eligible remains** (all plans complete, no backlog, no `docs/STATUS.md` §1 next-action):
 do NOT emit a prompt block. Print this exact terminal message:
 
 > No eligible next action — pipeline is idle. Run `/review-tasks` for a project
