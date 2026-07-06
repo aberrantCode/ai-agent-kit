@@ -391,6 +391,11 @@ function Install-SkillBundle {
             -Destination (Join-Path $skillDir 'references') | Out-Null
     } catch { Write-Warning "    references/ incomplete for $SkillName" }
 
+    try {
+        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/rules" `
+            -Destination (Join-Path $skillDir 'rules') | Out-Null
+    } catch { Write-Warning "    rules/ incomplete for $SkillName" }
+
     return $true
 }
 

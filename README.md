@@ -72,6 +72,7 @@ All paths are prompted at runtime — press Enter to accept the default or type 
 | `commands/*.md` | no | Companion slash commands |
 | `sub-skills/*/SKILL.md` | no | Delegate sub-skills |
 | `references/**` | no | Skill-local templates and support files |
+| `rules/**` | no | Skill-local rule libraries (e.g. Vercel react-best-practices) |
 
 Instructions are single `.md` files — no bundles.
 
