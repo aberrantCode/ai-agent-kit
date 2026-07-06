@@ -73,7 +73,7 @@ empty `outputs/` dirs, and an `eval_metadata.json`.
 
 In the same Claude Code turn, spawn 8 `general-purpose` subagents in parallel.
 Each with-skill agent is pointed at
-`C:/development/llm_skills/claude/skills/what-next/SKILL.md` and the fixture
+`C:/development/ai-agent-kit/claude/skills/what-next/SKILL.md` and the fixture
 dir for its eval; each baseline agent gets only the fixture and the prompt.
 
 See the prompts used for iterations 1 and 2 in the git history (search for

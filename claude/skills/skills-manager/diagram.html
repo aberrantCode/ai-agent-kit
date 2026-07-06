@@ -564,7 +564,7 @@
 
   <!-- HEADER -->
   <header class="header animate" style="--i:0">
-    <div class="breadcrumb">llm_skills / claude / skills / <span>skills-manager</span></div>
+    <div class="breadcrumb">ai-agent-kit / claude / skills / <span>skills-manager</span></div>
     <h1>skills-manager</h1>
     <div class="tagline">// full lifecycle management for LLM skills across the workstation</div>
     <div class="header-meta">
@@ -600,7 +600,7 @@
       <div class="arch-tier arch-tier--archive" data-label="02 Archive ★">
         <div class="tier-title">Archive — Source of Truth</div>
         <ul class="tier-paths">
-          <li>llm_skills/claude/skills/&lt;n&gt;/</li>
+          <li>ai-agent-kit/claude/skills/&lt;n&gt;/</li>
           <li>&nbsp;&nbsp;SKILL.md</li>
           <li>&nbsp;&nbsp;sub-skills/*/SKILL.md</li>
           <li>&nbsp;&nbsp;commands/*.md</li>
@@ -621,7 +621,7 @@
           <li>&lt;project&gt;/.claude/skills/</li>
           <li>&lt;name&gt;/SKILL.md</li>
           <li>installed-from:</li>
-          <li>&nbsp;&nbsp;llm_skills</li>
+          <li>&nbsp;&nbsp;ai-agent-kit</li>
         </ul>
       </div>
 
@@ -676,7 +676,7 @@
             </div>
             <div class="flow-step flow-step--guard">
               <div class="flow-step-icon">✕</div>
-              <div class="flow-step-text">Skip <code>installed-from: llm_skills</code> files</div>
+              <div class="flow-step-text">Skip <code>installed-from: ai-agent-kit</code> files</div>
             </div>
             <div class="flow-step flow-step--guard">
               <div class="flow-step-icon">!</div>
@@ -766,7 +766,7 @@
             </div>
             <div class="flow-step flow-step--output">
               <div class="flow-step-icon">▶</div>
-              <div class="flow-step-text">Write SKILL.md + inject <code>installed-from: llm_skills</code>; sub-skills with marker; commands without marker</div>
+              <div class="flow-step-text">Write SKILL.md + inject <code>installed-from: ai-agent-kit</code>; sub-skills with marker; commands without marker</div>
             </div>
           </div>
         </div>
@@ -783,7 +783,7 @@
           <div class="op-flow">
             <div class="flow-step flow-step--action">
               <div class="flow-step-icon">⌖</div>
-              <div class="flow-step-text">Scan project's <code>.claude/skills/</code> for <code>installed-from: llm_skills</code></div>
+              <div class="flow-step-text">Scan project's <code>.claude/skills/</code> for <code>installed-from: ai-agent-kit</code></div>
             </div>
             <div class="flow-step flow-step--action">
               <div class="flow-step-icon">≈</div>
@@ -989,7 +989,7 @@ flowchart TD
     end
 
     subgraph FILTER["② FILTER &amp; CLASSIFY  /find-skills"]
-        F1{{"installed-from:\nllm_skills?"}}
+        F1{{"installed-from:\nai-agent-kit?"}}
         F2{{"status:\ndeprecated?"}}
         F3["Classify:\nNew · Changed\nUnchanged · Orphan"]
         F4["Detect companions\n&amp; sub-skills"]
@@ -1002,7 +1002,7 @@ flowchart TD
         WIN(["winning source"])
     end
 
-    subgraph ARC["④ ARCHIVE  llm_skills/claude/skills/&#60;name&#62;/"]
+    subgraph ARC["④ ARCHIVE  ai-agent-kit/claude/skills/&#60;name&#62;/"]
         A1["SKILL.md"]
         A2["sub-skills/ + commands/"]
         A3["diagram.html"]
@@ -1055,7 +1055,7 @@ flowchart TD
       <pre class="mermaid">
 flowchart LR
     subgraph GUARDS["FILTER GUARDS applied before any confirmation"]
-        G1{{"installed-from:\nllm_skills?"}}
+        G1{{"installed-from:\nai-agent-kit?"}}
         G2{{"status:\ndraft?"}}
         G3{{"status:\ndeprecated?"}}
     end
@@ -1125,7 +1125,7 @@ flowchart LR
       <span>skills-manager</span> &middot; 9 operations &middot; 2026-04-05
     </div>
     <div class="footer-label">
-      archive: <span>C:\development\llm_skills</span>
+      archive: <span>C:\development\ai-agent-kit</span>
     </div>
   </footer>
 

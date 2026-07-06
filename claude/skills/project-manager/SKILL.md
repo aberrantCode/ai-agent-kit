@@ -42,10 +42,17 @@ docs/
       {feature-slug}-p{N}-t{M}.md
   guides/                    # Supporting docs, architecture notes (optional)
   issues/                    # Logged failures and blockers
+  STATUS.md                  # SINGLE entry point: outstanding work + next action (generated + curated)
   workflow/
-    FOCUS.md                 # Current focus and next action
+    FOCUS.md                 # Retired stub → points to STATUS.md §1 (kept for back-compat)
     INDEX.md                 # Durable decisions and discoveries
 ```
+
+`docs/STATUS.md` is the one file that answers "what is outstanding, and what should happen next?".
+Its `pm:generated:*` sections (progress + outstanding) are rewritten by the `sync-status` skill from
+the canonical specs/plans/tasks/issues; its `pm:curated:*` sections (§1 runtime/next-action, §4
+unowned backlog) are hand-maintained and preserved across regeneration. `/continue-tasks` and
+`/update-tasks` regenerate it automatically.
 
 Read `references/feature-spec-template.md`, `references/plan-template.md`, and
 `references/task-file-template.md` for the exact file formats to use. These templates ship with
@@ -233,8 +240,9 @@ Reads this session's own most recent recap to extract the "next step" recommenda
 relevant feature spec / plan / active task paths, and prints a single copy-ready Markdown code block
 containing the handoff prompt. Reference-style — paths plus 2–3 line excerpts, no large inline
 content. Read-only: never modifies project state. If no recap recommendation exists (e.g., first
-turn of the session), falls back to `docs/workflow/FOCUS.md`, then `pm-next.ps1`, then the
-highest-priority unblocked `todo` task. Detailed flow lives in `sub-skills/continue-new-session/SKILL.md`.
+turn of the session), falls back to `docs/STATUS.md` §1 (`docs/workflow/FOCUS.md` is a retired stub
+pointing there), then `pm-next.ps1`, then the highest-priority unblocked `todo` task. Detailed flow
+lives in `sub-skills/continue-new-session/SKILL.md`.
 
 ---
 
@@ -286,8 +294,8 @@ scan below.
 6. List active task files in `docs/tasks/active/`, including stale or malformed completion blocks
 7. List verification backlog and open issues in `docs/issues/`
 8. Report claim/lease state from task frontmatter and `docs/tasks/locks/`, including expired leases
-9. Report handoff readiness from `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, and recent
-   `docs/tasks/logs/` entries
+9. Report handoff readiness from `docs/STATUS.md` §1 (`docs/workflow/FOCUS.md` is a retired stub),
+   `docs/workflow/INDEX.md`, and recent `docs/tasks/logs/` entries
 10. Report optional tracker sync coverage from `external_issue` / `external_url`
 11. Output a structured markdown report showing:
    - Overall completion percentage
@@ -318,7 +326,19 @@ errors unrelated to the active completion being reconciled, surface them and avo
 4. Run `pm-validate.ps1` again when present and report any remaining warnings/errors.
 5. Report what was updated and what still needs user or worker attention
 
-This command is idempotent — safe to run multiple times.
+This command is idempotent — safe to run multiple times. After reconciliation it regenerates
+`docs/STATUS.md` via `sync-status` (generated sections only).
+
+---
+
+### `/sync-status` — Regenerate the Outstanding-Work Tracker
+
+Rewrite the `pm:generated:*` sections of `docs/STATUS.md` (progress table + outstanding-work list)
+from the canonical specs/plans/tasks/issues, preserving the `pm:curated:*` sections (§1 runtime,
+§4 unowned backlog). Write scope is `docs/STATUS.md` only — never mutate specs/plans/tasks. This is
+the persist-to-file counterpart of the read-only `/review-tasks`, and it runs automatically at the
+end of every `/continue-tasks` and `/update-tasks` cycle. Detailed flow lives in
+`sub-skills/sync-status/SKILL.md`.
 
 ---
 
@@ -464,8 +484,9 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /continue-tasks      →  generate plans, spawn agents, iterate
 /continue-new-session →  emit a copy-ready prompt to resume the recap's next action in a fresh session
 /iterate-tasks       →  one self-perpetuating iteration: merge pending PR, dispatch next action as fresh subagent, emit next-next prompt
-/update-tasks        →  reconcile active task files with plan statuses
-/review-tasks        →  read-only progress snapshot
+/update-tasks        →  reconcile active task files with plan statuses (regenerates docs/STATUS.md)
+/review-tasks        →  read-only progress snapshot (persisted form is docs/STATUS.md)
+/sync-status         →  regenerate docs/STATUS.md generated sections; preserve curated sections
 /sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative
 /analyze-parallelism →  read-only opt-in future parallel batch analysis
 /reinit              →  archive legacy state, normalize, then run /continue-tasks

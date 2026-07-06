@@ -36,8 +36,9 @@ If any helper is missing, fall back to the markdown scan below for that category
 8. List open issues in `docs/issues/`.
 9. Report claim and lease metadata from active tasks and `docs/tasks/locks/`, including expired
    leases and manually cancelled locks.
-10. Report handoff readiness from `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, and recent
-   `docs/tasks/logs/` files.
+10. Report handoff readiness from `docs/STATUS.md` §1 (the curated runtime/next-action block;
+   `docs/workflow/FOCUS.md` is a retired stub that points there), `docs/workflow/INDEX.md`, and
+   recent `docs/tasks/logs/` files.
 11. Report optional tracker coverage from `external_issue` and `external_url`.
 
 ## Dependency Report
@@ -76,8 +77,10 @@ Return a markdown report with:
 - Open issues
 - Next recommended action
 
-State clearly that `/review-tasks` is read-only and that `ROADMAP.md` must be updated manually from
-the report if the user wants a persistent roadmap snapshot.
+State clearly that `/review-tasks` is read-only. The **persistent** form of this snapshot is
+`docs/STATUS.md` (the single outstanding-work + next-action tracker): §2/§3 are the generated
+equivalents of this report. To refresh the persisted file, run `/sync-status` (the writer) — do
+not have `/review-tasks` modify any file, including `docs/STATUS.md` or `ROADMAP.md`.
 
 ## Related Commands
 

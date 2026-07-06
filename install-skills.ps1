@@ -4,7 +4,7 @@
     Interactive skill and instruction installer for Claude, Codex, and Gemini.
 
 .DESCRIPTION
-    Fetches available skills and agent instructions from the llm_skills GitHub
+    Fetches available skills and agent instructions from the ai-agent-kit GitHub
     archive, displays interactive selectors, and deploys chosen bundles to local
     directories you specify.
 
@@ -17,7 +17,7 @@
 
 .NOTES
     Remote one-liner:
-        irm 'https://raw.githubusercontent.com/aberrantCode/llm_skills/main/install-skills.ps1' | iex
+        irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-skills.ps1' | iex
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -25,7 +25,7 @@ $ErrorActionPreference = 'Stop'
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 $Owner   = 'aberrantCode'
-$Repo    = 'llm_skills'
+$Repo    = 'ai-agent-kit'
 $Branch  = 'main'
 $ApiBase = "https://api.github.com/repos/$Owner/$Repo"
 $RawBase = "https://raw.githubusercontent.com/$Owner/$Repo/$Branch"
