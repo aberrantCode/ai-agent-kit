@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 106 | 90 | 5 | 201 |
+| Skills | 107 | 90 | 5 | 202 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 27 | — | — | 27 |
 
@@ -120,7 +120,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 6 | code-review, codex-review, gemini-review, playwright-testing |
 | Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
-| AI & LLM | 5 | agentic-development, llm-patterns, ai-models, honcho, project-manager |
+| AI & LLM | 6 | agentic-development, llm-patterns, ai-models, csv-driven-llm-pipeline, honcho, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
@@ -202,6 +202,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
 | [`ai-models`](claude/skills/ai-models/) | AI & LLM | Latest AI models reference — Claude, OpenAI, Gemini | ✓ | ✓ | |
+| [`csv-driven-llm-pipeline`](claude/skills/csv-driven-llm-pipeline/) | AI & LLM | Stateful, resumable CSV-driven batch pipelines mixing HTTP fetch and LLM calls with per-row state | ✓ | | |
 | [`honcho`](claude/skills/honcho/) | AI & LLM | Honcho AI-native memory — integrate, migrate the SDK, inspect via CLI, and health-check a self-hosted deployment | ✓ | | |
 | [`project-manager`](claude/skills/project-manager/) [(diagram)](claude/skills/project-manager/diagram.html) | AI & LLM | Feature-driven development orchestrator with bundled commands, sub-skills, and references | ✓ | ✓ | ✓ |
 | [`shopify-apps`](claude/skills/shopify-apps/) | Commerce & Payments | Shopify apps — Remix, Admin API, checkout extensions | ✓ | ✓ | |
