@@ -36,6 +36,8 @@ Deploying a bundle to a repo copies:
 - `SKILL.md` → `<target>/.gemini/skills/<name>/SKILL.md`
 - Each `sub-skills/<sub>/SKILL.md` → `<target>/.gemini/skills/<sub>/SKILL.md`
 - Each `commands/<cmd>.md` → `<target>/.gemini/commands/<cmd>.md`
+- Each `references/**` file → `<target>/.gemini/skills/<name>/references/**`
+- Each `rules/**` file → `<target>/.gemini/skills/<name>/rules/**`
 
 ### Installed Copy
 A skill file is an installed copy when its YAML frontmatter carries an `installed-from:` marker pointing at this archive. New installs stamp `installed-from: ai-agent-kit`; copies installed before the repository was renamed carry the legacy value `installed-from: llm_skills`. **Treat either value as an installed copy** — throughout this document, `installed-from: ai-agent-kit` is shorthand for *either the current or the legacy marker*. The sync and find operations skip these — they are not project-developed skills.
@@ -176,6 +178,8 @@ Deploy a skill bundle from the archive into a project.
    - `SKILL.md` (1 file per skill)
    - Sub-skills from `sub-skills/` (N files)
    - Commands from `commands/` (N files)
+   - References from `references/` (N files)
+   - Rules from `rules/` (N files)
 
 6. If `name` was given, prompt the user to confirm:
    - Question: "Install `<name>` (+ N dependencies) into `<target>`? This will write N files."
@@ -185,6 +189,8 @@ Deploy a skill bundle from the archive into a project.
    - Write `<target>/.gemini/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (add after existing fields)
    - Write each sub-skill to `<target>/.gemini/skills/<sub>/SKILL.md` with same marker
    - Write each command to `<target>/.gemini/commands/<cmd>.md` (no marker — commands are not skills)
+   - Copy each `references/**` file to `<target>/.gemini/skills/<name>/references/**` (no marker)
+   - Copy each `rules/**` file to `<target>/.gemini/skills/<name>/rules/**` (no marker)
 
 8. Report all files written
 
@@ -213,6 +219,7 @@ Update installed skills in the current project when the archive has newer versio
    - Overwrite each `SKILL.md`, preserving the `installed-from: ai-agent-kit` marker in frontmatter
    - Also check `commands/` in the archive bundle — write any new or changed commands to `<project>/.gemini/commands/`
    - Also check `sub-skills/` — update any installed sub-skills that are outdated
+   - Also check `references/` and `rules/` in the archive bundle — write any new or changed files to `<project>/.gemini/skills/<name>/references/**` and `<project>/.gemini/skills/<name>/rules/**`
    - Regenerate the diagram: delegate to a subagent to create a diagram for each updated skill and overwrite `gemini/skills/<name>/diagram.html`; update the `## Diagram` section in SKILL.md if the path changed
 
 6. Report updated files
@@ -369,6 +376,8 @@ Push a skill bundle from the archive to the global user profile (`~/.gemini/`) s
    - Write `SKILL.md` to `~/.gemini/skills/<name>/SKILL.md` (do NOT add `installed-from` marker — the global profile is a source, not a deployment target)
    - Write each sub-skill from `sub-skills/` to `~/.gemini/skills/<sub>/SKILL.md`
    - Write each companion command from `commands/` to `~/.gemini/commands/<cmd>.md`
+   - Write each `references/**` file to `~/.gemini/skills/<name>/references/**`
+   - Write each `rules/**` file to `~/.gemini/skills/<name>/rules/**`
 
 4. Report all files written
 
