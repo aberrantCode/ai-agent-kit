@@ -1,5 +1,9 @@
 # Git Commit
 
+> **Deprecated — folded into the `github` skill.** Use `/commit` from the `github` bundle
+> (`claude/skills/github/`), which runs this workflow under the parent skill's minimal-output
+> contract. This file is retained for history only.
+
 Stage all changes, pull latest (merging any conflicts), commit, and push to remote.
 
 Follow these steps exactly and in order. Do not skip steps or ask for confirmation unless a merge conflict requires a decision.

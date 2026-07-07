@@ -1,3 +1,7 @@
+> **Deprecated — folded into the `github` skill.** Use `/publish-github` from the `github`
+> bundle (`claude/skills/github/`), which runs this workflow under the parent skill's
+> minimal-output contract. This file is retained for history only.
+
 Use the Skill tool to invoke the `publish-github` skill, then follow it exactly.
 
 Arguments (optional): $ARGUMENTS

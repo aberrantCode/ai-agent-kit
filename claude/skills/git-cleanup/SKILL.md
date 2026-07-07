@@ -1,7 +1,12 @@
 ---
 name: git-cleanup
 description: Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like "let's clean up the repo", "what branches can I delete", "remove old branches", or asks about git branch hygiene — even if they don't use the word "stale". Always invoke this skill before manually running git branch -d or git worktree remove commands.
+status: deprecated
 ---
+
+> **Deprecated — folded into the `github` skill.** Use `/git-cleanup` from the `github`
+> bundle (`claude/skills/github/`), which runs this workflow under the parent skill's
+> minimal-output contract. This file is retained for history only.
 
 # Git Cleanup
 

@@ -1,7 +1,12 @@
 ---
 name: ship-to-dev
 description: Use when the user wants to ship current working changes through a feature branch PR into the DEV branch — covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.
+status: deprecated
 ---
+
+> **Deprecated — folded into the `github` skill.** Use `/ship-to-dev` from the `github`
+> bundle (`claude/skills/github/`), which runs a leaner version of this workflow under the
+> parent skill's minimal-output contract. This file is retained for history only.
 
 # Ship to DEV
 

@@ -1,7 +1,12 @@
 ---
 name: release-to-main
 description: Use when the user wants to merge dev into main for a production release — covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.
+status: deprecated
 ---
+
+> **Deprecated — folded into the `github` skill.** Use `/release-to-main` from the `github`
+> bundle (`claude/skills/github/`), which runs a leaner version of this workflow under the
+> parent skill's minimal-output contract. This file is retained for history only.
 
 # Release to Main
 

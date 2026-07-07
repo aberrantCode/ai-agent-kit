@@ -112,7 +112,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 24 | base, tdd-workflow, ship-to-dev, release-to-main, git-cleanup, analyze-conversations, **what-next** |
+| Foundations & Workflow | 25 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
@@ -143,10 +143,11 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — merge, PR, squash, or cleanup | ✓ | ✓ | |
 | [`using-git-worktrees`](claude/skills/using-git-worktrees/) | Foundations & Workflow | Isolated git worktrees with smart directory selection | ✓ | ✓ | |
 | [`requesting-code-review`](claude/skills/requesting-code-review/) | Foundations & Workflow | Dispatch code review before merging | ✓ | ✓ | |
-| [`ship-to-dev`](claude/skills/ship-to-dev/) | Foundations & Workflow | Feature branch → DEV merge workflow with test gates | ✓ | ✓ | |
-| [`release-to-main`](claude/skills/release-to-main/) | Foundations & Workflow | DEV → main release with semantic versioning and tagging | ✓ | ✓ | |
+| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — `/publish-github`, `/commit`, `/ship-to-dev`, `/merge`, `/release-to-main`, `/git-cleanup` with a minimal-output contract | ✓ | | |
+| [`ship-to-dev`](claude/skills/ship-to-dev/) | Foundations & Workflow | _Deprecated — folded into `github`._ Feature branch → DEV merge workflow with test gates | ✓ | ✓ | |
+| [`release-to-main`](claude/skills/release-to-main/) | Foundations & Workflow | _Deprecated — folded into `github`._ DEV → main release with semantic versioning and tagging | ✓ | ✓ | |
 | [`commit-hygiene`](claude/skills/commit-hygiene/) | Foundations & Workflow | Atomic commits, PR size limits, commit thresholds | ✓ | ✓ | |
-| [`git-cleanup`](claude/skills/git-cleanup/) | Foundations & Workflow | Audit and remove stale worktrees and merged branches | ✓ | ✓ | |
+| [`git-cleanup`](claude/skills/git-cleanup/) | Foundations & Workflow | _Deprecated — folded into `github`._ Audit and remove stale worktrees and merged branches | ✓ | ✓ | |
 | [`guide-assistant`](claude/skills/guide-assistant/) | Foundations & Workflow | Walk through any markdown guide step-by-step | ✓ | ✓ | |
 | [`feature-start`](claude/skills/feature-start/) | Foundations & Workflow | Pre-flight workflow before starting feature work | ✓ | ✓ | |
 | [`fix-start`](claude/skills/fix-start/) | Foundations & Workflow | Bug fix workflow with severity classification | ✓ | ✓ | |
@@ -223,7 +224,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`graphify`](claude/skills/graphify/) | Tooling & DevOps | Turn any folder into a navigable knowledge graph — community detection, GraphRAG JSON, interactive HTML (Windows/PowerShell) | ✓ | | |
 | [`project-tooling`](claude/skills/project-tooling/) | Tooling & DevOps | gh, vercel, supabase, render CLI setup | ✓ | ✓ | |
 | [`workspace`](claude/skills/workspace/) | Tooling & DevOps | Multi-repo topology analysis and contract tracking | ✓ | ✓ | |
-| [`publish-github`](claude/skills/publish-github/) | Tooling & DevOps | Publish to GitHub with branch protection and gitleaks | ✓ | ✓ | |
+| [`publish-github`](claude/skills/publish-github/) | Tooling & DevOps | _Deprecated — folded into `github`._ Publish to GitHub with branch protection and gitleaks | ✓ | ✓ | |
 | [`remote-installer`](claude/skills/remote-installer/) | Tooling & DevOps | Remote PowerShell installer domain expertise | ✓ | ✓ | |
 | [`skills-manager`](claude/skills/skills-manager/) | Tooling & DevOps | Full skill lifecycle — find, sync, install, audit | ✓ | ✓ | ✓ |
 | [`start-app`](claude/skills/start-app/) | Tooling & DevOps | Discover and run the correct startup command | ✓ | ✓ | |
@@ -336,13 +337,13 @@ next-task, blocked, stale, and validation reports.
 | [`/build-fix`](claude/commands/build-fix.md) | Incrementally fix TypeScript and build errors |
 | [`/check-contributors`](claude/commands/check-contributors.md) | Check project contributors; optionally enable multi-person mode |
 | [`/code-review`](claude/commands/code-review.md) | Security and quality review — blocks commit on CRITICAL/HIGH |
-| [`/commit`](claude/commands/commit.md) | Stage, pull, commit with conventional format, and push |
+| [`/commit`](claude/commands/commit.md) | _Deprecated — use `/commit` from the `github` skill._ Stage, pull, commit, and push |
 | [`/diagnose`](claude/commands/diagnose.md) | Load diagnostic context — execution flow, logs, failure points |
 | [`/e2e`](claude/commands/e2e.md) | Generate and run Playwright E2E tests with artifacts |
 | [`/initialize-project`](claude/commands/initialize-project.md) | Full project setup with coding guardrails (idempotent) |
 | [`/new-action`](claude/commands/new-action.md) | Guided creator for OSM profile action JSON files |
 | [`/plan`](claude/commands/plan.md) | Requirements → risks → step-by-step plan; waits for confirmation |
-| [`/publish-github`](claude/commands/publish-github.md) | Publish to GitHub with gitleaks, branch protection, .gitignore |
+| [`/publish-github`](claude/commands/publish-github.md) | _Deprecated — use `/publish-github` from the `github` skill._ Publish to GitHub with gitleaks, branch protection |
 | [`/refactor-clean`](claude/commands/refactor-clean.md) | Safely remove dead code with test verification |
 | [`/start-app`](claude/commands/start-app.md) | Discover and run the correct startup command |
 | [`/sync-contracts`](claude/commands/sync-contracts.md) | Incremental workspace contract update |
@@ -424,4 +425,4 @@ model: opus              # opus | sonnet | haiku
 - **Never delete** from archive — set `status: deprecated` instead
 - All changes go through feature branch → PR → `dev` → release to `main`
 - Branch naming: `feat/short-description`, `fix/short-description`, etc.
-- Use `/ship-to-dev` to merge changes, `/release-to-main` for production releases
+- Use the `github` skill for the whole repo lifecycle: `/publish-github` to create a hardened repo, `/commit`, `/ship-to-dev` to ship changes, `/merge` a PR into dev, `/release-to-main` for production releases, `/git-cleanup` to prune stale branches

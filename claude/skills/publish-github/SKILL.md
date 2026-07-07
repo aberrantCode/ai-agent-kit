@@ -10,7 +10,12 @@ description: >
   that enforce PRs on both branches. Always invoke this skill — even if the user says
   "just push to GitHub quickly" — because security hardening and branch protection should
   never be optional.
+status: deprecated
 ---
+
+> **Deprecated — folded into the `github` skill.** Use `/publish-github` from the `github`
+> bundle (`claude/skills/github/`), which runs a leaner version of this workflow under the
+> parent skill's minimal-output contract. This file is retained for history only.
 
 # Publish to GitHub
 
