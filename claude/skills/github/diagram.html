@@ -148,7 +148,7 @@
     <div class="section-label"><span class="dot"></span> Operations · commands/ → sub-skills/</div>
     <ul class="step-list">
       <li class="step-item">
-        <div class="op-cmd op-cmd--emerald">/publish-github</div>
+        <div class="op-cmd op-cmd--emerald">/publish</div>
         <div><div class="step-title">Publish a hardened repo (day&nbsp;0)</div><div class="step-desc"><code>gh repo create</code> + gitleaks pre-commit hook + <code>.gitignore</code>/<code>.gitattributes</code> + <code>main</code>&nbsp;/&nbsp;<code>dev</code> with branch protection requiring PRs on both.</div></div>
       </li>
       <li class="step-item">
@@ -156,7 +156,7 @@
         <div><div class="step-title">Stage · pull · commit · push</div><div class="step-desc">Conventional-commit message from the staged diff. Warns on sensitive files; never force-pushes.</div></div>
       </li>
       <li class="step-item">
-        <div class="op-cmd op-cmd--teal">/ship-to-dev</div>
+        <div class="op-cmd op-cmd--teal">/ship</div>
         <div><div class="step-title">Feature branch → PR → dev</div><div class="step-desc">Branch preflight (create/rename to <code>type/slug</code>), generic test gate, optional <code>/code-review</code>, open PR, merge commit, clean up.</div></div>
       </li>
       <li class="step-item">
@@ -164,11 +164,11 @@
         <div><div class="step-title">Merge open PR(s) into dev</div><div class="step-desc">Targets = PR&nbsp;# · branch · worktree · a set · or current context. Gates on mergeable + CI, merges, cleans up <strong>worktree → local → remote</strong>.</div></div>
       </li>
       <li class="step-item">
-        <div class="op-cmd op-cmd--violet">/release-to-main</div>
+        <div class="op-cmd op-cmd--violet">/release</div>
         <div><div class="step-title">dev → main versioned release</div><div class="step-desc">Branch preflight, auto semver from conventional commits, <code>--no-ff</code> merge, tag + GitHub Release, sync dev.</div></div>
       </li>
       <li class="step-item">
-        <div class="op-cmd op-cmd--red">/git-cleanup</div>
+        <div class="op-cmd op-cmd--red">/prune</div>
         <div><div class="step-title">Prune stale worktrees + branches</div><div class="step-desc">Merged-into-dev detection (squash or standard), protects dirty worktrees, deletes local + origin, logs to <code>docs/git-log.md</code>.</div></div>
       </li>
     </ul>
@@ -178,7 +178,7 @@
       <span class="lc-node">ship</span><span class="lc-sep">→</span>
       <span class="lc-node">merge</span><span class="lc-sep">→</span>
       <span class="lc-node">release</span><span class="lc-sep">→</span>
-      <span class="lc-node">cleanup</span>
+      <span class="lc-node">prune</span>
     </div>
   </div>
 
@@ -214,7 +214,7 @@
     <div class="two-col">
       <div class="ve-card ve-card--teal">
         <div class="title">/code-review</div>
-        <div class="desc">Optional pre-PR quality/security gate. <code>ship-to-dev</code> offers it before opening the PR; it blocks on CRITICAL/HIGH.</div>
+        <div class="desc">Optional pre-PR quality/security gate. <code>ship</code> offers it before opening the PR; it blocks on CRITICAL/HIGH.</div>
       </div>
       <div class="ve-card ve-card--violet">
         <div class="title">/diff-review</div>

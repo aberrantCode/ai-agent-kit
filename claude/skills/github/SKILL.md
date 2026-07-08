@@ -63,14 +63,14 @@ question.
 
 | Command | Operation | Sub-skill |
 |---|---|---|
-| `/publish-github` | publish-github | `sub-skills/publish-github` |
+| `/publish` | publish | `sub-skills/publish` |
 | `/commit` | commit | `sub-skills/commit` |
-| `/ship-to-dev` | ship-to-dev | `sub-skills/ship-to-dev` |
+| `/ship` | ship | `sub-skills/ship` |
 | `/merge [targets]` | merge | `sub-skills/merge` |
-| `/release-to-main` | release-to-main | `sub-skills/release-to-main` |
-| `/git-cleanup` | git-cleanup | `sub-skills/git-cleanup` |
+| `/release` | release | `sub-skills/release` |
+| `/prune` | prune | `sub-skills/prune` |
 
-The operations form one repo lifecycle: **publish → commit → ship → merge → release → cleanup**.
+The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
 When a new thin command is added, append a row here and a sub-skill under `sub-skills/`.
 
 ### Companion commands (not part of this bundle)
@@ -78,7 +78,7 @@ When a new thin command is added, append a row here and a sub-skill under `sub-s
 These live elsewhere but pair naturally with the operations above — reference them, do not
 re-implement:
 
-- **`/code-review`** — an optional pre-PR quality/security gate. `ship-to-dev` may suggest it
+- **`/code-review`** — an optional pre-PR quality/security gate. `ship` may suggest it
   before opening the PR.
 - **`/diff-review`** — a visual HTML diff of a branch, commit, or PR. Point users to it to
   inspect a PR before `/merge`.

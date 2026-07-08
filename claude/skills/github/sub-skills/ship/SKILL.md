@@ -1,9 +1,9 @@
 ---
-name: github-ship-to-dev
+name: github-ship
 description: Sub-skill of `github`. Ship current working changes (or an already-committed feature branch) into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge commit, and clean up. Honors the parent Output Contract.
 ---
 
-# Operation: ship-to-dev
+# Operation: ship
 
 **Goal.** Take whatever is ready — uncommitted changes or a pre-committed feature branch — and
 land it on `dev` through a PR, then clean up. Obey the parent **Output Contract**: silent run,
@@ -112,7 +112,7 @@ if   [ -f scripts/Start-Tests.ps1 ]; then pwsh -NonInteractive -File scripts/Sta
 elif [ -f Makefile ] && grep -qE '^test:' Makefile; then make test
 elif [ -f package.json ] && grep -qE '"test"[[:space:]]*:' package.json; then npm test
 elif command -v pytest >/dev/null 2>&1 && { [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; }; then pytest
-else echo "[ship-to-dev] no recognized test runner — skipping the gate"; fi
+else echo "[ship] no recognized test runner — skipping the gate"; fi
 ```
 
 If the runner exits non-zero → **stop**, surface the failure, do not merge. If none was

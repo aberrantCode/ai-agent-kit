@@ -1,9 +1,9 @@
 ---
-name: github-publish-github
+name: github-publish
 description: Sub-skill of `github`. Publish a local project as a new GitHub repository with security hardening — gitleaks pre-commit hook, .gitignore/.gitattributes, main + dev branches, and branch protection rules requiring PRs on both. Honors the parent Output Contract.
 ---
 
-# Operation: publish-github
+# Operation: publish
 
 **Goal.** Turn the current local project into a hardened GitHub repo: `main` (protected) + `dev`
 (protected, self-merge), gitleaks secrets hook, and sane ignore/attributes files. This is the

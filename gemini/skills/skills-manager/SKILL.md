@@ -67,7 +67,7 @@ All `SKILL.md` files support these optional frontmatter fields beyond the requir
 - **`status`**: `draft` | `active` (default) | `deprecated`
   - `draft` — skill is in development; `/install-skill` skips unless forced
   - `active` — production-ready; normal install/sync behaviour
-  - `deprecated` — superseded or obsolete; `/install-skill` skips and warns; `/find-skills` classifies as **Deprecated** rather than New/Changed
+  - `deprecated` — superseded or obsolete, and **scheduled for deletion**; `/install-skill` skips and warns; `/find-skills` classifies as **Deprecated** rather than New/Changed
 
 - **`version`**: semver string (e.g. `1.2.0`) or ISO date (e.g. `2026-04-05`) — displayed by `/update-skill` so the user sees the version delta before accepting an update
 
@@ -147,7 +147,7 @@ Archive a specific skill (or all discovered skills) including its full bundle.
 - Bundled commands: document on the skill's row as `— ships with /cmd1, /cmd2`; do NOT add standalone rows for them in the Commands table
 - Sub-skills in bundles: do NOT list as standalone rows; implied by parent skill row
 - **Diagram link**: every skill row that has a `diagram.html` in its archive directory must include a diagram link in the Skill column cell, formatted as: `` [`<name>`](gemini/skills/<name>/) [(diagram)](gemini/skills/<name>/diagram.html) ``
-- Never delete from archive; never remove rows
+- When a skill is deleted from the archive, delete its README row too — every row must point to a real file
 
 ---
 
@@ -432,7 +432,7 @@ If no keywords match: **Uncategorized**. Multiple matches: most keyword hits win
 
 ## Archive Invariants — Never Violate
 
-1. **Never delete from archive.** Even if a source file no longer exists, the archive copy stays. Deletions are manual curatorial decisions.
+1. **Sync never auto-deletes; curators do.** The automated flow won't remove an archive copy just because its source file vanished — but superseded skills/commands are *intentionally* deleted (folded-in or obsolete → removed; git history is the record), never kept as permanent `deprecated` tombstones.
 2. **Flow is always source → archive** — except `/import-skill`, which explicitly reverses this.
 3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
 4. **Toolset is determined by directory, not content.**

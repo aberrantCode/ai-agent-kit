@@ -1,9 +1,9 @@
 ---
-name: github-git-cleanup
+name: github-prune
 description: Sub-skill of `github`. Audit and remove stale git worktrees, local branches, and remote (origin) branches that are already merged into dev, protecting anything with uncommitted changes. Honors the parent Output Contract.
 ---
 
-# Operation: git-cleanup
+# Operation: prune
 
 **Goal.** Remove stale worktrees and branches (local + origin) already merged into `dev`,
 protecting anything dirty. Obey the parent **Output Contract**: silent run, errors as they

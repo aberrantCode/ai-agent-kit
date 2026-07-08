@@ -30,7 +30,7 @@ logs/timing.jsonl             — ship-to-dev timing log
 
 ## Key Conventions
 
-- **Never delete** from archive — set `status: deprecated` instead
+- **Delete superseded skills/commands** — git history is the archive of record; `status: deprecated` is a transient "scheduled for removal" marker, not a permanent tombstone
 - **Flow direction** is always source → archive; only `/import-skill` reverses this
 - **Installed copies** carry `installed-from: ai-agent-kit` frontmatter (legacy copies: `installed-from: llm_skills`) — skip either during scans
 - **Skill bundles** may include optional `sub-skills/` and `commands/` subdirectories

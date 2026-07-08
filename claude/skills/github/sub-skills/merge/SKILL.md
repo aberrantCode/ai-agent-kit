@@ -8,7 +8,7 @@ description: Sub-skill of `github`. Merge one or more open pull requests (resolv
 **Goal.** Merge already-open pull request(s) into `dev` with a merge commit, then fully clean
 up. The merge unit is always a **PR** — targets that are branches or worktrees are resolved to
 their open PR. This operation does not create PRs; if a branch has commits but no open PR,
-stop and point the user at `/ship-to-dev`.
+stop and point the user at `/ship`.
 
 Obey the parent **Output Contract**: no narration, errors surfaced as they occur, one concise
 summary at the end.
@@ -22,7 +22,7 @@ Parse the invocation message per the parent **Parameter Contract**. Build a list
 - **Digits** → that PR number directly.
 - **Branch name** → `gh pr list --head <branch> --base dev --state open --json number` — take
   the number. No open PR → record an error for this target: "no open PR for `<branch>` — run
-  /ship-to-dev".
+  /ship".
 - **Worktree path** → read its checked-out branch
   (`git -C <path> branch --show-current`), then resolve as a branch above. Remember the path
   for Step 4 cleanup.

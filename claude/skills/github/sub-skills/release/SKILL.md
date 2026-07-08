@@ -1,9 +1,9 @@
 ---
-name: github-release-to-main
+name: github-release
 description: Sub-skill of `github`. Promote dev to main as a versioned production release — rebase dev if behind, auto-derive the next semantic version from conventional commits, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the parent Output Contract.
 ---
 
-# Operation: release-to-main
+# Operation: release
 
 **Goal.** Promote `dev` → `main` as a versioned release. Obey the parent **Output Contract**:
 silent run, errors as they occur, one concise summary.
@@ -28,7 +28,7 @@ HAS_DEV=$(git ls-remote --heads origin dev  | grep -c . || true)
 | both missing | **STOP** — this is not an initialized repo; tell the user |
 
 Do not rename `main` or `dev` — they are protected. Feature-branch renaming is handled by
-`ship-to-dev`, not here.
+`ship`, not here.
 
 ---
 
