@@ -64,3 +64,7 @@ works: the goal is a pure token substitution, not a rebuild.
 - This turns a brand reskin into a data change (new token values) instead of a code
   refactor — if a "new brand" request still requires editing component files, the
   token boundary wasn't drawn correctly.
+
+## Diagram
+
+[View diagram](diagram.html)

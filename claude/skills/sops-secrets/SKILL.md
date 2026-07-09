@@ -145,3 +145,7 @@ internal API token between services).
 The new skill's `_lib.sh` will eventually subsume `scripts/get-secret.sh`'s
 logic, but the existing script remains so that `sync-secrets-to-keepass.sh`
 and any external tooling that grew dependencies on its CLI shape don't break.
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -30,3 +30,7 @@ When a review surfaces spec-vs-reality drift (a doc says one thing, the deployed
 - YAML round-tripping is the single most common way to accidentally destroy formatting/comments in a doc fix — default to line-oriented edits for anything hand-formatted.
 - Redundant catalog fields usually indicate a missing "derive, don't duplicate" step upstream — fixing the immediate inconsistency without addressing the duplication just delays the next drift.
 - Don't skip the word-multiset diff step on large structural repairs — it's the cheapest way to catch accidental prose loss before it ships.
+
+## Diagram
+
+[View diagram](diagram.html)

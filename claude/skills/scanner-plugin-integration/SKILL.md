@@ -39,3 +39,7 @@ You're integrating a set of similar external-service plugins (scanners, provider
 - Don't put gating logic in `Run()` "for safety" — it duplicates the aggregate-level check in `DryRun()` and creates two sources of truth for whether a scanner should execute.
 - Vendor/API docs go stale — always confirm exact URL/auth/response shape against the live endpoint before writing integration code, not after tests fail.
 - Decommissioning is easy to do partially (delete the backend file but forget the UI branch or `.env.example` entry) — treat it as a checklist, not a single deletion.
+
+## Diagram
+
+[View diagram](diagram.html)

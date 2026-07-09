@@ -62,3 +62,7 @@ element sizes needs a deliberate testing strategy — this is that strategy.
 - Dynamic `measureElement` sizing requires the `getBoundingClientRect` shim to exist
   in test setup ahead of time — without it, tests either fail or force falling back
   to a fixed `estimateSize`, which doesn't exercise the same code path as production.
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -31,3 +31,7 @@ Alongside the shell-helper-migration skill, before migrating any script to sourc
 - Don't infer skip status from "uses SSH" — that's necessary but not sufficient. The determinant is execution location of the body, not the presence of a network call.
 - A file can look migratable (has all the canonical helper names) and still be a hard skip because of *where* it runs, not *what* it contains.
 - Discovering any skip category mid-migration means stopping and re-classifying that file — don't assume the rest of a batch shares the same classification just because the filenames look similar.
+
+## Diagram
+
+[View diagram](diagram.html)

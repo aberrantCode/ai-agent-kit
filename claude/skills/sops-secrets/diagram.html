@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOPS Secrets Skill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:11px; font-weight:700; padding:6px 8px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--red); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--red-dim); color:var(--red); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--emerald); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>SOPS Secrets Skill</h1>
+<p class="subtitle">operator domain knowledge · secrets/*.enc.yml · ac-devops-only decryption</p>
+
+<div class="diagram">
+
+  <div class="section section--red section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> The One Rule</div>
+    <div class="callout">
+      <strong>Never run <code>sops</code> on the workstation. Always run it on ac-devops via SSH.</strong>
+      The age key (<code>~/.config/sops/age/keys.txt</code>) lives on ac-devops only. If a script in this skill ever tries <code>sops</code> locally and the user waits for a timeout, that's a bug in the skill — fix the script, not the workflow.
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    what breaks when the rule is broken
+  </div>
+
+  <div class="section section--amber" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Failure Modes · wrong move → what happens</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">get-secret.sh</div>
+        <div><div class="step-title">Run from Windows</div><div class="step-desc">Exit 4 — "age key not found". Wasted round trip; you SSH anyway.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">sops -d</div>
+        <div><div class="step-title">Run from Windows</div><div class="step-desc"><code>failed to MAC</code> or "no key could decrypt".</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">local fallback</div>
+        <div><div class="step-title">command -v sops added to a script</div><div class="step-desc">Some operator's stale local key half-works on some files, silently corrupts others.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">playbook run</div>
+        <div><div class="step-title">Decrypt on a Proxmox/Docker host</div><div class="step-desc">ISSUE-022 — <code>sops</code> binary not present; needs <code>delegate_to: localhost</code>.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section section--teal" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Slash Commands · thin wrapper → committed script → ac-devops</div>
+    <div class="two-col">
+      <div>
+        <div class="ve-card ve-card--emerald" style="margin-bottom:8px"><div class="title">/get-service-auth &lt;service&gt;</div><div class="desc">URL / username / password / token, three lines, from <code>services-auth-catalog.yml</code>.</div></div>
+        <div class="ve-card ve-card--emerald" style="margin-bottom:8px"><div class="title">/list-service-auth [filter]</div><div class="desc">Enumerate every catalog service with source file + key paths.</div></div>
+        <div class="ve-card ve-card--emerald"><div class="title">/sops-status</div><div class="desc">Probes ac-devops: SSH reach, age key, sops binary, parser, KeePass mirror.</div></div>
+      </div>
+      <div>
+        <div class="ve-card ve-card--red" style="margin-bottom:8px"><div class="title">/update-auth &lt;service&gt;</div><div class="desc"><code>sops --set</code> (atomic), commits + pushes, syncs KeePass, auto-applies the consuming playbook.</div></div>
+        <div class="ve-card ve-card--red" style="margin-bottom:8px"><div class="title">/rotate-service-password &lt;service&gt;</div><div class="desc"><code>openssl rand -hex 24</code>, then the <code>/update-auth</code> machinery.</div></div>
+        <div class="ve-card ve-card--red"><div class="title">/sync-keepass</div><div class="desc">Re-mirror SOPS → KeePass on demand after a manual ac-devops edit.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col" style="--i:4">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Not For</div>
+      <ul class="princ-list">
+        <li>Creating a brand-new SOPS file — one-off, done by hand per <code>secrets/README.md</code>.</li>
+        <li>Rotating the age key itself — separate runbook.</li>
+        <li>Bulk-decrypting a whole file into chat — refused on principle; extract one key at a time.</li>
+        <li>New credential types — edit <code>services-auth-catalog.yml</code> first, then everything else flows.</li>
+      </ul>
+    </div>
+    <div class="section section--slate">
+      <div class="section-label"><span class="dot"></span> vs /get-secret</div>
+      <div class="ve-card" style="margin-bottom:8px">
+        <div class="title">/get-service-auth (this skill)</div>
+        <div class="desc">Higher-level, opinionated. Reach for it first for "I just need the admin login for X".</div>
+      </div>
+      <div class="ve-card">
+        <div class="title">/get-secret &lt;app&gt; &lt;key&gt;</div>
+        <div class="desc">Older, lower-level. Kept as-is for raw SOPS access and data outside the catalog (PSKs, webhook URLs, internal tokens).</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

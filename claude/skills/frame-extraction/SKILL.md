@@ -104,3 +104,7 @@ If `frames/` already contains files matching the expected pattern and
 - Path to `frames.index.json`
 - Frame count and total duration covered
 - Mode used
+
+## Diagram
+
+[View diagram](diagram.html)

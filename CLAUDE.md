@@ -10,7 +10,7 @@ Manages domain-specific knowledge modules for Claude Code, OpenAI Codex CLI, and
 ```
 claude/
   instructions/                     — 15 agent instructions (invoked via Task tool)
-  commands/                   — 27 global slash commands
+  commands/                   — 25 global slash commands
   skills/<name>/
     SKILL.md                  — main skill content
     diagram.html              — visual diagram (generated)
@@ -23,7 +23,7 @@ gemini/
   instructions/                     — agent instructions for Gemini CLI
   skills/<name>/SKILL.md
 .claude/commands/             — repo-local slash commands (skills-manager)
-logs/timing.jsonl             — ship-to-dev timing log
+logs/timing.jsonl             — `/ship` timing log
 ```
 
 ---
@@ -70,6 +70,6 @@ logs/timing.jsonl             — ship-to-dev timing log
 
 ## Git Workflow
 
-Always use `/ship-to-dev` to merge changes into `dev`, then `/release-to-main` for production releases.
+Always use `/ship` to merge changes into `dev`, then `/release` for production releases.
 
 Feature branches: `type/short-description` branching off `dev`, PR back to `dev`.

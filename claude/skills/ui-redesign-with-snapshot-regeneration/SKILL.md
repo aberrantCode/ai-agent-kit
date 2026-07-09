@@ -68,3 +68,7 @@ non-snapshot failures if done carelessly.
 - Regenerating snapshots before confirming the visual change is actually intended
   can permanently bake a regression into the baseline — regenerate at merge-ready
   time, not reflexively whenever a test fails.
+
+## Diagram
+
+[View diagram](diagram.html)

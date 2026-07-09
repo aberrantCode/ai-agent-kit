@@ -35,3 +35,7 @@ version: 2026-07-05
 - A gate that emits nothing on success (e.g., zero violation pairs) can look identical to a hung or misconfigured run — verify the script's actual success contract before trusting silence.
 - Recurring stale-task classes (e.g., "fixed in a follow-up PR but the backlog row was never closed") indicate a verify-before-promote discipline gap — treat repeat occurrences as a process signal, not just a one-off cleanup.
 - Independent auditors lose their value if they're given the same framing/bias each round — vary the review lens or angle slightly, or the second "independent" pass just re-confirms the first.
+
+## Diagram
+
+[View diagram](diagram.html)

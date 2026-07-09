@@ -37,3 +37,7 @@ version: 2026-07-05
 - A service that "can see" the GPU isn't the same as one that's safe to run concurrently — visibility and arbitration are separate concerns.
 - Stale or frozen healthchecks can mask a wedged GPU process; always confirm with a live `nvidia-smi` process-table read, not just container health status.
 - Don't rely on total-VRAM headroom alone — validate the timeline, not just the peak, since transient spikes during model load/unload are where OOMs happen.
+
+## Diagram
+
+[View diagram](diagram.html)

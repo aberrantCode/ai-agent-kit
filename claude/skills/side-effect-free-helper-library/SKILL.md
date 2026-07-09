@@ -71,3 +71,7 @@ across a large, heterogeneous set of existing scripts.
 - Bulk text substitution across hundreds of scripts via naive `sed`/pattern-match
   risks mojibake; use line-range-based, content-agnostic replacement instead, and
   verify with a full parse sweep after each batch, not just a sample.
+
+## Diagram
+
+[View diagram](diagram.html)

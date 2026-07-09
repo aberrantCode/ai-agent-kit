@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State-File-Driven Multi-Turn Resumption</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f4f8; --surface: #ffffff; --surface2: #e6edf4; --surface-elevated: #f8fafd;
+    --border: rgba(20,50,90,0.07); --border-bright: rgba(20,50,90,0.15);
+    --text: #0a1526; --text-dim: #4a6080;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+    --blue: #1d4ed8; --blue-dim: rgba(29,78,216,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030811; --surface: #081018; --surface2: #0d1a24; --surface-elevated: #11202c;
+      --border: rgba(90,150,220,0.07); --border-bright: rgba(90,150,220,0.15);
+      --text: #d8e4f0; --text-dim: #5a80a0;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+      --blue: #93c5fd; --blue-dim: rgba(147,197,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--blue-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:34px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--blue    .section-label{color:var(--blue)}    .section--blue .dot{background:var(--blue)}    .section--blue{border-color:var(--blue-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--blue-dim); color:var(--blue); padding:1px 5px; border-radius:3px; }
+  .ve-card--blue    { border-left:3px solid var(--blue); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; counter-reset:step; }
+  .step-item { display:grid; grid-template-columns:32px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .step-num { counter-increment:step; font-family:var(--font-mono); font-size:12px; font-weight:700; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); }
+  .step-num::before { content: counter(step); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--blue); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--blue-dim); color:var(--blue); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"⚠"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); font-size:10px; }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>State-File-Driven Multi-Turn Resumption</h1>
+<p class="subtitle">durable progress file as single source of truth · one step per turn · copy-ready handoff</p>
+
+<div class="diagram">
+
+  <div class="section section--blue section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to Use</div>
+    <div class="callout">
+      A task spans multiple sessions, context resets, or <code>/loop</code> iterations, and progress must survive them. A durable state file (e.g. <code>docs/progress.md</code>) becomes the <strong>single source of truth</strong> — not conversation history, not assumptions from the prompt.
+    </div>
+    <div class="two-col" style="margin-top:14px">
+      <div class="ve-card ve-card--blue">
+        <div class="title">Too large for one window</div>
+        <div class="desc">Explicitly run via <code>/loop</code> or recursive re-invocation across fresh sessions.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">"Continue" / "resume" prompts</div>
+        <div class="desc">You may not have full history for the repo — the state file fills the gap.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    seven-step method, repeated every turn
+  </div>
+
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method · one turn, one step</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Read the state file first</div><div class="step-desc">Before planning anything. Trust it over <code>git log</code> alone for "what's already done."</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Verify the premise before committing effort</div><div class="step-desc">Check SoT (<code>docs/features/</code>, <code>docs/plans/</code>), <code>git log -S</code>, in-flight PRs, the state file, and <code>CLAUDE.md</code> conventions. ~5 minutes, prevents redoing shipped work.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Advance exactly one step per turn</div><div class="step-desc">No batching. Record evidence inline: PR number, output, API excerpt, commit hash, verification-gate result.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Respect workflow constraints</div><div class="step-desc">Feature branches only, never direct commits to <code>dev</code>/<code>main</code>. Handle leftover uncommitted state from prior breaks first.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Use explicit completion sentinels</div><div class="step-desc">Unambiguous markers — not just prose — so a fresh agent can parse "what's next" mechanically.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">End with a copy-ready resume prompt</div><div class="step-desc">Done/next, verification discipline, recurring failure-mode warnings, exact workflow to repeat — a self-perpetuating template.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num"></div>
+        <div><div class="step-title">Pause proactively for <code>/loop</code></div><div class="step-desc">Around ~200k tokens of context, emit "RESUME PROMPT" as the literal last output so a fresh session can paste it with zero state loss.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section section--amber" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Acting on a prompt's stated premise without checking SoT/git log/progress file causes redundant work on already-shipped features.</li>
+      <li>Trusting <code>git log</code> alone instead of the state file (or vice versa) — reconcile both; git is the tie-breaker for "did this actually land."</li>
+      <li>Batching multiple checklist steps per turn defeats the auditability purpose.</li>
+      <li>Committing directly to <code>dev</code>/<code>main</code> instead of a feature branch breaks workflow compliance.</li>
+      <li>Letting context run past ~200k tokens without emitting a resume prompt loses unwritten state.</li>
+      <li>Omitting evidence turns checkboxes into unverifiable claims.</li>
+      <li>Forgetting to surface recurring failure modes lets the same mistake repeat across sessions.</li>
+      <li>Ignoring leftover uncommitted state from a prior session break can silently clobber or duplicate work.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

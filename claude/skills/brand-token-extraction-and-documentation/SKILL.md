@@ -37,3 +37,7 @@ You need to reskin or extend an app to match a real brand's colors, logo, and ty
 - Popular page-builder frameworks (Divi and similar) leave signature default colors in the stylesheet that will pollute an occurrence-count ranking if not explicitly filtered out.
 - A "baked" token (hard-coded into a generated asset) is a hidden maintenance liability — every baked value needs an explicit comment noting it won't auto-update, or it will silently drift from the source token.
 - Treating token names as a stable contract (not just their values) is what prevents downstream breakage — a value change is safe, a name change/removal is not.
+
+## Diagram
+
+[View diagram](diagram.html)

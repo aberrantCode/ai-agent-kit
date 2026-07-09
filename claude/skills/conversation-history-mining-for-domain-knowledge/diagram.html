@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversation History Mining for Domain Knowledge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:36px 1fr; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-num { font-family:var(--font-mono); font-size:13px; font-weight:700; padding:6px 0; border-radius:8px; text-align:center; }
+  .op-num--teal { background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Conversation History Mining for Domain Knowledge</h1>
+<p class="subtitle">mine prior Claude transcripts for load-bearing domain knowledge · not logs, not current code alone</p>
+
+<div class="diagram">
+
+  <!-- When to use — the defining contract -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to Use</div>
+    <div class="callout">
+      Load-bearing domain knowledge about a service, system, or process has been
+      <strong>discussed before but isn't written down anywhere authoritative</strong>:
+      building a new skill for an internal tool, onboarding onto a legacy system, or
+      auditing "what keeps going wrong" across a fleet of repos. Transcripts capture
+      failure modes, workarounds, and decisions that current code and logs alone won't
+      reveal — they encode the <strong>why</strong>, not just the <strong>what</strong>.
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    five-step method
+  </div>
+
+  <!-- Method -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-num op-num--teal">1</div>
+        <div><div class="step-title">Mine transcripts, not just logs or current state</div><div class="step-desc">Prior conversations accumulate incidents, constraints, and workarounds that never made it into docs — e.g. a Honcho skill built by pulling <code>DERIVER_FLUSH_ENABLED</code> behavior, a conclusion-pollution incident, and a 6-day silent auth-key failure straight out of history.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-num op-num--teal">2</div>
+        <div><div class="step-title">Dispatch a search agent over the transcript corpus</div><div class="step-desc">Don't read everything serially. Search for symptom descriptions, workaround phrasing, and decision language ("we changed X because Y", "the actual cause was").</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-num op-num--teal">3</div>
+        <div><div class="step-title">Parse transcripts as structured data, not prose</div><div class="step-desc">JSONL session logs carry tool calls and results as first-class fields. Use a read-only funnel script to extract them, then cluster errors by a normalized signature (strip timestamps/IDs, group by error shape).</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-num op-num--teal">4</div>
+        <div><div class="step-title">Treat the transcript as the arbiter of what happened</div><div class="step-desc">Current git/system state gets masked by later manual remediation. The transcript is the only record of what the agent actually did and claimed at the time; session-end wrap-ups state the <em>intended</em> outcome even if not fully realized.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-num op-num--teal">5</div>
+        <div><div class="step-title">Convert discoveries into durable memory: capture-then-curate</div><div class="step-desc">Agents append diagnostic insights to a lightweight intake file, no ceremony. A curator agent periodically sweeps it: dedups entries, allocates stable IDs, links related items, writes into a permanent index — keeping CLAUDE.md from ballooning.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Inputs / Outputs -->
+  <div class="section section--amber" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Inputs &amp; Outputs</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--amber">
+        <div class="title">Inputs</div>
+        <div class="desc">Prior Claude conversation transcripts (JSONL session logs) · a dispatched search agent · a lightweight append-only intake file</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Outputs</div>
+        <div class="desc">Clustered recurring failure classes · a new skill/doc/knowledge base entry · a curated, deduped permanent index with stable IDs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gotchas -->
+  <div class="section section--red" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Don't treat current repo/system state as ground truth for "did this bug get fixed" — silent manual remediation outside the session makes a real recurring bug look resolved. Cross-check against the transcript.</li>
+      <li>Clustering needs normalization (strip volatile timestamps/paths/IDs) or every error looks unique and no pattern emerges.</li>
+      <li>An intake file that's never curated just becomes a second, messier <code>CLAUDE.md</code> — the curator pass (dedup + ID allocation + linking) is what makes it durable memory rather than a growing pile of notes.</li>
+      <li>Measuring "session completion vs. actual delivery" requires reading <strong>both</strong> the wrap-up (stated intent) and the tool-call trace (actual actions) — either alone overstates or understates what was really delivered.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

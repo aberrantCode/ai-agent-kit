@@ -442,3 +442,7 @@ If no keywords match: **Uncategorized**. Multiple matches: most keyword hits win
 3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
 4. **Toolset is determined by directory, not content.**
 5. **Installed copies are not project-developed skills.** The `installed-from: ai-agent-kit` marker gates this distinction.
+
+## Diagram
+
+[View diagram](diagram.html)

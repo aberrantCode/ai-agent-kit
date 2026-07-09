@@ -129,3 +129,7 @@ Diff the new report against the previous and:
 
 - Path to `EXTRACTION.md`
 - Counts: files reconstructed, screenshots embedded, gaps flagged
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -30,3 +30,7 @@ version: 2026-07-05
 - Don't average or merge two disagreeing surfaces' numbers — pick the authoritative one deliberately and state why, or the reconciliation itself becomes a new source of confusion.
 - Container/process healthchecks can freeze mid-wedge and report a stale "healthy" or "unhealthy" state well past when it stopped being accurate — always cross-check with a live log tail or fresh metric sample before trusting it.
 - Building new collection infrastructure to fill a metrics gap is a last resort — check first whether an existing poller/exporter already has the data, just not surfaced correctly.
+
+## Diagram
+
+[View diagram](diagram.html)

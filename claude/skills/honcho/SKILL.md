@@ -99,3 +99,7 @@ console.log(await user.chat("What config format does this user prefer?"));
 - Docs: <https://honcho.dev/docs>
 - API reference: <https://honcho.dev/docs/v3/api-reference/introduction>
 - Changelog / SDK versions: <https://honcho.dev/docs/changelog/introduction>
+
+## Diagram
+
+[View diagram](diagram.html)

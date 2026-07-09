@@ -29,11 +29,11 @@ Requires PowerShell 5.1+. Works on Windows, macOS (`pwsh`), and Linux (`pwsh`).
 ai-agent-kit/
 ├── claude/
 │   ├── instructions/     # 15 agent instructions
-│   ├── commands/         # 27 slash commands
-│   └── skills/           # 91 domain-specific knowledge modules
+│   ├── commands/         # 25 slash commands
+│   └── skills/           # 143 domain-specific knowledge modules
 ├── codex/
 │   ├── instructions/     # Agent instructions for Codex CLI
-│   └── skills/           # 90 domain-specific knowledge modules
+│   └── skills/           # 87 domain-specific knowledge modules
 ├── gemini/
 │   ├── instructions/     # Agent instructions for Gemini CLI
 │   └── skills/           # 5 domain-specific knowledge modules
@@ -42,9 +42,9 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 107 | 90 | 5 | 202 |
+| Skills | 143 | 87 | 5 | 235 |
 | Instructions | 15 | — | — | 15 |
-| Commands | 27 | — | — | 27 |
+| Commands | 25 | — | — | 25 |
 
 ---
 
@@ -112,23 +112,25 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 22 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
+| Foundations & Workflow | 35 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
-| Frontend Frameworks | 8 | react-web, flutter, chrome-extension-builder |
+| Frontend Frameworks | 7 | react-web, flutter, chrome-extension-builder |
+| Frontend & UI | 6 | css-variables-for-multi-theme-reskin, ui-redesign-with-snapshot-regeneration |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
-| UI & Design | 9 | ui-web, frontend-design, visual-explainer |
+| UI & Design | 10 | ui-web, frontend-design, visual-explainer |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
-| Code Quality | 6 | code-review, codex-review, gemini-review, playwright-testing |
+| Code Quality | 9 | code-review, codex-review, gemini-review, playwright-testing |
 | Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
 | AI & LLM | 6 | agentic-development, llm-patterns, ai-models, csv-driven-llm-pipeline, honcho, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
 | Tooling & DevOps | 11 | ac-opbta-ops, project-tooling, skills-manager, start-app, graphify |
-| Research & OSINT | 12 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
+| DevOps & Tooling | 15 | deploy-idempotency-two-pass-gate, grafana-dashboard-workflow, lvm-thin-pool-diagnostics-recovery |
+| Research & OSINT | 11 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (135 Claude skills)</strong></summary>
+<summary><strong>Full skill list (143 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
@@ -143,7 +145,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — merge, PR, squash, or cleanup | ✓ | ✓ | |
 | [`using-git-worktrees`](claude/skills/using-git-worktrees/) | Foundations & Workflow | Isolated git worktrees with smart directory selection | ✓ | ✓ | |
 | [`requesting-code-review`](claude/skills/requesting-code-review/) | Foundations & Workflow | Dispatch code review before merging | ✓ | ✓ | |
-| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/prune` with a minimal-output contract | ✓ | | |
+| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
 | [`commit-hygiene`](claude/skills/commit-hygiene/) | Foundations & Workflow | Atomic commits, PR size limits, commit thresholds | ✓ | ✓ | |
 | [`guide-assistant`](claude/skills/guide-assistant/) | Foundations & Workflow | Walk through any markdown guide step-by-step | ✓ | ✓ | |
 | [`feature-start`](claude/skills/feature-start/) | Foundations & Workflow | Pre-flight workflow before starting feature work | ✓ | ✓ | |
@@ -232,7 +234,6 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`video-acquisition`](claude/skills/video-acquisition/) | Research & OSINT | Download and manage video files with metadata | ✓ |  |  |
 | [`worldview-shader-preset`](claude/skills/worldview-shader-preset/) | Research & OSINT | Scaffold WorldView post-processing presets | ✓ | ✓ | |
 | [`transcript-acquisition`](claude/skills/transcript-acquisition/) | Research & OSINT | Fetch and process video transcripts from multiple sources | ✓ |  |  |
-
 | [`frame-extraction`](claude/skills/frame-extraction/) | Research & OSINT | Extract frames and images from video content | ✓ |  |  |
 | [`frame-content-recognition`](claude/skills/frame-content-recognition/) | Research & OSINT | Identify and classify visual content in video frames | ✓ |  |  |
 | [`file-reconstruction`](claude/skills/file-reconstruction/) | Research & OSINT | Reconstruct files from extracted or partial data | ✓ |  |  |
@@ -248,6 +249,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`firewall-alias-as-indirection`](claude/skills/firewall-alias-as-indirection/) | DevOps & Tooling | Firewall rules should reference named device aliases, not hardcoded IPs, so inventory churn never touches rules | ✓ |  |  |
 | [`fleet-cp1252-mojibake-fix`](claude/skills/fleet-cp1252-mojibake-fix/) | DevOps & Tooling | Strip non-ASCII glyphs from script runtime output to fix cp1252/Git Bash mojibake without touching comments | ✓ |  |  |
 | [`gpu-workload-placement-and-arbitration`](claude/skills/gpu-workload-placement-and-arbitration/) | DevOps & Tooling | Plan and validate GPU workload placement and VRAM arbitration when services share one card | ✓ |  |  |
+| [`grafana-dashboard-engineer`](claude/skills/grafana-dashboard-engineer/) | DevOps & Tooling | Production-grade Grafana dashboard engineering — research, design, build, deploy, and validate observability dashboards across Prometheus, Loki, and custom datasources | ✓ |  |  |
 | [`grafana-dashboard-workflow`](claude/skills/grafana-dashboard-workflow/) | DevOps & Tooling | Author/retrofit Grafana dashboards with live-metric probing, a 4-row baseline, and a 4-rung verify ladder | ✓ |  |  |
 | [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/) | DevOps & Tooling | Diagnose stalled Honcho/background queues via direct Postgres checks, falsifiable health criteria, and pollution audits | ✓ |  |  |
 | [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/) | DevOps & Tooling | Layered LVM thin-pool diagnosis and recovery from ENOSPC, emergency_ro, and metadata-pressure write stalls | ✓ |  |  |
@@ -267,6 +269,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/) | Foundations & Workflow | Atomically fix spec-vs-reality drift and mangled markdown docs without scope creep | ✓ |  |  |
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/) | Foundations & Workflow | Verify cached refs (git default branch, session memory) against live state before destructive ops | ✓ |  |  |
 | [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/) | Foundations & Workflow | Resume multi-session work via a durable state file, one-step turns, and copy-ready handoff prompts | ✓ |  |  |
+| [`superpowers-overrides`](claude/skills/superpowers-overrides/) | Foundations & Workflow | Convention-adapted overrides of the superpowers brainstorming and writing-plans skills — save plans/specs to the project's own docs conventions instead of `docs/superpowers/` | ✓ |  |  |
 | [`worktree-isolated-loop`](claude/skills/worktree-isolated-loop/) | Foundations & Workflow | Isolate multi-turn/batch agent work in git worktrees and drive self-resuming loops from repo state | ✓ |  |  |
 | [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/) | Frontend & UI | Extract real brand colors/logos from raw site CSS and codify them as versioned, documented design tokens | ✓ |  |  |
 | [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/) | Frontend & UI | Build light/dark and multi-brand reskins as pure CSS custom-property token swaps | ✓ |  |  |
@@ -324,7 +327,7 @@ The `project-manager` skill ships bundled commands for its markdown-driven lifec
 next-task, blocked, stale, and validation reports.
 
 <details>
-<summary><strong>Full command list (27)</strong></summary>
+<summary><strong>Full command list (25 global + 2 bundled)</strong></summary>
 
 | Command | Description |
 |---------|-------------|

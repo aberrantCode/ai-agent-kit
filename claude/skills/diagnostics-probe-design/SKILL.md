@@ -35,3 +35,7 @@ version: 2026-07-05
 - Don't write PromQL/LogQL against assumed metric names — exporter drift silently breaks queries; pre-validate against the live scraper first.
 - Don't paraphrase captured error messages — verbatim text (timestamps included) preserves the signal needed for bisection.
 - Recorded metrics and live state answer different questions (what happened vs. what's true now) — use both, not one as a substitute for the other.
+
+## Diagram
+
+[View diagram](diagram.html)

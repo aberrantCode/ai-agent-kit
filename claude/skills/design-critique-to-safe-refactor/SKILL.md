@@ -35,3 +35,7 @@ version: 2026-07-05
 - Don't let "the design looks right" substitute for "the client-side hooks still resolve" — visually correct and functionally intact are different claims.
 - Dual-path checks (e.g., two auth mechanisms) are the classic place a fix looks complete but only covers one path — enumerate every path explicitly.
 - Image-blind subagents will fabricate visual detail if handed only a vague prompt; always ground them with a written inventory first.
+
+## Diagram
+
+[View diagram](diagram.html)

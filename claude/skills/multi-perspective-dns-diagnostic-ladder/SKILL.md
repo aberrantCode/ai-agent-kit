@@ -45,3 +45,7 @@ When a fix looks plausible, re-apply it and then re-read the system logs/output 
 - Don't stop the network investigation at "server looks fine" without stating that conclusion explicitly and then continuing upstream — otherwise the investigation stalls exactly where it should pivot to client/AP-side capture.
 - A fix that "looks right" (e.g. restarting a service, editing a secret) is not confirmed until logs are re-read post-apply; treat an unverified fix as still-open.
 - Building a single-dependency probe (checking only the network, only the secret) instead of the full chain risks fixing a step that wasn't actually the broken one.
+
+## Diagram
+
+[View diagram](diagram.html)

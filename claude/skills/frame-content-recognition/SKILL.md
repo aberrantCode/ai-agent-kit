@@ -122,3 +122,7 @@ changed. This step is expensive — avoid redoing it.
 - Path to `frames.recognition.json`
 - Count of distinct `file_path` values detected
 - Coverage stats: how many frames contained recognised file content vs. talking-head
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -207,3 +207,7 @@ change from `ac-devops`, (5) report status.
 
 Read these only when the current task requires them. Most work is a one-shot lookup
 against the tool index above plus a pointer to a runbook.
+
+## Diagram
+
+[View diagram](diagram.html)

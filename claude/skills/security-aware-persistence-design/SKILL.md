@@ -35,3 +35,7 @@ Any time you're adding a feature that writes user-supplied data to storage, expo
 - Mocked unit tests give false confidence on transaction correctness; only integration tests against a real engine catch rollback bugs.
 - Speculative future need is not a justification for present-day attack surface — require a concrete, currently-authenticating consumer.
 - A service being "behind SSO" doesn't mean it's safe to expose if the SSO is forward-auth only and the backend itself has no auth.
+
+## Diagram
+
+[View diagram](diagram.html)

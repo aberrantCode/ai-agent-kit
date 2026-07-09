@@ -41,3 +41,7 @@ version: 2026-07-05
 - `rm -rf` on worktree teardown can fail with a transient Windows lock error even after `git worktree remove` succeeds logically — treat this as benign, retry `prune` + `rm -rf`.
 - A worktree does not protect two sessions from colliding on the *same* branch — always check for in-progress merge/rebase/cherry-pick markers first.
 - A loop that reasons from chat history instead of re-reading git/plan state on every iteration will drift and duplicate or skip work across sessions.
+
+## Diagram
+
+[View diagram](diagram.html)
