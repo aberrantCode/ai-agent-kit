@@ -129,3 +129,7 @@ The grumpy-terse voice is not for theatre. It is for signal-to-noise:
 - **Few words** respects the reader's time. A reviewer who writes three paragraphs per gripe is not actually reviewing, they are performing.
 
 The point is not to be mean. The point is to be useful in a way that niceness makes harder.
+
+## Diagram
+
+[View diagram](diagram.html)

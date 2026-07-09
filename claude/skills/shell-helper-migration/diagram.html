@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shell Helper Migration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f3f6ef; --surface: #ffffff; --surface2: #e9efe1; --surface-elevated: #f9fbf6;
+    --border: rgba(50,80,10,0.07); --border-bright: rgba(50,80,10,0.15);
+    --text: #131c08; --text-dim: #56604a;
+    --olive: #4d7c0f; --olive-dim: rgba(77,124,15,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #070a02; --surface: #0e1406; --surface2: #131b09; --surface-elevated: #19230d;
+      --border: rgba(170,220,90,0.07); --border-bright: rgba(170,220,90,0.15);
+      --text: #e4f0d4; --text-dim: #7a9060;
+      --olive: #bef264; --olive-dim: rgba(190,242,100,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--olive-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--olive  .section-label{color:var(--olive)}  .section--olive .dot{background:var(--olive)}   .section--olive{border-color:var(--olive-dim)}
+  .section--amber  .section-label{color:var(--amber)}  .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--slate  .section-label{color:var(--slate)}  .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+  .section--teal   .section-label{color:var(--teal)}   .section--teal .dot{background:var(--teal)}     .section--teal{border-color:var(--teal-dim)}
+  .section--red    .section-label{color:var(--red)}    .section--red .dot{background:var(--red)}       .section--red{border-color:var(--red-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--olive-dim); color:var(--olive); padding:1px 5px; border-radius:3px; }
+  .ve-card--olive  { border-left:3px solid var(--olive); }
+  .ve-card--amber  { border-left:3px solid var(--amber); }
+  .ve-card--teal   { border-left:3px solid var(--teal); }
+  .ve-card--red    { border-left:3px solid var(--red); }
+  .ve-card--violet { border-left:3px solid var(--violet); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:34px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .step-num { font-family:var(--font-mono); font-size:12px; font-weight:700; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--olive-dim); color:var(--olive); border:1px solid var(--olive); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--olive); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--olive-dim); color:var(--olive); padding:1px 5px; border-radius:3px; }
+
+  .decision { display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:11px; margin-top:10px; flex-wrap:wrap; }
+  .decision .q { background:var(--slate-dim); color:var(--slate); border:1px solid var(--slate); padding:4px 10px; border-radius:6px; font-weight:700; }
+  .decision .yes { background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); padding:4px 10px; border-radius:6px; }
+  .decision .no { background:var(--red-dim); color:var(--red); border:1px solid var(--red); padding:4px 10px; border-radius:6px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Shell Helper Migration</h1>
+<p class="subtitle">consolidate log/ok/fail/die into one sourced module · preserve exit-code semantics exactly</p>
+
+<div class="diagram">
+
+  <div class="section section--olive section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to use</div>
+    <div class="callout">
+      Consolidating duplicated shell helper functions (<code>log</code>, <code>ok</code>, <code>fail</code>, <code>die</code>, <code>section</code>, <code>info</code>, <code>warn</code>, colour variables) scattered across many bash scripts into one shared module — without breaking exit codes, captured output, or execution semantics. Applies to batch migrations across tens or hundreds of scripts.
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    identify → source one line → forensically read contracts → judge per-file → clean → verify → batch
+  </div>
+
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method</div>
+    <ul class="step-list">
+      <li class="step-item"><div class="step-num">1</div><div><div class="step-title">Identify by canonical name</div><div class="step-desc">Delete only standard helper names; keep custom ones (<code>ssh_devops</code>, <code>hr</code>, <code>kv</code>) untouched.</div></div></li>
+      <li class="step-item"><div class="step-num">2</div><div><div class="step-title">Add exactly one source line</div><div class="step-desc">Immediately after <code>set -euo pipefail</code>. Anchor on <code>SCRIPT_DIR</code> if present, else <code>$(dirname "${'$'}{BASH_SOURCE[0]}")</code> as the safe default.</div></div></li>
+      <li class="step-item"><div class="step-num">3</div><div><div class="step-title">Forensically determine each helper's contract</div><div class="step-desc">Does the def <code>exit 1</code>? <code>return N</code>? Is the call site followed by explicit <code>exit</code>/<code>die</code>, or bare inside a loop? Is <code>set -e</code> active?</div></div></li>
+      <li class="step-item"><div class="step-num">4</div><div><div class="step-title">Judge per-file on three axes</div><div class="step-desc">Execution context (repo checkout vs. remote/on-host — see skip-taxonomy skill), contract (non-standard exit codes), semantics (fatal vs. non-fatal call sites).</div></div></li>
+      <li class="step-item"><div class="step-num">5</div><div><div class="step-title">Clean up orphaned state</div><div class="step-desc">Grep for now-unused colour vars (<code>$GREEN</code>, <code>$RED</code>, <code>_ts</code>) and remove — only if nothing else in the file still uses them.</div></div></li>
+      <li class="step-item"><div class="step-num">6</div><div><div class="step-title">Guard against use-before-source</div><div class="step-desc"><code>bash -n</code> only checks syntax, not order. Grep for helper calls above the source line (common in arg-parsing loops); move the source line earlier if found.</div></div></li>
+      <li class="step-item"><div class="step-num">7</div><div><div class="step-title">Verify</div><div class="step-desc"><code>bash -n</code> on every changed file, no-color render preview, smoke-test the arg-parse path (<code>--bogus</code> should fail via sourced <code>fail()</code>).</div></div></li>
+      <li class="step-item"><div class="step-num">8</div><div><div class="step-title">Batch coherently</div><div class="step-desc">Group by filename prefix / subsystem, not the whole repo in one commit — keeps review and revert tractable across 100+ files.</div></div></li>
+    </ul>
+  </div>
+
+  <div class="two-col" style="--i:3">
+    <div class="section section--amber">
+      <div class="section-label"><span class="dot"></span> Exit-code decision rule</div>
+      <div class="decision">
+        <span class="q">fail + exit N (N≠1)</span><span class="yes">stays exactly as-is</span>
+      </div>
+      <div class="decision">
+        <span class="q">fail + exit 1, or ... || die</span><span class="yes">becomes die</span>
+      </div>
+      <div class="decision">
+        <span class="q">bare non-fatal fail (fleet loop)</span><span class="yes">stays fail</span>
+      </div>
+    </div>
+    <div class="section section--slate">
+      <div class="section-label"><span class="dot"></span> Gotchas</div>
+      <ul class="princ-list">
+        <li>A return-based <code>fail()</code> under <code>set -e</code> aborts immediately — <code>fail; fail; exit 1</code> never prints the second message. Flag it, don't silently preserve.</li>
+        <li>Never blind-<code>sed</code> replace <code>fail</code>→<code>die</code> or vice versa; read semantics from def and every call site.</li>
+        <li>Removing non-ASCII glyphs is fine workstation-side, but NOT inside heredoc payloads — see skip-taxonomy skill.</li>
+        <li>"Looks the same" is not "is the same" — identically-named helpers can carry different exit-code contracts.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

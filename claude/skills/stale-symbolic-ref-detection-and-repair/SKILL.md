@@ -58,3 +58,7 @@ Treat any such reference as a hypothesis to verify, not a fact to act on.
 - Once verified (right or wrong), write the ground truth back immediately. An
   unresolved discrepancy between memory and reality is a blocker for any subsequent
   destructive step, not a minor inconsistency to shrug off.
+
+## Diagram
+
+[View diagram](diagram.html)

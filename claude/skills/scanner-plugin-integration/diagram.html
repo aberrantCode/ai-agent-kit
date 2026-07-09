@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner Plugin Integration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f4f8; --surface: #ffffff; --surface2: #e8eef4; --surface-elevated: #f8fafd;
+    --border: rgba(20,50,90,0.07); --border-bright: rgba(20,50,90,0.15);
+    --text: #0a1520; --text-dim: #4a6070;
+    --blue: #1d4ed8; --blue-dim: rgba(29,78,216,0.08);
+    --cyan: #0e7490; --cyan-dim: rgba(14,116,144,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030810; --surface: #081018; --surface2: #0d1a24; --surface-elevated: #112030;
+      --border: rgba(100,160,220,0.07); --border-bright: rgba(100,160,220,0.15);
+      --text: #d8e4f0; --text-dim: #5a7890;
+      --blue: #93c5fd; --blue-dim: rgba(147,197,253,0.1);
+      --cyan: #67e8f9; --cyan-dim: rgba(103,232,249,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--blue-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--cyan-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--blue   .section-label{color:var(--blue)}   .section--blue .dot{background:var(--blue)}     .section--blue{border-color:var(--blue-dim)}
+  .section--cyan   .section-label{color:var(--cyan)}   .section--cyan .dot{background:var(--cyan)}     .section--cyan{border-color:var(--cyan-dim)}
+  .section--red    .section-label{color:var(--red)}    .section--red .dot{background:var(--red)}       .section--red{border-color:var(--red-dim)}
+  .section--amber  .section-label{color:var(--amber)}  .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet .section-label{color:var(--violet)} .section--violet .dot{background:var(--violet)} .section--violet{border-color:var(--violet-dim)}
+  .section--slate  .section-label{color:var(--slate)}  .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--blue-dim); color:var(--blue); padding:1px 5px; border-radius:3px; }
+  .ve-card--blue   { border-left:3px solid var(--blue); }
+  .ve-card--cyan   { border-left:3px solid var(--cyan); }
+  .ve-card--red    { border-left:3px solid var(--red); }
+  .ve-card--amber  { border-left:3px solid var(--amber); }
+  .ve-card--violet { border-left:3px solid var(--violet); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:130px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:11px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--blue   { background:var(--blue-dim);   color:var(--blue);   border:1px solid var(--blue); }
+  .op-cmd--cyan   { background:var(--cyan-dim);   color:var(--cyan);   border:1px solid var(--cyan); }
+  .op-cmd--amber  { background:var(--amber-dim);  color:var(--amber);  border:1px solid var(--amber); }
+  .op-cmd--red    { background:var(--red-dim);    color:var(--red);    border:1px solid var(--red); }
+  .op-cmd--violet { background:var(--violet-dim); color:var(--violet); border:1px solid var(--violet); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--cyan-dim); color:var(--cyan); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--blue); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--blue-dim); color:var(--blue); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Scanner Plugin Integration</h1>
+<p class="subtitle">merging orphaned scaffolds · one interface, many providers · gate in DryRun not Run</p>
+
+<div class="diagram">
+
+  <div class="section section--blue section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to use</div>
+    <div class="callout">
+      Integrating a set of similar external-service plugins (scanners, providers, suppliers — any <strong>"one interface, many implementations"</strong> integration) into a codebase: merging a scaffold built in a separate location into the real package tree, adding a new provider that follows an established template, or fixing/decommissioning an existing one.
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    fix orphaned scaffold → preserve interface shape → gate architecture → add/fix provider
+  </div>
+
+  <div class="section section--red" style="--i:2">
+    <div class="section-label"><span class="dot"></span> 1 · Fixing orphaned scaffolds (Go-specific, broadly applicable)</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">identity</div>
+        <div><div class="step-title">Package identity is the directory, not the <code>package</code> clause</div><div class="step-desc">Code in a separate top-level folder is a distinct package even if the clause matches — causes <code>undefined: suppliers.X</code> import errors.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">fix</div>
+        <div><div class="step-title">Move, don't re-export</div><div class="step-desc">Move files into the real tree, merge registration into the existing <code>init.go</code>, delete the scaffold entirely — no re-export shim.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--slate">generalize</div>
+        <div><div class="step-title">Pattern applies broadly</div><div class="step-desc">Any "sidecar extraction that should have been integrated" gets the same fix: merge directories, consolidate init/registration, delete the orphan.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="two-col" style="--i:3">
+    <div class="section section--cyan">
+      <div class="section-label"><span class="dot"></span> 2 · Preserve the plugin interface pattern</div>
+      <div class="ve-card ve-card--cyan" style="margin-bottom:8px">
+        <div class="title">Common shape</div>
+        <div class="desc">Small fixed-method interface (e.g. 4 methods) + supplier-delegation layer + mock implementation + table-driven tests, applied consistently across every provider.</div>
+      </div>
+      <div class="ve-card ve-card--blue">
+        <div class="title">Why it matters</div>
+        <div class="desc">Keeps future providers a templating exercise, not a bespoke one-off each time.</div>
+      </div>
+    </div>
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> 3 · Gating architecture</div>
+      <div class="ve-card ve-card--violet" style="margin-bottom:8px">
+        <div class="title"><code>DryRun()</code> not <code>Run()</code></div>
+        <div class="desc"><code>Library.Scan</code> calls <code>DryRun()</code> for every registered scanner first and skips failures — gate lives at the aggregate level, <code>Run()</code> stays thin.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title"><code>/dryrun</code> vs <code>/run</code></div>
+        <div class="desc">HTTP <code>/run</code> deliberately bypasses the gate, assuming the caller already checked <code>/dryrun</code> — no redundant validation inside <code>/run</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section section--amber" style="--i:4">
+    <div class="section-label"><span class="dot"></span> 4 · Adding or fixing a provider</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">understand</div>
+        <div><div class="step-title">Read the supplier interface first</div><div class="step-desc">Method signatures (e.g. <code>SearchByPhone</code>) and expected response shape, before writing code.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">verify live</div>
+        <div><div class="step-title">Test the live endpoint before coding</div><div class="step-desc">Confirm exact URL, auth mechanism, response format — vendor docs drift from the actual API.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--cyan">mock</div>
+        <div><div class="step-title">Keep interfaces mock-friendly</div><div class="step-desc">Tests run without live credentials, reinforcing the 4-method interface + mock pattern.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--blue">dedup</div>
+        <div><div class="step-title">Reuse response structs across API versions</div><div class="step-desc">Migrating v1 → v2 reuses <code>DehashedEntry</code>-style structs instead of parallel v2 types.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--slate">decommission</div>
+        <div><div class="step-title">Removal is a checklist, not a deletion</div><div class="step-desc">Backend files + role, registration, UI branches, docs, <code>.env.example</code>, full test suite.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section section--slate" style="--i:5">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Matching <code>package</code> clause + different directory is still a different package — produces "undefined" errors that look like a missing import.</li>
+      <li>Don't put gating in <code>Run()</code> "for safety" — duplicates the aggregate check and creates two sources of truth.</li>
+      <li>Vendor/API docs go stale — confirm URL/auth/response shape against the live endpoint before writing integration code.</li>
+      <li>Decommissioning is easy to do partially — treat it as a checklist (backend, UI, docs, env, tests), not a single deletion.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

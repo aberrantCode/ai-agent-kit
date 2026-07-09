@@ -68,3 +68,7 @@ Don't recite every rule. Don't lecture. Match the advice to what the session act
 - It does not silently change the user's model or settings. Recommend, then act only on confirmation.
 - It does not summarize-and-clear without asking — the user may have unsaved context in the conversation.
 - It does not send data anywhere. The usage report is strictly local.
+
+## Diagram
+
+[View diagram](diagram.html)

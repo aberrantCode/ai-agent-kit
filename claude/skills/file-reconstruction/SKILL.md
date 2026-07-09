@@ -148,3 +148,7 @@ walk recognition state itself.
 - Path to `files/` directory
 - Path to `_manifest.json`
 - Count of files written, count skipped due to conflicts
+
+## Diagram
+
+[View diagram](diagram.html)

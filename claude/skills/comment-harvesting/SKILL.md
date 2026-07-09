@@ -94,3 +94,7 @@ If `comments.json` already exists for `<basename>`, only re-fetch on explicit
 refresh request (comment threads on older videos are mostly stable). Append a
 new `comments.<ISO-date>.json` instead of overwriting if the user does want a
 fresh pull.
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -42,3 +42,7 @@ version: 2026-07-05
 - Omitting evidence (PR#, output, commit hash) turns checkboxes into unverifiable claims — future turns can't distinguish "done" from "claimed done."
 - Forgetting to surface recurring failure modes in the handoff prompt causes the same mistake to repeat across sessions.
 - Ignoring leftover uncommitted working-tree state from a prior session break can silently clobber or duplicate work.
+
+## Diagram
+
+[View diagram](diagram.html)

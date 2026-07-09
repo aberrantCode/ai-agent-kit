@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Paced Loop Iteration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f6f8; --surface: #ffffff; --surface2: #e4eef2; --surface-elevated: #f7fbfc;
+    --border: rgba(10,70,90,0.07); --border-bright: rgba(10,70,90,0.15);
+    --text: #08181f; --text-dim: #486070;
+    --cyan: #0e7490; --cyan-dim: rgba(14,116,144,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030a0c; --surface: #071418; --surface2: #0c1c20; --surface-elevated: #10242a;
+      --border: rgba(100,210,230,0.07); --border-bright: rgba(100,210,230,0.15);
+      --text: #d8f0f4; --text-dim: #5a8898;
+      --cyan: #67e8f9; --cyan-dim: rgba(103,232,249,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--cyan-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--cyan   .section-label{color:var(--cyan)}   .section--cyan .dot{background:var(--cyan)}     .section--cyan{border-color:var(--cyan-dim)}
+  .section--teal   .section-label{color:var(--teal)}   .section--teal .dot{background:var(--teal)}     .section--teal{border-color:var(--teal-dim)}
+  .section--amber  .section-label{color:var(--amber)}  .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--slate  .section-label{color:var(--slate)}  .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+  .section--violet .section-label{color:var(--violet)} .section--violet .dot{background:var(--violet)} .section--violet{border-color:var(--violet-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--cyan-dim); color:var(--cyan); padding:1px 5px; border-radius:3px; }
+  .ve-card--cyan   { border-left:3px solid var(--cyan); }
+  .ve-card--teal   { border-left:3px solid var(--teal); }
+  .ve-card--amber  { border-left:3px solid var(--amber); }
+  .ve-card--violet { border-left:3px solid var(--violet); }
+  .ve-card--red    { border-left:3px solid var(--red); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:34px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .step-num { font-family:var(--font-mono); font-size:12px; font-weight:700; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--cyan-dim); color:var(--cyan); border:1px solid var(--cyan); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--cyan); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--cyan-dim); color:var(--cyan); padding:1px 5px; border-radius:3px; }
+
+  .lifecycle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-family:var(--font-mono); font-size:11px; }
+  .lc-node { padding:4px 10px; border-radius:6px; background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); font-weight:700; }
+  .lc-sep { color:var(--text-dim); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Self-Paced Loop Iteration</h1>
+<p class="subtitle">/loop with no fixed interval · one shippable unit per wakeup · pace set by the work, not the clock</p>
+
+<div class="diagram">
+
+  <div class="section section--cyan section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to use</div>
+    <div class="callout">
+      Draining a multi-task backlog, feature plan, or long-running operational workload — a phased feature plan, a backlog of 5-50 small tasks, an operational batch job, or open-ended exploration. Use <code>/loop</code> with <strong>no fixed interval</strong> so duration is determined by the work, not the clock.
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    each iteration: ground truth → one unit → gate to green → sync doc → next wakeup
+  </div>
+
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method — per iteration</div>
+    <ul class="step-list">
+      <li class="step-item"><div class="step-num">1</div><div><div class="step-title">Re-establish ground truth</div><div class="step-desc">Re-read the progress doc, confirm git state via <code>fetch</code> + reflog — never trust a prior turn's summary.</div></div></li>
+      <li class="step-item"><div class="step-num">2</div><div><div class="step-title">Scope to exactly one shippable unit</div><div class="step-desc">One task, one enhancement, one phase item — never bundle multiple backlog rows.</div></div></li>
+      <li class="step-item"><div class="step-num">3</div><div><div class="step-title">TDD for code changes</div><div class="step-desc">RED → GREEN → refactor, then full gate suite (<code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code> / <code>tsc</code>, lint, <code>vitest</code>) green before commit.</div></div></li>
+      <li class="step-item"><div class="step-num">4</div><div><div class="step-title">Code review inside the iteration</div><div class="step-desc">Not deferred to the end. Address CRITICAL/HIGH immediately; security-review pass for auth/admin/backup touches.</div></div></li>
+      <li class="step-item"><div class="step-num">5</div><div><div class="step-title">Size discipline</div><div class="step-desc">Warn at 400 changed LOC, hard-cap at 800 — split the unit rather than ship oversized.</div></div></li>
+      <li class="step-item"><div class="step-num">6</div><div><div class="step-title">Sync the progress doc in the same commit/PR</div><div class="step-desc">Checkmark + <code>YYYY-MM-DD</code> + one-line resolution note — doc drift is the top way loop work becomes untrustworthy.</div></div></li>
+      <li class="step-item"><div class="step-num">7</div><div><div class="step-title">Merge with a regular merge commit</div><div class="step-desc">Preserves full per-iteration history on the integration branch.</div></div></li>
+      <li class="step-item"><div class="step-num">8</div><div><div class="step-title">Decide the next wakeup dynamically</div><div class="step-desc">Emit the result into context, pick the next backlog row / phase-gated item / newly-discovered task, schedule a short wakeup.</div></div></li>
+      <li class="step-item"><div class="step-num">9</div><div><div class="step-title">Fresh-context iterations</div><div class="step-desc">Dispatch each iteration as a fresh subagent with full task context but not accumulated conversation history — avoids context exhaustion.</div></div></li>
+      <li class="step-item"><div class="step-num">10</div><div><div class="step-title">Checkpoint before large or risky phases</div><div class="step-desc">A self-paced loop is not a license to skip approval gates on big-ticket phases.</div></div></li>
+    </ul>
+  </div>
+
+  <div class="section section--violet" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Resumption model</div>
+    <div class="lifecycle">
+      <span class="lc-node">interrupted / restarted</span><span class="lc-sep">→</span>
+      <span class="lc-node">re-read progress doc</span><span class="lc-sep">→</span>
+      <span class="lc-node">re-confirm origin/&lt;branch&gt;</span><span class="lc-sep">→</span>
+      <span class="lc-node">resume — safe after any merged unit</span>
+    </div>
+  </div>
+
+  <div class="section section--slate" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Must tolerate multi-session resumption — never resume from stale in-context assumptions.</li>
+      <li>Phase gating matters: don't start a downstream task before its documented predecessor is actually complete, even if the loop "has time."</li>
+      <li>Self-pacing is about cadence, not about skipping verification — every iteration still needs gate-to-green and review.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

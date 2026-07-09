@@ -198,3 +198,7 @@ Read whichever you need; SKILL.md is sufficient for the high-level decision.
 ## Origin
 
 Extracted from the github-awesome project (PRs #14 - #24): a 14-phase rebuild of a YouTube-channel analysis pipeline that processes ~160 episodes and ~2700 GitHub repos with idempotent discovery, rate-limited GitHub fetches, and ollama-driven classification.
+
+## Diagram
+
+[View diagram](diagram.html)

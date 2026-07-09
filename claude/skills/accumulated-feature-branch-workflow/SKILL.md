@@ -33,3 +33,7 @@ version: 2026-07-05
 - Skipping the live-verify gate on any PR in a risk-seam split (even the "safe" reversible one) breaks the whole point of the split — the safety guarantee is per-PR, not just at the end.
 - `git add --all` on a mixed dirty/committed branch is the most common way unrelated scratch files (mockups, local notes) end up shipped — always inspect dirty files individually first.
 - Rebase-on-merge for multi-PR features prevents phantom endpoints, but only if every dependent PR actually rebases after each merge — a stale branch will silently reference deleted/renamed code.
+
+## Diagram
+
+[View diagram](diagram.html)

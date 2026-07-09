@@ -46,3 +46,7 @@ A Honcho instance (or structurally similar background-processing queue — ffmpe
 - Never bulk-reset queue errors without excluding special categories (`reconciler`, `dream`) and without holding the coordination lock — a concurrent reset can race an active deriver.
 - Resource contention (playback transcoding starving an extraction pipeline) looks identical to "broken" from throughput alone — always check the three falsifiable criteria before declaring a pipeline dead.
 - Pollution cleanup should be targeted (trace to origin) not wholesale — indiscriminate deletion risks removing legitimate operator-approved memory alongside noise.
+
+## Diagram
+
+[View diagram](diagram.html)

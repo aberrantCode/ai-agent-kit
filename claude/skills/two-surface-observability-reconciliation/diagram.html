@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two-Surface Observability Reconciliation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f5f0f8; --surface: #ffffff; --surface2: #ede6f4; --surface-elevated: #faf8fd;
+    --border: rgba(60,20,90,0.07); --border-bright: rgba(60,20,90,0.15);
+    --text: #1a0a26; --text-dim: #604a80;
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --blue: #1d4ed8; --blue-dim: rgba(29,78,216,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0311; --surface: #150818; --surface2: #1e0d24; --surface-elevated: #26112c;
+      --border: rgba(200,90,220,0.07); --border-bright: rgba(200,90,220,0.15);
+      --text: #ecd8f0; --text-dim: #a05aa0;
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --blue: #93c5fd; --blue-dim: rgba(147,197,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--violet-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:stretch; }
+
+  .surface-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+  .surface-box .title { font-weight:600; font-size:13px; margin-bottom:6px; }
+  .surface-box .desc { font-size:11px; color:var(--text-dim); line-height:1.6; }
+  .surface-box--blue { border-left:3px solid var(--blue); }
+  .surface-box--teal { border-left:3px solid var(--teal); }
+
+  .vs-node { display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:12px; color:var(--violet); }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--violet-dim); color:var(--violet); padding:1px 5px; border-radius:3px; }
+  .ve-card--violet { border-left:3px solid var(--violet); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:110px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:11px; font-weight:700; padding:6px 8px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--violet); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--violet-dim); color:var(--violet); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"⚠"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); font-size:10px; }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Two-Surface Observability Reconciliation</h1>
+<p class="subtitle">two blind surfaces · one diagnostic probe · a single deliberate verdict</p>
+
+<div class="diagram">
+
+  <div class="section section--violet section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to Use</div>
+    <div class="callout">
+      A system's true state can only be seen by combining two observability surfaces that <strong>can't see each other</strong> — or two candidate sources of truth disagree about what's actually going on. Reconcile them into one verdict instead of trusting either alone.
+    </div>
+  </div>
+
+  <div class="two-col" style="--i:1">
+    <div class="surface-box surface-box--blue">
+      <div class="title">Surface A · API / tool-level view</div>
+      <div class="desc">In-session tool layer, formal PM framework (specs → plans → tasks), or a container healthcheck. Can look "recent and coherent" while being blind to a stuck downstream stage.</div>
+    </div>
+    <div class="surface-box surface-box--teal">
+      <div class="title">Surface B · backend / infra-level view</div>
+      <div class="desc">Direct SSH/DB query, a living backlog doc, or a live log tail / metric sample. Reveals what the other surface never reports.</div>
+    </div>
+  </div>
+  <div class="vs-node" style="--i:1">↕ compare concrete, comparable signals — not self-reports ↕</div>
+
+  <div class="flow-arrow" style="--i:2">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    four-part reconciliation method
+  </div>
+
+  <div class="section section--teal" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Method</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">probe</div>
+        <div><div class="step-title">Build a diagnostic probe per surface</div><div class="step-desc">Read each surface in its native format, separately, then compare. E.g. latest-derivation timestamp on each side, or error count vs. throughput.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">choose SoT</div>
+        <div><div class="step-title">Pick the authoritative source deliberately</div><div class="step-desc">Formal framework fits greenfield work with a defined completion state; a living backlog fits perpetual infrastructure repos. Report by priority/theme, not % complete, when backlog wins.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">unstick</div>
+        <div><div class="step-title">Separate host health from live app state</div><div class="step-desc">A <code>docker ps</code> "unhealthy" can be stale. Confirm real failure via fresh log activity, daemon restart, and live metrics (memory, load, io.pressure) recovering.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">derive</div>
+        <div><div class="step-title">Prefer deriving from an existing collector</div><div class="step-desc">E.g. <code>increase(metric_name[1h])</code> from an exporter that already polls, over standing up a new log-scraper. Validate idempotency of any backfill (second pass = <code>changed=0</code>).</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section section--amber" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>A surface that looks "recent and coherent" can still be blind to a stuck downstream stage.</li>
+      <li>Don't average or merge two disagreeing surfaces' numbers — pick the authoritative one and state why.</li>
+      <li>Healthchecks freeze mid-wedge and report stale status — always cross-check with a live log tail or fresh metric.</li>
+      <li>Building new collection infrastructure to fill a gap is a last resort — check for an existing poller/exporter first.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Perspective DNS Diagnostic Ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f4f8; --surface: #ffffff; --surface2: #e8eef4; --surface-elevated: #f8fafd;
+    --border: rgba(20,40,80,0.07); --border-bright: rgba(20,40,80,0.15);
+    --text: #0a1220; --text-dim: #4a5a70;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030712; --surface: #08101d; --surface2: #0d1826; --surface-elevated: #11192a;
+      --border: rgba(120,150,200,0.08); --border-bright: rgba(120,150,200,0.16);
+      --text: #dce6f4; --text-dim: #6d84a0;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--violet-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:34px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; line-height:1.6; max-width:900px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--slate   { background:var(--slate-dim);   color:var(--slate);   border:1px solid var(--slate); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--violet-dim); color:var(--violet); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--teal); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .lifecycle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-family:var(--font-mono); font-size:11px; }
+  .lc-node { padding:4px 10px; border-radius:6px; background:var(--amber-dim); color:var(--amber); border:1px solid var(--amber); font-weight:700; }
+  .lc-sep { color:var(--text-dim); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--red-dim); color:var(--red); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Multi-Perspective DNS Diagnostic Ladder</h1>
+<p class="subtitle">layered probing for DNS failures &amp; "mysterious" networked-service outages · localize the broken layer before guessing · always verify a fix against logs</p>
+
+<div class="diagram">
+
+  <!-- Purpose / when to use -->
+  <div class="section section--teal section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Purpose</div>
+    <div class="callout">
+      Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any "mysterious" networked-service failure needs root-causing — apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and <strong>always verify a fix by re-checking logs</strong> after applying it.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--teal">
+        <div class="title">DNS inconsistency</div>
+        <div class="desc">Queries return NXDOMAIN or differ depending on where they're issued from.</div>
+      </div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">Client join/auth failure</div>
+        <div class="desc">A device can't fully join/authenticate — cause could be client, AP, or server-side.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">"Down" monitored service</div>
+        <div class="desc">Unclear cause spanning cron, scripts, secrets, network, monitoring API.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    four-rung diagnostic ladder
+  </div>
+
+  <!-- Method steps -->
+  <div class="section section--violet" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method · inputs → probes → localized layer</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">STEP 1</div>
+        <div><div class="step-title">DNS: probe from three perspectives</div><div class="step-desc"><strong>Inputs:</strong> a failing/inconsistent hostname. <strong>P1</strong> workstation recursive resolver · <strong>P2</strong> public recursive via <code>DoH</code> (e.g. Cloudflare) · <strong>P3</strong> direct-to-authoritative (<code>dig @ns</code> / <code>curl --resolve</code>). <strong>Output:</strong> a pass/fail pattern across P1–P3.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">STEP 2</div>
+        <div><div class="step-title">Network/association: probe server → client</div><div class="step-desc"><strong>Inputs:</strong> firewall rules, service health, listening ports. Then live packet captures on suspect interfaces, using MAC-address signatures to positively identify the device. <strong>Output:</strong> server-side health verdict.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">STEP 3</div>
+        <div><div class="step-title">"Mysterious" outage: trace the full chain</div><div class="step-desc"><strong>Inputs:</strong> the dependency chain (e.g. cron → script → secret-decrypt → network → monitoring API). Build one probe/script with one check per link. <strong>Output:</strong> the single broken link, found by elimination.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">STEP 4</div>
+        <div><div class="step-title">Verify-after-apply</div><div class="step-desc"><strong>Inputs:</strong> the candidate fix + system logs. Re-apply, then re-read logs. <strong>Output:</strong> confirmed-fixed, or a falsified hypothesis that sends you back to bisect further.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Decision point: DNS pattern interpretation -->
+  <div class="section section--teal" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Decision Point · interpret the P1/P2/P3 failure pattern</div>
+    <div class="three-col">
+      <div class="ve-card ve-card--teal">
+        <div class="title">P1 fails, P3 succeeds</div>
+        <div class="desc">→ local resolver cache poisoning or stale cache.</div>
+      </div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">P2 fails, P1 succeeds</div>
+        <div class="desc">→ split-brain DNS (internal vs external views disagree).</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">All three fail</div>
+        <div class="desc">→ zone propagation lag, or the record genuinely isn't published yet.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px">This ladder separates a <strong>TTL/cache problem</strong> from a <strong>replication problem</strong> from a <strong>network interception problem</strong> — without guessing. Testing from only one vantage point can't distinguish between them.</div>
+  </div>
+
+  <!-- Decision point: network probe branch -->
+  <div class="two-col" style="--i:4">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Branch · if server side is healthy</div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">Confirmed healthy end-to-end</div>
+        <div class="desc">Explicitly state that conclusion, then <strong>stop looking server-side</strong> and pivot upstream — client association, VLAN tagging, or AP misconfiguration.</div>
+      </div>
+    </div>
+    <div class="section section--slate">
+      <div class="section-label"><span class="dot"></span> Branch · if server side is unhealthy</div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Firewall / service / port issue found</div>
+        <div class="desc">Fix the server-side defect first — no need to pivot to client/AP capture until this is ruled out.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verify lifecycle -->
+  <div class="section section--amber" style="--i:5">
+    <div class="section-label"><span class="dot"></span> Verify-After-Apply Lifecycle</div>
+    <div class="callout">A fix that "looks right" (restart a service, edit a secret) is <strong>not confirmed</strong> until logs are re-read post-apply. Treat an unverified fix as still-open.</div>
+    <div class="lifecycle">
+      <span class="lc-node">apply fix</span><span class="lc-sep">→</span>
+      <span class="lc-node">re-read logs</span><span class="lc-sep">→</span>
+      <span class="lc-node">signature gone?</span><span class="lc-sep">→</span>
+      <span class="lc-node">confirmed</span>
+      <span class="lc-sep">| else</span>
+      <span class="lc-node">bisect further</span>
+    </div>
+  </div>
+
+  <!-- Gotchas -->
+  <div class="section section--red" style="--i:6">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Testing DNS from only the workstation can't distinguish cache/TTL from replication from interception — always run the full three-perspective ladder.</li>
+      <li>Don't stop the network investigation at "server looks fine" silently — state it explicitly, then pivot upstream to client/AP-side capture.</li>
+      <li>A plausible-looking fix is not a confirmed fix until logs are re-read <code>post-apply</code>.</li>
+      <li>A single-dependency probe (only network, only secret) risks "fixing" a step that wasn't actually broken — always probe the full chain.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

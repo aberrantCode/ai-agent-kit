@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRLF / .gitattributes Normalization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--slate   { background:var(--slate-dim);   color:var(--slate);   border:1px solid var(--slate); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .section--amber .callout { border-left-color:var(--amber); }
+  .section--amber .callout code { background:var(--amber-dim); color:var(--amber); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--violet); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>CRLF / .gitattributes Normalization</h1>
+<p class="subtitle">fix spurious line-ending noise at the repo level · never reformat the file or skip the test</p>
+
+<div class="diagram">
+
+  <!-- When to use — the trigger conditions -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to Use · trigger symptoms</div>
+    <div class="callout">
+      In a Windows/Linux-mixed repo, use this whenever a diff, lint, or test failure <strong>looks like a content problem but is actually a line-ending artifact</strong> — normalize via <code>.gitattributes</code> rather than reformatting the file or skipping the test.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Spurious linter warnings</div>
+        <div class="desc">prettier / eslint / gofmt report "Delete ␍" or "file not formatted" even though the file looks clean.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Golden-fixture test failures</div>
+        <div class="desc">A byte-exact comparison against a fixture fails only on Windows, or only after a fresh checkout.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">About to mask the symptom</div>
+        <div class="desc">You're about to re-run a formatter or add a test skip/guard — stop and check whether it's a line-ending artifact first.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    five-step diagnose → fix → verify method
+  </div>
+
+  <!-- Method -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">1</div>
+        <div><div class="step-title">Understand the mechanism</div><div class="step-desc">Git blobs are always LF. With <code>core.autocrlf=true</code>, git rewrites LF → CRLF in the <strong>working tree</strong> on checkout — linters see the CRLF copy even though the committed blob is clean.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">2</div>
+        <div><div class="step-title">Diagnose before "fixing"</div><div class="step-desc">Confirm the committed blob is clean: <code>git show &lt;file&gt; | file -</code>. If it reports LF with no CRLF mention, the warning is harmless working-tree noise.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">3</div>
+        <div><div class="step-title">Fix at the repo level</div><div class="step-desc">Add <code>.gitattributes</code> rules — never a per-developer git config. General: <code>* text=auto eol=lf</code>. Fixtures: <code>**/testdata/**/*.txt text eol=lf</code>.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">4</div>
+        <div><div class="step-title">Re-normalize the working tree</div><div class="step-desc">General pass: <code>git checkout HEAD -- .</code>. Targeted fixtures: <code>git add --renormalize .</code>. Then re-run the linter/formatter/test.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">5</div>
+        <div><div class="step-title">Confirm idempotency</div><div class="step-desc">Blobs were already LF — only the working tree changes. Re-running checkout/renormalize on an already-normalized tree must be a safe no-op; verify before calling it done.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Decision point + principles -->
+  <div class="two-col" style="--i:3">
+    <div class="section section--amber">
+      <div class="section-label"><span class="dot"></span> Decision Point · is the blob clean?</div>
+      <div class="callout" style="margin-bottom:8px">
+        <code>git show &lt;file&gt; | file -</code> — does the committed blob mention CRLF?
+      </div>
+      <div class="ve-card ve-card--emerald" style="margin-bottom:8px">
+        <div class="title">No CRLF mention → blob is LF</div>
+        <div class="desc">Harmless working-tree artifact. Fix via <code>.gitattributes</code> + re-normalize. Do not reformat the file or add a test skip guard.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Blob itself contains CRLF</div>
+        <div class="desc">Not a working-tree artifact — this method doesn't apply; the content genuinely needs fixing.</div>
+      </div>
+    </div>
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Gotchas</div>
+      <ul class="princ-list">
+        <li>Don't reformat a file or skip/guard a test for a CRLF-vs-LF mismatch — check <code>git show | file -</code> first.</li>
+        <li><code>* text=auto eol=lf</code> won't retroactively fix already-checked-out files — still re-checkout or renormalize.</li>
+        <li>Fixture/golden-file tests need their own explicit <code>eol=lf</code> rule scoped to the fixture path.</li>
+        <li>Avoid <code>git config core.autocrlf=false</code> per-machine — it only fixes it for one contributor.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Inputs / outputs -->
+  <div class="section section--slate" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Inputs → Outputs</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--teal">
+        <div class="title">Input · mixed-checkout repo</div>
+        <div class="desc">Windows/Linux contributors with varying <code>core.autocrlf</code>, plus a spurious lint/format/byte-exact-fixture failure.</div>
+      </div>
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Output · repo-level rule + clean tree</div>
+        <div class="desc">A committed <code>.gitattributes</code> rule (general and/or fixture-scoped), a re-normalized working tree, and a passing, idempotent lint/test run.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

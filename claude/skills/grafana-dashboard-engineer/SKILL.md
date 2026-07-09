@@ -1142,3 +1142,7 @@ export GRAFANA_API_KEY="glsa_xxxxxxxxxxxxx"
 - ML-based anomaly detection integration
 - Dashboard performance profiling (slow queries, heavy panels)
 - Auto-remediation for common misconfiguration patterns
+
+## Diagram
+
+[View diagram](diagram.html)

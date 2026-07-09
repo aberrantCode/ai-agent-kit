@@ -69,3 +69,7 @@ not just the "what."
 - Measuring "session completion vs. actual delivery" requires reading both the
   wrap-up (stated intent) and the tool-call trace (actual actions) — either alone
   overstates or understates what was really delivered.
+
+## Diagram
+
+[View diagram](diagram.html)

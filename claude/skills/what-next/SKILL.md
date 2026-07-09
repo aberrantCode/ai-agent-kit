@@ -400,3 +400,7 @@ See [evals/README.md](evals/README.md) for the 7-step loop
 (`setup_iteration.py` → spawn subagents → `save_timing.py` → `grade.py` →
 `migrate_layout.py` → aggregate → review viewer). Past benchmarks are kept in
 `evals/benchmarks/`.
+
+## Diagram
+
+[View diagram](diagram.html)

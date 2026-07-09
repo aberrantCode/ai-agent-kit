@@ -36,3 +36,7 @@ A fleet of scripts (bash `.sh`, PowerShell `.ps1`) emits Unicode symbols — `�
 - `awk` line-range deletion is preferred over pattern-based deletion for removing whole helper blocks because it doesn't risk leaving orphaned braces/parens if the glyph pattern doesn't match every line of the block.
 - The bug only manifests under cp1252 (Windows Git Bash, `cmd.exe`); the same script may look fine when tested from a UTF-8 Linux terminal, which is why manual `.sh` reviews are necessary rather than relying on "it looked right when I tested it."
 - Always re-verify after cleanup — a partial glyph replacement (e.g., fixing `✓` but missing `══` in the same helper) is a common miss caught only by the residual-byte scan.
+
+## Diagram
+
+[View diagram](diagram.html)

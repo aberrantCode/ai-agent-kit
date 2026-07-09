@@ -78,3 +78,7 @@ the canonical repo URL and file paths the speaker references.
 If `video.<ext>` already exists with non-zero size for the same `<basename>`, do
 not re-download. Re-fetch metadata and description anyway, since channels can
 edit those after upload.
+
+## Diagram
+
+[View diagram](diagram.html)

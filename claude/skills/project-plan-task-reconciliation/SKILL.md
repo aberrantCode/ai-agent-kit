@@ -31,3 +31,7 @@ In any project-management framework where feature specs define scope, plans brea
 - Architectural drift can creep into hand-off prompts too (e.g. a subagent proposing an approach the plan explicitly rejected) — catch and downgrade this during reconciliation, not after the next session has already acted on it.
 - "Implemented but missing a plan" and "unimplemented with a plan" look similar in a status report but require completely different responses — conflating them misdirects remediation effort.
 - Freeze protocols on backlog directories are easy to violate accidentally by bundling the closure edit into the substance PR — always check whether the target directory is frozen before deciding PR boundaries.
+
+## Diagram
+
+[View diagram](diagram.html)

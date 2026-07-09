@@ -28,3 +28,7 @@ Whenever a deliverable needs to be portable enough to email, copy to a USB drive
 - Testing theme appearance with an active CSS transition captures a blended, wrong-looking frame — always disable transitions before a theme screenshot.
 - "Opens in a browser" is not the same as "has zero external requests" — check the network tab, not just visual rendering, especially when a strict CSP is a hard requirement.
 - Don't let the generated `dist/` artifact become the source of truth — always edit the modular source pieces and regenerate.
+
+## Diagram
+
+[View diagram](diagram.html)

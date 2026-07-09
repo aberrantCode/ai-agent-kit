@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deployment Driver: Pin Rewrite from Release-Tag Source of Truth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:34px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; line-height:1.5; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+  .ve-card--slate   { border-left:3px solid var(--slate); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:110px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--violet); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Deployment Driver: Pin Rewrite from Release-Tag Source of Truth</h1>
+<p class="subtitle">Use when a deployment/build system has both a human-editable "intent" field (release tag, plan row) and a derived "pin" artifact (image pin file, lockfile) — edits always go to the source of truth; the driver re-derives the pin.</p>
+
+<div class="diagram">
+
+  <!-- Core contract -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Core Contract · edit the source, not the shadow</div>
+    <div class="callout">
+      A privately-built image has two things that both look like "the version": a <strong>release tag</strong> checked into the repo, and a <strong>pin file</strong> generated at build time. Only one of them is authoritative — hand-editing the other is a silent no-op.
+    </div>
+    <div class="two-col" style="margin-top:14px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Source of Truth — release tag</div>
+        <div class="desc">Lives in the build script, checked into the repo, human-editable. This is where an intended version change belongs.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Derived Artifact — pin file</div>
+        <div class="desc">Generated at build time as <code>tag:sha</code>. A cache of the driver's last derivation — never a place to make decisions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    edit release tag → driver rebuilds → pin file auto-rewritten
+  </div>
+
+  <!-- Method -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method · five-step discipline</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">1</div>
+        <div><div class="step-title">Identify source of truth vs. derived artifact</div><div class="step-desc">The release tag is authoritative; the pin file is derived at build time (release tag + commit SHA baked in).</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">2</div>
+        <div><div class="step-title">Always edit the source-of-truth field</div><div class="step-desc">Never hand-edit the derived pin — the next build silently re-derives it from the (unchanged) release tag and re-deploys the old version.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">3</div>
+        <div><div class="step-title">Let the driver own the derivation</div><div class="step-desc">The deployment driver reads the release tag, builds with the commit SHA appended, and auto-rewrites the pin file as a build side-effect.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">4</div>
+        <div><div class="step-title">Apply the same discipline to orchestration loops</div><div class="step-desc">A <code>/loop</code>-style driver re-reads its source of truth fresh every iteration — <code>git fetch</code> + <code>git log</code> for the current <code>dev</code> tip, then re-read plan rows. Never trust chat history or "what I did last iteration."</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">5</div>
+        <div><div class="step-title">Define explicit pause conditions</div><div class="step-desc">So the loop doesn't spin or act on stale/ambiguous state.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- When to use + Pause conditions -->
+  <div class="two-col" style="--i:3">
+    <div class="section section--slate">
+      <div class="section-label"><span class="dot"></span> When to Use</div>
+      <div class="ve-card ve-card--slate" style="margin-bottom:8px">
+        <div class="title">Build-time pin, repo-checked-in tag</div>
+        <div class="desc">A privately-built image has a version pin file generated at build time, separate from a release tag checked into the repo.</div>
+      </div>
+      <div class="ve-card ve-card--slate" style="margin-bottom:8px">
+        <div class="title">Designing/debugging a deploy loop</div>
+        <div class="desc">Needs to decide "what's the next version/task to act on" without trusting stale chat history or memory.</div>
+      </div>
+      <div class="ve-card ve-card--slate">
+        <div class="title">"The deploy did nothing" report</div>
+        <div class="desc">Someone reports a deploy did nothing after what looked like a version bump — classic symptom of an edited pin, unchanged tag.</div>
+      </div>
+    </div>
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Loop Pause Conditions</div>
+      <ul class="princ-list">
+        <li>No eligible <code>todo</code> task found in the plan source.</li>
+        <li>A release step isn't authorized yet.</li>
+        <li>Token/usage budget is approaching its limit.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gotchas -->
+  <div class="section section--red" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--red">
+        <div class="title">Silent no-op</div>
+        <div class="desc">Hand-editing the pin file produces no error — the system quietly redeploys the old version on the next build. Easy to miss in review.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Two things claim to be "the pin"</div>
+        <div class="desc">A checked-in tag and a derived file both look authoritative — verify which one the driver actually reads at build time before assuming an edit takes effect.</div>
+      </div>
+    </div>
+    <div class="ve-card ve-card--red" style="margin-top:12px">
+      <div class="title">Loops that reason from their own output drift</div>
+      <div class="desc">A loop that trusts its own prior output instead of live repo state drifts — always re-fetch and re-read the plan/tag source per iteration rather than carrying forward an in-memory "current version."</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

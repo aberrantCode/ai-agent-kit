@@ -43,3 +43,7 @@ version: 2026-07-05
 - `* text=auto eol=lf` is a good general default but won't retroactively fix already-checked-out files — you must still re-checkout (`git checkout HEAD -- .`) or renormalize (`git add --renormalize .`) to apply it to the working tree.
 - Fixture/golden-file tests need their own explicit `eol=lf` rule scoped to the fixture path — the general root-level rule may not be specific enough if fixtures live under a directory with different existing attributes.
 - This is a repo-level, config-agnostic fix — avoid solving it via per-machine `git config core.autocrlf=false`, since that only fixes it for the one contributor who changes their config.
+
+## Diagram
+
+[View diagram](diagram.html)

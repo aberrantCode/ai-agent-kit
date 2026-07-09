@@ -157,3 +157,7 @@ opbta-ansible key drift); `Blocked: sleep N` (reaching for a forbidden
 `sleep`); and a correction cluster of "the command you gave me threw an error" /
 "don't see that it ran" — the agent claiming completion it hadn't verified.
 Each maps cleanly to a surface in Step 4.
+
+## Diagram
+
+[View diagram](diagram.html)

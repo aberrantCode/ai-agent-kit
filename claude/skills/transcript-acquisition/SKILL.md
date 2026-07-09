@@ -105,3 +105,7 @@ you do refresh, retain the previous transcript at `transcript.prev.md`.
 - Path to `transcript.md`
 - Source used (`youtube-auto-subs` | `youtube-manual-subs` | `whisper-cpp` | `whisper`)
 - Caveat flags (low confidence, partial coverage)
+
+## Diagram
+
+[View diagram](diagram.html)
