@@ -1,304 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security Skill — Diagram</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --font-body: 'Urbanist', system-ui, sans-serif;
-    --font-mono: 'Source Code Pro', 'SF Mono', monospace;
-    --bg: #0b0b10;
-    --surface: #13131c;
-    --surface2: #1a1a28;
-    --border: rgba(255,255,255,0.07);
-    --border-bright: rgba(255,255,255,0.14);
-    --text: #ddddef;
-    --text-dim: #7878a0;
-    --crimson: #ff4757;
-    --crimson-dim: rgba(255,71,87,0.1);
-    --amber: #ffa502;
-    --amber-dim: rgba(255,165,2,0.1);
-    --emerald: #2ed573;
-    --emerald-dim: rgba(46,213,115,0.1);
-    --blue: #1e90ff;
-    --blue-dim: rgba(30,144,255,0.1);
-    --violet: #a29bfe;
-    --violet-dim: rgba(162,155,254,0.1);
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    background-image:
-      radial-gradient(ellipse at 50% 0%, rgba(255,71,87,0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at 15% 80%, rgba(46,213,115,0.06) 0%, transparent 50%);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 44px 24px 80px;
-  }
-  .page { max-width: 1080px; margin: 0 auto; }
-
-  .hero { text-align: center; margin-bottom: 52px; animation: fadeUp 0.5s ease both; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
-    color: var(--crimson); background: var(--crimson-dim);
-    border: 1px solid rgba(255,71,87,0.25); border-radius: 8px;
-    padding: 5px 14px; margin-bottom: 18px;
-  }
-  .hero h1 {
-    font-size: clamp(30px, 5vw, 52px); font-weight: 800;
-    letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 14px;
-    color: var(--text);
-  }
-  .hero h1 span { color: var(--crimson); }
-  .hero p { font-size: 16px; color: var(--text-dim); max-width: 560px; margin: 0 auto; line-height: 1.65; }
-
-  .section-label {
-    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--text-dim); margin: 46px 0 14px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  /* OWASP TOP ITEMS */
-  .owasp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-  .owasp-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px;
-    animation: fadeUp 0.5s ease both;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-  .owasp-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
-  .owasp-num { font-family: var(--font-mono); font-size: 10px; color: var(--crimson); margin-bottom: 6px; letter-spacing: 0.1em; }
-  .owasp-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-  .owasp-fix { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
-  .code-ex {
-    font-family: var(--font-mono); font-size: 11px; background: var(--surface2);
-    border-radius: 5px; padding: 5px 9px; margin-top: 7px; display: block; color: var(--emerald);
-  }
-
-  /* ENV VARS TABLE */
-  .env-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); animation: fadeUp 0.4s ease both; }
-  .env-table th { background: var(--surface2); padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
-  .env-table td { padding: 11px 16px; border-top: 1px solid var(--border); vertical-align: middle; }
-  .env-table tr:hover td { background: var(--surface2); }
-  .badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; border-radius: 5px; padding: 2px 8px; font-weight: 600; }
-
-  /* CHECKLIST */
-  .checklist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-  .check-group {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 20px;
-    animation: fadeUp 0.5s ease both;
-  }
-  .check-group h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .check-item { display: flex; gap: 8px; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; line-height: 1.4; }
-  .check-item::before { content: '□'; color: var(--emerald); flex-shrink: 0; font-size: 14px; }
-
-  /* GOOD VS BAD */
-  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .cmp-card { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); animation: fadeUp 0.5s ease both; }
-  .cmp-header { padding: 11px 16px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; gap: 6px; align-items: center; }
-  .cmp-body { padding: 14px 16px; background: var(--surface); }
-  .cmp-item { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; display: flex; gap: 8px; line-height: 1.4; }
-  .cmp-item::before { flex-shrink: 0; font-weight: 700; }
-  .cmp-item.bad::before { content: '✗'; color: var(--crimson); }
-  .cmp-item.good::before { content: '✓'; color: var(--emerald); }
-
-  /* ANTI-PATTERNS STRIP */
-  .anti-strip { display: flex; flex-direction: column; gap: 8px; }
-  .anti-item {
-    display: flex; gap: 10px; align-items: flex-start;
-    background: var(--surface); border: 1px solid rgba(255,71,87,0.2);
-    border-radius: 8px; padding: 12px 14px; font-size: 12px;
-  }
-  .anti-x { color: var(--crimson); font-weight: 700; flex-shrink: 0; }
-
-  footer { text-align: center; margin-top: 60px; font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  @media (prefers-reduced-motion: reduce) { *{animation:none!important;transition:none!important} }
-  @media (max-width:640px) { .compare-grid{grid-template-columns:1fr} .owasp-grid{grid-template-columns:1fr} }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security — Patterns, Testing &amp; Review Checklist</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #141b24;
+      --surface-2: #1a2330;
+      --border: rgba(255,255,255,0.08);
+      --text: #dce6f2;
+      --text-dim: #7d8fa5;
+      --green: #3fb950;
+      --green-dim: rgba(63,185,80,0.12);
+      --red: #f85149;
+      --red-dim: rgba(248,81,73,0.10);
+      --amber: #d29922;
+      --amber-dim: rgba(210,153,34,0.12);
+      --blue: #58a6ff;
+      --blue-dim: rgba(88,166,255,0.10);
+      --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      background-image: radial-gradient(at 50% 0%, var(--green-dim) 0%, transparent 50%);
+      color: var(--text);
+      padding: 52px 24px 80px;
+    }
+    header { max-width: 920px; margin: 0 auto 44px; text-align: center; }
+    .badge {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--green);
+      border: 1px solid var(--green); border-radius: 999px; padding: 5px 16px; margin-bottom: 20px;
+    }
+    h1 { font-size: 2.6rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .tagline { font-size: 0.95rem; color: var(--text-dim); max-width: 620px; margin: 0 auto; line-height: 1.7; }
+    main { max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    .section-label {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim); margin: 22px 0 2px;
+    }
+    .principle {
+      background: var(--red-dim); border: 1px solid var(--red); border-radius: 12px;
+      padding: 18px 24px; text-align: center; font-size: 0.9rem; line-height: 1.6;
+    }
+    .principle strong { color: var(--red); }
+    .triggers { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .trigger {
+      font-family: var(--font-mono); font-size: 0.74rem; color: var(--text);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 14px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .card h3 { font-size: 0.95rem; margin-bottom: 10px; }
+    .card h3 .n { font-family: var(--font-mono); color: var(--green); margin-right: 8px; font-size: 0.8rem; }
+    .card ul { list-style: none; }
+    .card li { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; padding-left: 14px; position: relative; }
+    .card li::before { content: '▸'; position: absolute; left: 0; color: var(--green); font-size: 0.7rem; }
+    .card.amber li::before { color: var(--amber); }
+    .card.blue li::before { color: var(--blue); }
+    .gates { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .gate {
+      border-radius: 12px; padding: 18px 22px; border: 1px solid var(--amber);
+      background: var(--amber-dim);
+    }
+    .gate.release { border-color: var(--green); background: var(--green-dim); }
+    .gate h3 { font-size: 0.95rem; margin-bottom: 8px; }
+    .gate p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
+    .merged-note {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+      text-align: center; margin-top: 34px; letter-spacing: 0.06em;
+    }
+    @media (max-width: 760px) {
+      .grid, .gates { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
+  <header>
+    <div class="badge">security</div>
+    <h1>Security Skill</h1>
+    <p class="tagline">OWASP patterns, secrets management, and automated security testing — unified with the comprehensive review checklist for auth, input, payments, and sensitive features.</p>
+  </header>
+  <main>
+    <div class="principle"><strong>Security is not optional.</strong> Assume all input is malicious, all committed secrets will leak, and all dependencies have vulnerabilities. Every project passes security checks before merge.</div>
 
-  <div class="hero">
-    <div class="hero-badge">🛡 security skill</div>
-    <h1>Security is <span>Non-Negotiable</span></h1>
-    <p>OWASP security patterns, secrets management, and automated security testing. Every project must pass security checks before merge. Assume all input is malicious.</p>
-  </div>
+    <div class="section-label">When to activate the review checklist</div>
+    <div class="triggers">
+      <span class="trigger">authentication</span>
+      <span class="trigger">user input / uploads</span>
+      <span class="trigger">new API endpoints</span>
+      <span class="trigger">secrets &amp; credentials</span>
+      <span class="trigger">payments</span>
+      <span class="trigger">sensitive data</span>
+      <span class="trigger">3rd-party APIs</span>
+    </div>
 
-  <!-- OWASP TOP 10 KEY PATTERNS -->
-  <div class="section-label">01 — OWASP Top 10 Key Patterns</div>
-  <div class="owasp-grid">
-    <div class="owasp-card">
-      <div class="owasp-num">A01 · A03</div>
-      <div class="owasp-name">SQL Injection</div>
-      <div class="owasp-fix">Never concatenate user input into queries. Use parameterized queries or ORM.</div>
-      <code class="code-ex">db.query('SELECT * FROM users WHERE id = $1', [userId])</code>
-    </div>
-    <div class="owasp-card">
-      <div class="owasp-num">A03</div>
-      <div class="owasp-name">XSS Prevention</div>
-      <div class="owasp-fix">Sanitize user HTML with DOMPurify. Avoid dangerouslySetInnerHTML. React escapes by default.</div>
-      <code class="code-ex">DOMPurify.sanitize(userInput)</code>
-    </div>
-    <div class="owasp-card">
-      <div class="owasp-num">A02</div>
-      <div class="owasp-name">Crypto Failures</div>
-      <div class="owasp-fix">Use bcrypt (12+ rounds) for passwords. SHA1/MD5 are broken. Short JWT expiry.</div>
-      <code class="code-ex">bcrypt.hash(pass, 12)</code>
-    </div>
-    <div class="owasp-card">
-      <div class="owasp-num">A07</div>
-      <div class="owasp-name">Auth Failures</div>
-      <div class="owasp-fix">Rate limit auth endpoints. Rotate session tokens. Check all routes require auth.</div>
-      <code class="code-ex">rateLimit(&#123; max: 5/min &#125;)</code>
-    </div>
-    <div class="owasp-card">
-      <div class="owasp-num">A01</div>
-      <div class="owasp-name">Path Traversal</div>
-      <div class="owasp-fix">Use path.basename() to strip ../. Verify final path is within allowed directory.</div>
-      <code class="code-ex">path.basename(req.params.filename)</code>
-    </div>
-    <div class="owasp-card">
-      <div class="owasp-num">A05</div>
-      <div class="owasp-name">Security Headers</div>
-      <div class="owasp-fix">Use helmet middleware. Configure CSP directives. Enforce HTTPS with HSTS.</div>
-      <code class="code-ex">app.use(helmet(&#123; ... &#125;))</code>
-    </div>
-  </div>
-
-  <!-- ENV VARS -->
-  <div class="section-label">02 — Client-Exposed vs Server-Only Env Vars</div>
-  <table class="env-table">
-    <thead>
-      <tr>
-        <th>Framework</th>
-        <th>Client-Exposed Prefix</th>
-        <th>Server-Only</th>
-        <th>Risk if misused</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="font-weight:600">Vite</td>
-        <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--crimson)">VITE_*</code></td>
-        <td><span class="badge" style="background:var(--emerald-dim);color:var(--emerald)">No prefix</span></td>
-        <td style="color:var(--crimson);font-size:12px">API keys in browser bundle</td>
-      </tr>
-      <tr>
-        <td style="font-weight:600">Next.js</td>
-        <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--crimson)">NEXT_PUBLIC_*</code></td>
-        <td><span class="badge" style="background:var(--emerald-dim);color:var(--emerald)">No prefix</span></td>
-        <td style="color:var(--crimson);font-size:12px">API keys in browser bundle</td>
-      </tr>
-      <tr>
-        <td style="font-weight:600">CRA</td>
-        <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--crimson)">REACT_APP_*</code></td>
-        <td style="color:var(--text-dim)">N/A (no server)</td>
-        <td style="color:var(--crimson);font-size:12px">Everything exposed</td>
-      </tr>
-    </tbody>
-  </table>
-  <div style="margin-top:12px;padding:12px 16px;background:var(--crimson-dim);border:1px solid rgba(255,71,87,0.25);border-radius:8px;font-size:13px">
-    <strong style="color:var(--crimson)">Rule:</strong> <span style="color:var(--text-dim)">NEVER put secrets (API keys, service role keys, DB passwords) in client-exposed prefixes. Verify in devtools → Sources that secrets aren't in the bundle.</span>
-  </div>
-
-  <!-- COMPARE: GOOD VS BAD PATTERNS -->
-  <div class="section-label">03 — Patterns Comparison</div>
-  <div class="compare-grid">
-    <div class="cmp-card">
-      <div class="cmp-header" style="background:var(--crimson-dim);color:var(--crimson)">❌ Insecure Patterns</div>
-      <div class="cmp-body">
-        <div class="cmp-item bad">Hardcoded API key: <code style="font-family:var(--font-mono);font-size:11px">const key = "sk-proj-xxx"</code></div>
-        <div class="cmp-item bad">SQL concat: <code style="font-family:var(--font-mono);font-size:11px">`SELECT * WHERE id = ${id}`</code></div>
-        <div class="cmp-item bad">Weak hash: MD5 or SHA1 for passwords</div>
-        <div class="cmp-item bad">JWT no expiry or expiry &gt; 24h</div>
-        <div class="cmp-item bad">No rate limiting on /api/auth</div>
-        <div class="cmp-item bad">Sensitive data in logs</div>
-        <div class="cmp-item bad">CORS origin set to <code style="font-family:var(--font-mono);font-size:11px">*</code> in production</div>
+    <div class="section-label">Defense layers</div>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="n">01</span>Secrets &amp; Environment</h3>
+        <ul>
+          <li>Non-negotiable .gitignore set</li>
+          <li>.env.example, validated at startup (Zod / Pydantic)</li>
+          <li>Never VITE_* / NEXT_PUBLIC_* for secrets</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>Input Validation</h3>
+        <ul>
+          <li>Parameterized queries only (SQLi)</li>
+          <li>Sanitized HTML with allowlists (XSS)</li>
+          <li>File uploads: size, type, extension</li>
+          <li>Path traversal guards</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>AuthN &amp; AuthZ</h3>
+        <ul>
+          <li>Short-lived JWTs, httpOnly cookies</li>
+          <li>Authorization before sensitive ops</li>
+          <li>Supabase Row Level Security</li>
+          <li>bcrypt 12+ rounds · rate limiting</li>
+        </ul>
+      </div>
+      <div class="card amber">
+        <h3><span class="n">04</span>CSRF &amp; Headers</h3>
+        <ul>
+          <li>CSRF tokens on state changes</li>
+          <li>SameSite=Strict cookies</li>
+          <li>helmet / CSP via next.config.js</li>
+        </ul>
+      </div>
+      <div class="card amber">
+        <h3><span class="n">05</span>Data Exposure</h3>
+        <ul>
+          <li>Redacted logging — no PII, no tokens</li>
+          <li>Generic error messages to users</li>
+          <li>Stack traces stay server-side</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3><span class="n">06</span>Automation &amp; Deps</h3>
+        <ul>
+          <li>detect-secrets pre-commit · security-check.sh</li>
+          <li>GitHub Actions: trufflehog, audit, CodeQL</li>
+          <li>npm audit / safety · lock files committed</li>
+          <li>Solana wallet &amp; transaction verification</li>
+        </ul>
       </div>
     </div>
-    <div class="cmp-card">
-      <div class="cmp-header" style="background:var(--emerald-dim);color:var(--emerald)">✅ Secure Patterns</div>
-      <div class="cmp-body">
-        <div class="cmp-item good">Env var: <code style="font-family:var(--font-mono);font-size:11px">process.env.API_KEY</code> + validate at startup</div>
-        <div class="cmp-item good">Parameterized: <code style="font-family:var(--font-mono);font-size:11px">query('...WHERE id=$1', [id])</code></div>
-        <div class="cmp-item good">bcrypt with 12+ salt rounds</div>
-        <div class="cmp-item good">JWT expiry: 15m access, 7d refresh</div>
-        <div class="cmp-item good">Rate limit: 5 req/min on auth endpoints</div>
-        <div class="cmp-item good">Log only userId, email — redact tokens</div>
-        <div class="cmp-item good">CORS restricted to known origins list</div>
+
+    <div class="section-label">Gates</div>
+    <div class="gates">
+      <div class="gate release">
+        <h3>Release Gate — Security Testing Checklist</h3>
+        <p>Secrets · dependencies · input validation · authentication · authorization · database · headers &amp; CORS · logging — run before every release.</p>
+      </div>
+      <div class="gate">
+        <h3>Production Gate — Pre-Deployment Checklist</h3>
+        <p>17-point final sweep before ANY production deployment, from hardcoded secrets to RLS to wallet signature verification.</p>
       </div>
     </div>
-  </div>
 
-  <!-- SECURITY CHECKLIST -->
-  <div class="section-label">04 — Pre-Release Security Checklist</div>
-  <div class="checklist-grid">
-    <div class="check-group">
-      <h4><span>🔑</span> Secrets &amp; Environment</h4>
-      <div class="check-item">No secrets in code (run detect-secrets)</div>
-      <div class="check-item">.env files in .gitignore</div>
-      <div class="check-item">.env.example with all required vars</div>
-      <div class="check-item">Environment validated at startup (Zod)</div>
-    </div>
-    <div class="check-group">
-      <h4><span>🛡</span> Input &amp; Database</h4>
-      <div class="check-item">All API inputs validated with schema</div>
-      <div class="check-item">File uploads restricted by type &amp; size</div>
-      <div class="check-item">Parameterized queries only</div>
-      <div class="check-item">Path traversal prevented</div>
-    </div>
-    <div class="check-group">
-      <h4><span>🔐</span> Auth &amp; Headers</h4>
-      <div class="check-item">Passwords hashed with bcrypt (12+)</div>
-      <div class="check-item">Rate limiting on auth endpoints</div>
-      <div class="check-item">Security headers enabled (helmet)</div>
-      <div class="check-item">CORS restricted to known origins</div>
-    </div>
-    <div class="check-group">
-      <h4><span>📦</span> Dependencies &amp; Logs</h4>
-      <div class="check-item">npm audit / safety check passes</div>
-      <div class="check-item">No known vulnerabilities in deps</div>
-      <div class="check-item">No secrets in logs</div>
-      <div class="check-item">No PII in logs (or properly masked)</div>
-    </div>
-  </div>
-
-  <!-- CI/CD SECURITY -->
-  <div class="section-label">05 — GitHub Actions Security Workflow</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp 0.5s ease both">
-      <div style="font-size:18px;margin-bottom:8px">🔍</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--crimson)">Secrets Scan</div>
-      <div style="font-size:12px;color:var(--text-dim)">trufflehog on every PR. Scans full git history for exposed secrets.</div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp 0.5s ease both">
-      <div style="font-size:18px;margin-bottom:8px">📦</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--amber)">Dependency Audit</div>
-      <div style="font-size:12px;color:var(--text-dim)">npm audit --audit-level=high on every push. Python: safety check.</div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp 0.5s ease both">
-      <div style="font-size:18px;margin-bottom:8px">🔬</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--blue)">CodeQL Analysis</div>
-      <div style="font-size:12px;color:var(--text-dim)">Static analysis by GitHub. Detects common vulnerability patterns.</div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp 0.5s ease both">
-      <div style="font-size:18px;margin-bottom:8px">⏰</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--violet)">Weekly Schedule</div>
-      <div style="font-size:12px;color:var(--text-dim)">Cron job: Monday 9am UTC. Catches new CVEs in existing deps.</div>
-    </div>
-  </div>
-
-  <footer>security skill · OWASP Top 10 · Secrets Management · Pre-commit hooks · CI/CD scanning</footer>
-</div>
+    <p class="merged-note">unified skill — merges security-review (checklist &amp; review patterns) into security · rationalization M5</p>
+  </main>
 </body>
 </html>

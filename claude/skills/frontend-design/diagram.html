@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frontend Design Skill — Creative Direction</title>
+  <title>Frontend Design — Concept to Enforcement</title>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -25,427 +25,146 @@
       --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
       --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: var(--font-sans);
       background: var(--bg);
-      background-image:
-        radial-gradient(at 50% 0%, var(--gold-dim) 0%, transparent 55%);
+      background-image: radial-gradient(at 50% 0%, var(--gold-dim) 0%, transparent 55%);
       color: var(--text);
       padding: 52px 24px 80px;
     }
-
-    header {
-      max-width: 880px;
-      margin: 0 auto 56px;
-      text-align: center;
-    }
-
-    .header-rule {
-      width: 60px;
-      height: 2px;
-      background: var(--gold);
-      margin: 0 auto 24px;
-    }
-
+    header { max-width: 880px; margin: 0 auto 48px; text-align: center; }
+    .header-rule { width: 60px; height: 2px; background: var(--gold); margin: 0 auto 24px; }
     h1 {
       font-family: var(--font-serif);
-      font-size: 3.8rem;
-      font-weight: 600;
-      font-style: italic;
-      letter-spacing: -0.02em;
-      line-height: 1.05;
-      color: var(--cream);
-      margin-bottom: 18px;
+      font-size: 3.4rem; font-weight: 600; font-style: italic;
+      letter-spacing: -0.02em; line-height: 1.05;
+      color: var(--cream); margin-bottom: 18px;
     }
-
-    .tagline {
-      font-size: 1rem;
-      color: var(--text-dim);
-      max-width: 480px;
-      margin: 0 auto;
-      line-height: 1.7;
+    .tagline { font-size: 1rem; color: var(--text-dim); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+    main { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+    .part-label {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--gold); margin: 26px 0 4px;
     }
-
-    main {
-      max-width: 880px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* Design Thinking phases */
-    .phases {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 3px;
-      animation: fadeUp 0.4s ease both;
-    }
-
-    .phase {
-      background: var(--surface);
-      padding: 20px 18px;
-      position: relative;
-      min-width: 0;
-    }
-
+    .part-label.rust { color: var(--rust); }
+    .phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+    .phase { background: var(--surface); padding: 20px 18px; position: relative; min-width: 0; }
     .phase:first-child { border-radius: 12px 0 0 12px; }
     .phase:last-child  { border-radius: 0 12px 12px 0; }
-
     .phase::after {
-      content: '›';
-      position: absolute;
-      right: -9px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gold);
-      font-size: 1.4rem;
-      z-index: 1;
+      content: '›'; position: absolute; right: -7px; top: 50%; transform: translateY(-50%);
+      color: var(--gold); font-size: 1.2rem; z-index: 2;
     }
-    .phase:last-child::after { display: none; }
-
-    .phase-num {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--gold);
-      letter-spacing: 0.12em;
-      margin-bottom: 8px;
+    .phase:last-child::after { content: none; }
+    .phase h3 { font-family: var(--font-serif); font-size: 1.15rem; color: var(--cream); margin-bottom: 8px; }
+    .phase p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; }
+    .dials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .dial {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px; text-align: center;
     }
-
-    .phase h3 {
-      font-family: var(--font-serif);
-      font-size: 1.05rem;
-      font-weight: 600;
-      font-style: italic;
-      color: var(--cream);
-      margin-bottom: 8px;
+    .dial .value { font-family: var(--font-mono); font-size: 2rem; color: var(--gold); }
+    .dial .name { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; color: var(--text); margin: 6px 0 4px; }
+    .dial .range { font-size: 0.75rem; color: var(--text-dim); }
+    .rulegrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .rulecard {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px;
     }
-
-    .phase p {
-      font-size: 0.76rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-      min-width: 0;
-      overflow-wrap: break-word;
+    .rulecard h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--cream); margin-bottom: 8px; }
+    .rulecard.rust { border-left: 3px solid var(--rust); }
+    .rulecard.sage { border-left: 3px solid var(--sage); }
+    .rulecard.gold { border-left: 3px solid var(--gold); }
+    .rulecard ul { list-style: none; }
+    .rulecard li { font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; padding-left: 16px; position: relative; }
+    .rulecard li::before { content: '—'; position: absolute; left: 0; color: var(--gold); }
+    .rulecard.rust li::before { color: var(--rust); }
+    .rulecard.sage li::before { color: var(--sage); }
+    .gate {
+      background: var(--sage-dim); border: 1px solid var(--sage); border-radius: 12px;
+      padding: 20px 24px; text-align: center;
     }
-
-    /* Aesthetic directions */
-    .aesthetics-section {
-      background: var(--surface);
-      border: 1px solid var(--border-bright);
-      border-radius: 14px;
-      padding: 28px 30px;
-      animation: fadeUp 0.4s 0.1s ease both;
+    .gate h3 { font-family: var(--font-serif); font-size: 1.2rem; color: var(--cream); margin-bottom: 6px; }
+    .gate p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+    .merged-note {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+      text-align: center; margin-top: 34px; letter-spacing: 0.06em;
     }
-
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 20px;
+    @media (max-width: 720px) {
+      .phases, .dials, .rulegrid { grid-template-columns: 1fr; }
+      .phase { border-radius: 0 !important; }
+      .phase::after { content: none; }
+      h1 { font-size: 2.4rem; }
     }
-
-    .aesthetic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 8px;
-    }
-
-    .aesthetic-card {
-      border-radius: 8px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      min-width: 0;
-    }
-
-    .aesthetic-card h4 {
-      font-family: var(--font-serif);
-      font-size: 0.95rem;
-      font-style: italic;
-      color: var(--cream);
-      margin-bottom: 4px;
-    }
-
-    .aesthetic-card p {
-      font-size: 0.71rem;
-      color: var(--text-dim);
-      line-height: 1.4;
-      min-width: 0;
-      overflow-wrap: break-word;
-    }
-
-    .acard-1 { background: var(--gold-dim); }
-    .acard-2 { background: var(--rust-dim); }
-    .acard-3 { background: var(--sage-dim); }
-    .acard-4 { background: rgba(100,80,200,0.08); }
-    .acard-5 { background: rgba(180,30,30,0.08); }
-    .acard-6 { background: rgba(30,80,150,0.10); }
-    .acard-7 { background: rgba(60,60,60,0.15); }
-    .acard-8 { background: rgba(200,150,50,0.08); }
-
-    /* The five pillars */
-    .pillars {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      animation: fadeUp 0.4s 0.2s ease both;
-    }
-
-    .pillar {
-      background: var(--surface);
-      border: 1px solid var(--border-bright);
-      border-top: 3px solid var(--gold);
-      border-radius: 10px;
-      padding: 14px 16px;
-      min-width: 0;
-    }
-
-    .pillar h4 {
-      font-family: var(--font-serif);
-      font-size: 0.9rem;
-      font-style: italic;
-      color: var(--gold);
-      margin-bottom: 8px;
-    }
-
-    .pillar ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .pillar li {
-      font-size: 0.71rem;
-      color: var(--text-dim);
-      padding-left: 8px;
-      position: relative;
-      min-width: 0;
-      overflow-wrap: break-word;
-    }
-
-    .pillar li::before {
-      content: '·';
-      position: absolute;
-      left: 0;
-      color: var(--gold);
-    }
-
-    /* What makes it unforgettable */
-    .unforgettable {
-      background: var(--surface);
-      border: 1px solid var(--border-bright);
-      border-left: 4px solid var(--rust);
-      border-radius: 12px;
-      padding: 20px 24px;
-      animation: fadeUp 0.4s 0.3s ease both;
-    }
-
-    .unforgettable h2 {
-      font-family: var(--font-serif);
-      font-size: 1.3rem;
-      font-style: italic;
-      color: var(--cream);
-      margin-bottom: 14px;
-    }
-
-    .never-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 6px;
-    }
-
-    .never-item {
-      font-size: 0.76rem;
-      color: var(--text-dim);
-      padding: 6px 10px;
-      background: var(--rust-dim);
-      border-radius: 5px;
-      min-width: 0;
-      overflow-wrap: break-word;
-    }
-
-    /* Critical note */
-    .critical-note {
-      background: var(--gold-dim);
-      border: 1px solid rgba(212,167,58,0.25);
-      border-radius: 10px;
-      padding: 16px 20px;
-      font-family: var(--font-serif);
-      font-size: 1.1rem;
-      font-style: italic;
-      color: var(--gold);
-      text-align: center;
-      line-height: 1.5;
-      animation: fadeUp 0.4s 0.4s ease both;
-    }
-
-    @media (max-width: 760px) {
-      .phases { grid-template-columns: 1fr 1fr; }
-      .pillars { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 2.6rem; }
-    }
-    @media (max-width: 500px) {
-      .phases { grid-template-columns: 1fr; }
-      .pillars { grid-template-columns: 1fr; }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
   </style>
 </head>
 <body>
-
-<header>
-  <div class="header-rule"></div>
-  <h1>Frontend Design</h1>
-  <p class="tagline">Distinctive, production-grade interfaces. Commits to a bold aesthetic direction — executed with precision, not intensity. Avoids generic AI aesthetics at every layer.</p>
-</header>
-
-<main>
-
-  <!-- Design Thinking Phases -->
-  <div class="phases">
-    <div class="phase">
-      <div class="phase-num">01 — PURPOSE</div>
-      <h3>Problem</h3>
-      <p>What problem does this solve? Who uses it? Context drives every aesthetic decision.</p>
+  <header>
+    <div class="header-rule"></div>
+    <h1>Frontend Design</h1>
+    <p class="tagline">One unified skill: commit to a bold conceptual direction first, then execute it under prescriptive senior UI/UX engineering rules that override default LLM biases.</p>
+  </header>
+  <main>
+    <div class="part-label">Part I — Design Thinking (conceptual)</div>
+    <div class="phases">
+      <div class="phase"><h3>Purpose</h3><p>What problem does this interface solve, and who uses it?</p></div>
+      <div class="phase"><h3>Tone</h3><p>Pick an extreme: brutalist, editorial, luxury, organic, maximalist… and stay true to it.</p></div>
+      <div class="phase"><h3>Constraints</h3><p>Framework, performance, accessibility — the technical reality.</p></div>
+      <div class="phase"><h3>Differentiation</h3><p>The one thing someone will remember. Intentionality over intensity.</p></div>
     </div>
-    <div class="phase">
-      <div class="phase-num">02 — TONE</div>
-      <h3>Aesthetic</h3>
-      <p>Pick an extreme: brutally minimal, maximalist, retro-futuristic, luxury, editorial, brutalist, art deco…</p>
-    </div>
-    <div class="phase">
-      <div class="phase-num">03 — CONSTRAINTS</div>
-      <h3>Technical</h3>
-      <p>Framework, performance budget, accessibility. These shape what beauty is achievable.</p>
-    </div>
-    <div class="phase">
-      <div class="phase-num">04 — HOOK</div>
-      <h3>Unforgettable?</h3>
-      <p>What is the ONE thing someone will remember? Commit to that — then execute it precisely.</p>
-    </div>
-  </div>
 
-  <!-- Aesthetic Directions -->
-  <div class="aesthetics-section">
-    <div class="section-label">Aesthetic Directions — Pick One, Execute Fully</div>
-    <div class="aesthetic-grid">
-      <div class="aesthetic-card acard-1">
-        <h4>Brutally Minimal</h4>
-        <p>Nothing decorative. Pure function. Extreme whitespace, one typeface, no color.</p>
+    <div class="part-label rust">Part II — Engineering Directives (prescriptive)</div>
+    <div class="dials">
+      <div class="dial"><div class="value">8</div><div class="name">DESIGN_VARIANCE</div><div class="range">symmetry ↔ artsy chaos</div></div>
+      <div class="dial"><div class="value">6</div><div class="name">MOTION_INTENSITY</div><div class="range">static ↔ cinematic physics</div></div>
+      <div class="dial"><div class="value">4</div><div class="name">VISUAL_DENSITY</div><div class="range">art gallery ↔ cockpit</div></div>
+    </div>
+
+    <div class="rulegrid">
+      <div class="rulecard gold">
+        <h3>Architecture &amp; Conventions</h3>
+        <ul>
+          <li>Verify dependencies in package.json before importing</li>
+          <li>RSC-safe: interactivity isolated in 'use client' leaves</li>
+          <li>Tailwind version lock · Grid over flex-math · min-h-[100dvh]</li>
+          <li>Emojis banned — Phosphor/Radix icons only</li>
+        </ul>
       </div>
-      <div class="aesthetic-card acard-2">
-        <h4>Maximalist Chaos</h4>
-        <p>Dense layers, clashing type, multiple palettes. Deliberately overwhelming.</p>
+      <div class="rulecard rust">
+        <h3>Bias Correction &amp; Forbidden Patterns</h3>
+        <ul>
+          <li>The Lila Ban: no AI purple, no neon gradients, no Inter</li>
+          <li>No centered heroes at high variance · no 3-card rows</li>
+          <li>No generic names, fake numbers, or startup slop copy</li>
+          <li>Cards only when elevation communicates hierarchy</li>
+        </ul>
       </div>
-      <div class="aesthetic-card acard-3">
-        <h4>Organic / Natural</h4>
-        <p>Warm earthy tones, organic shapes, imperfect textures and paper-like surfaces.</p>
+      <div class="rulecard sage">
+        <h3>Creative Arsenal &amp; Bento Engine</h3>
+        <ul>
+          <li>Liquid glass refraction · magnetic micro-physics</li>
+          <li>Staggered orchestration with spring physics</li>
+          <li>Bento 2.0: perpetual micro-interactions, 5 card archetypes</li>
+          <li>GSAP/ThreeJS isolated from Framer Motion trees</li>
+        </ul>
       </div>
-      <div class="aesthetic-card acard-4">
-        <h4>Luxury / Refined</h4>
-        <p>Deep navy + gold, generous negative space, serif type. Whispers don't shout.</p>
-      </div>
-      <div class="aesthetic-card acard-5">
-        <h4>Brutalist / Raw</h4>
-        <p>Stark borders, visible structure, monospace everywhere, unpolished honesty.</p>
-      </div>
-      <div class="aesthetic-card acard-6">
-        <h4>Art Deco / Geometric</h4>
-        <p>Angular symmetry, geometric ornament, strong verticals, metallic accents.</p>
-      </div>
-      <div class="aesthetic-card acard-7">
-        <h4>Industrial / Utilitarian</h4>
-        <p>Functional type, grid rigidity, data-forward, no decoration without purpose.</p>
-      </div>
-      <div class="aesthetic-card acard-8">
-        <h4>Editorial / Magazine</h4>
-        <p>Mixed type scales, pull quotes, asymmetric columns, editorial photography.</p>
+      <div class="rulecard gold">
+        <h3>Performance Guardrails</h3>
+        <ul>
+          <li>Animate transform/opacity only — never top/left/size</li>
+          <li>Grain filters on fixed pointer-events-none layers only</li>
+          <li>Perpetual loops memoized in isolated client components</li>
+          <li>Z-index restraint: systemic layers only</li>
+        </ul>
       </div>
     </div>
-  </div>
 
-  <!-- Five Pillars -->
-  <div class="pillars">
-    <div class="pillar">
-      <h4>Typography</h4>
-      <ul>
-        <li>Beautiful &amp; distinctive fonts</li>
-        <li>Avoid Arial, Inter, Roboto</li>
-        <li>Display + body pairing</li>
-        <li>Unexpected + characterful</li>
-      </ul>
+    <div class="gate">
+      <h3>Final Pre-Flight Check</h3>
+      <p>Committed aesthetic direction · mobile collapse guaranteed · dvh-safe heights · effect cleanup · loading/empty/error states · cards omitted where spacing works · heavy animation isolated</p>
     </div>
-    <div class="pillar">
-      <h4>Color</h4>
-      <ul>
-        <li>Cohesive — CSS variables</li>
-        <li>Dominant + sharp accents</li>
-        <li>Avoid purple/pink/cyan</li>
-        <li>Vary light vs dark themes</li>
-      </ul>
-    </div>
-    <div class="pillar">
-      <h4>Motion</h4>
-      <ul>
-        <li>Staggered page load reveals</li>
-        <li>CSS-first for HTML artifacts</li>
-        <li>Motion library for React</li>
-        <li>Surprise on hover + scroll</li>
-      </ul>
-    </div>
-    <div class="pillar">
-      <h4>Composition</h4>
-      <ul>
-        <li>Unexpected layouts</li>
-        <li>Asymmetry + overlap</li>
-        <li>Diagonal flow</li>
-        <li>Generous negative space</li>
-      </ul>
-    </div>
-    <div class="pillar">
-      <h4>Background</h4>
-      <ul>
-        <li>Atmosphere + depth</li>
-        <li>Gradient meshes, noise</li>
-        <li>Geometric patterns</li>
-        <li>Dramatic shadows</li>
-      </ul>
-    </div>
-  </div>
 
-  <!-- Never Do -->
-  <div class="unforgettable">
-    <h2>Never Converge on These Generic Patterns</h2>
-    <div class="never-list">
-      <div class="never-item">Inter / Roboto / Arial as primary font</div>
-      <div class="never-item">Purple gradients on white backgrounds</div>
-      <div class="never-item">Space Grotesk across all generations</div>
-      <div class="never-item">Predictable 3-card feature rows</div>
-      <div class="never-item">Default Tailwind purple/pink/cyan palette</div>
-      <div class="never-item">Centered hero over dark background image</div>
-      <div class="never-item">Cookie-cutter layouts with no context</div>
-      <div class="never-item">Same aesthetic every generation</div>
-    </div>
-  </div>
-
-  <!-- Critical note -->
-  <div class="critical-note">
-    "Bold maximalism and refined minimalism both work — the key is intentionality, not intensity.<br>
-    Claude is capable of extraordinary creative work. Don't hold back."
-  </div>
-
-</main>
-
+    <p class="merged-note">unified skill — merges design-taste-frontend (prescriptive) into frontend-design (conceptual) · rationalization M1</p>
+  </main>
 </body>
 </html>

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-05",
+  "generated": "2026-07-10",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -23,6 +23,11 @@
   "platforms": {
     "claude": {
       "skills": {
+        "ac-logo": {
+          "description": "Full lifecycle for AC \"PCB phosphor console\" brand logos in any repository \u2014 finding existing logo assets and judging them against the brand checklist, generating a new on-brand badge, reskinning an off-brand logo into the house style, and archiving a repo's logo set back to the AC_DESIGN gallery. Triggers on \"/find-logo\", \"/generate-logo\", \"/reskin-logo\", \"/archive-logo\", and phrasings like \"make a logo for this repo\", \"is this logo on-brand\", \"rebrand this icon to the AC style\", \"convert this logo to the phosphor style\", or \"save this logo to the design gallery\". All brand requirements are read at runtime from the AC_DESIGN repository \u2014 never copied.",
+          "category": "Other",
+          "has_commands": true
+        },
         "ac-opbta-ops": {
           "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
           "category": "Other"
@@ -32,7 +37,7 @@
           "category": "Foundations & Workflow"
         },
         "add-feature": {
-          "description": "Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature or when the user says things like \"I want to add a feature\", \"spec out a feature\", \"create a feature spec\", \"write a feature specification\", \"plan a new feature\", \"document a feature idea\", \"let's design a feature\", or \"I have a feature idea\". Walks through a structured 7-phase conversational workflow that produces a thorough feature spec saved to /docs/features/ with a date-prefixed filename. If project-manager scaffolding is present, defer to project-manager:add-feature instead so the canonical CAP-ID workflow is used. After saving, automatically generates a visual diagram of the spec and offers to create an implementation plan. Use this proactively whenever a user describes a feature they want to build, even if they don't explicitly say \"spec\" or \"specification\".",
+          "description": "Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature, /create-feature-spec, or when the user says things like \"I want to add a feature\", \"spec out a feature\", \"create a feature spec\", \"write a feature specification\", \"plan a new feature\", \"document a feature idea\", \"let's design a feature\", or \"I have a feature idea\". Offers two workflow styles: a conversational 7-phase interview that produces a date-prefixed spec in /docs/features/, or a template-first mode that expands a single-sentence description into a comprehensive spec using the project's canonical template with iterative refinement. If project-manager scaffolding is present, defer to project-manager:add-feature instead so the canonical CAP-ID workflow is used. After saving, automatically generates a visual diagram of the spec and offers to create an implementation plan. Use this proactively whenever a user describes a feature they want to build, even if they don't explicitly say \"spec\" or \"specification\".",
           "category": "Foundations & Workflow"
         },
         "add-remote-installer": {
@@ -54,6 +59,10 @@
         "ai-models": {
           "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
           "category": "AI & LLM"
+        },
+        "analyze-conversations": {
+          "description": "Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting \u2014 \"what keeps going wrong\", \"find issues we've hit more than once\", \"audit our conversation history\", \"what should we change so this stops happening\". Mines the JSONL transcripts for repeated tool errors, rejections, and operator corrections, then proposes concrete prevention patches.",
+          "category": "Other"
         },
         "android-java": {
           "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
@@ -123,10 +132,6 @@
           "description": "Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps \u2014 mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.",
           "category": "Foundations & Workflow"
         },
-        "create-feature-spec": {
-          "description": "Create a comprehensive feature specification from a single sentence description",
-          "category": "Foundations & Workflow"
-        },
         "credentials": {
           "description": "Centralized API key management from Access.txt",
           "category": "Content & Marketing"
@@ -159,10 +164,6 @@
           "description": "Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.",
           "category": "Code Quality"
         },
-        "design-taste-frontend": {
-          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
-          "category": "Frontend & UI"
-        },
         "diagnostics-probe-design": {
           "description": "Use when investigating a service or infrastructure failure and before proposing any fix \u2014 verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.",
           "category": "DevOps & Tooling"
@@ -193,7 +194,7 @@
           "category": "Other"
         },
         "finishing-a-development-branch": {
-          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the branch, or discarding it. Integration into dev is delegated to the github bundle's ship operation.",
           "category": "Foundations & Workflow"
         },
         "firebase": {
@@ -226,16 +227,18 @@
           "category": "Other"
         },
         "frontend-design": {
-          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Combines conceptual design direction with prescriptive senior UI/UX engineering rules \u2014 metric-based design dials, strict component architecture, CSS hardware acceleration, and balanced design engineering that overrides default LLM biases. Generates creative, polished code and UI design that avoids generic AI aesthetics.",
           "category": "Frontend & UI"
         },
         "gemini-review": {
           "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
           "category": "Code Quality"
         },
-        "git-cleanup": {
-          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
-          "category": "Foundations & Workflow"
+        "github": {
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; or pruning stale branches and worktrees. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
+          "category": "Other",
+          "has_commands": true,
+          "has_sub_skills": true
         },
         "gpu-workload-placement-and-arbitration": {
           "description": "Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.",
@@ -249,9 +252,17 @@
           "description": "Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards \u2014 enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.",
           "category": "DevOps & Tooling"
         },
+        "graphify": {
+          "description": "any input (code, docs, papers, images) \u2192 knowledge graph \u2192 clustered communities \u2192 HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships \u2014 especially if graphify-out/ exists. Provides persistent graph with god nodes, community detection, and BFS/DFS query tools.",
+          "category": "Other"
+        },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. ALWAYS use AskUserQuestion for every prompt to the user \u2014 never just print a question as plain text.",
           "category": "Foundations & Workflow"
+        },
+        "honcho": {
+          "description": "Work with Honcho \u2014 the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, inspecting or debugging a Honcho deployment via the `honcho` CLI, or health-checking a self-hosted Honcho instance (peers, sessions, conclusions, representations, the deriver queue). Triggers on: \"add Honcho\", \"Honcho SDK\", \"peer.chat\", \"dialectic\", \"observe_me\", \"conclusions/representations\", \"is Honcho working\", \"deriver stalled\", \"migrate honcho\".",
+          "category": "Other"
         },
         "honcho-deriver-queue-health-diagnostics": {
           "description": "Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts \u2014 check both the MCP-visible layer and the server-side queue table directly, distinguish \"broken\" from \"contended,\" and audit stored conclusions for pollution.",
@@ -332,10 +343,6 @@
           "description": "gh, vercel, supabase, render CLI and deployment platform setup",
           "category": "DevOps & Tooling"
         },
-        "publish-github": {
-          "description": "End-to-end workflow for publishing a local project as a new GitHub repository with security hardening, structured branching, and branch protection rules. Use this skill whenever the user wants to create a GitHub repo, publish a project to GitHub, initialize git and push to remote, run `gh repo create`, set up branch protection, or types `/publish-github`. This skill covers: gitleaks secrets-detection hook, .gitignore and .gitattributes creation, `main`/`dev` branch setup, and GitHub branch protection rules that enforce PRs on both branches. Always invoke this skill \u2014 even if the user says \"just push to GitHub quickly\" \u2014 because security hardening and branch protection should never be optional.",
-          "category": "DevOps & Tooling"
-        },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
           "category": "Frontend & UI"
@@ -376,10 +383,6 @@
           "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
           "category": "Content & Marketing"
         },
-        "release-to-main": {
-          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
-          "category": "Foundations & Workflow"
-        },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
           "category": "DevOps & Tooling"
@@ -398,15 +401,11 @@
           "category": "Code Quality"
         },
         "security": {
-          "description": "OWASP security patterns, secrets management, security testing",
+          "description": "OWASP security patterns, secrets management, and security testing, plus a comprehensive security review checklist. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features.",
           "category": "Code Quality"
         },
         "security-aware-persistence-design": {
           "description": "Use when designing or reviewing a feature that persists user-supplied data (new DB table/API, exposing a service, or writing multi-statement Create/Update/Delete flows) \u2014 apply parameterized queries, PII handling, DoS caps, and transaction safety, and gate any network-exposure decision on real (not speculative) use.",
-          "category": "Code Quality"
-        },
-        "security-review": {
-          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
           "category": "Code Quality"
         },
         "self-contained-html-artifact-with-inline-assets": {
@@ -428,10 +427,6 @@
         "shell-migration-skip-taxonomy": {
           "description": "Use when deciding whether a shell script can safely be migrated to source a centralized helper library \u2014 classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.",
           "category": "DevOps & Tooling"
-        },
-        "ship-to-dev": {
-          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
-          "category": "Foundations & Workflow"
         },
         "shopify-apps": {
           "description": "Shopify app development - Remix, Admin API, checkout extensions",
@@ -667,7 +662,7 @@
     "codex": {
       "skills": {
         "add-feature": {
-          "description": "Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature or when the user says things like \"I want to add a feature\", \"spec out a feature\", \"create a feature spec\", \"write a feature specification\", \"plan a new feature\", \"document a feature idea\", \"let's design a feature\", or \"I have a feature idea\". Walks through a structured 7-phase conversational workflow that produces a thorough feature spec saved to /docs/features/ with a date-prefixed filename. After saving, automatically generates a visual diagram of the spec and offers to create an implementation plan. Use this proactively whenever a user describes a feature they want to build, even if they don't explicitly say \"spec\" or \"specification\".",
+          "description": "Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature, /create-feature-spec, or when the user says things like \"I want to add a feature\", \"spec out a feature\", \"create a feature spec\", \"write a feature specification\", \"plan a new feature\", \"document a feature idea\", \"let's design a feature\", or \"I have a feature idea\". Offers two workflow styles: a conversational 7-phase interview that produces a date-prefixed spec in /docs/features/, or a template-first mode that expands a single-sentence description into a comprehensive spec using the project's canonical template with iterative refinement. After saving, automatically generates a visual diagram of the spec and offers to create an implementation plan. Use this proactively whenever a user describes a feature they want to build, even if they don't explicitly say \"spec\" or \"specification\".",
           "category": "Foundations & Workflow"
         },
         "add-remote-installer": {
@@ -738,10 +733,6 @@
           "description": "",
           "category": "Foundations & Workflow"
         },
-        "create-feature-spec": {
-          "description": "Create a comprehensive feature specification from a single sentence description",
-          "category": "Foundations & Workflow"
-        },
         "credentials": {
           "description": "Centralized API key management from Access.txt",
           "category": "Content & Marketing"
@@ -749,10 +740,6 @@
         "database-schema": {
           "description": "Schema awareness - read before coding, type generation, prevent column errors",
           "category": "Databases"
-        },
-        "design-taste-frontend": {
-          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
-          "category": "Frontend & UI"
         },
         "doc-coauthoring": {
           "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
@@ -771,7 +758,7 @@
           "category": "Foundations & Workflow"
         },
         "finishing-a-development-branch": {
-          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the branch, or discarding it. Integration into dev is delegated to the github bundle's ship operation.",
           "category": "Foundations & Workflow"
         },
         "firebase": {
@@ -787,16 +774,17 @@
           "category": "Languages"
         },
         "frontend-design": {
-          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+          "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Combines conceptual design direction with prescriptive senior UI/UX engineering rules \u2014 metric-based design dials, strict component architecture, CSS hardware acceleration, and balanced design engineering that overrides default LLM biases. Generates creative, polished code and UI design that avoids generic AI aesthetics.",
           "category": "Frontend & UI"
         },
         "gemini-review": {
           "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
           "category": "Code Quality"
         },
-        "git-cleanup": {
-          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
-          "category": "Foundations & Workflow"
+        "github": {
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; publishing a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"cut a release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit this\", \"clean up branches\", \"publish this repo\" \u2014 even when the word \"git\" is absent. This is a thin orchestrator: match the request to one operation below and run that operation's sub-skill against the current repo with minimal terminal output.",
+          "category": "Other",
+          "has_sub_skills": true
         },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. Always prompt the user interactively for every question \u2014 never just print a question as plain text.",
@@ -850,10 +838,6 @@
           "description": "gh, vercel, supabase, render CLI and deployment platform setup",
           "category": "DevOps & Tooling"
         },
-        "publish-github": {
-          "description": "End-to-end workflow for publishing a local project as a new GitHub repository with security hardening, structured branching, and branch protection rules. Use this skill whenever the user wants to create a GitHub repo, publish a project to GitHub, initialize git and push to remote, run `gh repo create`, set up branch protection, or types `/publish-github`. This skill covers: gitleaks secrets-detection hook, .gitignore and .gitattributes creation, `main`/`dev` branch setup, and GitHub branch protection rules that enforce PRs on both branches. Always invoke this skill \u2014 even if the user says \"just push to GitHub quickly\" \u2014 because security hardening and branch protection should never be optional.",
-          "category": "DevOps & Tooling"
-        },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
           "category": "Frontend & UI"
@@ -882,10 +866,6 @@
           "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
           "category": "Content & Marketing"
         },
-        "release-to-main": {
-          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
-          "category": "Foundations & Workflow"
-        },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
           "category": "DevOps & Tooling"
@@ -899,19 +879,11 @@
           "category": "Foundations & Workflow"
         },
         "security": {
-          "description": "OWASP security patterns, secrets management, security testing",
-          "category": "Code Quality"
-        },
-        "security-review": {
-          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+          "description": "OWASP security patterns, secrets management, and security testing, plus a comprehensive security review checklist. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features.",
           "category": "Code Quality"
         },
         "session-management": {
           "description": "Context preservation, tiered summarization, resumability",
-          "category": "Foundations & Workflow"
-        },
-        "ship-to-dev": {
-          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
           "category": "Foundations & Workflow"
         },
         "shopify-apps": {
@@ -1049,8 +1021,8 @@
           "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Manages the full lifecycle: extracting feature specs via interview, generating phased implementation plans, delegating tasks to worker agents, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as shared state.",
           "category": "AI & LLM"
         },
-        "security-review": {
-          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+        "security": {
+          "description": "OWASP security patterns, secrets management, and security testing, plus a comprehensive security review checklist. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features.",
           "category": "Code Quality"
         },
         "skills-manager": {

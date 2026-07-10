@@ -16,7 +16,7 @@ CATEGORIES = {
         'base', 'code-deduplication', 'commit-hygiene', 'existing-repo',
         'iterative-development', 'session-management', 'team-coordination',
         'tdd-workflow', 'workspace', 'subagent-driven-development',
-        'create-feature-spec', 'finishing-a-development-branch',
+        'finishing-a-development-branch',
         'using-git-worktrees', 'requesting-code-review', 'ship-to-dev',
         'release-to-main', 'git-cleanup', 'guide-assistant', 'feature-start',
         'fix-start', 'pre-pr', 'retro-fit-spec', 'spec-align', 'add-feature',
@@ -31,7 +31,7 @@ CATEGORIES = {
     ],
     'Code Quality': [
         'code-review', 'codex-review', 'gemini-review', 'playwright-testing',
-        'security', 'security-review',
+        'security',
         'design-critique-to-safe-refactor', 'scanner-plugin-integration',
         'security-aware-persistence-design', 'crlf-gitattributes-normalization',
     ],
@@ -41,7 +41,7 @@ CATEGORIES = {
         'typescript',
     ],
     'Frontend & UI': [
-        'design-taste-frontend', 'frontend-design', 'pwa-development',
+        'frontend-design', 'pwa-development',
         'ui-mobile', 'ui-testing', 'ui-web', 'web-design-guidelines',
         'chrome-extension-builder',
         'self-contained-html-artifact-with-inline-assets',
