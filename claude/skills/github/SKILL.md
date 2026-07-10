@@ -4,10 +4,12 @@ description: >
   Use when the user wants to perform a git or GitHub repository operation from the terminal —
   merging a pull request, branch, or worktree into dev; shipping working changes through a
   feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
-  automation (changelog generator + tag-triggered workflow); committing and pushing; or pruning
-  stale branches and worktrees. Triggers on "merge 1209", "merge this branch", "merge the
+  automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
+  stale branches and worktrees; or creating, working in, and tearing down an isolated per-task
+  worktree. Triggers on "merge 1209", "merge this branch", "merge the
   current worktree", "ship it", "release", "set up releases", "release init", "provision
-  release workflow", "fix changelog automation", "commit", "clean up branches", and similar
+  release workflow", "fix changelog automation", "commit", "clean up branches", "create a
+  worktree", "set up an isolated workspace", "remove the worktree", and similar
   phrasings — even
   when the word "git" is absent. This is a thin-command bundle: each command names one
   operation and this skill runs it against the current repo with minimal terminal output.
@@ -74,6 +76,16 @@ question.
 | `/release-init` | release-init | `sub-skills/release-init` |
 | `/prune` | prune | `sub-skills/prune` |
 
+One sub-skill has **no command of its own** and triggers directly on worktree phrasings:
+
+| *(no command — triggers directly)* | worktree lifecycle | `sub-skills/worktree-task-lifecycle` |
+|---|---|---|
+
+`worktree-task-lifecycle` is the **single lifecycle authority** for per-task worktrees —
+creation under `<repo>-wt/.worktrees/`, post-merge idempotent removal, Windows file-lock
+recovery, and credential rules. `merge` and `prune` delegate their worktree handling to it;
+so do multi-agent harnesses (agent-manager) that run one worktree per agent.
+
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
 `release-init` sits beside `release`: an idempotent provisioning pass that brings a repo's
 changelog generator + tag-triggered release workflow up to the Release-Automation Standard
@@ -107,10 +119,21 @@ These hold for every operation, present or future:
   primary root before merging.
 - **Cleanup order is worktree → local branch → remote.** Removing a worktree does not delete
   its backing branch; delete that separately.
-- **Windows worktree-lock footgun.** After a merge, a lingering file handle can block deletion
-  of the worktree directory with "Permission denied". Prune git's metadata
-  (`git worktree prune`) and force-remove the leftover directory; if it still cannot be
-  removed, leave it and say so in the summary rather than looping.
+- **Worktree create/remove goes through `sub-skills/worktree-task-lifecycle`.** It owns the
+  canonical location (`<repo>-wt/.worktrees/`), the Windows lock-recovery sequence
+  (`git worktree prune` + force-remove; if the directory still resists, leave it and say so
+  in the summary rather than looping), and the credentials-stay-in-primary-checkout rule.
+- **Commit conventions.** Conventional-commit format `<type>: <description>` with types
+  `feat|fix|refactor|docs|test|chore|perf|ci`; one logical change per commit (atomic — if the
+  message needs "and", split it); never leave `WIP` commits on a branch that reaches a PR;
+  commit at every stable point rather than waiting for "done".
+- **Verify remembered refs against live state before anything destructive.** A cached pointer
+  — `git symbolic-ref refs/remotes/origin/HEAD`, a remembered default branch, a memory-file
+  note — is a hypothesis, not a fact: branches get deleted and renamed after the cache was
+  written. Before a release, force-push, or bulk delete, confirm the target actually exists
+  remotely (`git ls-remote --heads origin <branch>`); if the cached ref is wrong, repair it at
+  the source (`git remote set-head origin -a`) rather than working around it, and never
+  guess-continue past a failed verification.
 - **All user prompts go through `AskUserQuestion`.** Never write "type yes/no".
 - **Never force-push `dev` or `main` blind, never skip failing CI gates.** Surface the failure
   and stop.

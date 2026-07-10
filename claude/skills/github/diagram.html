@@ -140,7 +140,7 @@
 
   <div class="flow-arrow" style="--i:1">
     <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
-    seven thin commands, one lifecycle
+    seven thin commands + one direct-trigger sub-skill, one lifecycle
   </div>
 
   <!-- Operations -->
@@ -175,6 +175,10 @@
         <div class="op-cmd op-cmd--red">/prune</div>
         <div><div class="step-title">Prune stale worktrees + branches</div><div class="step-desc">Merged-into-dev detection (squash or standard), protects dirty worktrees, deletes local + origin, logs to <code>docs/git-log.md</code>.</div></div>
       </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--slate">no&nbsp;cmd</div>
+        <div><div class="step-title">worktree-task-lifecycle · triggers directly</div><div class="step-desc">Single lifecycle authority: create under <code>&lt;repo&gt;-wt/.worktrees/</code>, clean-baseline setup, credentials stay in the primary checkout, merge from primary (never inside the worktree), post-merge idempotent removal with Windows lock recovery. <code>merge</code>/<code>prune</code> and agent harnesses delegate here.</div></div>
+      </li>
     </ul>
     <div class="lifecycle">
       <span class="lc-node">publish</span><span class="lc-sep">→</span>
@@ -206,7 +210,9 @@
         <li>Merge strategy is a <strong>merge commit</strong>; never squash feature → dev.</li>
         <li>Run destructive git/gh from the <strong>repo root</strong>, never a secondary worktree.</li>
         <li>Cleanup order: <strong>worktree → local branch → remote</strong>.</li>
-        <li>Windows lock footgun — <code>git worktree prune</code> + force-remove; if it resists, leave it and say so.</li>
+        <li>Worktree create/remove goes through <strong>worktree-task-lifecycle</strong> (incl. Windows lock recovery).</li>
+        <li>Commit conventions — <code>type: description</code>, atomic commits, no WIP in PRs.</li>
+        <li>Verify remembered refs live (<code>git ls-remote</code>) before anything destructive; repair with <code>git remote set-head origin -a</code>.</li>
         <li>Never bypass a failing CI gate — surface and stop.</li>
       </ul>
     </div>

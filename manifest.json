@@ -235,7 +235,7 @@
           "category": "Code Quality"
         },
         "github": {
-          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; or pruning stale branches and worktrees. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; pruning stale branches and worktrees; or creating, working in, and tearing down an isolated per-task worktree. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", \"create a worktree\", \"set up an isolated workspace\", \"remove the worktree\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
           "category": "Other",
           "has_commands": true,
           "has_sub_skills": true
@@ -535,10 +535,6 @@
           "description": "User experience flows - journey mapping, UX validation, error recovery",
           "category": "Content & Marketing"
         },
-        "using-git-worktrees": {
-          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
-          "category": "Foundations & Workflow"
-        },
         "vercel-deploy-claimable": {
           "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",
           "category": "DevOps & Tooling"
@@ -574,10 +570,6 @@
         },
         "workspace": {
           "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
-          "category": "Foundations & Workflow"
-        },
-        "worktree-isolated-loop": {
-          "description": "Use when running multi-turn or batch agent work (refactoring, feature loops) that must stay isolated from concurrent edits in the primary checkout, and when setting up a self-perpetuating /loop that hands off context between turns via git state rather than chat memory.",
           "category": "Foundations & Workflow"
         },
         "worldview-layer-scaffold": {
@@ -953,10 +945,6 @@
         "user-journeys": {
           "description": "User experience flows - journey mapping, UX validation, error recovery",
           "category": "Content & Marketing"
-        },
-        "using-git-worktrees": {
-          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
-          "category": "Foundations & Workflow"
         },
         "vercel-deploy-claimable": {
           "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",

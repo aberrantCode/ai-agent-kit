@@ -178,7 +178,7 @@ git worktree remove <worktree-path>
 - **github (ship operation)** - PR-based integration into dev (Option 1)
 
 **Pairs with:**
-- **using-git-worktrees** - Cleans up worktree created by that skill
+- **github (worktree-task-lifecycle sub-skill)** - Cleans up worktrees created by that sub-skill
 
 ## Diagram
 
