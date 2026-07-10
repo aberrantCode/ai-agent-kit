@@ -140,7 +140,7 @@
 
   <div class="flow-arrow" style="--i:1">
     <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
-    six thin commands, one lifecycle
+    seven thin commands, one lifecycle
   </div>
 
   <!-- Operations -->
@@ -166,6 +166,10 @@
       <li class="step-item">
         <div class="op-cmd op-cmd--violet">/release</div>
         <div><div class="step-title">dev → main versioned release</div><div class="step-desc">Branch preflight, auto semver from conventional commits, <code>--no-ff</code> merge, tag + GitHub Release, sync dev.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">/release-init</div>
+        <div><div class="step-title">Provision / repair release automation</div><div class="step-desc">Release-Automation Standard: persistent changelog generator + tag-triggered <code>release.yml</code> that <strong>regenerates notes from git at tag time</strong> — a committed CHANGELOG is a cache, never the source of truth. Detects missing / anti-pattern / stale states; idempotent.</div></div>
       </li>
       <li class="step-item">
         <div class="op-cmd op-cmd--red">/prune</div>

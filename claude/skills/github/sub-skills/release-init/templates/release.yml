@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history + all tags so Generate-Changelog.ps1 can walk every
+          # release range. A shallow clone would leave it unable to compute
+          # per-version sections.
+          fetch-depth: 0
+
+      - name: Regenerate CHANGELOG for the released tag
+        shell: pwsh
+        run: |
+          # Derive notes from git at release time rather than trusting a
+          # hand-committed CHANGELOG. This guarantees the "## [<version>]"
+          # section below always exists and matches the tag, so the release
+          # can never publish stale notes.
+          ./scripts/Generate-Changelog.ps1
+
+      - name: Extract release notes from CHANGELOG.md
+        id: notes
+        shell: bash
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          version="${tag#v}"
+          notes_file=/tmp/release-notes.md
+
+          # Only the tag-named section is acceptable: "## [1.8.0]". The
+          # regenerate step above always produces it. There is deliberately NO
+          # [Unreleased] fallback — a missing section degrades to the
+          # placeholder below, never to stale notes.
+          section=$(awk -v v="## [$version]" '
+            index($0, v) == 1 { flag=1; next }
+            /^## \[/ && flag { flag=0 }
+            flag
+          ' CHANGELOG.md)
+
+          if [ -z "$(echo "$section" | tr -d '[:space:]')" ]; then
+            section="See [CHANGELOG.md](CHANGELOG.md) for details."
+          fi
+
+          # Trim leading/trailing blank lines
+          printf '%s\n' "$section" | awk '
+            NF { started=1 }
+            started { lines[NR]=$0 }
+            END {
+              last=NR
+              while (last>0 && lines[last]=="") last--
+              first=1
+              while (first<=last && lines[first]=="") first++
+              for (i=first; i<=last; i++) print lines[i]
+            }
+          ' > "$notes_file"
+
+          echo "Extracted release notes for $tag:"
+          echo '----'
+          cat "$notes_file"
+          echo '----'
+
+          # Prerelease if the tag has a pre-release identifier (e.g. v1.8.0-rc1)
+          prerelease=false
+          case "$tag" in
+            *-*) prerelease=true ;;
+          esac
+
+          {
+            echo "path=$notes_file"
+            echo "tag=$tag"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=(
+            "${{ steps.notes.outputs.tag }}"
+            --title "${{ steps.notes.outputs.tag }}"
+            --notes-file "${{ steps.notes.outputs.path }}"
+          )
+          if [ "${{ steps.notes.outputs.prerelease }}" = "true" ]; then
+            args+=(--prerelease)
+          fi
+          gh release create "${args[@]}"

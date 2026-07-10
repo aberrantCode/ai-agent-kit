@@ -145,7 +145,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — merge, PR, squash, or cleanup | ✓ | ✓ | |
 | [`using-git-worktrees`](claude/skills/using-git-worktrees/) | Foundations & Workflow | Isolated git worktrees with smart directory selection | ✓ | ✓ | |
 | [`requesting-code-review`](claude/skills/requesting-code-review/) | Foundations & Workflow | Dispatch code review before merging | ✓ | ✓ | |
-| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
+| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/release-init`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
 | [`commit-hygiene`](claude/skills/commit-hygiene/) | Foundations & Workflow | Atomic commits, PR size limits, commit thresholds | ✓ | ✓ | |
 | [`guide-assistant`](claude/skills/guide-assistant/) | Foundations & Workflow | Walk through any markdown guide step-by-step | ✓ | ✓ | |
 | [`feature-start`](claude/skills/feature-start/) | Foundations & Workflow | Pre-flight workflow before starting feature work | ✓ | ✓ | |
@@ -423,4 +423,4 @@ model: opus              # opus | sonnet | haiku
 - **Delete superseded skills/commands** — git history is the archive of record; `status: deprecated` is a transient "scheduled for removal" marker, not a permanent tombstone
 - All changes go through feature branch → PR → `dev` → release to `main`
 - Branch naming: `feat/short-description`, `fix/short-description`, etc.
-- Use the `github` skill for the whole repo lifecycle: `/publish` to create a hardened repo, `/commit`, `/ship` to ship changes, `/merge` a PR into dev, `/release` for production releases, `/prune` to remove stale branches
+- Use the `github` skill for the whole repo lifecycle: `/publish` to create a hardened repo, `/commit`, `/ship` to ship changes, `/merge` a PR into dev, `/release` for production releases, `/release-init` to provision or repair release automation, `/prune` to remove stale branches

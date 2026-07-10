@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-05",
+  "generated": "2026-07-10",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -23,6 +23,11 @@
   "platforms": {
     "claude": {
       "skills": {
+        "ac-logo": {
+          "description": "Full lifecycle for AC \"PCB phosphor console\" brand logos in any repository \u2014 finding existing logo assets and judging them against the brand checklist, generating a new on-brand badge, reskinning an off-brand logo into the house style, and archiving a repo's logo set back to the AC_DESIGN gallery. Triggers on \"/find-logo\", \"/generate-logo\", \"/reskin-logo\", \"/archive-logo\", and phrasings like \"make a logo for this repo\", \"is this logo on-brand\", \"rebrand this icon to the AC style\", \"convert this logo to the phosphor style\", or \"save this logo to the design gallery\". All brand requirements are read at runtime from the AC_DESIGN repository \u2014 never copied.",
+          "category": "Other",
+          "has_commands": true
+        },
         "ac-opbta-ops": {
           "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
           "category": "Other"
@@ -54,6 +59,10 @@
         "ai-models": {
           "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
           "category": "AI & LLM"
+        },
+        "analyze-conversations": {
+          "description": "Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting \u2014 \"what keeps going wrong\", \"find issues we've hit more than once\", \"audit our conversation history\", \"what should we change so this stops happening\". Mines the JSONL transcripts for repeated tool errors, rejections, and operator corrections, then proposes concrete prevention patches.",
+          "category": "Other"
         },
         "android-java": {
           "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
@@ -233,9 +242,11 @@
           "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
           "category": "Code Quality"
         },
-        "git-cleanup": {
-          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
-          "category": "Foundations & Workflow"
+        "github": {
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; or pruning stale branches and worktrees. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
+          "category": "Other",
+          "has_commands": true,
+          "has_sub_skills": true
         },
         "gpu-workload-placement-and-arbitration": {
           "description": "Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.",
@@ -249,9 +260,17 @@
           "description": "Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards \u2014 enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.",
           "category": "DevOps & Tooling"
         },
+        "graphify": {
+          "description": "any input (code, docs, papers, images) \u2192 knowledge graph \u2192 clustered communities \u2192 HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships \u2014 especially if graphify-out/ exists. Provides persistent graph with god nodes, community detection, and BFS/DFS query tools.",
+          "category": "Other"
+        },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. ALWAYS use AskUserQuestion for every prompt to the user \u2014 never just print a question as plain text.",
           "category": "Foundations & Workflow"
+        },
+        "honcho": {
+          "description": "Work with Honcho \u2014 the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, inspecting or debugging a Honcho deployment via the `honcho` CLI, or health-checking a self-hosted Honcho instance (peers, sessions, conclusions, representations, the deriver queue). Triggers on: \"add Honcho\", \"Honcho SDK\", \"peer.chat\", \"dialectic\", \"observe_me\", \"conclusions/representations\", \"is Honcho working\", \"deriver stalled\", \"migrate honcho\".",
+          "category": "Other"
         },
         "honcho-deriver-queue-health-diagnostics": {
           "description": "Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts \u2014 check both the MCP-visible layer and the server-side queue table directly, distinguish \"broken\" from \"contended,\" and audit stored conclusions for pollution.",
@@ -332,10 +351,6 @@
           "description": "gh, vercel, supabase, render CLI and deployment platform setup",
           "category": "DevOps & Tooling"
         },
-        "publish-github": {
-          "description": "End-to-end workflow for publishing a local project as a new GitHub repository with security hardening, structured branching, and branch protection rules. Use this skill whenever the user wants to create a GitHub repo, publish a project to GitHub, initialize git and push to remote, run `gh repo create`, set up branch protection, or types `/publish-github`. This skill covers: gitleaks secrets-detection hook, .gitignore and .gitattributes creation, `main`/`dev` branch setup, and GitHub branch protection rules that enforce PRs on both branches. Always invoke this skill \u2014 even if the user says \"just push to GitHub quickly\" \u2014 because security hardening and branch protection should never be optional.",
-          "category": "DevOps & Tooling"
-        },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
           "category": "Frontend & UI"
@@ -375,10 +390,6 @@
         "reddit-api": {
           "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
           "category": "Content & Marketing"
-        },
-        "release-to-main": {
-          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
-          "category": "Foundations & Workflow"
         },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
@@ -428,10 +439,6 @@
         "shell-migration-skip-taxonomy": {
           "description": "Use when deciding whether a shell script can safely be migrated to source a centralized helper library \u2014 classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.",
           "category": "DevOps & Tooling"
-        },
-        "ship-to-dev": {
-          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
-          "category": "Foundations & Workflow"
         },
         "shopify-apps": {
           "description": "Shopify app development - Remix, Admin API, checkout extensions",
@@ -794,9 +801,10 @@
           "description": "Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration",
           "category": "Code Quality"
         },
-        "git-cleanup": {
-          "description": "Audits and removes stale git worktrees and branches (local + remote origin) that have been merged into `dev`. Use this whenever the user wants to clean up branches, prune stale worktrees, remove merged branches, tidy up the repo, or do any kind of branch housekeeping. Also trigger when the user says things like \"let's clean up the repo\", \"what branches can I delete\", \"remove old branches\", or asks about git branch hygiene \u2014 even if they don't use the word \"stale\". Always invoke this skill before manually running git branch -d or git worktree remove commands.",
-          "category": "Foundations & Workflow"
+        "github": {
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; publishing a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"cut a release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit this\", \"clean up branches\", \"publish this repo\" \u2014 even when the word \"git\" is absent. This is a thin orchestrator: match the request to one operation below and run that operation's sub-skill against the current repo with minimal terminal output.",
+          "category": "Other",
+          "has_sub_skills": true
         },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. Always prompt the user interactively for every question \u2014 never just print a question as plain text.",
@@ -850,10 +858,6 @@
           "description": "gh, vercel, supabase, render CLI and deployment platform setup",
           "category": "DevOps & Tooling"
         },
-        "publish-github": {
-          "description": "End-to-end workflow for publishing a local project as a new GitHub repository with security hardening, structured branching, and branch protection rules. Use this skill whenever the user wants to create a GitHub repo, publish a project to GitHub, initialize git and push to remote, run `gh repo create`, set up branch protection, or types `/publish-github`. This skill covers: gitleaks secrets-detection hook, .gitignore and .gitattributes creation, `main`/`dev` branch setup, and GitHub branch protection rules that enforce PRs on both branches. Always invoke this skill \u2014 even if the user says \"just push to GitHub quickly\" \u2014 because security hardening and branch protection should never be optional.",
-          "category": "DevOps & Tooling"
-        },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
           "category": "Frontend & UI"
@@ -882,10 +886,6 @@
           "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
           "category": "Content & Marketing"
         },
-        "release-to-main": {
-          "description": "Use when the user wants to merge dev into main for a production release \u2014 covers rebasing dev from main if behind, automatic semantic versioning from conventional commits, merge commit, release tagging, and syncing dev back onto main.",
-          "category": "Foundations & Workflow"
-        },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
           "category": "DevOps & Tooling"
@@ -908,10 +908,6 @@
         },
         "session-management": {
           "description": "Context preservation, tiered summarization, resumability",
-          "category": "Foundations & Workflow"
-        },
-        "ship-to-dev": {
-          "description": "Use when the user wants to ship current working changes through a feature branch PR into the DEV branch \u2014 covers pulling latest, staging, committing, pushing, PR creation, merge, branch cleanup, and syncing DEV locally.",
           "category": "Foundations & Workflow"
         },
         "shopify-apps": {
