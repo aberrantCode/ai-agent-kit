@@ -153,7 +153,7 @@ PR as the iteration's work. Full scope per iteration lives in `implementation_or
 `final_master_skills` of the consensus JSON.
 
 - [x] 0. Charter + ledger (docs-only): routing model, boundary sentences, slug rules, mirror policy, command-namespace registry + generic-verb rule, 142-directory disposition ledger, delete what-next-workspace eval artifacts, correct counts in README/CLAUDE.md
-- [ ] 1. github pt1: master SKILL.md extension + worktree-task-lifecycle; delete using-git-worktrees, worktree-isolated-loop; parity pass
+- [x] 1. github pt1: master SKILL.md extension + worktree-task-lifecycle; delete using-git-worktrees, worktree-isolated-loop; parity pass
 - [ ] 2. github pt2: pr-splitter + large-asset-vendoring; lift additive-merge-conflict-resolution + crlf-gitattributes-normalization; delete commit-hygiene, accumulated-feature-branch-workflow, pre-pr; /split-pr
 - [ ] 3. github pt3: /sync-dev + /changelog-preview; extend ship/merge/release/release-init/prune/publish; regenerate diagram; /push-skill github
 - [ ] 4. skills-manager pt1: skill-parity-guard + installed-copy-sweep; /sweep-installed-copies; extend /audit-skills; retire /backfill-diagrams; CLAUDE.md command table

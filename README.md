@@ -30,10 +30,10 @@ ai-agent-kit/
 ├── claude/
 │   ├── instructions/     # 15 agent instructions
 │   ├── commands/         # 25 slash commands
-│   └── skills/           # 141 domain-specific knowledge modules
+│   └── skills/           # 139 domain-specific knowledge modules
 ├── codex/
 │   ├── instructions/     # Agent instructions for Codex CLI
-│   └── skills/           # 84 domain-specific knowledge modules
+│   └── skills/           # 83 domain-specific knowledge modules
 ├── gemini/
 │   ├── instructions/     # Agent instructions for Gemini CLI
 │   └── skills/           # 5 domain-specific knowledge modules
@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 141 | 84 | 5 | 230 |
+| Skills | 139 | 83 | 5 | 227 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 25 | — | — | 25 |
 
@@ -112,7 +112,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 34 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
+| Foundations & Workflow | 32 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 7 | react-web, flutter, chrome-extension-builder |
 | Frontend & UI | 6 | css-variables-for-multi-theme-reskin, ui-redesign-with-snapshot-regeneration |
@@ -130,7 +130,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Research & OSINT | 11 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (141 Claude skills)</strong></summary>
+<summary><strong>Full skill list (139 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
@@ -142,9 +142,8 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`existing-repo`](claude/skills/existing-repo/) | Foundations & Workflow | Analyze existing repositories, maintain structure, setup guardrails | ✓ | ✓ | |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/) | Foundations & Workflow | Parallel task execution using sub-agents | ✓ | ✓ | |
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — ship to dev via the github ship operation, keep the branch, or discard | ✓ | ✓ | |
-| [`using-git-worktrees`](claude/skills/using-git-worktrees/) | Foundations & Workflow | Isolated git worktrees with smart directory selection | ✓ | ✓ | |
 | [`requesting-code-review`](claude/skills/requesting-code-review/) | Foundations & Workflow | Dispatch code review before merging | ✓ | ✓ | |
-| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/release-init`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
+| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/release-init`, `/prune` companion commands and matching sub-skills plus a worktree-task-lifecycle sub-skill, with a minimal-output contract | ✓ | ✓ | |
 | [`commit-hygiene`](claude/skills/commit-hygiene/) | Foundations & Workflow | Atomic commits, PR size limits, commit thresholds | ✓ | ✓ | |
 | [`guide-assistant`](claude/skills/guide-assistant/) | Foundations & Workflow | Walk through any markdown guide step-by-step | ✓ | ✓ | |
 | [`feature-start`](claude/skills/feature-start/) | Foundations & Workflow | Pre-flight workflow before starting feature work | ✓ | ✓ | |
@@ -268,7 +267,6 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/) | Foundations & Workflow | Verify cached refs (git default branch, session memory) against live state before destructive ops | ✓ |  |  |
 | [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/) | Foundations & Workflow | Resume multi-session work via a durable state file, one-step turns, and copy-ready handoff prompts | ✓ |  |  |
 | [`superpowers-overrides`](claude/skills/superpowers-overrides/) | Foundations & Workflow | Convention-adapted overrides of the superpowers brainstorming and writing-plans skills — save plans/specs to the project's own docs conventions instead of `docs/superpowers/` | ✓ |  |  |
-| [`worktree-isolated-loop`](claude/skills/worktree-isolated-loop/) | Foundations & Workflow | Isolate multi-turn/batch agent work in git worktrees and drive self-resuming loops from repo state | ✓ |  |  |
 | [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/) | Frontend & UI | Extract real brand colors/logos from raw site CSS and codify them as versioned, documented design tokens | ✓ |  |  |
 | [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/) | Frontend & UI | Build light/dark and multi-brand reskins as pure CSS custom-property token swaps | ✓ |  |  |
 | [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/) | Frontend & UI | Test React list virtualization under jsdom by stubbing getBoundingClientRect and asserting DOM shape | ✓ |  |  |
