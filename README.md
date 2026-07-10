@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 143 | 87 | 5 | 235 |
+| Skills | 144 | 87 | 5 | 236 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 25 | — | — | 25 |
 
@@ -117,7 +117,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Frontend Frameworks | 7 | react-web, flutter, chrome-extension-builder |
 | Frontend & UI | 6 | css-variables-for-multi-theme-reskin, ui-redesign-with-snapshot-regeneration |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
-| UI & Design | 10 | ui-web, frontend-design, visual-explainer |
+| UI & Design | 11 | ui-web, frontend-design, visual-explainer, **ac-logo** (`/generate-logo`) |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 9 | code-review, codex-review, gemini-review, playwright-testing |
 | Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
@@ -170,6 +170,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`android-java`](claude/skills/android-java/) | Mobile (Native) | Android Java with MVVM, ViewBinding, Espresso | ✓ | ✓ | |
 | [`android-kotlin`](claude/skills/android-kotlin/) | Mobile (Native) | Android Kotlin with Coroutines, Jetpack Compose, Hilt | ✓ | ✓ | |
 | [`ui-mobile`](claude/skills/ui-mobile/) | Mobile (Native) | Mobile UI patterns — touch targets, platform conventions | ✓ | ✓ | |
+| [`ac-logo`](claude/skills/ac-logo/) | UI & Design | AC brand logo lifecycle — ships `/find-logo`, `/generate-logo`, `/reskin-logo`, `/archive-logo` companion commands and an 8-file dark/light variant pipeline; reads the brand spec from AC_DESIGN at runtime | ✓ | | |
 | [`ui-web`](claude/skills/ui-web/) | UI & Design | Web UI — glassmorphism, Tailwind, dark mode, accessibility | ✓ | ✓ | |
 | [`ui-testing`](claude/skills/ui-testing/) | UI & Design | Visual testing — invisible buttons, broken layouts, contrast | ✓ | ✓ | |
 | [`design-taste-frontend`](claude/skills/design-taste-frontend/) | UI & Design | Senior UI/UX guidance with metric-based rules | ✓ | ✓ | |
