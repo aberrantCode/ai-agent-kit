@@ -42,7 +42,7 @@ ai-agent-kit/
 
 | Type | Claude | Codex | Gemini | Total |
 |------|:------:|:-----:|:------:|------:|
-| Skills | 144 | 87 | 5 | 236 |
+| Skills | 141 | 84 | 5 | 230 |
 | Instructions | 15 | — | — | 15 |
 | Commands | 25 | — | — | 25 |
 
@@ -112,15 +112,15 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 
 | Category | Count | Examples |
 |----------|:-----:|---------|
-| Foundations & Workflow | 35 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
+| Foundations & Workflow | 34 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
 | Frontend Frameworks | 7 | react-web, flutter, chrome-extension-builder |
 | Frontend & UI | 6 | css-variables-for-multi-theme-reskin, ui-redesign-with-snapshot-regeneration |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
-| UI & Design | 11 | ui-web, frontend-design, visual-explainer, **ac-logo** (`/generate-logo`) |
+| UI & Design | 10 | ui-web, frontend-design, visual-explainer, **ac-logo** (`/generate-logo`) |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
 | Code Quality | 9 | code-review, codex-review, gemini-review, playwright-testing |
-| Security & Credentials | 4 | security, credentials, security-review, sops-secrets |
+| Security & Credentials | 3 | security, credentials, sops-secrets |
 | AI & LLM | 6 | agentic-development, llm-patterns, ai-models, csv-driven-llm-pipeline, honcho, project-manager |
 | Commerce & Payments | 4 | shopify-apps, medusa, web-payments, woocommerce |
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
@@ -130,7 +130,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Research & OSINT | 11 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
-<summary><strong>Full skill list (143 Claude skills)</strong></summary>
+<summary><strong>Full skill list (141 Claude skills)</strong></summary>
 
 | Skill | Category | Description | Claude | Codex | Gemini |
 |-------|----------|-------------|:------:|:-----:|:------:|
@@ -141,11 +141,10 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`team-coordination`](claude/skills/team-coordination/) | Foundations & Workflow | Multi-person projects — shared state, todo claiming, handoffs | ✓ | ✓ | |
 | [`existing-repo`](claude/skills/existing-repo/) | Foundations & Workflow | Analyze existing repositories, maintain structure, setup guardrails | ✓ | ✓ | |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/) | Foundations & Workflow | Parallel task execution using sub-agents | ✓ | ✓ | |
-| [`create-feature-spec`](claude/skills/create-feature-spec/) | Foundations & Workflow | Create feature specifications from a single sentence | ✓ | ✓ | |
-| [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — merge, PR, squash, or cleanup | ✓ | ✓ | |
+| [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/) | Foundations & Workflow | Guides branch completion — ship to dev via the github ship operation, keep the branch, or discard | ✓ | ✓ | |
 | [`using-git-worktrees`](claude/skills/using-git-worktrees/) | Foundations & Workflow | Isolated git worktrees with smart directory selection | ✓ | ✓ | |
 | [`requesting-code-review`](claude/skills/requesting-code-review/) | Foundations & Workflow | Dispatch code review before merging | ✓ | ✓ | |
-| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
+| [`github`](claude/skills/github/) | Foundations & Workflow | Git/GitHub thin-command bundle — ships with `/publish`, `/commit`, `/ship`, `/merge`, `/release`, `/release-init`, `/prune` companion commands and matching sub-skills, with a minimal-output contract | ✓ | ✓ | |
 | [`commit-hygiene`](claude/skills/commit-hygiene/) | Foundations & Workflow | Atomic commits, PR size limits, commit thresholds | ✓ | ✓ | |
 | [`guide-assistant`](claude/skills/guide-assistant/) | Foundations & Workflow | Walk through any markdown guide step-by-step | ✓ | ✓ | |
 | [`feature-start`](claude/skills/feature-start/) | Foundations & Workflow | Pre-flight workflow before starting feature work | ✓ | ✓ | |
@@ -153,7 +152,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`pre-pr`](claude/skills/pre-pr/) | Foundations & Workflow | Three self-gates before opening a pull request | ✓ | ✓ | |
 | [`retro-fit-spec`](claude/skills/retro-fit-spec/) | Foundations & Workflow | Add capability IDs to feature specs missing them | ✓ | ✓ | |
 | [`spec-align`](claude/skills/spec-align/) | Foundations & Workflow | Align codebase to a feature spec — gap analysis through implementation | ✓ | ✓ | |
-| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Standalone conversational feature spec workflow; defers to project-manager:add-feature inside project-manager repositories | ✓ | ✓ | |
+| [`add-feature`](claude/skills/add-feature/) | Foundations & Workflow | Feature spec workflow with style selector — conversational 7-phase interview or template-first from a single sentence; defers to project-manager:add-feature inside project-manager repositories | ✓ | ✓ | |
 | [`what-next`](claude/skills/what-next/) | Foundations & Workflow | Universal next-action decider — detects the PM framework, prioritises pending work, delegates to the right specialist. Ships with [solution](claude/skills/what-next/diagrams/solution.html) / [feature](claude/skills/what-next/diagrams/features.html) / [plan](claude/skills/what-next/diagrams/plan.html) diagrams and a reusable [eval harness](claude/skills/what-next/evals/). | ✓ | | |
 | [`code-deduplication`](claude/skills/code-deduplication/) | Foundations & Workflow | Prevent semantic duplication with capability index | ✓ | ✓ | |
 | [`typescript`](claude/skills/typescript/) | Languages & Runtimes | TypeScript strict mode with eslint and jest | ✓ | ✓ | |
@@ -173,8 +172,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`ac-logo`](claude/skills/ac-logo/) | UI & Design | AC brand logo lifecycle — ships `/find-logo`, `/generate-logo`, `/reskin-logo`, `/archive-logo` companion commands and an 8-file dark/light variant pipeline; reads the brand spec from AC_DESIGN at runtime | ✓ | | |
 | [`ui-web`](claude/skills/ui-web/) | UI & Design | Web UI — glassmorphism, Tailwind, dark mode, accessibility | ✓ | ✓ | |
 | [`ui-testing`](claude/skills/ui-testing/) | UI & Design | Visual testing — invisible buttons, broken layouts, contrast | ✓ | ✓ | |
-| [`design-taste-frontend`](claude/skills/design-taste-frontend/) | UI & Design | Senior UI/UX guidance with metric-based rules | ✓ | ✓ | |
-| [`frontend-design`](claude/skills/frontend-design/) | UI & Design | Production-grade interfaces avoiding generic AI aesthetics | ✓ | ✓ | |
+| [`frontend-design`](claude/skills/frontend-design/) | UI & Design | Production-grade interfaces avoiding generic AI aesthetics — conceptual design direction plus prescriptive metric-based UI/UX rules | ✓ | ✓ | |
 | [`logo-restylizer`](claude/skills/logo-restylizer/) | UI & Design | Restylize logos — dark/light/neon/flat variants | ✓ | ✓ | |
 | [`user-journeys`](claude/skills/user-journeys/) | UI & Design | UX flows — journey mapping, validation, error recovery | ✓ | ✓ | |
 | [`web-design-guidelines`](claude/skills/web-design-guidelines/) | UI & Design | Web Interface Guidelines compliance and UX audits | ✓ | ✓ | |
@@ -196,9 +194,8 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`gemini-review`](claude/skills/gemini-review/) | Code Quality | Gemini CLI review with 1M token context | ✓ | ✓ | |
 | [`playwright-testing`](claude/skills/playwright-testing/) | Code Quality | E2E testing with Playwright — Page Objects, CI/CD | ✓ | ✓ | |
 | [`tdd-workflow`](claude/skills/tdd-workflow/) | Code Quality | TDD Red/Green/Refactor with 80%+ coverage | ✓ | ✓ | ✓ |
-| [`security`](claude/skills/security/) | Security & Credentials | OWASP patterns, secrets management, security testing | ✓ | ✓ | |
+| [`security`](claude/skills/security/) | Security & Credentials | OWASP patterns, secrets management, security testing, and the comprehensive review checklist for auth, input, and payment features | ✓ | ✓ | ✓ |
 | [`credentials`](claude/skills/credentials/) | Security & Credentials | Centralized API key management from Access.txt | ✓ | ✓ | |
-| [`security-review`](claude/skills/security-review/) | Security & Credentials | OWASP Top 10 checklist for auth, input, payments | ✓ | ✓ | ✓ |
 | [`sops-secrets`](claude/skills/sops-secrets/) | Security & Credentials | SOPS-encrypted secrets — reading service logins, rotating credentials, KeePass sync | ✓ | | |
 | [`agentic-development`](claude/skills/agentic-development/) | AI & LLM | Build AI agents with Pydantic AI and Claude SDK | ✓ | ✓ | |
 | [`llm-patterns`](claude/skills/llm-patterns/) | AI & LLM | AI-first application patterns and prompt management | ✓ | ✓ | |
@@ -423,4 +420,4 @@ model: opus              # opus | sonnet | haiku
 - **Delete superseded skills/commands** — git history is the archive of record; `status: deprecated` is a transient "scheduled for removal" marker, not a permanent tombstone
 - All changes go through feature branch → PR → `dev` → release to `main`
 - Branch naming: `feat/short-description`, `fix/short-description`, etc.
-- Use the `github` skill for the whole repo lifecycle: `/publish` to create a hardened repo, `/commit`, `/ship` to ship changes, `/merge` a PR into dev, `/release` for production releases, `/prune` to remove stale branches
+- Use the `github` skill for the whole repo lifecycle: `/publish` to create a hardened repo, `/commit`, `/ship` to ship changes, `/merge` a PR into dev, `/release` for production releases, `/release-init` to provision or repair release automation, `/prune` to remove stale branches

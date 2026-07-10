@@ -1,641 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Feature Spec</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800;900&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ===== THEME: Coral / Terracotta Product Design ===== */
-:root {
-  --font-body: 'Raleway', system-ui, sans-serif;
-  --font-mono: 'Source Code Pro', 'SF Mono', Consolas, monospace;
-
-  --bg: #fef8f4;
-  --surface: #ffffff;
-  --surface2: #fdf2eb;
-  --surface3: #fbe8d8;
-  --border: rgba(0,0,0,0.07);
-  --border-bright: rgba(0,0,0,0.14);
-  --text: #1e1007;
-  --text-dim: #7c4a2b;
-  --text-muted: #c49070;
-
-  --coral:  #e8521a;
-  --coral-dim: rgba(232,82,26,0.08);
-  --coral-glow: rgba(232,82,26,0.20);
-  --orange: #ea7c2e;
-  --orange-dim: rgba(234,124,46,0.08);
-  --amber:  #d97706;
-  --amber-dim: rgba(217,119,6,0.08);
-  --green:  #15803d;
-  --green-dim: rgba(21,128,61,0.08);
-  --blue:   #2563eb;
-  --blue-dim: rgba(37,99,235,0.08);
-  --purple: #7c3aed;
-  --purple-dim: rgba(124,58,237,0.08);
-  --teal:   #0f766e;
-  --teal-dim: rgba(15,118,110,0.08);
-  --rose:   #be123c;
-  --rose-dim: rgba(190,18,60,0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a0e07;
-    --surface: #241507;
-    --surface2: #2e1c0a;
-    --surface3: #3a2412;
-    --border: rgba(255,255,255,0.07);
-    --border-bright: rgba(255,255,255,0.14);
-    --text: #fdebd4;
-    --text-dim: #d4965a;
-    --text-muted: #7a4f2a;
-    --coral: #ff7c50;
-    --coral-dim: rgba(255,124,80,0.12);
-    --coral-glow: rgba(255,124,80,0.25);
-    --orange: #fb923c;
-    --orange-dim: rgba(251,146,60,0.10);
-    --amber: #fbbf24;
-    --amber-dim: rgba(251,191,36,0.10);
-    --green: #4ade80;
-    --green-dim: rgba(74,222,128,0.10);
-    --blue: #60a5fa;
-    --blue-dim: rgba(96,165,250,0.10);
-    --purple: #a78bfa;
-    --purple-dim: rgba(167,139,250,0.10);
-    --teal: #2dd4bf;
-    --teal-dim: rgba(45,212,191,0.10);
-    --rose: #fb7185;
-    --rose-dim: rgba(251,113,133,0.10);
-  }
-}
-
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 30% 0%, var(--coral-glow) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 90%, var(--orange-dim) 0%, transparent 55%);
-  color: var(--text);
-  font-family: var(--font-body);
-  padding: 52px 36px;
-  min-height: 100vh;
-  overflow-wrap: break-word;
-  line-height: 1.5;
-}
-
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-@keyframes scaleIn {
-  from { opacity:0; transform:scale(0.92); }
-  to   { opacity:1; transform:scale(1); }
-}
-.animate {
-  animation: fadeUp 0.45s ease-out both;
-  animation-delay: calc(var(--i,0) * 0.07s);
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration:0.01ms !important; }
-}
-
-.container { max-width: 1060px; margin: 0 auto; }
-
-/* ===== HEADER ===== */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--coral);
-  margin-bottom: 12px;
-}
-h1 {
-  font-size: 50px;
-  font-weight: 900;
-  letter-spacing: -2px;
-  line-height: 1.0;
-  color: var(--text);
-  margin-bottom: 10px;
-}
-h1 span { color: var(--coral); }
-.subtitle {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
-.tagline {
-  font-size: 14px;
-  color: var(--text-dim);
-  max-width: 640px;
-  line-height: 1.8;
-  margin-bottom: 44px;
-}
-.tagline strong { color: var(--text); }
-
-/* ===== SECTION HEAD ===== */
-.sh {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
-}
-
-/* ===== 7-PHASE GRID ===== */
-.phases-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-@media (max-width: 900px) {
-  .phases-grid { grid-template-columns: repeat(4, 1fr); border-radius: 10px; }
-}
-@media (max-width: 560px) {
-  .phases-grid { grid-template-columns: repeat(2, 1fr); }
-}
-.phase-col {
-  padding: 16px 12px;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  position: relative;
-  overflow: hidden;
-  min-width: 0;
-}
-.phase-col:last-child { border-right: none; }
-.phase-col::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-/* Phase color accents */
-.ph1::before { background: var(--coral); }
-.ph2::before { background: var(--orange); }
-.ph3::before { background: var(--amber); }
-.ph4::before { background: var(--green); }
-.ph5::before { background: var(--blue); }
-.ph6::before { background: var(--purple); }
-.ph7::before { background: var(--rose); }
-
-.phase-num {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.phase-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-}
-.phase-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  margin-top: 4px;
-  flex-shrink: 0;
-}
-.d1 { background: var(--coral); }
-.d2 { background: var(--orange); }
-.d3 { background: var(--amber); }
-.d4 { background: var(--green); }
-.d5 { background: var(--blue); }
-.d6 { background: var(--purple); }
-.d7 { background: var(--rose); }
-
-/* ===== PHASE DETAIL CARDS ===== */
-.phases-detail {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0;
-  margin-bottom: 32px;
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 12px 12px;
-  overflow: hidden;
-}
-@media (max-width: 900px) {
-  .phases-detail { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 560px) {
-  .phases-detail { grid-template-columns: repeat(2, 1fr); }
-}
-.pd-col {
-  padding: 12px 12px 14px;
-  border-right: 1px solid var(--border);
-  background: var(--surface2);
-  font-size: 11px;
-  color: var(--text-dim);
-  line-height: 1.55;
-  min-width: 0;
-}
-.pd-col:last-child { border-right: none; }
-.pd-col ul {
-  list-style: none;
-  padding: 0;
-}
-.pd-col ul li {
-  padding-left: 10px;
-  position: relative;
-  margin-bottom: 3px;
-}
-.pd-col ul li::before {
-  content: '·';
-  position: absolute;
-  left: 0;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-.pd-special {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 6px;
-  border-radius: 3px;
-  display: inline-block;
-  margin-bottom: 5px;
-}
-.sp-essential { background: var(--amber-dim); color: var(--amber); }
-.sp-critical  { background: var(--coral-dim); color: var(--coral); }
-.sp-prevent   { background: var(--purple-dim); color: var(--purple); }
-
-/* ===== PRINCIPLES ROW ===== */
-.principles-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 12px;
-  margin-bottom: 32px;
-}
-.principles-row > * { min-width: 0; }
-.principle-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 13px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.pi-icon { font-size: 18px; }
-.pi-title { font-size: 12px; font-weight: 700; color: var(--text); }
-.pi-body  { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
-.principle-item.p-must { border-left: 3px solid var(--coral); }
-.principle-item.p-never { border-left: 3px solid var(--rose); background: linear-gradient(145deg, var(--surface), var(--rose-dim)); }
-
-/* ===== SPEC FILE CARD ===== */
-.spec-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 32px;
-}
-.sc-head {
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.sc-file {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--coral);
-  font-weight: 600;
-}
-.sc-badge {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: var(--coral-dim);
-  color: var(--coral);
-}
-.sc-sections {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 1px;
-  background: var(--border);
-}
-.sc-sections > * { min-width: 0; }
-.sc-section {
-  background: var(--surface);
-  padding: 12px 14px;
-}
-.scs-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 3px;
-}
-.scs-desc {
-  font-size: 10px;
-  color: var(--text-dim);
-  line-height: 1.4;
-}
-.scs-tag {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  margin-top: 4px;
-  display: inline-block;
-}
-.tag-table { background: var(--blue-dim); color: var(--blue); }
-.tag-list  { background: var(--green-dim); color: var(--green); }
-.tag-free  { background: var(--amber-dim); color: var(--amber); }
-
-/* ===== POST-GENERATION FLOW ===== */
-.post-flow {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-}
-.pf-step {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  flex: 1;
-  min-width: 160px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.pf-step.auto { border-top: 3px solid var(--coral); }
-.pf-step.offer { border-top: 3px solid var(--blue); border-style: dashed dashed solid dashed; }
-.pf-arrow {
-  padding: 0 12px;
-  color: var(--text-muted);
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.pfs-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
-}
-.lbl-auto  { color: var(--coral); }
-.lbl-offer { color: var(--blue); }
-.pfs-title { font-size: 12px; font-weight: 700; color: var(--text); }
-.pfs-body  { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
-
-/* ===== CHIPS ===== */
-.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
-.chip {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-.chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-
-@media (max-width: 768px) {
-  body { padding: 20px 16px; }
-  h1 { font-size: 32px; }
-  .post-flow { flex-direction: column; align-items: stretch; }
-  .pf-arrow { transform: rotate(90deg); padding: 6px 0; text-align: center; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Feature — Two Spec Workflows, One Skill</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #101418;
+      --surface: #171d24;
+      --surface-2: #1e2630;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8edf3;
+      --text-dim: #8a96a8;
+      --teal: #35b5a5;
+      --teal-dim: rgba(53,181,165,0.12);
+      --violet: #9a7bd8;
+      --violet-dim: rgba(154,123,216,0.12);
+      --amber: #d9a03f;
+      --amber-dim: rgba(217,160,63,0.12);
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      background-image: radial-gradient(at 30% 0%, var(--teal-dim) 0%, transparent 50%),
+                        radial-gradient(at 70% 0%, var(--violet-dim) 0%, transparent 50%);
+      color: var(--text);
+      padding: 52px 24px 80px;
+    }
+    header { max-width: 940px; margin: 0 auto 44px; text-align: center; }
+    h1 { font-family: var(--font-serif); font-size: 2.9rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .tagline { font-size: 0.95rem; color: var(--text-dim); max-width: 620px; margin: 0 auto; line-height: 1.7; }
+    main { max-width: 940px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    .gate {
+      background: var(--amber-dim); border: 1px solid var(--amber); border-radius: 12px;
+      padding: 16px 22px; text-align: center; font-size: 0.85rem; color: var(--text-dim); line-height: 1.6;
+    }
+    .gate strong { color: var(--amber); }
+    .selector {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 24px; text-align: center;
+    }
+    .selector h3 { font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 6px; }
+    .selector p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+    .selector .mono { font-family: var(--font-mono); font-size: 0.78rem; }
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .mode { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+    .mode.conversational { border-top: 3px solid var(--teal); }
+    .mode.template { border-top: 3px solid var(--violet); }
+    .mode h2 { font-family: var(--font-serif); font-size: 1.35rem; margin-bottom: 4px; }
+    .mode .trigger { font-family: var(--font-mono); font-size: 0.72rem; margin-bottom: 14px; display: block; }
+    .mode.conversational .trigger { color: var(--teal); }
+    .mode.template .trigger { color: var(--violet); }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li {
+      counter-increment: step; font-size: 0.8rem; color: var(--text-dim); line-height: 1.55;
+      padding: 7px 0 7px 34px; position: relative; border-bottom: 1px solid var(--border);
+    }
+    .steps li:last-child { border-bottom: none; }
+    .steps li::before {
+      content: counter(step); position: absolute; left: 0; top: 7px;
+      width: 22px; height: 22px; border-radius: 50%; font-family: var(--font-mono);
+      font-size: 0.68rem; display: flex; align-items: center; justify-content: center;
+    }
+    .mode.conversational .steps li::before { background: var(--teal-dim); color: var(--teal); }
+    .mode.template .steps li::before { background: var(--violet-dim); color: var(--violet); }
+    .steps li strong { color: var(--text); font-weight: 500; }
+    .converge {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; text-align: center;
+    }
+    .converge h3 { font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 10px; }
+    .post { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .post span {
+      font-family: var(--font-mono); font-size: 0.74rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; color: var(--text-dim);
+    }
+    .merged-note {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+      text-align: center; margin-top: 34px; letter-spacing: 0.06em;
+    }
+    .arrow { text-align: center; color: var(--text-dim); font-size: 1.1rem; line-height: 1; }
+    @media (max-width: 760px) { .modes { grid-template-columns: 1fr; } h1 { font-size: 2.1rem; } }
+  </style>
 </head>
 <body>
-<div class="container">
+  <header>
+    <h1>Add Feature Spec</h1>
+    <p class="tagline">One skill, two workflow styles — a conversational 7-phase interview or a template-first expansion of a single sentence. Both land a thorough spec in <span style="font-family:var(--font-mono);font-size:0.85em">/docs/features/</span>.</p>
+  </header>
+  <main>
+    <div class="gate"><strong>Project-manager guard:</strong> if docs/workflow/SDLC.md + docs/features/template.md + docs/tasks/ exist, stop and invoke project-manager:add-feature (CAP-ID lifecycle) instead.</div>
 
-  <!-- HEADER -->
-  <div class="eyebrow animate" style="--i:0">Skill Reference</div>
-  <h1 class="animate" style="--i:1">Add<br><span>Feature</span></h1>
-  <p class="subtitle animate" style="--i:2">add-feature</p>
-  <p class="tagline animate" style="--i:3">
-    Walks through a structured <strong>7-phase conversational workflow</strong> to produce a thorough feature specification.
-    Summarizes after every phase to catch misunderstandings early — never skip phases, never accept vague acceptance criteria.
-  </p>
+    <div class="selector">
+      <h3>Phase 0 — Style Selection</h3>
+      <p><span class="mono">/add-feature</span> or a conversational idea → Conversational · <span class="mono">/create-feature-spec</span> or one sentence + canonical template → Template-first · ambiguous → AskUserQuestion</p>
+    </div>
 
-  <!-- 7 PHASES HEADER ROW -->
-  <div class="sh animate" style="--i:4">The 7 Phases</div>
-  <div class="phases-grid animate" style="--i:5">
-    <div class="phase-col ph1">
-      <div class="phase-num">Phase 1</div>
-      <div class="phase-title">Feature Identity</div>
-      <div class="phase-dot d1"></div>
-    </div>
-    <div class="phase-col ph2">
-      <div class="phase-num">Phase 2</div>
-      <div class="phase-title">Context &amp; Motivation</div>
-      <div class="phase-dot d2"></div>
-    </div>
-    <div class="phase-col ph3">
-      <div class="phase-num">Phase 3</div>
-      <div class="phase-title">Codebase Scan</div>
-      <div class="phase-dot d3"></div>
-    </div>
-    <div class="phase-col ph4">
-      <div class="phase-num">Phase 4</div>
-      <div class="phase-title">User Stories &amp; Personas</div>
-      <div class="phase-dot d4"></div>
-    </div>
-    <div class="phase-col ph5">
-      <div class="phase-num">Phase 5</div>
-      <div class="phase-title">Technical Design</div>
-      <div class="phase-dot d5"></div>
-    </div>
-    <div class="phase-col ph6">
-      <div class="phase-num">Phase 6</div>
-      <div class="phase-title">Out of Scope</div>
-      <div class="phase-dot d6"></div>
-    </div>
-    <div class="phase-col ph7">
-      <div class="phase-num">Phase 7</div>
-      <div class="phase-title">Risks &amp; Open Questions</div>
-      <div class="phase-dot d7"></div>
-    </div>
-  </div>
-
-  <!-- 7 PHASES DETAIL ROW -->
-  <div class="phases-detail animate" style="--i:6">
-    <div class="pd-col">
-      <ul>
-        <li>Feature name</li>
-        <li>Problem statement (1–3 sentences)</li>
-        <li>Audience: user / dev / internal</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <ul>
-        <li>Who requested it</li>
-        <li>Priority &amp; urgency</li>
-        <li>Background context or links</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <div class="pd-special sp-essential">Essential</div>
-      <ul>
-        <li>Scan related files &amp; patterns</li>
-        <li>Identify affected components</li>
-        <li>Summarize findings → confirm</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <ul>
-        <li>Primary personas</li>
-        <li>"As a [user] I want…"</li>
-        <li>Measurable ACs — push back on vague ones</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <ul>
-        <li>Affected components (from Phase 3)</li>
-        <li>Architecture decisions</li>
-        <li>External dependencies</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <div class="pd-special sp-prevent">Prevents scope creep</div>
-      <ul>
-        <li>Explicit exclusions</li>
-        <li>Related items deferred</li>
-      </ul>
-    </div>
-    <div class="pd-col">
-      <ul>
-        <li>Open decisions</li>
-        <li>Technical risks</li>
-        <li>Blockers / dependencies</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- SPEC FILE STRUCTURE -->
-  <div class="sh animate" style="--i:7">Generated Spec File</div>
-  <div class="spec-card animate" style="--i:8">
-    <div class="sc-head">
-      <span class="sc-file">/docs/features/YYYY-MM-DD-&lt;kebab-case-name&gt;.md</span>
-      <span class="sc-badge">All sections required — write N/A with reason if none</span>
-    </div>
-    <div class="sc-sections">
-      <div class="sc-section">
-        <div class="scs-title">Overview &amp; Motivation</div>
-        <div class="scs-desc">2–4 sentences: problem + why now. Background links if any.</div>
-        <span class="scs-tag tag-free">prose</span>
+    <div class="modes">
+      <div class="mode conversational">
+        <h2>Conversational Mode</h2>
+        <span class="trigger">/add-feature · guided 7-phase interview</span>
+        <ol class="steps">
+          <li><strong>Feature identity</strong> — name, problem statement, audience</li>
+          <li><strong>Context &amp; motivation</strong> — who asked, priority, background</li>
+          <li><strong>Codebase scan</strong> — find affected files, confirm with user</li>
+          <li><strong>User stories &amp; personas</strong> — measurable acceptance criteria</li>
+          <li><strong>Technical design</strong> — grounded in the Phase 3 scan</li>
+          <li><strong>Out of scope</strong> — the anti-scope-creep section</li>
+          <li><strong>Risks &amp; open questions</strong> — then generate the date-prefixed spec</li>
+        </ol>
       </div>
-      <div class="sc-section">
-        <div class="scs-title">User Stories &amp; Acceptance Criteria</div>
-        <div class="scs-desc">Personas + story→AC table. Criteria must be measurable.</div>
-        <span class="scs-tag tag-table">table</span>
-      </div>
-      <div class="sc-section">
-        <div class="scs-title">Technical Design</div>
-        <div class="scs-desc">Affected Components, Architecture Notes, Dependencies.</div>
-        <span class="scs-tag tag-list">subsections</span>
-      </div>
-      <div class="sc-section">
-        <div class="scs-title">Out of Scope</div>
-        <div class="scs-desc">Explicit exclusions with reasons. Aligns stakeholders.</div>
-        <span class="scs-tag tag-list">bullets</span>
-      </div>
-      <div class="sc-section">
-        <div class="scs-title">Risks &amp; Open Questions</div>
-        <div class="scs-desc">Item, Type (Risk/Question), Notes/owner columns.</div>
-        <span class="scs-tag tag-table">table</span>
-      </div>
-      <div class="sc-section">
-        <div class="scs-title">Implementation Notes</div>
-        <div class="scs-desc">Optional: phasing, rough effort, suggested approach.</div>
-        <span class="scs-tag tag-free">optional</span>
+      <div class="mode template">
+        <h2>Template-First Mode</h2>
+        <span class="trigger">/create-feature-spec · single sentence → canonical template</span>
+        <ol class="steps">
+          <li><strong>Initial analysis</strong> — read FEATURE_SPECIFICATION.md template</li>
+          <li><strong>Gather context</strong> — scan codebase before asking anything</li>
+          <li><strong>Clarifying questions</strong> — 3-4 strategic, via AskUserQuestion</li>
+          <li><strong>Initial draft</strong> — all REQUIRED sections, substantive content</li>
+          <li><strong>Iterative refinement</strong> — improve sections until approved</li>
+          <li><strong>Quality checklist</strong> — 10-point gate before completion</li>
+          <li><strong>Save</strong> — kebab-case name in /docs/features/</li>
+        </ol>
       </div>
     </div>
-  </div>
 
-  <!-- POST-GENERATION FLOW -->
-  <div class="sh animate" style="--i:9">Post-Generation Actions</div>
-  <div class="post-flow animate" style="--i:10">
-    <div class="pf-step auto">
-      <div class="pfs-label lbl-auto">Automatic — no permission needed</div>
-      <div class="pfs-title">Generate Visual Diagram</div>
-      <div class="pfs-body">Immediately invoke <code style="font-family:var(--font-mono);font-size:10px">visual-explainer:generate-web-diagram</code> on the saved spec file. Opens in browser.</div>
-    </div>
-    <div class="pf-arrow">→</div>
-    <div class="pf-step offer">
-      <div class="pfs-label lbl-offer">Offer to user</div>
-      <div class="pfs-title">Write Implementation Plan</div>
-      <div class="pfs-body">Ask: "Would you like me to run <code style="font-family:var(--font-mono);font-size:10px">/superpowers:writing-plans</code>?" If yes, invoke it.</div>
-    </div>
-  </div>
+    <div class="arrow">▼</div>
 
-  <!-- PRINCIPLES -->
-  <div class="sh animate" style="--i:11">Key Principles</div>
-  <div class="principles-row animate" style="--i:12">
-    <div class="principle-item p-must">
-      <div class="pi-icon">↻</div>
-      <div class="pi-title">Summarize after every phase</div>
-      <div class="pi-body">Brief "here's what I captured" before moving on catches misunderstandings before they compound.</div>
+    <div class="converge">
+      <h3>Post-Generation (both modes)</h3>
+      <div class="post">
+        <span>auto: visual-explainer:generate-web-diagram</span>
+        <span>offer: superpowers:writing-plans</span>
+      </div>
     </div>
-    <div class="principle-item p-must">
-      <div class="pi-icon">🔍</div>
-      <div class="pi-title">Phase 3 scan is essential</div>
-      <div class="pi-body">Actively scan — don't skip. Use findings in Phase 5 with specific file names, not abstractions.</div>
-    </div>
-    <div class="principle-item p-must">
-      <div class="pi-icon">📐</div>
-      <div class="pi-title">Push back on vague ACs</div>
-      <div class="pi-body">"It should work" is not an acceptance criterion. Press for something measurable or observable.</div>
-    </div>
-    <div class="principle-item p-never">
-      <div class="pi-icon">🚫</div>
-      <div class="pi-title">Never skip phases</div>
-      <div class="pi-body">Each phase builds context for the next. Skipping any creates implementation debt and misalignment.</div>
-    </div>
-    <div class="principle-item p-must">
-      <div class="pi-icon">✂️</div>
-      <div class="pi-title">Out of Scope is valuable</div>
-      <div class="pi-body">One of the most important sections — prevents scope creep and aligns stakeholders before coding starts.</div>
-    </div>
-    <div class="principle-item p-must">
-      <div class="pi-icon">📌</div>
-      <div class="pi-title">Lean on codebase scan</div>
-      <div class="pi-body">Suggest specific affected files from Phase 3 rather than speaking in abstractions. Ground the spec in reality.</div>
-    </div>
-  </div>
 
-  <!-- INTEGRATION -->
-  <div class="sh animate" style="--i:13">Integration &amp; Triggers</div>
-  <div class="chip-row animate" style="--i:14">
-    <div class="chip"><div class="dot" style="background:var(--coral)"></div>Trigger: /add-feature</div>
-    <div class="chip"><div class="dot" style="background:var(--coral)"></div>Trigger: "I want to add a feature"</div>
-    <div class="chip"><div class="dot" style="background:var(--coral)"></div>Trigger: "spec out a feature"</div>
-    <div class="chip"><div class="dot" style="background:var(--green)"></div>Output feeds: superpowers:writing-plans</div>
-    <div class="chip"><div class="dot" style="background:var(--blue)"></div>Auto-invokes: visual-explainer:generate-web-diagram</div>
-    <div class="chip"><div class="dot" style="background:var(--purple)"></div>Saves to: /docs/features/</div>
-  </div>
-
-</div>
+    <p class="merged-note">unified skill — merges create-feature-spec (template-first) into add-feature (conversational) · rationalization M9</p>
+  </main>
 </body>
 </html>
