@@ -134,6 +134,22 @@ Release.
 
 ---
 
+## Release-Automation Standard (verify and warn — never fix here)
+
+Release notes must be derived from git **at tag time**; a committed `CHANGELOG.md` is a cache,
+never the source of truth. The full spec and the provisioning/repair operation live in the
+`release-init` operation (`sub-skills/release-init`, `/release-init`).
+
+While tagging, check the repo's artifacts. If either check trips, print the one-line warning
+and continue the release — do **not** auto-fix here:
+
+| Check | Warning |
+|---|---|
+| `.github/workflows/release.yml` extracts notes from the committed `CHANGELOG.md` with an `[Unreleased]` fallback and no regenerate step (or shallow checkout) | `WARNING: release.yml publishes notes from the committed changelog — run /release-init to fix.` |
+| `CHANGELOG.md` has content under `[Unreleased]` but no `## [<version>]` section for `$LAST_TAG` | `WARNING: CHANGELOG.md is stale (released content still under [Unreleased]) — run /release-init.` |
+
+---
+
 ## Step 7 — Sync dev from main
 
 ```bash

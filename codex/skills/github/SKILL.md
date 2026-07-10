@@ -3,10 +3,12 @@ name: github
 description: >
   Use when the user wants to perform a git or GitHub repository operation from the terminal —
   merging a pull request, branch, or worktree into dev; shipping working changes through a
-  feature-branch PR; cutting a dev→main release; committing and pushing; publishing a new repo;
-  or pruning stale branches and worktrees. Triggers on natural phrasings such as "merge 1209",
-  "merge this branch", "merge the current worktree", "ship it", "cut a release", "commit this",
-  "clean up branches", "publish this repo" — even when the word "git" is absent. This is a thin
+  feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
+  automation (changelog generator + tag-triggered workflow); committing and pushing; publishing
+  a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as
+  "merge 1209", "merge this branch", "merge the current worktree", "ship it", "cut a release",
+  "set up releases", "release init", "provision release workflow", "fix changelog automation",
+  "commit this", "clean up branches", "publish this repo" — even when the word "git" is absent. This is a thin
   orchestrator: match the request to one operation below and run that operation's sub-skill
   against the current repo with minimal terminal output.
 ---
@@ -70,9 +72,14 @@ never guess silently.
 | ship | `sub-skills/ship/SKILL.md` |
 | merge | `sub-skills/merge/SKILL.md` |
 | release | `sub-skills/release/SKILL.md` |
+| release-init | `sub-skills/release-init/SKILL.md` |
 | prune | `sub-skills/prune/SKILL.md` |
 
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
+`release-init` sits beside `release`: an idempotent provisioning pass that brings a repo's
+changelog generator + tag-triggered release workflow up to the Release-Automation Standard
+(notes derived from git at tag time — see `sub-skills/release-init`). `release` verifies
+conformance and warns; only `release-init` fixes.
 A request that names one of these actions (or an equivalent natural phrasing) runs the matching
 sub-skill. When a new operation is added, append a row here and a sub-skill under
 `sub-skills/`.
