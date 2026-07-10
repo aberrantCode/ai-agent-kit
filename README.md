@@ -30,10 +30,10 @@ ai-agent-kit/
 ├── claude/
 │   ├── instructions/     # 15 agent instructions
 │   ├── commands/         # 25 slash commands
-│   └── skills/           # 143 domain-specific knowledge modules
+│   └── skills/           # 141 domain-specific knowledge modules
 ├── codex/
 │   ├── instructions/     # Agent instructions for Codex CLI
-│   └── skills/           # 87 domain-specific knowledge modules
+│   └── skills/           # 84 domain-specific knowledge modules
 ├── gemini/
 │   ├── instructions/     # Agent instructions for Gemini CLI
 │   └── skills/           # 5 domain-specific knowledge modules

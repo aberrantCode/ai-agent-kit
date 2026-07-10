@@ -36,6 +36,7 @@ logs/timing.jsonl             — `/ship` timing log
 - **Skill bundles** may include optional `sub-skills/` and `commands/` subdirectories
 - **All changes** go through feature branch → PR → `dev` (never commit directly to `dev` or `main`)
 - **README parity** — every archived skill must have a README row; every row must point to a real file
+- **Master-skills reorg (in progress)** — every skill PR must conform to `docs/reorg/charter.md`; per-directory dispositions live in `docs/reorg/disposition-ledger.md`, command names in `docs/reorg/command-namespace-registry.md`
 
 ---
 
