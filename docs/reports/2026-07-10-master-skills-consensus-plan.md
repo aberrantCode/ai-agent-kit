@@ -28,8 +28,9 @@ redundancy-checker, maintenance-skeptic, dx-reviewer, consistency-reviewer) appr
   description opens with ``Sub-skill of `<master>`.``
 - **~25 draft commands were cut or merged**; verb-first naming applied (`/handoff`,
   `/burndown`, `/apply-script`, `/probe-incident`, `/search-sessions`).
-- **Phase 1 is hard-gated**: `github` + `project-manager` + `skills-manager` ship first; P1
-  masters proceed only after Phase-1 sub-skills have demonstrably fired in real sessions.
+- **Phase 1 is soft-gated** (erik, 2026-07-10): `github` + `project-manager` + `skills-manager`
+  ship first; at iteration 10 the loop reviews and reports Phase-1 sub-skill firing evidence,
+  then proceeds without blocking on confirmation.
 
 Board verdicts: architect, redundancy-checker, dx-reviewer, consistency-reviewer =
 **approve-with-changes**; maintenance-skeptic = **reject-restructure** (its cuts were adopted
@@ -121,29 +122,29 @@ One-line missions:
    PreToolUse hook; unattended `/burndown` and `/loop` runs must document handling of the
    git-push-opens-Zed review hook.
 
-## 4. Open Decisions for Erik
+## 4. Open Decisions — RESOLVED by erik, 2026-07-10
 
-The board could not resolve these; the implementation loop applies the stated default and
-flags, never resolves unilaterally.
+All five decisions were resolved in an interview on 2026-07-10. These resolutions are
+binding and override the encoded defaults where they differ (#2 and #4). The same
+resolutions are recorded machine-readably in `human_resolutions` of the consensus JSON.
 
-1. **workspace skill's API-contract/cross-repo-topology half** has no willing owner
-   (repo-picker half went to project-manager's what-next). Options: fold into
-   orchestrator-bookkeeping, give to developer-manager, or delete. **No default — decide
-   before the workspace skill directory is removed.**
-2. **Deferred single-repo sub-skills** (go-development, fastapi-htmx, python-app-scaffolds,
-   ollama-integration, product-inception-pack, enhancement-bundle, raw-json-to-domain-panel,
-   pdf-document-mining, human-review-gate-webui, report-then-apply-merge, dropbox-api,
-   rule-based-taxonomy-classifier, TTS/manual-generation recipes): drop entirely vs stage as
-   `status: draft` references. **Default (encoded): drop/park per the skeptic; git history is
-   the archive.**
-3. **Global command moves** (code-review, tdd, test-coverage, e2e into quality-manager):
-   move-with-sweep vs leave standalone forever. **Default (encoded): move-with-sweep, names
-   unchanged.**
-4. **Phase-gate strictness**: the skeptic requires demonstrated real-session usage of Phase-1
-   sub-skills before Phase 2; the other four reviewers accepted the full package. **Default
-   (encoded): hard gate at iteration 10 — stop and ask.**
-5. **console-output-style placement**: design-manager (encoded default) vs a
-   PowerShell/tooling home.
+1. **workspace API-contract/cross-repo-topology half** → **DELETE.** Nothing migrates; the
+   workspace skill directory is removed once the repo-picker half lands in what-next
+   (iteration 9). Git history is the archive if a real multi-repo need resurfaces.
+2. **Deferred single-repo sub-skills** → **STAGE AS `status: draft`** (overrides the encoded
+   drop default). Each of the 13 items is authored as a thin draft stub inside its owning
+   bundle per the JSON mapping (go-development, fastapi-htmx, python-app-scaffolds,
+   ollama-integration → developer-manager; product-inception-pack, enhancement-bundle →
+   project-manager; raw-json-to-domain-panel → design-manager; pdf-document-mining,
+   human-review-gate-webui, report-then-apply-merge, rule-based-taxonomy-classifier →
+   gated-batch; dropbox-api → ops-manager; TTS/manual-generation → youtube-extraction),
+   discoverable via `/search-skill`, promoted to `active` only when a second project needs them.
+3. **Global command moves** (code-review, tdd, test-coverage, e2e into quality-manager) →
+   **move-with-sweep, names unchanged** (encoded default confirmed).
+4. **Phase-gate strictness** → **SOFT GATE** (overrides the encoded hard gate). At iteration
+   10 the loop reviews and reports Phase-1 sub-skill firing evidence, then proceeds to
+   iteration 11 without stopping to ask.
+5. **console-output-style placement** → **design-manager** (encoded default confirmed).
 
 ## 5. Implementation Tracker
 
@@ -161,7 +162,7 @@ PR as the iteration's work. Full scope per iteration lives in `implementation_or
 - [ ] 7. project-manager pt2: loop-prompt-composer + backlog-burndown + /loop-prompt + /burndown; delete self-paced-loop-iteration, iterative-development
 - [ ] 8. project-manager pt3: orchestrator-bookkeeping + learnings-ledger + /log-learning
 - [ ] 9. project-manager pt4: backfill-features + operator-runbook-authoring + what-next move with workspace mode; push to global
-- [ ] 10. Fleet sweep #1 across C:\development for all Phase-1 deletions/renames — **HARD GATE: review Phase-1 sub-skill firing + ask erik before iteration 11**
+- [ ] 10. Fleet sweep #1 across C:\development for all Phase-1 deletions/renames — **SOFT GATE (resolved 2026-07-10): review + report Phase-1 sub-skill firing evidence, then proceed to iteration 11 without blocking**
 - [ ] 11. agent-manager pt1: bundle head + session-jsonl-toolkit + /search-sessions + /token-report
 - [ ] 12. agent-manager pt2: fleet-repo-fanout + stalled-agent-recovery + llm-json-output-repair + /fleet-fanout + /recover-agent
 - [ ] 13. agent-manager pt3: binpacked-batch-dispatch + history-mining-pipeline + parallel-workstream-launcher + agent-coordination + agent-runtime-config + mcp-wiring-verification; push to global
@@ -198,10 +199,13 @@ Execute the FIRST unchecked iteration in "## 5. Implementation Tracker":
    archive of record.
 4. Flip this iteration's checkbox in the plan doc on the same branch.
 5. /ship the branch to dev.
-6. Open decisions (§4 of the plan): apply the encoded default where stated; NEVER resolve
-   decision #1 (workspace API-contract half) unilaterally — flag and skip.
-7. HARD GATE: after iteration 10 ships, STOP — use AskUserQuestion to confirm with erik that
-   Phase-1 sub-skills have fired in real sessions before starting iteration 11.
+6. Open decisions (§4 of the plan): all five are RESOLVED (2026-07-10) — apply the recorded
+   resolutions, which override encoded defaults where they differ: delete the workspace
+   API-contract half; stage the 13 deferred sub-skills as status: draft stubs in their owning
+   bundles; move the quality commands with sweep; soft gate; console-output-style →
+   design-manager. See also human_resolutions in the consensus JSON.
+7. SOFT GATE: after iteration 10 ships, compile and report Phase-1 sub-skill firing evidence
+   in the iteration summary, then continue to iteration 11 without stopping to ask.
 8. End your turn by emitting this same prompt verbatim as the copy-ready prompt for the next
    iteration.
 ```
