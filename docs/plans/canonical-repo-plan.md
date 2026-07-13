@@ -142,7 +142,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   `.claude/commands/install-skill.md`, `.claude/commands/audit-skills.md`.
 
 ### T4 — Implement `audit.ps1` (+ generator flags)
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #61
 - **Agent / model:** general-purpose / opus (multi-check logic; single-parser design)
 - **Description:** Real, read-only archive health check per requirements §6.
 - **Work plan:**
