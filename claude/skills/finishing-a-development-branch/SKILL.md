@@ -1,5 +1,6 @@
 ---
 name: finishing-a-development-branch
+category: Foundations & Workflow
 description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the branch, or discarding it. Integration into dev is delegated to the github bundle's ship operation.
 ---
 

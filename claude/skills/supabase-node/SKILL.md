@@ -1,5 +1,6 @@
 ---
 name: supabase-node
+category: Databases & Storage
 description: Express/Hono with Supabase and Drizzle ORM
 requires: [supabase]
 ---

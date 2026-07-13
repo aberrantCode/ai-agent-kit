@@ -1,5 +1,6 @@
 ---
 name: comment-harvesting
+category: Research & OSINT
 description: >
   Domain expertise for harvesting comments and threads from a YouTube video using yt-dlp.
   Sub-skill of `youtube-extraction`. Use when the parent skill needs comments as a primary

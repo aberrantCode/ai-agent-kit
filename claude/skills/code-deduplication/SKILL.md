@@ -1,5 +1,6 @@
 ---
 name: code-deduplication
+category: Foundations & Workflow
 description: Prevent semantic code duplication with capability index and check-before-write
 ---
 

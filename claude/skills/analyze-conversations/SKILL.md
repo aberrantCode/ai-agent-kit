@@ -1,5 +1,6 @@
 ---
 name: analyze-conversations
+category: Foundations & Workflow
 description: Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting — "what keeps going wrong", "find issues we've hit more than once", "audit our conversation history", "what should we change so this stops happening". Mines the JSONL transcripts for repeated tool errors, rejections, and operator corrections, then proposes concrete prevention patches.
 ---
 

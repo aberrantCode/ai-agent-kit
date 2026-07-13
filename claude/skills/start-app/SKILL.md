@@ -1,5 +1,6 @@
 ---
 name: start-app
+category: Tooling & DevOps
 description: Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says "start the app", "run it", "boot it up", "kick it off", "get it running", "spin it up", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. "start the Next.js app", "run the FastAPI server", "launch the Docker stack").
 ---
 

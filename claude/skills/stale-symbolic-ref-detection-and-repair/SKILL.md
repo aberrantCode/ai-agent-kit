@@ -1,5 +1,6 @@
 ---
 name: stale-symbolic-ref-detection-and-repair
+category: Foundations & Workflow
 description: Use when a script, agent, or session is about to act on a remembered reference — a git default branch, a cached IP/credential, an "SSH is broken" note in memory — before any destructive or high-stakes operation. Verifies the reference against live state instead of trusting the cache.
 status: active
 version: 2026-07-05

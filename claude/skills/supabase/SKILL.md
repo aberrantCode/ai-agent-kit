@@ -1,5 +1,6 @@
 ---
 name: supabase
+category: Databases & Storage
 description: Core Supabase CLI, migrations, RLS, Edge Functions
 ---
 

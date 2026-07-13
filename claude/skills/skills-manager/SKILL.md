@@ -1,5 +1,6 @@
 ---
 name: skills-manager
+category: Tooling & DevOps
 description: >
   Full lifecycle management of LLM skills across the workstation — finding, archiving,
   installing, updating, and importing skills with their complete bundles (sub-skills +

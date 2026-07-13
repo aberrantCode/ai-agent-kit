@@ -1,5 +1,6 @@
 ---
 name: youtube-extraction
+category: Research & OSINT
 description: >
   Reconstruct locally the solution depicted in a YouTube video — files, configurations,
   commands, transcripts, and supporting artifacts. Use whenever the user wants to extract,

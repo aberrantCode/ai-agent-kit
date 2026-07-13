@@ -1,5 +1,6 @@
 ---
 name: add-feature
+category: Foundations & Workflow
 description: >
   Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature,
   /create-feature-spec, or when the user says things like "I want to add a feature", "spec out a

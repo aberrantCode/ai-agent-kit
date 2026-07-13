@@ -1,5 +1,6 @@
 ---
 name: deploy-idempotency-two-pass-gate
+category: DevOps & Tooling
 description: Use when running any live infrastructure apply (Ansible playbook, Terraform, Docker Compose stack, or similar) — before declaring a deployment successful or moving on to smoke tests, run the apply twice and require the second pass to report zero changes, so latent non-idempotent tasks are caught before they corrupt future deploys.
 status: active
 version: 2026-07-05

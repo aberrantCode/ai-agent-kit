@@ -1,5 +1,6 @@
 ---
 name: parallel-subagent-fanout
+category: Foundations & Workflow
 description: Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature branch — to dispatch multiple subagents concurrently and reconcile their results into one verdict.
 status: active
 version: 2026-07-05

@@ -1,5 +1,6 @@
 ---
 name: security-aware-persistence-design
+category: Code Quality
 description: Use when designing or reviewing a feature that persists user-supplied data (new DB table/API, exposing a service, or writing multi-statement Create/Update/Delete flows) — apply parameterized queries, PII handling, DoS caps, and transaction safety, and gate any network-exposure decision on real (not speculative) use.
 status: active
 version: 2026-07-05

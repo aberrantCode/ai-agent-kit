@@ -1,5 +1,6 @@
 ---
 name: aws-dynamodb
+category: Databases & Storage
 description: AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python
 ---
 

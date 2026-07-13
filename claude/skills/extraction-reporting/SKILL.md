@@ -1,5 +1,6 @@
 ---
 name: extraction-reporting
+category: Research & OSINT
 description: >
   Domain expertise for generating the final markdown report that summarises a YouTube
   extraction operation — files reconstructed, evidence trail, gaps, and follow-ups.

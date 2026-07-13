@@ -1,5 +1,6 @@
 ---
 name: scanner-plugin-integration
+category: Code Quality
 description: Use when importing, fixing, or adding a new provider/scanner plugin (e.g. OSINT lookup services, external-API integrations) into an existing Go-style package tree — merge orphaned scaffolds into the real package, preserve the plugin interface pattern, keep gating in DryRun not Run, and verify live endpoints before coding against docs.
 status: active
 version: 2026-07-05

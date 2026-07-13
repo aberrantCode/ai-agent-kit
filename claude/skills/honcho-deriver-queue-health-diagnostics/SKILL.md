@@ -1,5 +1,6 @@
 ---
 name: honcho-deriver-queue-health-diagnostics
+category: DevOps & Tooling
 description: Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts — check both the MCP-visible layer and the server-side queue table directly, distinguish "broken" from "contended," and audit stored conclusions for pollution.
 status: active
 version: 2026-07-05

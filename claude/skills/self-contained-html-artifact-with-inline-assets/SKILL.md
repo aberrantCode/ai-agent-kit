@@ -1,5 +1,6 @@
 ---
 name: self-contained-html-artifact-with-inline-assets
+category: Frontend & UI
 description: Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests — no CDNs, no relative-path assets, no build step — and correctly render in both light and dark themes.
 status: active
 version: 2026-07-05

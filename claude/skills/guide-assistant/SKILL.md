@@ -1,5 +1,6 @@
 ---
 name: guide-assistant
+category: Foundations & Workflow
 description: >
   Personal assistant for walking the user step-by-step through any markdown file, manual, guide,
   runbook, or instruction document. Use this skill whenever the user says things like "walk me

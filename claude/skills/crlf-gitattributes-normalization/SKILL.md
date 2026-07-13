@@ -1,5 +1,6 @@
 ---
 name: crlf-gitattributes-normalization
+category: Code Quality
 description: Use when a Windows/Linux-mixed repo shows spurious linter "Delete ␍" warnings, gofmt/prettier flags files as unformatted after a clean rebase, or golden-fixture tests fail on byte-exact CRLF-vs-LF comparisons — normalizes line endings via .gitattributes rather than reformatting or skipping tests.
 status: active
 version: 2026-07-05

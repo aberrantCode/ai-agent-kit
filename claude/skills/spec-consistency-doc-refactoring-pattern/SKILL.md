@@ -1,5 +1,6 @@
 ---
 name: spec-consistency-doc-refactoring-pattern
+category: Foundations & Workflow
 description: Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scope-limited fixes that preserve intent and prose without a full re-architecture.
 status: active
 version: 2026-07-05

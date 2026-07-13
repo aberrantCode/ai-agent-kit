@@ -1,5 +1,6 @@
 ---
 name: video-acquisition
+category: Research & OSINT
 description: >
   Domain expertise for downloading a YouTube video locally at a resolution suitable for
   later frame OCR. Sub-skill of `youtube-extraction`. Use when the parent skill needs to

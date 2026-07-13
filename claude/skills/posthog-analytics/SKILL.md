@@ -1,5 +1,6 @@
 ---
 name: posthog-analytics
+category: Third-Party Integrations
 description: PostHog analytics, event tracking, feature flags, dashboards
 ---
 

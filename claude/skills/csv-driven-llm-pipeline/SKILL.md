@@ -1,5 +1,6 @@
 ---
 name: csv-driven-llm-pipeline
+category: AI & LLM
 description: Build a stateful, resumable batch pipeline driven by CSV files with per-row pipeline-state columns. Use whenever the user wants to iterate over a corpus and do per-row work that may take time, hit external APIs, call an LLM, or need restart-resilience — even if they don't say "pipeline". Triggers on phrases like "process all the X", "for each row do Y", "analyze the corpus", "batch enrich", "add a column tracking whether...", "extract X from Y for every Z", or any task requiring eligibility filtering, idempotent re-runs, rate-limit awareness, or downstream-resumable state. Covers schema design, phase-by-phase execution, deterministic discovery, rate-limited HTTP fetching, iterative LLM prompt engineering with A/B testing, and PowerShell pitfalls.
 ---
 

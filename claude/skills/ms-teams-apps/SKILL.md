@@ -1,5 +1,6 @@
 ---
 name: ms-teams-apps
+category: Third-Party Integrations
 description: Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API
 ---
 

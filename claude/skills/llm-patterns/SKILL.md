@@ -1,5 +1,6 @@
 ---
 name: llm-patterns
+category: AI & LLM
 description: AI-first application patterns, LLM testing, prompt management
 ---
 

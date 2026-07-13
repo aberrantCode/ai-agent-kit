@@ -1,5 +1,6 @@
 ---
 name: reactive-ui-state-with-delegated-event-routing
+category: Frontend & UI
 description: Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-color-scheme/prefers-reduced-motion in a testable way.
 status: active
 version: 2026-07-05

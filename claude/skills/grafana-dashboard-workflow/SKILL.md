@@ -1,5 +1,6 @@
 ---
 name: grafana-dashboard-workflow
+category: DevOps & Tooling
 description: Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards — enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.
 status: active
 version: 2026-07-05

@@ -1,5 +1,6 @@
 ---
 name: shopify-apps
+category: Commerce & Payments
 description: Shopify app development - Remix, Admin API, checkout extensions
 ---
 

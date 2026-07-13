@@ -1,5 +1,6 @@
 ---
 name: base
+category: Foundations & Workflow
 description: Universal coding patterns, constraints, TDD workflow, atomic todos
 ---
 

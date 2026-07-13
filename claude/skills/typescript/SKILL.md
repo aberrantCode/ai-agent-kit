@@ -1,5 +1,6 @@
 ---
 name: typescript
+category: Languages & Runtimes
 description: TypeScript strict mode with eslint and jest
 ---
 

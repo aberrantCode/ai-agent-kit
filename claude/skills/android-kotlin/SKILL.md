@@ -1,5 +1,6 @@
 ---
 name: android-kotlin
+category: Mobile (Native)
 description: Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing
 ---
 

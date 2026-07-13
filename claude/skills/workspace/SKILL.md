@@ -1,5 +1,6 @@
 ---
 name: workspace
+category: Tooling & DevOps
 description: Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context
 ---
 

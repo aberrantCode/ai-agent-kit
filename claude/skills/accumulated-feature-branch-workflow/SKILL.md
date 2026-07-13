@@ -1,5 +1,6 @@
 ---
 name: accumulated-feature-branch-workflow
+category: Foundations & Workflow
 description: Use when implementing multiple related enhancements, or a large feature that must be split across risk boundaries, and you need to decide branch/PR structure. Covers accumulating related work on one shared branch with atomic commits per enhancement, splitting risky multi-PR features along risk seams, and safely handling a branch that has both committed and dirty (uncommitted) work when shipping.
 status: active
 version: 2026-07-05

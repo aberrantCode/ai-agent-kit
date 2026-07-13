@@ -1,5 +1,6 @@
 ---
 name: self-paced-loop-iteration
+category: Foundations & Workflow
 description: Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, commits, and schedules the next wakeup based on what just happened rather than wall-clock time.
 status: active
 version: 2026-07-05

@@ -1,5 +1,6 @@
 ---
 name: web-payments
+category: Commerce & Payments
 description: Stripe Checkout, subscriptions, webhooks, customer portal
 ---
 

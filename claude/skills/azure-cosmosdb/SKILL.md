@@ -1,5 +1,6 @@
 ---
 name: azure-cosmosdb
+category: Databases & Storage
 description: Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns
 ---
 

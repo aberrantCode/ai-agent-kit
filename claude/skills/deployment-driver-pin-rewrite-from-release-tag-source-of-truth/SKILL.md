@@ -1,5 +1,6 @@
 ---
 name: deployment-driver-pin-rewrite-from-release-tag-source-of-truth
+category: DevOps & Tooling
 description: Use when a deployment or build system has both a human-editable "intent" field (a release tag, plan row) and a derived "pin" artifact (an image pin file, lockfile) — ensures edits always go to the source-of-truth field and the driver/loop re-derives the pin, rather than hand-editing the derived artifact.
 status: active
 version: 2026-07-05

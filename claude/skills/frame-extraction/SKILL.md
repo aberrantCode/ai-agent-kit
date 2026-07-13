@@ -1,5 +1,6 @@
 ---
 name: frame-extraction
+category: Research & OSINT
 description: >
   Domain expertise for slicing a downloaded YouTube video into image frames using ffmpeg —
   with sampling strategies tuned to the downstream task (file reconstruction, PRD evidence,

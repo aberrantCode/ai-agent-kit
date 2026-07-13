@@ -1,5 +1,6 @@
 ---
 name: playwright-testing
+category: Code Quality
 description: E2E testing with Playwright - Page Objects, cross-browser, CI/CD
 ---
 

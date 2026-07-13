@@ -1,5 +1,6 @@
 ---
 name: reddit-api
+category: Third-Party Integrations
 description: Reddit API with PRAW (Python) and Snoowrap (Node.js)
 ---
 

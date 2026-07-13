@@ -1,5 +1,6 @@
 ---
 name: klaviyo
+category: Third-Party Integrations
 description: Klaviyo email/SMS marketing - profiles, events, flows, segmentation
 ---
 

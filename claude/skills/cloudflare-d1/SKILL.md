@@ -1,5 +1,6 @@
 ---
 name: cloudflare-d1
+category: Databases & Storage
 description: Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations
 ---
 

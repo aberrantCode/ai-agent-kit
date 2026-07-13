@@ -16,13 +16,13 @@ what a *deployed* skill does at runtime (N4) — this is archive tooling only.
 
 | Script | State | Contract summary |
 |---|---|---|
-| `generate-manifest.py` | modified | Generates `manifest.json` from skill/instruction frontmatter. Now also accepts `--output PATH` (default unchanged: repo-root `manifest.json`) and `--validate --json` (read-only; emits parsed frontmatter + per-skill validation records — including the `categorySource` marker — for `audit.ps1` to consume, so there is one frontmatter parser for the whole repo). `category:` frontmatter support replacing the hardcoded category dict still lands in T5. |
-| `audit.ps1` | implemented | Read-only archive health check: frontmatter validity + name/dir match, missing `category:` (severity keyed off the generator's `categorySource` marker), `installed-from:` presence in the archive, secret-shaped content under `shared/`, manifest freshness (timestamp-excluded), CATALOG parity (both directions, when `CATALOG.md` exists), Claude↔Codex mirror gap, missing `diagram.html`. Delegates all YAML parsing to `generate-manifest.py --validate --json`. Console table + `-Json`. See `docs/requirements/canonical-repo.md` §6 for the full check list and severities. |
+| `generate-manifest.py` | modified (T5) | Generates `manifest.json` from skill/instruction frontmatter. Accepts `--output PATH` (default unchanged: repo-root `manifest.json`) and `--validate --json` (read-only; emits parsed frontmatter + per-skill validation records — including the `categorySource` marker — for `audit.ps1` to consume, so there is one frontmatter parser for the whole repo). `category:` frontmatter is now the sole per-skill source of truth (D8) — the old hardcoded skill→category dict is gone; `categorySource` reports `frontmatter`. Mirrors (`codex`, `gemini`) have no `category:` frontmatter of their own and inherit their source Claude skill's category by name. The curated category **display order** (16 entries, not alphabetical) remains an explicit list in the script and populates `manifest.json`'s `categories` array. Manifest output also gains a top-level `schemaVersion` field (see "manifest.json shape" below). |
+| `audit.ps1` | implemented | Read-only archive health check: frontmatter validity + name/dir match, missing `category:` (severity keyed off the generator's `categorySource` marker — now `frontmatter`, so a missing category is `error`), `installed-from:` presence in the archive, secret-shaped content under `shared/`, manifest freshness (timestamp-excluded), CATALOG parity (both directions, when `CATALOG.md` exists), Claude↔Codex mirror gap, missing `diagram.html`. Delegates all YAML parsing to `generate-manifest.py --validate --json`. Console table + `-Json`. See `docs/requirements/canonical-repo.md` §6 for the full check list and severities. |
 | `install-to-project.ps1` | stub | Copies a skill bundle (SKILL.md + sub-skills/ + commands/ + references/ + rules/) into a target project's `.claude/`, stamping `installed-from: ai-agent-kit`. |
 | `push-to-profile.ps1` | stub | Deploys a bundle to `~/.claude/skills/` (or the vendor equivalent), stamping provenance. |
 | `sync-installed.ps1` | stub | Scans a project (or fleet root) for stamped installed copies, diffs against the archive; report-only by default, `-Force` writes with backup-before-overwrite. |
 | `generate-catalog.ps1` | stub — becomes implemented in T6 | Renders `CATALOG.md` from `manifest.json`. Byte-stable output (ordinal sort, `utf8NoBOM`, LF via `.gitattributes`) so a future validation gate can diff it. |
-| `backfill-categories.ps1` | stub — runs once in T5, then stays as a re-runnable sweep | Injects `category:` frontmatter into each Claude `SKILL.md`; skips any file with a non-empty `category:` already set; preview by default, explicit `-Force` to write; reports unresolvable skills for human assignment. |
+| `backfill-categories.ps1` | **implemented — executed** (T5) | Injected `category:` frontmatter into all 138 Claude `SKILL.md` files in one sweep (seed mapping: the old `generate-manifest.py` `CATEGORIES` dict reconciled against the pre-rewrite root `README.md` skill table, README winning on conflict). Skips any file with a non-empty `category:` already set (idempotent — safe to re-run for future skills); preview by default, explicit `-Force` to write, backs up each modified file to a bounded temp dir first; reports unresolvable skills for human assignment (none were unresolved in the T5 run). |
 | `validate.ps1` | not yet present — planned (T8) | Local validation gate: regenerates `CATALOG.md` from the committed manifest and fails on `git diff --exit-code`, checks manifest staleness via `audit.ps1`'s timestamp-excluded freshness check, runs `audit.ps1` (fails the gate on exit 1/2). |
 | `install-hooks.ps1` | not yet present — planned (T8) | Opt-in installer for a repo-local `core.hooksPath` `pre-push` hook that runs `validate.ps1`. |
 | `install-skills.ps1` (repo root, not in this directory) | implemented — grandfathered exception | The published remote-bootstrap one-liner. Stays at PowerShell 5.1 (see "Grandfathered exception" below) and at the repo root (see "Root-installer URL contract" below). Not moved into `scripts/` — its location *is* its contract (D5). |
@@ -110,6 +110,56 @@ There is no version pinning and no integrity check in the one-liner above.
 The `main`-HEAD one-liner remains the documented quick-start precisely because it is
 the lowest-friction path; the alternatives above exist for anyone who wants to reduce
 the trust they're extending before executing remote code.
+
+## `manifest.json` shape (P1)
+
+`manifest.json` is the single machine-readable source of truth (P1,
+`docs/requirements/canonical-repo.md` §7) — generated by `python
+scripts/generate-manifest.py`, never hand-edited. Top-level shape:
+
+```jsonc
+{
+  "schemaVersion": 1,          // bump on any breaking change to this shape
+  "generated": "2026-07-13",   // ISO date; excluded from audit.ps1's freshness diff
+  "standard_skills": ["code-review", "..."],   // curated, hand-maintained list
+  "categories": ["Foundations & Workflow", "..."],  // curated display order, 16 entries — NOT alphabetical, NOT derived from skill data
+  "platforms": {
+    "claude": {
+      "skills": {
+        "<skill-name>": {
+          "description": "...",       // from SKILL.md frontmatter
+          "category": "...",          // from SKILL.md `category:` frontmatter (D8) — "Other" only if unresolved
+          "has_commands": true,       // present only if a commands/ subdir exists
+          "has_sub_skills": true      // present only if a sub-skills/ subdir exists
+        }
+      },
+      "instructions": {
+        "<instruction-name>": {
+          "description": "...",
+          "model": "opus"             // present only if the instruction's frontmatter sets one
+        }
+      }
+    },
+    "codex": { "skills": { "...": { "...": "same shape; category inherited from the claude skill of the same name" } }, "instructions": {} },
+    "gemini": { "skills": { "...": {} }, "instructions": {} }
+  }
+}
+```
+
+Category resolution (D8, landed in T5): every Claude `SKILL.md` carries its own
+`category:` frontmatter field, backfilled once by `scripts/backfill-categories.ps1`
+and read directly by the generator — there is no hardcoded skill→category mapping
+left in `generate-manifest.py`. `codex` and `gemini` skills carry no `category:` of
+their own; the generator looks up their category from the Claude skill of the same
+name (mirrors inherit, per D8). The `categories` array's **order** is still curated
+by hand in the generator (`CATEGORY_ORDER`) so `CATALOG.md` and any other rendering
+keeps a stable, non-alphabetical reading order — this is a display-order list only,
+never a source of per-skill category truth.
+
+`--validate --json` emits a parallel, more detailed payload (parsed frontmatter +
+per-skill validation records, including a top-level `categorySource` marker —
+`frontmatter` once T5 landed, previously `legacy-dict`) for `audit.ps1` to consume;
+see that script's `.SYNOPSIS` for its exact shape.
 
 ## Regeneration rule
 

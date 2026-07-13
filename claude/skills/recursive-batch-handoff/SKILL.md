@@ -1,5 +1,6 @@
 ---
 name: recursive-batch-handoff
+category: Foundations & Workflow
 description: Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations — each batch runs a discovery command to find what's left, executes one coherent chunk, and emits a self-similar handoff prompt so the next session (or run) continues without a central master plan.
 status: active
 version: 2026-07-05

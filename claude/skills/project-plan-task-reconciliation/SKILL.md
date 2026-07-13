@@ -1,5 +1,6 @@
 ---
 name: project-plan-task-reconciliation
+category: Foundations & Workflow
 description: Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, and auditing for features that shipped without a formal plan/task trail.
 status: active
 version: 2026-07-05

@@ -1,5 +1,6 @@
 ---
 name: additive-merge-conflict-resolution
+category: Foundations & Workflow
 description: Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the conflict as a false signal and resolves it as a union-keep-both operation instead of a real semantic merge.
 status: active
 version: 2026-07-05
