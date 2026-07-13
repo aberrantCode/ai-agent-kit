@@ -5,8 +5,20 @@ Run from repo root:
     python scripts/generate-manifest.py
 """
 
-import os, re, json, sys
+import os, re, json, sys, argparse
 from datetime import date
+
+# Category source-of-truth marker (requirements canonical-repo.md §6, D8).
+# While categories are resolved from the hardcoded CATEGORIES dict below this is
+# 'legacy-dict'; the T5 backfill flips resolution to per-skill `category:`
+# frontmatter and this becomes 'frontmatter'. audit.ps1 keys the missing-category
+# severity off this explicit marker (legacy-dict -> warn, frontmatter -> error) —
+# it is a deliberate signal, never a coverage heuristic.
+CATEGORY_SOURCE = 'legacy-dict'
+
+# Original working directory, captured before the chdir below so that a relative
+# --output path resolves against where the user invoked the script, not REPO_ROOT.
+INVOCATION_CWD = os.getcwd()
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(REPO_ROOT)
@@ -149,6 +161,21 @@ def read_frontmatter(path, max_bytes=10000):
     return fields
 
 
+def frontmatter_status(path, max_bytes=10000):
+    """Return (fields, status) with status in 'ok' | 'missing' | 'unterminated'.
+
+    Single source of frontmatter truth for the whole repo: audit.ps1 consumes the
+    --validate --json output built from this instead of re-parsing YAML in PowerShell.
+    """
+    with open(path, encoding='utf-8') as f:
+        content = f.read(max_bytes)
+    if not content.startswith('---'):
+        return {}, 'missing'
+    if not re.search(r'(?m)^---\s*$', content[3:]):
+        return {}, 'unterminated'
+    return read_frontmatter(path, max_bytes), 'ok'
+
+
 def scan_platform(platform):
     result = {'skills': {}, 'instructions': {}}
 
@@ -183,31 +210,110 @@ def scan_platform(platform):
     return result
 
 
-manifest = {
-    'generated': date.today().isoformat(),
-    'standard_skills': STANDARD_SKILLS,
-    'categories': list(CATEGORIES.keys()),
-    'platforms': {},
-}
+def build_manifest():
+    manifest = {
+        'generated': date.today().isoformat(),
+        'standard_skills': STANDARD_SKILLS,
+        'categories': list(CATEGORIES.keys()),
+        'platforms': {},
+    }
+    for platform in ('claude', 'codex', 'gemini'):
+        manifest['platforms'][platform] = scan_platform(platform)
+    return manifest
 
-for platform in ('claude', 'codex', 'gemini'):
-    manifest['platforms'][platform] = scan_platform(platform)
 
-out_path = os.path.join(REPO_ROOT, 'manifest.json')
-with open(out_path, 'w', encoding='utf-8') as f:
-    json.dump(manifest, f, indent=2)
+def build_validation():
+    """Emit parsed frontmatter + per-skill validation records for audit.ps1.
 
-# Report
-for p in ('claude', 'codex', 'gemini'):
-    s = len(manifest['platforms'][p]['skills'])
-    i = len(manifest['platforms'][p]['instructions'])
-    print(f'  {p}: {s} skills, {i} instructions')
+    One parser, two consumers: audit.ps1 reads this JSON rather than re-implementing
+    YAML parsing. Category severity is keyed off the top-level categorySource marker.
+    """
+    result = {
+        'categorySource': CATEGORY_SOURCE,
+        'platforms': {},
+    }
+    for platform in ('claude', 'codex', 'gemini'):
+        skills = {}
+        skills_dir = os.path.join(platform, 'skills')
+        if os.path.isdir(skills_dir):
+            for name in sorted(os.listdir(skills_dir)):
+                skill_dir = os.path.join(skills_dir, name)
+                skill_md = os.path.join(skill_dir, 'SKILL.md')
+                if not os.path.isfile(skill_md):
+                    continue
+                fields, status = frontmatter_status(skill_md)
+                category = skill_to_cat.get(name, 'Other')
+                skills[name] = {
+                    'path': f'{platform}/skills/{name}/SKILL.md',
+                    'frontmatterStatus': status,
+                    'name': fields.get('name'),
+                    'nameMatchesDir': fields.get('name') == name,
+                    'description': fields.get('description', ''),
+                    'category': category,
+                    'hasCategoryField': bool(fields.get('category')),
+                    'isOther': category == 'Other',
+                    'installedFrom': fields.get('installed-from'),
+                    'hasDiagram': os.path.isfile(os.path.join(skill_dir, 'diagram.html')),
+                }
+        result['platforms'][platform] = {'skills': skills}
+    return result
 
-orphans = [
-    n for p in manifest['platforms'].values()
-    for n, s in p['skills'].items() if s.get('category') == 'Other'
-]
-if orphans:
-    print(f'  WARNING: {len(orphans)} skills in Other: {orphans}')
 
-print(f'  Written to {out_path}')
+def resolve_output(output):
+    if output is None:
+        return os.path.join(REPO_ROOT, 'manifest.json')
+    if os.path.isabs(output):
+        return output
+    return os.path.abspath(os.path.join(INVOCATION_CWD, output))
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description='Generate manifest.json from skill/instruction frontmatter.')
+    parser.add_argument(
+        '--output', metavar='PATH', default=None,
+        help='Write the manifest to PATH (default: repo-root manifest.json).')
+    parser.add_argument(
+        '--validate', action='store_true',
+        help='Read-only: emit parsed frontmatter + validation records instead of '
+             'writing the manifest. Pair with --json for machine output.')
+    parser.add_argument(
+        '--json', action='store_true',
+        help='With --validate, emit the validation payload as JSON to stdout.')
+    args = parser.parse_args(argv)
+
+    if args.validate:
+        validation = build_validation()
+        if args.json:
+            json.dump(validation, sys.stdout, indent=2)
+            sys.stdout.write('\n')
+        else:
+            for p, data in validation['platforms'].items():
+                others = [n for n, s in data['skills'].items() if s['isOther']]
+                print(f'  {p}: {len(data["skills"])} skills, '
+                      f'{len(others)} without category (source={validation["categorySource"]})')
+        return 0
+
+    manifest = build_manifest()
+    out_path = resolve_output(args.output)
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(manifest, f, indent=2)
+
+    for p in ('claude', 'codex', 'gemini'):
+        s = len(manifest['platforms'][p]['skills'])
+        i = len(manifest['platforms'][p]['instructions'])
+        print(f'  {p}: {s} skills, {i} instructions')
+
+    orphans = [
+        n for p in manifest['platforms'].values()
+        for n, s in p['skills'].items() if s.get('category') == 'Other'
+    ]
+    if orphans:
+        print(f'  WARNING: {len(orphans)} skills in Other: {orphans}')
+
+    print(f'  Written to {out_path}')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
