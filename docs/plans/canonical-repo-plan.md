@@ -58,7 +58,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
 ## Tasks
 
 ### T1 — `shared/` tree + prompts move
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #58
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Create the vendor-neutral asset area and populate its first class.
 - **Work plan:**
@@ -89,7 +89,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
 - **References:** requirements §4 D1/D6/D7, §5 (class boundary); `docs/reorg/charter.md` §4.
 
 ### T2 — Folder READMEs (root-level + vendor subtrees)
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #58
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Give every root-level folder a prescriptive README (G4).
 - **Work plan:**
