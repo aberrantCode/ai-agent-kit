@@ -115,7 +115,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
 - **References:** requirements §5 coverage rule, OQ4; charter §5, §6; root `CLAUDE.md`.
 
 ### T3 — Script stubs + `scripts/README.md`
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #59
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Enumerate the automation surface as documented PowerShell 7 stubs.
 - **Work plan:**
