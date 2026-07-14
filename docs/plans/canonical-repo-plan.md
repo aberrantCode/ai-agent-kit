@@ -369,7 +369,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   project `CLAUDE.md`.
 
 ### T8 — Local validation gate *(P2 approved as modified: local, not GitHub Actions)*
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #70
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Local pre-PR validation replacing the original GitHub Actions
   proposal — erik wants reduced reliance on GitHub Actions.
