@@ -215,7 +215,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   per PR map order).
 
 ### T5b — Align frontmatter names to directories
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #63
 - **Agent / model:** general-purpose / sonnet
 - **Description:** `audit.ps1`'s `name-dir-match` check (T4) surfaced 19 error-severity
   findings on the live repo: 10 distinct skills (9 mirrored in both `claude/skills/`
