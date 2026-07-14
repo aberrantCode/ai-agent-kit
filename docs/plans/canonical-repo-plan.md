@@ -395,7 +395,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   §7 (hook interactions).
 
 ### T9 — `CONTRIBUTING.md` *(P4 approved)*
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #71
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Codify contribution rules (P4 scope).
 - **Work plan:**
