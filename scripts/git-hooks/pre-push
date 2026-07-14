@@ -1,0 +1,46 @@
+#!/bin/sh
+# pre-push — runs scripts/validate.ps1 before allowing a push, rejecting the push if
+# it fails.
+#
+# Installed via `pwsh ./scripts/install-hooks.ps1 -Force` (opt-in; see
+# scripts/README.md — this hook only runs once someone has explicitly installed it,
+# it is never active in a fresh clone). Uninstall with:
+#   git config --unset core.hooksPath
+#
+# Why POSIX sh and not PowerShell: git invokes hooks through a shell — via /bin/sh on
+# Linux/macOS, and via Git for Windows' bundled sh.exe on Windows, even inside a
+# PowerShell session — using the file's shebang line to pick the interpreter. Git does
+# NOT execute .ps1 files directly, so this file's only job is to be that POSIX
+# hand-off point to a real pwsh (PowerShell 7+) invocation of validate.ps1.
+#
+# Interaction with erik's global "git-push-opens-Zed" PreToolUse hook
+# (docs/reorg/charter.md §7): that hook is client-side — it fires inside Claude Code,
+# before Claude Code's own `git push` tool call runs, and opens Zed for human review.
+# This pre-push hook is a *git* hook instead: once core.hooksPath points at this
+# directory, it fires for every `git push` against this repo from every client
+# (a terminal, Claude Code, VS Code's Source Control panel, another agent, CI if one
+# is ever wired up) — because core.hooksPath is repo-local git config, not an
+# editor/agent setting. The two hooks are independent and additive, not redundant:
+# a push initiated from Claude Code trips the Zed-review PreToolUse hook first
+# (informational — a human looks at the diff before it happens), then git itself
+# invokes this pre-push hook as part of the push operation proper — if
+# validate.ps1 exits non-zero here, git aborts the push regardless of what the human
+# already saw in Zed. A push from a client with no Zed hook (e.g. plain `git push`
+# from a terminal) still goes through this gate; a push from Claude Code with this
+# hook NOT installed still goes through the Zed review, just not this gate. Installing
+# this hook is the only way to get gate coverage against every push path.
+
+set -e
+
+repo_root=$(git rev-parse --show-toplevel)
+
+if command -v pwsh >/dev/null 2>&1; then
+    pwsh_cmd="pwsh"
+else
+    echo "pre-push: pwsh (PowerShell 7+) not found on PATH -- cannot run scripts/validate.ps1" >&2
+    echo "pre-push: install PowerShell 7, or bypass this one push with: git push --no-verify" >&2
+    exit 1
+fi
+
+"$pwsh_cmd" -NoProfile -File "$repo_root/scripts/validate.ps1"
+exit $?

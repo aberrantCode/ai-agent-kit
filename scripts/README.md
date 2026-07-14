@@ -23,8 +23,8 @@ what a *deployed* skill does at runtime (N4) — this is archive tooling only.
 | `sync-installed.ps1` | stub | Scans a project (or fleet root) for stamped installed copies, diffs against the archive; report-only by default, `-Force` writes with backup-before-overwrite. |
 | `generate-catalog.ps1` | implemented (T6) | Renders `CATALOG.md` from `manifest.json`: per-vendor skill tables (grouped by the curated category order, ordinal-sorted within category), per-vendor instruction tables (incl. Codex/Gemini — OQ4), a global-commands table, and per-class `shared/` asset listings. Byte-stable output (ordinal sort via `[System.StringComparer]::Ordinal`, `utf8NoBOM`, explicit LF, pinned via `.gitattributes`) — verified identical across repeated runs and under `tr-TR` culture / `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1`. `-Json` emits the underlying data model instead of markdown; default is preview-only, `-Force` writes. |
 | `backfill-categories.ps1` | **implemented — executed** (T5) | Injected `category:` frontmatter into all 138 Claude `SKILL.md` files in one sweep (seed mapping: the old `generate-manifest.py` `CATEGORIES` dict reconciled against the pre-rewrite root `README.md` skill table, README winning on conflict). Skips any file with a non-empty `category:` already set (idempotent — safe to re-run for future skills); preview by default, explicit `-Force` to write, backs up each modified file to a bounded temp dir first; reports unresolvable skills for human assignment (none were unresolved in the T5 run). |
-| `validate.ps1` | not yet present — planned (T8) | Local validation gate: regenerates `CATALOG.md` from the committed manifest and fails on `git diff --exit-code`, checks manifest staleness via `audit.ps1`'s timestamp-excluded freshness check, runs `audit.ps1` (fails the gate on exit 1/2). |
-| `install-hooks.ps1` | not yet present — planned (T8) | Opt-in installer for a repo-local `core.hooksPath` `pre-push` hook that runs `validate.ps1`. |
+| `validate.ps1` | implemented (T8) | Local pre-PR validation gate (P2, approved as modified: local, not GitHub Actions). Regenerates `CATALOG.md` from the manifest.json on disk and byte-diffs it against the committed file (restoring the original bytes afterward — never leaves a diff in the working tree), then runs `audit.ps1` as a child process and folds its findings/exit code in. Manifest freshness is never re-checked directly here — that would mean a second, timestamp-naive diff that false-positives on day rollover, so it is delegated entirely to `audit.ps1`'s own timestamp-excluded freshness check. Console summary table + `-Json`. Exit `0` clean, `1` catalog-stale and/or audit error-severity findings, `2` execution failure. Measured runtime on the live repo: ~2s (target <60s). |
+| `install-hooks.ps1` | implemented (T8) | Opt-in, idempotent installer that points this repo's local `core.hooksPath` at the committed `scripts/git-hooks/` directory (never global — repo-local git config only). Preview by default; `-Force` applies. Re-running (with or without `-Force`) once installed is a reported no-op. See "Local validation gate + pre-push hook" below for the Zed-hook interaction note. |
 | `install-skills.ps1` (repo root, not in this directory) | implemented — grandfathered exception | The published remote-bootstrap one-liner. Stays at PowerShell 5.1 (see "Grandfathered exception" below) and at the repo root (see "Root-installer URL contract" below). Not moved into `scripts/` — its location *is* its contract (D5). |
 
 "Stub" here means the binding definition from `docs/requirements/canonical-repo.md`
@@ -175,8 +175,54 @@ see that script's `.SYNOPSIS` for its exact shape.
   volatile `generated` timestamp field), and checks `CATALOG.md` parity if the file
   exists. Every reorg deletion PR must leave both regenerated and in sync — this is
   the concrete enforcement point for charter §6's parity rule.
-- Until the local validation gate (`validate.ps1`, T8) ships, this rule is
-  soft-enforced: run `audit.ps1` manually before opening a PR.
+- `validate.ps1` (T8) is the hard enforcement point: it wraps `audit.ps1` plus its own
+  `CATALOG.md` byte-staleness check into a single pass/fail gate — see the next
+  section.
+
+## Local validation gate + pre-push hook (T8, P2 as modified)
+
+erik wants reduced reliance on GitHub Actions, so the pre-PR gate for this repo runs
+**locally**, not in hosted CI (`docs/requirements/canonical-repo.md` §7 P2, approved as
+modified). Two pieces:
+
+- **`validate.ps1`** — the gate itself. Regenerates `CATALOG.md` from the manifest.json
+  currently on disk and byte-diffs it against the committed file, restoring the
+  original bytes afterward regardless of outcome (it never leaves a diff in the
+  working tree — verified live: a clean repo is bit-for-bit clean after a run, and a
+  deliberately-dirtied repo is restored to that same dirty state, not silently
+  cleaned). Then runs `audit.ps1` as a child process and folds its exit code in.
+  Mirror-gap and missing-diagram findings stay `info`-severity (charter §5) and never
+  fail the gate — only `audit.ps1`'s own error-severity findings do. Exit `0` clean,
+  `1` findings (stale catalog and/or audit errors), `2` execution failure.
+- **`install-hooks.ps1`** — opt-in, idempotent installer. Points this repo's *local*
+  `core.hooksPath` git config (never global — nothing outside this repo is affected)
+  at the committed `scripts/git-hooks/` directory, whose `pre-push` hook runs
+  `validate.ps1` and rejects the push on nonzero exit. Preview by default; `-Force`
+  applies. Re-running it, installed or not, is always a safe no-op the second time.
+  Uninstall with `git config --unset core.hooksPath`.
+- The repo `CLAUDE.md` also wires `/ship` to run `validate.ps1` before opening any PR
+  and abort on failure — so the gate applies whether or not a contributor has
+  installed the git hook.
+
+**Interaction with the global "git-push-opens-Zed" PreToolUse hook** (charter §7
+precedent — every hook-interaction case in this repo gets documented, not assumed):
+that hook is **client-side** — it lives in `~/.claude/settings.json` and fires only
+inside Claude Code, before Claude Code's own `git push` tool call, opening Zed for a
+human diff review. The `pre-push` git hook installed by `install-hooks.ps1` is
+**git-side** — once `core.hooksPath` points at `scripts/git-hooks`, it fires for
+*every* `git push` against this repo from *any* client (a bare terminal, Claude Code,
+VS Code's Source Control panel, another agent), because `core.hooksPath` is git
+config, not an editor setting. The two are independent and additive: a push from
+Claude Code trips the Zed review first (a human looks at the diff), then git invokes
+this `pre-push` hook as part of the push operation itself — if `validate.ps1` fails
+here, git aborts the push regardless of what happened in Zed. A plain `git push` from
+a terminal has no Zed review but still goes through this gate once the hook is
+installed. See `scripts/git-hooks/pre-push`'s header comment for the same explanation
+in the file the hook mechanism actually lives in.
+
+**Backlog, not scheduled:** a hosted-CI mirror of this same gate
+(`docs/plans/canonical-repo-plan.md` Backlog) — recorded, not implemented, per erik's
+explicit "reduce reliance on GitHub Actions" direction for this effort.
 
 ## Cross-links
 

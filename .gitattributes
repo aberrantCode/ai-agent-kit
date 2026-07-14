@@ -3,3 +3,9 @@
 # (docs/requirements/canonical-repo.md §6; docs/plans/canonical-repo-plan.md T6)
 CATALOG.md text eol=lf
 manifest.json text eol=lf
+
+# git hooks: must stay LF regardless of platform / core.autocrlf. Git invokes hooks
+# via a shell using the file's shebang line (docs/requirements/canonical-repo.md §6;
+# scripts/validate.ps1, T8) — a CRLF shebang line is a broken interpreter path on
+# POSIX shells, including Git for Windows' bundled sh.exe.
+scripts/git-hooks/* text eol=lf
