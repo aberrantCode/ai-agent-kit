@@ -1,5 +1,5 @@
 ---
-name: homeradar-retro-fit-spec
+name: retro-fit-spec
 category: Foundations & Workflow
 description: Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section
 ---
