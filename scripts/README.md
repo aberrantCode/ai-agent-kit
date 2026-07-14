@@ -21,7 +21,7 @@ what a *deployed* skill does at runtime (N4) — this is archive tooling only.
 | `install-to-project.ps1` | stub | Copies a skill bundle (SKILL.md + sub-skills/ + commands/ + references/ + rules/) into a target project's `.claude/`, stamping `installed-from: ai-agent-kit`. |
 | `push-to-profile.ps1` | stub | Deploys a bundle to `~/.claude/skills/` (or the vendor equivalent), stamping provenance. |
 | `sync-installed.ps1` | stub | Scans a project (or fleet root) for stamped installed copies, diffs against the archive; report-only by default, `-Force` writes with backup-before-overwrite. |
-| `generate-catalog.ps1` | stub — becomes implemented in T6 | Renders `CATALOG.md` from `manifest.json`. Byte-stable output (ordinal sort, `utf8NoBOM`, LF via `.gitattributes`) so a future validation gate can diff it. |
+| `generate-catalog.ps1` | implemented (T6) | Renders `CATALOG.md` from `manifest.json`: per-vendor skill tables (grouped by the curated category order, ordinal-sorted within category), per-vendor instruction tables (incl. Codex/Gemini — OQ4), a global-commands table, and per-class `shared/` asset listings. Byte-stable output (ordinal sort via `[System.StringComparer]::Ordinal`, `utf8NoBOM`, explicit LF, pinned via `.gitattributes`) — verified identical across repeated runs and under `tr-TR` culture / `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1`. `-Json` emits the underlying data model instead of markdown; default is preview-only, `-Force` writes. |
 | `backfill-categories.ps1` | **implemented — executed** (T5) | Injected `category:` frontmatter into all 138 Claude `SKILL.md` files in one sweep (seed mapping: the old `generate-manifest.py` `CATEGORIES` dict reconciled against the pre-rewrite root `README.md` skill table, README winning on conflict). Skips any file with a non-empty `category:` already set (idempotent — safe to re-run for future skills); preview by default, explicit `-Force` to write, backs up each modified file to a bounded temp dir first; reports unresolvable skills for human assignment (none were unresolved in the T5 run). |
 | `validate.ps1` | not yet present — planned (T8) | Local validation gate: regenerates `CATALOG.md` from the committed manifest and fails on `git diff --exit-code`, checks manifest staleness via `audit.ps1`'s timestamp-excluded freshness check, runs `audit.ps1` (fails the gate on exit 1/2). |
 | `install-hooks.ps1` | not yet present — planned (T8) | Opt-in installer for a repo-local `core.hooksPath` `pre-push` hook that runs `validate.ps1`. |
@@ -168,8 +168,8 @@ see that script's `.SYNOPSIS` for its exact shape.
 
 - Any change to skill/instruction frontmatter, category assignment, or bundle
   composition is followed by `python scripts/generate-manifest.py` before commit.
-- Once `generate-catalog.ps1` is implemented (T6), any manifest change is followed by
-  `./scripts/generate-catalog.ps1 -Force` before commit.
+- Any manifest change is followed by `./scripts/generate-catalog.ps1 -Force` before
+  commit (implemented T6).
 - `audit.ps1` (T4) is the mechanical check that both stayed in sync — it regenerates
   a manifest to a temp path and diffs it against the committed one (excluding the
   volatile `generated` timestamp field), and checks `CATALOG.md` parity if the file
