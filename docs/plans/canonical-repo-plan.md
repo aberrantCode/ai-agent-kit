@@ -214,6 +214,48 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   pre-rewrite README category tables (git history if T7 already landed — it won't have,
   per PR map order).
 
+### T5b — Align frontmatter names to directories
+- [ ] **Status:** todo
+- **Agent / model:** general-purpose / sonnet
+- **Description:** `audit.ps1`'s `name-dir-match` check (T4) surfaced 19 error-severity
+  findings on the live repo: 10 distinct skills (9 mirrored in both `claude/skills/`
+  and `codex/skills/`, plus `graphify` which is claude-only) whose frontmatter `name:`
+  field disagrees with its directory name — legacy `vercel-`/`homeradar-` provenance
+  prefixes (and one `graphify-windows`) that predate the directory rename, plus one
+  inverse case (`vercel-deploy-claimable` directory vs. stale `vercel-deploy`
+  frontmatter). These block T8's acceptance criterion of a clean `audit.ps1` exit.
+- **Override (erik, 2026-07-14 — binding for this task only):** the plan's global rule
+  "never move, rename, or delete anything under `*/skills/` except the T5 category
+  additions" is explicitly overridden, **scoped strictly to the 19 frontmatter `name:`
+  fields** identified by the live `audit.ps1` run (10 distinct skill names, see PR body
+  table). No directory renames. No other content edits, moves, or deletions under
+  `*/skills/`. Directory always wins — frontmatter is edited to match the directory,
+  never the reverse.
+- **Work plan:**
+  1. Run `pwsh ./scripts/audit.ps1`; derive the finding list mechanically (do not trust
+     a hardcoded table) — cross-check against the known 19/10 shape and stop to report
+     any discrepancy.
+  2. Edit each flagged `SKILL.md`'s `name:` frontmatter field to equal its directory
+     name; keep `claude/` and `codex/` mirrors consistent with each other.
+  3. Cross-reference sweep: grep the repo for each old frontmatter name; update any
+     reference outside `*/skills/` (README rows, docs, command files, `requires:`
+     lists) to the new name. Leave historical/dated docs (e.g. rationalization
+     reports, consensus snapshots) describing past state untouched. References to old
+     names found *inside* `*/skills/` (e.g. one skill's body prose linking to another
+     by its old name, or a `diagram.html` label) are left as-is in this task — editing
+     them would violate the "only `name:` lines change under `*/skills/`" acceptance
+     criterion — and are reported as follow-up for a future skill-body pass.
+  4. Regenerate `manifest.json` via `scripts/generate-manifest.py` (never hand-edited).
+  5. README parity check for the 10 renamed skills (charter §6 duty).
+- **Acceptance criteria:** `pwsh ./scripts/audit.ps1` exits `0` with zero
+  error-severity findings on the live repo; `git diff dev...HEAD -- '*/skills/'` shows
+  only `name:` frontmatter lines changed (19 files); no skill directory renamed
+  (`git diff dev...HEAD --diff-filter=R --stat` empty for `*/skills/`); `manifest.json`
+  regenerated; this section's override is recorded here and restated in the PR body.
+- **Unblocks:** T8 (local validation gate) depends on `audit.ps1` exiting clean.
+- **References:** requirements §6 (`audit.ps1` contract), N1/N2; charter §6 (parity
+  follow-through); T4 (audit implementation).
+
 ### T6 — Implement `generate-catalog.ps1` + first `CATALOG.md`
 - [ ] **Status:** todo
 - **Agent / model:** general-purpose / sonnet
