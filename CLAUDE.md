@@ -7,10 +7,13 @@ Manages domain-specific knowledge modules for Claude Code, OpenAI Codex CLI, and
 
 ## Directory Structure
 
+Asset inventory — every skill, instruction, and command — lives in the generated
+[`CATALOG.md`](CATALOG.md). Never restate counts here; they drift.
+
 ```
 claude/
-  instructions/                     — 15 agent instructions (invoked via Task tool)
-  commands/                   — 25 global slash commands
+  instructions/               — agent instructions (invoked via Task tool)
+  commands/                   — global slash commands
   skills/<name>/
     SKILL.md                  — main skill content
     diagram.html              — visual diagram (generated)
