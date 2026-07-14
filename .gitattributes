@@ -1,0 +1,5 @@
+# Generated, machine-diffed files: pin to LF regardless of platform / core.autocrlf
+# so regeneration diffs stay stable across Windows/macOS/Linux contributors and CI.
+# (docs/requirements/canonical-repo.md §6; docs/plans/canonical-repo-plan.md T6)
+CATALOG.md text eol=lf
+manifest.json text eol=lf
