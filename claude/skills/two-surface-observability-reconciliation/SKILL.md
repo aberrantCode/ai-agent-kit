@@ -1,6 +1,6 @@
 ---
 name: two-surface-observability-reconciliation
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two candidate sources of truth (a formal tracking framework and a living backlog, or two metrics pipelines) disagree about what's actually going on. Reconciles them into one verdict instead of trusting either alone.
 status: active
 version: 2026-07-05

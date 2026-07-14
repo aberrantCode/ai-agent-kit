@@ -38,8 +38,7 @@ os.chdir(REPO_ROOT)
 CATEGORY_ORDER = [
     'Foundations & Workflow',
     'Languages & Runtimes',
-    'Frontend Frameworks',
-    'Frontend & UI',
+    'Frontend',
     'Mobile (Native)',
     'UI & Design',
     'Databases & Storage',
@@ -50,7 +49,7 @@ CATEGORY_ORDER = [
     'Third-Party Integrations',
     'SEO & Web Presence',
     'Tooling & DevOps',
-    'DevOps & Tooling',
+    'Infrastructure & Ops',
     'Research & OSINT',
 ]
 

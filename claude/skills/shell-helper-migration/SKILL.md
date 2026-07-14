@@ -1,6 +1,6 @@
 ---
 name: shell-helper-migration
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) — extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and preserving exact exit-code and output-contract semantics across a batch of scripts.
 status: active
 version: 2026-07-05

@@ -12,8 +12,7 @@
   "categories": [
     "Foundations & Workflow",
     "Languages & Runtimes",
-    "Frontend Frameworks",
-    "Frontend & UI",
+    "Frontend",
     "Mobile (Native)",
     "UI & Design",
     "Databases & Storage",
@@ -24,7 +23,7 @@
     "Third-Party Integrations",
     "SEO & Web Presence",
     "Tooling & DevOps",
-    "DevOps & Tooling",
+    "Infrastructure & Ops",
     "Research & OSINT"
   ],
   "platforms": {
@@ -97,11 +96,11 @@
         },
         "brand-token-extraction-and-documentation": {
           "description": "Use when reskinning an app with a real brand's visual identity \u2014 extract the actual palette from a live site's raw CSS (not markdown), recreate logo/icon assets programmatically with documented extraction rationale, and codify everything as versioned, named design tokens rather than one-off hardcoded values.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "cloudflare-d1": {
           "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
@@ -129,7 +128,7 @@
         },
         "composition-patterns": {
           "description": "",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "content-aware-file-renaming": {
           "description": "Use when renaming files into a structured naming formula based on their contents \u2014 especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files (document.pdf, document (1).pdf, IMG_*.jpg, scan*.pdf, untitled.*), bulk extracts from broker/bank portals or email attachments, or zip archives that must be extracted before processing. Triggers when the existing filename does not carry the document's identity and the file's content must be inspected to determine who, what, where, and when. The canonical naming formula is `%who% - %what% - %where% - %when% - %extra%`. Always prompt the user via AskUserQuestion only \u2014 never as plain text.",
@@ -149,7 +148,7 @@
         },
         "css-variables-for-multi-theme-reskin": {
           "description": "Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to \"reskin\" or \"retheme\" an existing interface without touching its structure or interaction logic.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "csv-driven-llm-pipeline": {
           "description": "Build a stateful, resumable batch pipeline driven by CSV files with per-row pipeline-state columns. Use whenever the user wants to iterate over a corpus and do per-row work that may take time, hit external APIs, call an LLM, or need restart-resilience \u2014 even if they don't say \"pipeline\". Triggers on phrases like \"process all the X\", \"for each row do Y\", \"analyze the corpus\", \"batch enrich\", \"add a column tracking whether...\", \"extract X from Y for every Z\", or any task requiring eligibility filtering, idempotent re-runs, rate-limit awareness, or downstream-resumable state. Covers schema design, phase-by-phase execution, deterministic discovery, rate-limited HTTP fetching, iterative LLM prompt engineering with A/B testing, and PowerShell pitfalls.",
@@ -161,11 +160,11 @@
         },
         "deploy-idempotency-two-pass-gate": {
           "description": "Use when running any live infrastructure apply (Ansible playbook, Terraform, Docker Compose stack, or similar) \u2014 before declaring a deployment successful or moving on to smoke tests, run the apply twice and require the second pass to report zero changes, so latent non-idempotent tasks are caught before they corrupt future deploys.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "deployment-driver-pin-rewrite-from-release-tag-source-of-truth": {
           "description": "Use when a deployment or build system has both a human-editable \"intent\" field (a release tag, plan row) and a derived \"pin\" artifact (an image pin file, lockfile) \u2014 ensures edits always go to the source-of-truth field and the driver/loop re-derives the pin, rather than hand-editing the derived artifact.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "design-critique-to-safe-refactor": {
           "description": "Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.",
@@ -173,7 +172,7 @@
         },
         "diagnostics-probe-design": {
           "description": "Use when investigating a service or infrastructure failure and before proposing any fix \u2014 verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "doc-coauthoring": {
           "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
@@ -210,7 +209,7 @@
         },
         "firewall-alias-as-indirection": {
           "description": "Use when designing or editing firewall rules for a group of devices (e.g. cameras, IoT clusters) \u2014 reference a named alias instead of hardcoded IPs so device-set changes never require rule edits, and use config-tracing (not assumption) to decide whether a public endpoint is actually load-bearing before retiring it.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "fix-start": {
           "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
@@ -219,11 +218,11 @@
         },
         "fleet-cp1252-mojibake-fix": {
           "description": "Use when shell scripts (bash/PowerShell) print non-ASCII glyphs like checkmarks, X marks, or box-drawing rules that render as mojibake under Git Bash / Windows cp1252 terminals \u2014 replace runtime output with ASCII equivalents while leaving comments and remote heredocs untouched.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "flutter": {
           "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "frame-content-recognition": {
           "description": "Domain expertise for visually inspecting extracted video frames to identify which ones show file content (IDE panes, terminal cat, slides, READMEs) and capture path, language, and visible line ranges. Sub-skill of `youtube-extraction`.",
@@ -249,15 +248,15 @@
         },
         "gpu-workload-placement-and-arbitration": {
           "description": "Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "grafana-dashboard-engineer": {
           "description": "Production-grade Grafana dashboard engineer. Enables rapid research, design, build, deployment, and validation of observability dashboards across Prometheus, Loki, and custom datasources. Supports IaC (Ansible/PowerShell), application-specific templates, and full git workflow integration for homelab and enterprise environments.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "grafana-dashboard-workflow": {
           "description": "Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards \u2014 enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "graphify": {
           "description": "any input (code, docs, papers, images) \u2192 knowledge graph \u2192 clustered communities \u2192 HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships \u2014 especially if graphify-out/ exists. Provides persistent graph with god nodes, community detection, and BFS/DFS query tools.",
@@ -273,7 +272,7 @@
         },
         "honcho-deriver-queue-health-diagnostics": {
           "description": "Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts \u2014 check both the MCP-visible layer and the server-side queue table directly, distinguish \"broken\" from \"contended,\" and audit stored conclusions for pollution.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "iterative-audit-gate-with-streak-reset": {
           "description": "Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification gates repeatedly, resetting a \"clean streak\" to zero on any finding, until two consecutive rounds come back clean \u2014 forcing convergence instead of accepting the first green result.",
@@ -297,7 +296,7 @@
         },
         "lvm-thin-pool-diagnostics-recovery": {
           "description": "Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space \u2014 covers layered diagnosis and safe recovery of the thin pool and any affected filesystems.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "marko": {
           "description": "Marko is a grumpy senior code reviewer who critiques code with zero praise inflation and never suggests fixes. Invoke Marko whenever the user addresses him by name to ask for a code opinion \u2014 \"marko?\", \"what do you think marko?\", \"hey marko\", \"marko review this\", \"marko take a look\", \"marko thoughts?\", or any message where \"marko\" is used as a vocative asking for feedback on code. Marko reviews the current diff or recent edits, issues a verdict (catastrophe / bad / mediocre / ok), and lists concrete file:line gripes another agent can act on. Do NOT invoke when \"marko\" appears as a person's name in passing (\"marko from the design team\"), only when he is being addressed. Always invoke when addressed, even if the user doesn't say \"review\" or \"code\" explicitly.",
@@ -313,7 +312,7 @@
         },
         "multi-perspective-dns-diagnostic-ladder": {
           "description": "Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any \"mysterious\" networked-service failure needs root-causing \u2014 apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and always verify a fix by re-checking logs after applying it.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "nodejs-backend": {
           "description": "Node.js backend patterns with Express/Fastify, repositories",
@@ -352,7 +351,7 @@
         },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "python": {
           "description": "Python development with ruff, mypy, pytest - TDD and type safety",
@@ -360,23 +359,23 @@
         },
         "react-best-practices": {
           "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "react-native": {
           "description": "React Native and Expo patterns \u2014 project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "react-virtualization-with-jsdom-measurement": {
           "description": "Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "react-web": {
           "description": "React web development with hooks, React Query, Zustand",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "reactive-ui-state-with-delegated-event-routing": {
           "description": "Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-color-scheme/prefers-reduced-motion in a testable way.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "recursive-batch-handoff": {
           "description": "Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations \u2014 each batch runs a discovery command to find what's left, executes one coherent chunk, and emits a self-similar handoff prompt so the next session (or run) continues without a central master plan.",
@@ -417,7 +416,7 @@
         },
         "self-contained-html-artifact-with-inline-assets": {
           "description": "Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests \u2014 no CDNs, no relative-path assets, no build step \u2014 and correctly render in both light and dark themes.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "self-paced-loop-iteration": {
           "description": "Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval \u2014 each iteration completes one bounded unit of work, verifies it, commits, and schedules the next wakeup based on what just happened rather than wall-clock time.",
@@ -429,11 +428,11 @@
         },
         "shell-helper-migration": {
           "description": "Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) \u2014 extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and preserving exact exit-code and output-contract semantics across a batch of scripts.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "shell-migration-skip-taxonomy": {
           "description": "Use when deciding whether a shell script can safely be migrated to source a centralized helper library \u2014 classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "shopify-apps": {
           "description": "Shopify app development - Remix, Admin API, checkout extensions",
@@ -441,7 +440,7 @@
         },
         "side-effect-free-helper-library": {
           "description": "Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own validation or exit-code conventions.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "site-architecture": {
           "description": "Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals",
@@ -512,7 +511,7 @@
         },
         "two-surface-observability-reconciliation": {
           "description": "Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two candidate sources of truth (a formal tracking framework and a living backlog, or two metrics pipelines) disagree about what's actually going on. Reconciles them into one verdict instead of trusting either alone.",
-          "category": "DevOps & Tooling"
+          "category": "Infrastructure & Ops"
         },
         "typescript": {
           "description": "TypeScript strict mode with eslint and jest",
@@ -524,7 +523,7 @@
         },
         "ui-redesign-with-snapshot-regeneration": {
           "description": "Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes \u2014 to avoid masking real regressions as \"just snapshot drift.",
-          "category": "Frontend & UI"
+          "category": "Frontend"
         },
         "ui-testing": {
           "description": "Visual testing - catch invisible buttons, broken layouts, contrast",
@@ -706,7 +705,7 @@
         },
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "cloudflare-d1": {
           "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
@@ -730,7 +729,7 @@
         },
         "composition-patterns": {
           "description": "",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "credentials": {
           "description": "Centralized API key management from Access.txt",
@@ -770,7 +769,7 @@
         },
         "flutter": {
           "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "frontend-design": {
           "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Combines conceptual design direction with prescriptive senior UI/UX engineering rules \u2014 metric-based design dials, strict component architecture, CSS hardware acceleration, and balanced design engineering that overrides default LLM biases. Generates creative, polished code and UI design that avoids generic AI aesthetics.",
@@ -839,7 +838,7 @@
         },
         "pwa-development": {
           "description": "Progressive Web Apps - service workers, caching strategies, offline, Workbox",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "python": {
           "description": "Python development with ruff, mypy, pytest - TDD and type safety",
@@ -847,15 +846,15 @@
         },
         "react-best-practices": {
           "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "react-native": {
           "description": "React Native mobile patterns, platform-specific code",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "react-web": {
           "description": "React web development with hooks, React Query, Zustand",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "reddit-ads": {
           "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
@@ -1010,7 +1009,7 @@
       "skills": {
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
-          "category": "Frontend Frameworks"
+          "category": "Frontend"
         },
         "project-manager": {
           "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Manages the full lifecycle: extracting feature specs via interview, generating phased implementation plans, delegating tasks to worker agents, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as shared state.",

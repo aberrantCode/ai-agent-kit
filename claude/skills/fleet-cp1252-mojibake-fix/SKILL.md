@@ -1,6 +1,6 @@
 ---
 name: fleet-cp1252-mojibake-fix
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when shell scripts (bash/PowerShell) print non-ASCII glyphs like checkmarks, X marks, or box-drawing rules that render as mojibake under Git Bash / Windows cp1252 terminals — replace runtime output with ASCII equivalents while leaving comments and remote heredocs untouched.
 status: active
 version: 2026-07-05

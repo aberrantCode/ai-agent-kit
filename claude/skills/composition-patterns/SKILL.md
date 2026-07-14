@@ -1,6 +1,6 @@
 ---
 name: composition-patterns
-category: Frontend Frameworks
+category: Frontend
 description:
   React composition patterns that scale. Use when refactoring components with
   boolean prop proliferation, building flexible component libraries, or

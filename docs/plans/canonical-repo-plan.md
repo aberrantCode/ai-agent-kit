@@ -256,8 +256,68 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
 - **References:** requirements §6 (`audit.ps1` contract), N1/N2; charter §6 (parity
   follow-through); T4 (audit implementation).
 
-### T6 — Implement `generate-catalog.ps1` + first `CATALOG.md`
+### T5c — Category taxonomy consolidation
 - [ ] **Status:** todo
+- **Agent / model:** general-purpose / sonnet
+- **Description:** T6's generated `CATALOG.md` surfaced category drift from T5's
+  backfill: two near-identical category names (`Tooling & DevOps` / `DevOps &
+  Tooling`) and a split frontend taxonomy (`Frontend Frameworks` / `Frontend & UI`)
+  that doesn't match erik's documented category vocabulary. erik reviewed the actual
+  skill lists behind each name and issued binding decisions rather than a mechanical
+  merge.
+- **Override (erik, 2026-07-14 — binding for this task only, same shape as T5b's
+  override):** the plan's global rule "never move, rename, or delete anything under
+  `*/skills/` except the T5 category additions" is explicitly extended, **scoped
+  strictly to the `category:` frontmatter VALUE on 28 named `claude/skills/*/SKILL.md`
+  files** (15 DevOps-cluster skills + 7 `Frontend Frameworks` skills + 6 `Frontend &
+  UI` skills). No directory renames, no `name:` changes, no body/content edits, no
+  file moves or deletions. Nothing under `codex/skills/` or `gemini/skills/` changes
+  (mirrors carry no `category:` of their own — T5 confirmed this still holds).
+- **erik's decisions (binding — do not re-litigate):**
+  1. **DevOps categories split by real meaning, not merged.** `Tooling & DevOps` (11
+     skills) is unchanged. `DevOps & Tooling` (15 skills) is renamed to
+     `Infrastructure & Ops` — the two clusters hid genuinely different skill
+     populations (archive/lifecycle tooling vs. infra/observability diagnostics).
+  2. **Frontend categories consolidated to match erik's global CLAUDE.md taxonomy**,
+     which lists `Frontend` and `UI & Design` with no `Frontend Frameworks` entry.
+     `Frontend Frameworks` (7 skills) and `Frontend & UI` (6 skills) both fold into a
+     single `Frontend` category (13 skills). `UI & Design` (10 skills) is unchanged.
+  - Net: 16 categories → 15. `DevOps & Tooling`, `Frontend Frameworks`, and
+    `Frontend & UI` cease to exist; `Infrastructure & Ops` and `Frontend` appear.
+- **Work plan:**
+  1. Derive the affected file list mechanically from `manifest.json` (query by
+     current category) rather than trusting a hardcoded list; cross-check against the
+     15/7/6 shape and stop to report any discrepancy.
+  2. Edit the `category:` frontmatter value in each of the 28 affected
+     `claude/skills/*/SKILL.md` files per the decisions above.
+  3. Update the curated `CATEGORY_ORDER` list in `scripts/generate-manifest.py`
+     (16 → 15 entries): replace `Frontend Frameworks` + `Frontend & UI` with a single
+     `Frontend` in the slot the frontend categories occupied; replace
+     `DevOps & Tooling` with `Infrastructure & Ops` in the slot it occupied (right
+     after `Tooling & DevOps`). Keep `scripts/backfill-categories.ps1`'s mirrored
+     `$script:CategoryOrder` and `$script:CategorySeed` entries for the 28 skills in
+     sync (comment-mandated).
+  4. Regenerate `manifest.json` (`python scripts/generate-manifest.py`) and
+     `CATALOG.md` (`pwsh ./scripts/generate-catalog.ps1 -Force`); verify byte-stable
+     across repeat runs and locale-invariant (tr-TR).
+  5. Fix stale category-count/category-name references outside the generated files:
+     `scripts/README.md` (`16 entries` → `15 entries`, two occurrences),
+     `README.md`'s "Categories at a glance" table and full skill-list table (28 rows).
+     Do not touch `docs/reports/` or other dated historical snapshots.
+  6. Run `pwsh ./scripts/audit.ps1`; fix any regressions before opening the PR.
+- **Acceptance criteria:** `manifest.json`'s `categories` array has exactly 15
+  entries, contains `Frontend` and `Infrastructure & Ops`, and does not contain
+  `Frontend Frameworks`, `Frontend & UI`, or `DevOps & Tooling`; category membership
+  counts are `Frontend` = 13, `Infrastructure & Ops` = 15, `Tooling & DevOps` = 11,
+  `UI & Design` = 10; `git diff dev...HEAD -- 'claude/skills/'` shows only `category:`
+  lines changed across 28 files; no changes under `codex/skills/` or `gemini/skills/`;
+  `CATALOG.md` regenerated and byte-stable, no stale category headings remain;
+  `pwsh ./scripts/audit.ps1` exits 0 with zero error-severity findings.
+- **References:** requirements D8, §6; charter §6 (parity follow-through); T5, T5b
+  (override precedent); T6 (the CATALOG.md run that surfaced the drift).
+
+### T6 — Implement `generate-catalog.ps1` + first `CATALOG.md`
+- [x] **Status:** done — PR #65
 - **Agent / model:** general-purpose / sonnet
 - **Description:** Render the full asset catalog from `manifest.json` (D2).
 - **Work plan:**

@@ -1,6 +1,6 @@
 ---
 name: react-virtualization-with-jsdom-measurement
-category: Frontend & UI
+category: Frontend
 description: Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser.
 status: active
 version: 2026-07-05
