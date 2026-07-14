@@ -341,7 +341,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   (content reference only — do not preserve their hand-drift).
 
 ### T7 — Root `README.md` rewrite + count-pointer fixes
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #68
 - **Agent / model:** general-purpose / opus (orientation-writing quality is the deliverable)
 - **Description:** Replace the 40KB catalog-README with a mission-first orientation doc.
 - **Work plan:**
