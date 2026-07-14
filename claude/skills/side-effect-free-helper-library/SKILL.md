@@ -1,6 +1,6 @@
 ---
 name: side-effect-free-helper-library
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own validation or exit-code conventions.
 status: active
 version: 2026-07-05

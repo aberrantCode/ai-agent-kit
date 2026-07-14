@@ -114,8 +114,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 |----------|:-----:|---------|
 | Foundations & Workflow | 32 | base, tdd-workflow, **github** (`/merge`), analyze-conversations, **what-next** |
 | Languages & Runtimes | 4 | typescript, python, nodejs-backend, marko |
-| Frontend Frameworks | 7 | react-web, flutter, chrome-extension-builder |
-| Frontend & UI | 6 | css-variables-for-multi-theme-reskin, ui-redesign-with-snapshot-regeneration |
+| Frontend | 13 | react-web, flutter, chrome-extension-builder, css-variables-for-multi-theme-reskin |
 | Mobile (Native) | 3 | android-java, android-kotlin, ui-mobile |
 | UI & Design | 10 | ui-web, frontend-design, visual-explainer, **ac-logo** (`/generate-logo`) |
 | Databases & Storage | 10 | supabase, firebase, aws-dynamodb, cloudflare-d1 |
@@ -126,7 +125,7 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | Third-Party Integrations | 5 | klaviyo, reddit-api, ms-teams-apps, posthog-analytics |
 | SEO & Web Presence | 3 | site-architecture, web-content, aeo-optimization |
 | Tooling & DevOps | 11 | ac-opbta-ops, project-tooling, skills-manager, start-app, graphify |
-| DevOps & Tooling | 15 | deploy-idempotency-two-pass-gate, grafana-dashboard-workflow, lvm-thin-pool-diagnostics-recovery |
+| Infrastructure & Ops | 15 | deploy-idempotency-two-pass-gate, grafana-dashboard-workflow, lvm-thin-pool-diagnostics-recovery |
 | Research & OSINT | 11 | youtube-extraction, youtube-prd-forensics, worldview-layer-scaffold |
 
 <details>
@@ -158,13 +157,13 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`python`](claude/skills/python/) | Languages & Runtimes | Python with ruff, mypy, pytest — TDD and type safety | ✓ | ✓ | |
 | [`marko`](claude/skills/marko/) | Languages & Runtimes | Template engine and component system for node.js | ✓ | ✓ |  |
 | [`nodejs-backend`](claude/skills/nodejs-backend/) | Languages & Runtimes | Node.js backend patterns with Express/Fastify | ✓ | ✓ | |
-| [`react-web`](claude/skills/react-web/) | Frontend Frameworks | React web with hooks, React Query, Zustand | ✓ | ✓ | |
-| [`react-native`](claude/skills/react-native/) | Frontend Frameworks | React Native and Expo — FlashList, Reanimated, React Compiler, native UI primitives, platform-specific code | ✓ | ✓ | |
-| [`flutter`](claude/skills/flutter/) | Frontend Frameworks | Flutter with Riverpod, Freezed, go_router, mocktail | ✓ | ✓ | |
-| [`pwa-development`](claude/skills/pwa-development/) | Frontend Frameworks | Progressive Web Apps — service workers, caching, Workbox | ✓ | ✓ | |
-| [`chrome-extension-builder`](claude/skills/chrome-extension-builder/) | Frontend Frameworks | Chrome MV3 extensions with WXT + React + TypeScript | ✓ | ✓ | ✓ |
-| [`composition-patterns`](claude/skills/composition-patterns/) | Frontend Frameworks | React composition patterns that scale — ships a 10-rule library | ✓ | ✓ | |
-| [`react-best-practices`](claude/skills/react-best-practices/) | Frontend Frameworks | React/Next.js performance optimization from Vercel Engineering — ships a 57-rule library | ✓ | ✓ | |
+| [`react-web`](claude/skills/react-web/) | Frontend | React web with hooks, React Query, Zustand | ✓ | ✓ | |
+| [`react-native`](claude/skills/react-native/) | Frontend | React Native and Expo — FlashList, Reanimated, React Compiler, native UI primitives, platform-specific code | ✓ | ✓ | |
+| [`flutter`](claude/skills/flutter/) | Frontend | Flutter with Riverpod, Freezed, go_router, mocktail | ✓ | ✓ | |
+| [`pwa-development`](claude/skills/pwa-development/) | Frontend | Progressive Web Apps — service workers, caching, Workbox | ✓ | ✓ | |
+| [`chrome-extension-builder`](claude/skills/chrome-extension-builder/) | Frontend | Chrome MV3 extensions with WXT + React + TypeScript | ✓ | ✓ | ✓ |
+| [`composition-patterns`](claude/skills/composition-patterns/) | Frontend | React composition patterns that scale — ships a 10-rule library | ✓ | ✓ | |
+| [`react-best-practices`](claude/skills/react-best-practices/) | Frontend | React/Next.js performance optimization from Vercel Engineering — ships a 57-rule library | ✓ | ✓ | |
 | [`android-java`](claude/skills/android-java/) | Mobile (Native) | Android Java with MVVM, ViewBinding, Espresso | ✓ | ✓ | |
 | [`android-kotlin`](claude/skills/android-kotlin/) | Mobile (Native) | Android Kotlin with Coroutines, Jetpack Compose, Hilt | ✓ | ✓ | |
 | [`ui-mobile`](claude/skills/ui-mobile/) | Mobile (Native) | Mobile UI patterns — touch targets, platform conventions | ✓ | ✓ | |
@@ -240,21 +239,21 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`design-critique-to-safe-refactor`](claude/skills/design-critique-to-safe-refactor/) | Code Quality | Turn design critique into safe refactors by preserving test contracts and client-side DOM hooks | ✓ |  |  |
 | [`scanner-plugin-integration`](claude/skills/scanner-plugin-integration/) | Code Quality | Merge orphaned scanner scaffolds into the real package tree, keep gating in DryRun, and template new providers consistently | ✓ |  |  |
 | [`security-aware-persistence-design`](claude/skills/security-aware-persistence-design/) | Code Quality | Parameterized queries, PII/DoS safeguards, real transactions, and use-gated exposure decisions for persistence features | ✓ |  |  |
-| [`deploy-idempotency-two-pass-gate`](claude/skills/deploy-idempotency-two-pass-gate/) | DevOps & Tooling | Gate live infra applies by requiring a second pass to show zero changes before success | ✓ |  |  |
-| [`deployment-driver-pin-rewrite-from-release-tag-source-of-truth`](claude/skills/deployment-driver-pin-rewrite-from-release-tag-source-of-truth/) | DevOps & Tooling | Edit the release-tag source of truth, not the derived image pin file, so deploy drivers re-derive correctly | ✓ |  |  |
-| [`diagnostics-probe-design`](claude/skills/diagnostics-probe-design/) | DevOps & Tooling | Design read-only, multi-hypothesis diagnostic probes to root-cause infra failures before fixing | ✓ |  |  |
-| [`firewall-alias-as-indirection`](claude/skills/firewall-alias-as-indirection/) | DevOps & Tooling | Firewall rules should reference named device aliases, not hardcoded IPs, so inventory churn never touches rules | ✓ |  |  |
-| [`fleet-cp1252-mojibake-fix`](claude/skills/fleet-cp1252-mojibake-fix/) | DevOps & Tooling | Strip non-ASCII glyphs from script runtime output to fix cp1252/Git Bash mojibake without touching comments | ✓ |  |  |
-| [`gpu-workload-placement-and-arbitration`](claude/skills/gpu-workload-placement-and-arbitration/) | DevOps & Tooling | Plan and validate GPU workload placement and VRAM arbitration when services share one card | ✓ |  |  |
-| [`grafana-dashboard-engineer`](claude/skills/grafana-dashboard-engineer/) | DevOps & Tooling | Production-grade Grafana dashboard engineering — research, design, build, deploy, and validate observability dashboards across Prometheus, Loki, and custom datasources | ✓ |  |  |
-| [`grafana-dashboard-workflow`](claude/skills/grafana-dashboard-workflow/) | DevOps & Tooling | Author/retrofit Grafana dashboards with live-metric probing, a 4-row baseline, and a 4-rung verify ladder | ✓ |  |  |
-| [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/) | DevOps & Tooling | Diagnose stalled Honcho/background queues via direct Postgres checks, falsifiable health criteria, and pollution audits | ✓ |  |  |
-| [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/) | DevOps & Tooling | Layered LVM thin-pool diagnosis and recovery from ENOSPC, emergency_ro, and metadata-pressure write stalls | ✓ |  |  |
-| [`multi-perspective-dns-diagnostic-ladder`](claude/skills/multi-perspective-dns-diagnostic-ladder/) | DevOps & Tooling | Layered DNS/network/dependency-chain probing ladder with mandatory verify-after-apply for root-causing failures | ✓ |  |  |
-| [`shell-helper-migration`](claude/skills/shell-helper-migration/) | DevOps & Tooling | Safely migrate bash scripts' log/fail/die helpers to a shared lib while preserving exit-code contracts | ✓ |  |  |
-| [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/) | DevOps & Tooling | Classify shell scripts by execution context to know which must skip centralized-helper migration | ✓ |  |  |
-| [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/) | DevOps & Tooling | Centralize shell output/logging helpers as a silent-on-source library, validation stays in consumers | ✓ |  |  |
-| [`two-surface-observability-reconciliation`](claude/skills/two-surface-observability-reconciliation/) | DevOps & Tooling | Reconcile two blind observability or source-of-truth surfaces into one trustworthy verdict | ✓ |  |  |
+| [`deploy-idempotency-two-pass-gate`](claude/skills/deploy-idempotency-two-pass-gate/) | Infrastructure & Ops | Gate live infra applies by requiring a second pass to show zero changes before success | ✓ |  |  |
+| [`deployment-driver-pin-rewrite-from-release-tag-source-of-truth`](claude/skills/deployment-driver-pin-rewrite-from-release-tag-source-of-truth/) | Infrastructure & Ops | Edit the release-tag source of truth, not the derived image pin file, so deploy drivers re-derive correctly | ✓ |  |  |
+| [`diagnostics-probe-design`](claude/skills/diagnostics-probe-design/) | Infrastructure & Ops | Design read-only, multi-hypothesis diagnostic probes to root-cause infra failures before fixing | ✓ |  |  |
+| [`firewall-alias-as-indirection`](claude/skills/firewall-alias-as-indirection/) | Infrastructure & Ops | Firewall rules should reference named device aliases, not hardcoded IPs, so inventory churn never touches rules | ✓ |  |  |
+| [`fleet-cp1252-mojibake-fix`](claude/skills/fleet-cp1252-mojibake-fix/) | Infrastructure & Ops | Strip non-ASCII glyphs from script runtime output to fix cp1252/Git Bash mojibake without touching comments | ✓ |  |  |
+| [`gpu-workload-placement-and-arbitration`](claude/skills/gpu-workload-placement-and-arbitration/) | Infrastructure & Ops | Plan and validate GPU workload placement and VRAM arbitration when services share one card | ✓ |  |  |
+| [`grafana-dashboard-engineer`](claude/skills/grafana-dashboard-engineer/) | Infrastructure & Ops | Production-grade Grafana dashboard engineering — research, design, build, deploy, and validate observability dashboards across Prometheus, Loki, and custom datasources | ✓ |  |  |
+| [`grafana-dashboard-workflow`](claude/skills/grafana-dashboard-workflow/) | Infrastructure & Ops | Author/retrofit Grafana dashboards with live-metric probing, a 4-row baseline, and a 4-rung verify ladder | ✓ |  |  |
+| [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/) | Infrastructure & Ops | Diagnose stalled Honcho/background queues via direct Postgres checks, falsifiable health criteria, and pollution audits | ✓ |  |  |
+| [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/) | Infrastructure & Ops | Layered LVM thin-pool diagnosis and recovery from ENOSPC, emergency_ro, and metadata-pressure write stalls | ✓ |  |  |
+| [`multi-perspective-dns-diagnostic-ladder`](claude/skills/multi-perspective-dns-diagnostic-ladder/) | Infrastructure & Ops | Layered DNS/network/dependency-chain probing ladder with mandatory verify-after-apply for root-causing failures | ✓ |  |  |
+| [`shell-helper-migration`](claude/skills/shell-helper-migration/) | Infrastructure & Ops | Safely migrate bash scripts' log/fail/die helpers to a shared lib while preserving exit-code contracts | ✓ |  |  |
+| [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/) | Infrastructure & Ops | Classify shell scripts by execution context to know which must skip centralized-helper migration | ✓ |  |  |
+| [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/) | Infrastructure & Ops | Centralize shell output/logging helpers as a silent-on-source library, validation stays in consumers | ✓ |  |  |
+| [`two-surface-observability-reconciliation`](claude/skills/two-surface-observability-reconciliation/) | Infrastructure & Ops | Reconcile two blind observability or source-of-truth surfaces into one trustworthy verdict | ✓ |  |  |
 | [`accumulated-feature-branch-workflow`](claude/skills/accumulated-feature-branch-workflow/) | Foundations & Workflow | Structure multi-PR feature branches by risk seam, ship mixed dirty state safely | ✓ |  |  |
 | [`additive-merge-conflict-resolution`](claude/skills/additive-merge-conflict-resolution/) | Foundations & Workflow | Resolve additive git conflicts on append-only files by keeping both sides | ✓ |  |  |
 | [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/) | Foundations & Workflow | Mine past Claude conversation transcripts to extract domain knowledge and recurring failures | ✓ |  |  |
@@ -267,12 +266,12 @@ Domain-specific knowledge modules loaded into AI context. Each skill lives in `{
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/) | Foundations & Workflow | Verify cached refs (git default branch, session memory) against live state before destructive ops | ✓ |  |  |
 | [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/) | Foundations & Workflow | Resume multi-session work via a durable state file, one-step turns, and copy-ready handoff prompts | ✓ |  |  |
 | [`superpowers-overrides`](claude/skills/superpowers-overrides/) | Foundations & Workflow | Convention-adapted overrides of the superpowers brainstorming and writing-plans skills — save plans/specs to the project's own docs conventions instead of `docs/superpowers/` | ✓ |  |  |
-| [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/) | Frontend & UI | Extract real brand colors/logos from raw site CSS and codify them as versioned, documented design tokens | ✓ |  |  |
-| [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/) | Frontend & UI | Build light/dark and multi-brand reskins as pure CSS custom-property token swaps | ✓ |  |  |
-| [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/) | Frontend & UI | Test React list virtualization under jsdom by stubbing getBoundingClientRect and asserting DOM shape | ✓ |  |  |
-| [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/) | Frontend & UI | Delegated event routing and callback-threading patterns for re-rendered UI, plus testable JS media-preference hooks | ✓ |  |  |
-| [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/) | Frontend & UI | Build zero-dependency single-file HTML deliverables with inlined assets that theme-flip correctly | ✓ |  |  |
-| [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/) | Frontend & UI | Stage UI redesigns with gated phases and a two-pass vitest -u regeneration to catch real regressions | ✓ |  |  |
+| [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/) | Frontend | Extract real brand colors/logos from raw site CSS and codify them as versioned, documented design tokens | ✓ |  |  |
+| [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/) | Frontend | Build light/dark and multi-brand reskins as pure CSS custom-property token swaps | ✓ |  |  |
+| [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/) | Frontend | Test React list virtualization under jsdom by stubbing getBoundingClientRect and asserting DOM shape | ✓ |  |  |
+| [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/) | Frontend | Delegated event routing and callback-threading patterns for re-rendered UI, plus testable JS media-preference hooks | ✓ |  |  |
+| [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/) | Frontend | Build zero-dependency single-file HTML deliverables with inlined assets that theme-flip correctly | ✓ |  |  |
+| [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/) | Frontend | Stage UI redesigns with gated phases and a two-pass vitest -u regeneration to catch real regressions | ✓ |  |  |
 </details>
 
 ---

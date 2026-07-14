@@ -1,6 +1,6 @@
 ---
 name: lvm-thin-pool-diagnostics-recovery
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space — covers layered diagnosis and safe recovery of the thin pool and any affected filesystems.
 status: active
 version: 2026-07-05

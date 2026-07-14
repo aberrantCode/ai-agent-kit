@@ -1,6 +1,6 @@
 ---
 name: css-variables-for-multi-theme-reskin
-category: Frontend & UI
+category: Frontend
 description: Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to "reskin" or "retheme" an existing interface without touching its structure or interaction logic.
 status: active
 version: 2026-07-05

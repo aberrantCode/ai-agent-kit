@@ -18,11 +18,14 @@
     `scripts/validate.ps1` (T8) can regenerate CATALOG.md and fail on
     `git diff --exit-code` as its staleness gate.
 
-    Renders faithfully whatever manifest.json['categories'] contains, including
-    near-duplicate category names (e.g. "Tooling & DevOps" vs "DevOps & Tooling") —
-    this script never merges, dedupes, or reinterprets category data. Category
-    consolidation is a skill-frontmatter change and out of scope for a read-only
-    catalog renderer (docs/reorg/charter.md N1).
+    Renders faithfully whatever manifest.json['categories'] contains — this script
+    never merges, dedupes, or reinterprets category data. Category consolidation is a
+    skill-frontmatter change and out of scope for a read-only catalog renderer
+    (docs/reorg/charter.md N1). T6 originally shipped with two near-duplicate category
+    names ("Tooling & DevOps" vs "DevOps & Tooling"); T5c (2026-07-14, erik-authorized)
+    reviewed the actual skill lists and split them by real meaning — DevOps & Tooling
+    was renamed to Infrastructure & Ops — so the near-duplicate note above no longer
+    applies.
 
     Content sections, in order:
       1. Skills — one section per platform (claude, codex, gemini), each with one
@@ -347,11 +350,6 @@ try {
     & $add 'and shared assets, across all vendors. See the root `README.md` for the mission'
     & $add 'and orientation doc; this file is the single generated source of every table and'
     & $add 'count (G5, `docs/requirements/canonical-repo.md`).'
-    & $add ''
-    & $add '**Known data-quality note:** `manifest.json`''s category list carries two'
-    & $add 'near-duplicate categories — `Tooling & DevOps` and `DevOps & Tooling` — retained'
-    & $add 'unmerged here on purpose; this renderer never edits or dedupes category data.'
-    & $add 'See the PR that introduced this file for counts and follow-up.'
     & $add ''
 
     foreach ($p in $platformOrder) {

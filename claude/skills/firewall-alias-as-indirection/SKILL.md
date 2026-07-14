@@ -1,6 +1,6 @@
 ---
 name: firewall-alias-as-indirection
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when designing or editing firewall rules for a group of devices (e.g. cameras, IoT clusters) — reference a named alias instead of hardcoded IPs so device-set changes never require rule edits, and use config-tracing (not assumption) to decide whether a public endpoint is actually load-bearing before retiring it.
 status: active
 version: 2026-07-05

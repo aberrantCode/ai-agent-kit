@@ -1,6 +1,6 @@
 ---
 name: pwa-development
-category: Frontend Frameworks
+category: Frontend
 description: Progressive Web Apps - service workers, caching strategies, offline, Workbox
 ---
 

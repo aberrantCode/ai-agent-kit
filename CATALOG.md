@@ -10,11 +10,6 @@ and shared assets, across all vendors. See the root `README.md` for the mission
 and orientation doc; this file is the single generated source of every table and
 count (G5, `docs/requirements/canonical-repo.md`).
 
-**Known data-quality note:** `manifest.json`'s category list carries two
-near-duplicate categories — `Tooling & DevOps` and `DevOps & Tooling` — retained
-unmerged here on purpose; this renderer never edits or dedupes category data.
-See the PR that introduced this file for counts and follow-up.
-
 ## Claude Skills
 
 ### Foundations & Workflow
@@ -62,25 +57,20 @@ See the PR that introduced this file for counts and follow-up.
 | [`python`](claude/skills/python/SKILL.md) | Python development with ruff, mypy, pytest - TDD and type safety | codex |
 | [`typescript`](claude/skills/typescript/SKILL.md) | TypeScript strict mode with eslint and jest | codex |
 
-### Frontend Frameworks
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`chrome-extension-builder`](claude/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | codex, gemini |
-| [`composition-patterns`](claude/skills/composition-patterns/SKILL.md) |  | codex |
-| [`flutter`](claude/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | codex |
-| [`pwa-development`](claude/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | codex |
-| [`react-best-practices`](claude/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | codex |
-| [`react-native`](claude/skills/react-native/SKILL.md) | React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code | codex |
-| [`react-web`](claude/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | codex |
-
-### Frontend & UI
+### Frontend
 
 | Skill | Description | Also in |
 |---|---|---|
 | [`brand-token-extraction-and-documentation`](claude/skills/brand-token-extraction-and-documentation/SKILL.md) | Use when reskinning an app with a real brand's visual identity — extract the actual palette from a live site's raw CSS (not markdown), recreate logo/icon assets programmatically with documented extraction rationale, a... | — |
+| [`chrome-extension-builder`](claude/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | codex, gemini |
+| [`composition-patterns`](claude/skills/composition-patterns/SKILL.md) |  | codex |
 | [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/SKILL.md) | Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to "reskin" or "retheme" an existing interface without touching its structure or interaction logic. | — |
+| [`flutter`](claude/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | codex |
+| [`pwa-development`](claude/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | codex |
+| [`react-best-practices`](claude/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | codex |
+| [`react-native`](claude/skills/react-native/SKILL.md) | React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code | codex |
 | [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/SKILL.md) | Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser. | — |
+| [`react-web`](claude/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | codex |
 | [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/SKILL.md) | Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-col... | — |
 | [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/SKILL.md) | Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests — no CDNs, no relative-path assets, ... | — |
 | [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/SKILL.md) | Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes — to avoid mask... | — |
@@ -199,7 +189,7 @@ See the PR that introduced this file for counts and follow-up.
 | [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
 
-### DevOps & Tooling
+### Infrastructure & Ops
 
 | Skill | Description | Also in |
 |---|---|---|
@@ -268,7 +258,7 @@ See the PR that introduced this file for counts and follow-up.
 | [`python`](codex/skills/python/SKILL.md) | Python development with ruff, mypy, pytest - TDD and type safety | claude |
 | [`typescript`](codex/skills/typescript/SKILL.md) | TypeScript strict mode with eslint and jest | claude |
 
-### Frontend Frameworks
+### Frontend
 
 | Skill | Description | Also in |
 |---|---|---|
@@ -392,7 +382,7 @@ See the PR that introduced this file for counts and follow-up.
 
 ## Gemini Skills
 
-### Frontend Frameworks
+### Frontend
 
 | Skill | Description | Also in |
 |---|---|---|

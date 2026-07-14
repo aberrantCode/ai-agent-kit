@@ -1,6 +1,6 @@
 ---
 name: multi-perspective-dns-diagnostic-ladder
-category: DevOps & Tooling
+category: Infrastructure & Ops
 description: Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any "mysterious" networked-service failure needs root-causing — apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and always verify a fix by re-checking logs after applying it.
 status: active
 version: 2026-07-05

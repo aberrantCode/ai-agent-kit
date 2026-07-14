@@ -1,6 +1,6 @@
 ---
 name: chrome-extension-builder
-category: Frontend Frameworks
+category: Frontend
 description: Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.
 ---
 
