@@ -1,5 +1,6 @@
 ---
 name: ai-models
+category: AI & LLM
 description: Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: brand-token-extraction-and-documentation
+category: Frontend & UI
 description: Use when reskinning an app with a real brand's visual identity — extract the actual palette from a live site's raw CSS (not markdown), recreate logo/icon assets programmatically with documented extraction rationale, and codify everything as versioned, named design tokens rather than one-off hardcoded values.
 status: active
 version: 2026-07-05

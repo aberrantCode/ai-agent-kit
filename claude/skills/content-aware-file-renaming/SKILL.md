@@ -1,5 +1,6 @@
 ---
 name: content-aware-file-renaming
+category: Tooling & DevOps
 description: >
   Use when renaming files into a structured naming formula based on their contents —
   especially batches of downloaded documents (statements, invoices, tax forms, receipts,

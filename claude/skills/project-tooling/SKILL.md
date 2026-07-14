@@ -1,5 +1,6 @@
 ---
 name: project-tooling
+category: Tooling & DevOps
 description: gh, vercel, supabase, render CLI and deployment platform setup
 ---
 

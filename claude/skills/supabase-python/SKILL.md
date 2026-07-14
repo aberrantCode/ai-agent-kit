@@ -1,5 +1,6 @@
 ---
 name: supabase-python
+category: Databases & Storage
 description: FastAPI with Supabase and SQLAlchemy/SQLModel
 requires: [supabase]
 ---

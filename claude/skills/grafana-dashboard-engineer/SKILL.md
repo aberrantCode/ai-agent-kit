@@ -1,5 +1,6 @@
 ---
 name: grafana-dashboard-engineer
+category: DevOps & Tooling
 description: >
   Production-grade Grafana dashboard engineer. Enables rapid research, design, build, deployment, 
   and validation of observability dashboards across Prometheus, Loki, and custom datasources. Supports 

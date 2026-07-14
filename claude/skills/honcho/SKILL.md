@@ -1,5 +1,6 @@
 ---
 name: honcho
+category: AI & LLM
 description: Work with Honcho — the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, inspecting or debugging a Honcho deployment via the `honcho` CLI, or health-checking a self-hosted Honcho instance (peers, sessions, conclusions, representations, the deriver queue). Triggers on: "add Honcho", "Honcho SDK", "peer.chat", "dialectic", "observe_me", "conclusions/representations", "is Honcho working", "deriver stalled", "migrate honcho".
 allowed-tools: Read, Glob, Grep, Edit, Write, WebFetch, AskUserQuestion, Bash(uv:*), Bash(bun:*), Bash(npm:*), Bash(honcho:*), Bash(jq:*), Bash(docker:*), Bash(psql:*)
 version: '1.0.0'

@@ -1,5 +1,6 @@
 ---
 name: ui-mobile
+category: Mobile (Native)
 description: Mobile UI patterns - React Native, iOS/Android, touch targets
 ---
 

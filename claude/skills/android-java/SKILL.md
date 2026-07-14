@@ -1,5 +1,6 @@
 ---
 name: android-java
+category: Mobile (Native)
 description: Android Java development with MVVM, ViewBinding, and Espresso testing
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: agentic-development
+category: AI & LLM
 description: Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js)
 ---
 

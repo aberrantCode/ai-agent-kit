@@ -1,5 +1,6 @@
 ---
 name: frame-content-recognition
+category: Research & OSINT
 description: >
   Domain expertise for visually inspecting extracted video frames to identify which ones
   show file content (IDE panes, terminal cat, slides, READMEs) and capture path, language,

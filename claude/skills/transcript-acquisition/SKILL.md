@@ -1,5 +1,6 @@
 ---
 name: transcript-acquisition
+category: Research & OSINT
 description: >
   Domain expertise for obtaining a timestamped transcript of a YouTube video — first via
   YouTube's own auto-subs/CC, falling back to local Whisper transcription of the downloaded

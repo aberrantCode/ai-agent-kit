@@ -1,5 +1,6 @@
 ---
 name: diagnostics-probe-design
+category: DevOps & Tooling
 description: Use when investigating a service or infrastructure failure and before proposing any fix — verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.
 status: active
 version: 2026-07-05

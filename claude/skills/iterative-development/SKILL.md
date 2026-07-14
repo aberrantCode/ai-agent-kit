@@ -1,5 +1,6 @@
 ---
 name: iterative-development
+category: Foundations & Workflow
 description: Ralph Wiggum loops - self-referential TDD iteration until tests pass
 ---
 

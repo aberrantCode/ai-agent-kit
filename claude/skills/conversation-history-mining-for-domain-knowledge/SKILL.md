@@ -1,5 +1,6 @@
 ---
 name: conversation-history-mining-for-domain-knowledge
+category: Foundations & Workflow
 description: Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps — mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.
 status: active
 version: 2026-07-05

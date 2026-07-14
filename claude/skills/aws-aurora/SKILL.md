@@ -1,5 +1,6 @@
 ---
 name: aws-aurora
+category: Databases & Storage
 description: AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling
 ---
 

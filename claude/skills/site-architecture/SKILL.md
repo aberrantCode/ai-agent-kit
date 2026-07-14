@@ -1,5 +1,6 @@
 ---
 name: site-architecture
+category: SEO & Web Presence
 description: Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals
 ---
 

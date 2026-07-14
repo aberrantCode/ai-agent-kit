@@ -1,5 +1,6 @@
 ---
 name: file-reconstruction
+category: Research & OSINT
 description: >
   Domain expertise for stitching multi-frame OCR evidence into canonical source files on
   disk — without duplicating overlapping lines — and for placing each file at a sensible

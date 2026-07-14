@@ -1,5 +1,6 @@
 ---
 name: subagent-driven-development
+category: Foundations & Workflow
 description: Use when executing implementation plans with independent tasks in the current session
 ---
 

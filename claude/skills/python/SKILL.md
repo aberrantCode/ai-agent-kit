@@ -1,5 +1,6 @@
 ---
 name: python
+category: Languages & Runtimes
 description: Python development with ruff, mypy, pytest - TDD and type safety
 ---
 

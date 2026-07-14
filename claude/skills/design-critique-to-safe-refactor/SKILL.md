@@ -1,5 +1,6 @@
 ---
 name: design-critique-to-safe-refactor
+category: Code Quality
 description: Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.
 status: active
 version: 2026-07-05

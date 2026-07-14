@@ -1,5 +1,6 @@
 ---
 name: woocommerce
+category: Commerce & Payments
 description: WooCommerce REST API - products, orders, customers, webhooks
 ---
 

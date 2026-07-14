@@ -1,5 +1,6 @@
 ---
 name: what-next
+category: Foundations & Workflow
 description: >
   Decide what the agent should do next in the current repository. Use this skill whenever the user
   asks "what next?", "what should I work on?", "where did we leave off?", "what's on the backlog?",

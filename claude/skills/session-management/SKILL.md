@@ -1,5 +1,6 @@
 ---
 name: session-management
+category: Foundations & Workflow
 description: Context preservation, tiered summarization, resumability
 ---
 

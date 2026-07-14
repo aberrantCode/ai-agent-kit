@@ -1,5 +1,6 @@
 ---
 name: homeradar-fix-start
+category: Foundations & Workflow
 description: Use when starting any HomeRadar bug fix or regression investigation, before writing any code
 ---
 

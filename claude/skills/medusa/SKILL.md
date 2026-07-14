@@ -1,5 +1,6 @@
 ---
 name: medusa
+category: Commerce & Payments
 description: Medusa headless commerce - modules, workflows, API routes, admin UI
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: worldview-shader-preset
+category: Research & OSINT
 description: Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, exposes adjustable parameters in the right panel, persists its settings per mode, and integrates with the SCENES shot-sequencer.
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: credentials
+category: Security & Credentials
 description: Centralized API key management from Access.txt
 ---
 

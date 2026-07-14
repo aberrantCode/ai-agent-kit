@@ -1,5 +1,6 @@
 ---
 name: gpu-workload-placement-and-arbitration
+category: DevOps & Tooling
 description: Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.
 status: active
 version: 2026-07-05

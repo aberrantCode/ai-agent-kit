@@ -1,5 +1,6 @@
 ---
 name: state-file-driven-multi-turn-resumption
+category: Foundations & Workflow
 description: Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them — a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one step, records evidence, and ends with a copy-ready resume prompt.
 status: active
 version: 2026-07-05

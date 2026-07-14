@@ -1,5 +1,6 @@
 ---
 name: existing-repo
+category: Foundations & Workflow
 description: Analyze existing repositories, maintain structure, setup guardrails and best practices
 ---
 

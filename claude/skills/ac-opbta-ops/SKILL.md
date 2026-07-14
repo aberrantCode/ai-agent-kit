@@ -1,5 +1,6 @@
 ---
 name: ac-opbta-ops
+category: Tooling & DevOps
 description: Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here — even if the tool isn't named explicitly (e.g. "add a rule so the IoT VLAN can reach Wyzebridge", "spin up a container for X", "what's the admin password for Y").
 ---
 

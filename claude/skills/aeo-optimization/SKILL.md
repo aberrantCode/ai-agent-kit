@@ -1,5 +1,6 @@
 ---
 name: aeo-optimization
+category: SEO & Web Presence
 description: AI Engine Optimization - semantic triples, page templates, content clusters for AI citations
 ---
 

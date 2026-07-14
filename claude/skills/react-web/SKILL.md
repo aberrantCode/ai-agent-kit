@@ -1,5 +1,6 @@
 ---
 name: react-web
+category: Frontend Frameworks
 description: React web development with hooks, React Query, Zustand
 ---
 

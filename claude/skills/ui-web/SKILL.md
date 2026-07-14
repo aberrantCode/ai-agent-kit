@@ -1,5 +1,6 @@
 ---
 name: ui-web
+category: UI & Design
 description: Web UI - glassmorphism, Tailwind, dark mode, accessibility
 ---
 

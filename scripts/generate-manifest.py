@@ -9,12 +9,16 @@ import os, re, json, sys, argparse
 from datetime import date
 
 # Category source-of-truth marker (requirements canonical-repo.md §6, D8).
-# While categories are resolved from the hardcoded CATEGORIES dict below this is
-# 'legacy-dict'; the T5 backfill flips resolution to per-skill `category:`
-# frontmatter and this becomes 'frontmatter'. audit.ps1 keys the missing-category
-# severity off this explicit marker (legacy-dict -> warn, frontmatter -> error) —
-# it is a deliberate signal, never a coverage heuristic.
-CATEGORY_SOURCE = 'legacy-dict'
+# T5 backfilled `category:` frontmatter onto every Claude SKILL.md and flipped
+# resolution here from the old hardcoded CATEGORIES dict to per-skill frontmatter.
+# audit.ps1 keys the missing-category severity off this explicit marker
+# (legacy-dict -> warn, frontmatter -> error) — it is a deliberate signal, never a
+# coverage heuristic.
+CATEGORY_SOURCE = 'frontmatter'
+
+# manifest.json shape version (requirements canonical-repo.md §7 P1). Bump on any
+# breaking change to the manifest's top-level shape; documented in scripts/README.md.
+SCHEMA_VERSION = 1
 
 # Original working directory, captured before the chdir below so that a relative
 # --output path resolves against where the user invoked the script, not REPO_ROOT.
@@ -23,95 +27,37 @@ INVOCATION_CWD = os.getcwd()
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(REPO_ROOT)
 
-CATEGORIES = {
-    'Foundations & Workflow': [
-        'base', 'code-deduplication', 'commit-hygiene', 'existing-repo',
-        'iterative-development', 'session-management', 'team-coordination',
-        'tdd-workflow', 'workspace', 'subagent-driven-development',
-        'finishing-a-development-branch',
-        'using-git-worktrees', 'requesting-code-review', 'ship-to-dev',
-        'release-to-main', 'git-cleanup', 'guide-assistant', 'feature-start',
-        'fix-start', 'pre-pr', 'retro-fit-spec', 'spec-align', 'add-feature',
-        'composition-patterns', 'doc-coauthoring', 'explain-code',
-        'state-file-driven-multi-turn-resumption', 'recursive-batch-handoff',
-        'parallel-subagent-fanout', 'self-paced-loop-iteration',
-        'additive-merge-conflict-resolution', 'project-plan-task-reconciliation',
-        'spec-consistency-doc-refactoring-pattern',
-        'accumulated-feature-branch-workflow', 'iterative-audit-gate-with-streak-reset',
-        'conversation-history-mining-for-domain-knowledge',
-        'stale-symbolic-ref-detection-and-repair', 'worktree-isolated-loop',
-    ],
-    'Code Quality': [
-        'code-review', 'codex-review', 'gemini-review', 'playwright-testing',
-        'security',
-        'design-critique-to-safe-refactor', 'scanner-plugin-integration',
-        'security-aware-persistence-design', 'crlf-gitattributes-normalization',
-    ],
-    'Languages': [
-        'android-java', 'android-kotlin', 'flutter', 'nodejs-backend',
-        'python', 'react-best-practices', 'react-native', 'react-web',
-        'typescript',
-    ],
-    'Frontend & UI': [
-        'frontend-design', 'pwa-development',
-        'ui-mobile', 'ui-testing', 'ui-web', 'web-design-guidelines',
-        'chrome-extension-builder',
-        'self-contained-html-artifact-with-inline-assets',
-        'brand-token-extraction-and-documentation',
-        'css-variables-for-multi-theme-reskin',
-        'react-virtualization-with-jsdom-measurement',
-        'reactive-ui-state-with-delegated-event-routing',
-        'ui-redesign-with-snapshot-regeneration',
-    ],
-    'Databases': [
-        'aws-aurora', 'aws-dynamodb', 'azure-cosmosdb', 'cloudflare-d1',
-        'database-schema', 'firebase', 'supabase', 'supabase-nextjs',
-        'supabase-node', 'supabase-python',
-    ],
-    'AI & LLM': [
-        'agentic-development', 'ai-models', 'csv-driven-llm-pipeline',
-        'llm-patterns', 'project-manager',
-    ],
-    'DevOps & Tooling': [
-        'add-remote-installer', 'project-tooling', 'publish-github',
-        'remote-installer', 'skills-manager', 'start-app',
-        'vercel-deploy-claimable', 'visual-explainer',
-        'grafana-dashboard-workflow', 'deploy-idempotency-two-pass-gate',
-        'diagnostics-probe-design', 'shell-helper-migration',
-        'gpu-workload-placement-and-arbitration', 'shell-migration-skip-taxonomy',
-        'firewall-alias-as-indirection', 'fleet-cp1252-mojibake-fix',
-        'honcho-deriver-queue-health-diagnostics',
-        'two-surface-observability-reconciliation',
-        'deployment-driver-pin-rewrite-from-release-tag-source-of-truth',
-        'lvm-thin-pool-diagnostics-recovery',
-        'multi-perspective-dns-diagnostic-ladder', 'side-effect-free-helper-library',
-    ],
-    'Commerce': [
-        'klaviyo', 'medusa', 'reddit-ads', 'shopify-apps', 'web-payments',
-        'woocommerce',
-    ],
-    'Content & Marketing': [
-        'aeo-optimization', 'credentials', 'ms-teams-apps',
-        'posthog-analytics', 'reddit-api', 'site-architecture',
-        'user-journeys', 'web-content',
-    ],
-    'Specialized': [
-        'logo-restylizer', 'worldview-layer-scaffold',
-        'worldview-shader-preset', 'youtube-prd-forensics',
-    ],
-}
+# Curated category display order (requirements canonical-repo.md §6, D8): NOT
+# alphabetical, preserved deliberately so manifest['categories'] (and anything
+# rendered from it, e.g. CATALOG.md) keeps the same reading order the archive has
+# always used. This is the one piece of category knowledge that stays in the
+# generator after T5 — actual skill -> category resolution now comes entirely from
+# each skill's own `category:` frontmatter (read_frontmatter), never from a
+# hardcoded skill list. Mirrors `$script:CategoryOrder` in
+# scripts/backfill-categories.ps1 verbatim; keep both in sync if this changes.
+CATEGORY_ORDER = [
+    'Foundations & Workflow',
+    'Languages & Runtimes',
+    'Frontend Frameworks',
+    'Frontend & UI',
+    'Mobile (Native)',
+    'UI & Design',
+    'Databases & Storage',
+    'Code Quality',
+    'Security & Credentials',
+    'AI & LLM',
+    'Commerce & Payments',
+    'Third-Party Integrations',
+    'SEO & Web Presence',
+    'Tooling & DevOps',
+    'DevOps & Tooling',
+    'Research & OSINT',
+]
 
 STANDARD_SKILLS = [
     'code-review', 'git-cleanup', 'project-manager',
     'release-to-main', 'ship-to-dev', 'skills-manager',
 ]
-
-# Build reverse lookup
-skill_to_cat = {}
-for cat, skills in CATEGORIES.items():
-    for s in skills:
-        if s not in skill_to_cat:
-            skill_to_cat[s] = cat
 
 
 def read_frontmatter(path, max_bytes=10000):
@@ -176,7 +122,15 @@ def frontmatter_status(path, max_bytes=10000):
     return read_frontmatter(path, max_bytes), 'ok'
 
 
-def scan_platform(platform):
+def scan_platform(platform, claude_categories=None):
+    """Scan one platform's skills/instructions.
+
+    claude_categories: None when scanning 'claude' itself (category comes from that
+    skill's own `category:` frontmatter, the D8 source of truth). A dict of
+    {skill_name: category} when scanning a mirror platform ('codex', 'gemini') —
+    mirrors carry no `category:` frontmatter of their own (T5 only backfilled Claude
+    SKILL.md files), so they inherit the source Claude skill's category by name.
+    """
     result = {'skills': {}, 'instructions': {}}
 
     skills_dir = os.path.join(platform, 'skills')
@@ -186,9 +140,13 @@ def scan_platform(platform):
             if not os.path.isfile(skill_md):
                 continue
             fm = read_frontmatter(skill_md)
+            if claude_categories is None:
+                category = fm.get('category') or 'Other'
+            else:
+                category = claude_categories.get(name, 'Other')
             entry = {
                 'description': fm.get('description', ''),
-                'category': skill_to_cat.get(name, 'Other'),
+                'category': category,
             }
             if os.path.isdir(os.path.join(skills_dir, name, 'commands')):
                 entry['has_commands'] = True
@@ -211,14 +169,20 @@ def scan_platform(platform):
 
 
 def build_manifest():
+    claude_scan = scan_platform('claude')
+    claude_categories = {
+        name: entry['category'] for name, entry in claude_scan['skills'].items()
+    }
     manifest = {
+        'schemaVersion': SCHEMA_VERSION,
         'generated': date.today().isoformat(),
         'standard_skills': STANDARD_SKILLS,
-        'categories': list(CATEGORIES.keys()),
-        'platforms': {},
+        'categories': CATEGORY_ORDER,
+        'platforms': {'claude': claude_scan},
     }
-    for platform in ('claude', 'codex', 'gemini'):
-        manifest['platforms'][platform] = scan_platform(platform)
+    for platform in ('codex', 'gemini'):
+        manifest['platforms'][platform] = scan_platform(
+            platform, claude_categories=claude_categories)
     return manifest
 
 
@@ -232,6 +196,10 @@ def build_validation():
         'categorySource': CATEGORY_SOURCE,
         'platforms': {},
     }
+    # claude first: its own `category:` frontmatter is authoritative and mirrors
+    # (codex, gemini) look up their category from this dict by skill name, since
+    # T5 only backfilled `category:` onto Claude SKILL.md files (D8).
+    claude_categories = {}
     for platform in ('claude', 'codex', 'gemini'):
         skills = {}
         skills_dir = os.path.join(platform, 'skills')
@@ -242,7 +210,12 @@ def build_validation():
                 if not os.path.isfile(skill_md):
                     continue
                 fields, status = frontmatter_status(skill_md)
-                category = skill_to_cat.get(name, 'Other')
+                has_category_field = bool(fields.get('category'))
+                if platform == 'claude':
+                    category = fields.get('category') or 'Other'
+                    claude_categories[name] = category
+                else:
+                    category = claude_categories.get(name, 'Other')
                 skills[name] = {
                     'path': f'{platform}/skills/{name}/SKILL.md',
                     'frontmatterStatus': status,
@@ -250,7 +223,7 @@ def build_validation():
                     'nameMatchesDir': fields.get('name') == name,
                     'description': fields.get('description', ''),
                     'category': category,
-                    'hasCategoryField': bool(fields.get('category')),
+                    'hasCategoryField': has_category_field,
                     'isOther': category == 'Other',
                     'installedFrom': fields.get('installed-from'),
                     'hasDiagram': os.path.isfile(os.path.join(skill_dir, 'diagram.html')),

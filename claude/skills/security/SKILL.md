@@ -1,5 +1,6 @@
 ---
 name: security
+category: Security & Credentials
 description: OWASP security patterns, secrets management, and security testing, plus a comprehensive security review checklist. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features.
 ---
 

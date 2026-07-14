@@ -1,5 +1,6 @@
 ---
 name: firebase
+category: Databases & Storage
 description: Firebase Firestore, Auth, Storage, real-time listeners, security rules
 ---
 

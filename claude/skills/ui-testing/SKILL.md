@@ -1,5 +1,6 @@
 ---
 name: ui-testing
+category: UI & Design
 description: Visual testing - catch invisible buttons, broken layouts, contrast
 ---
 

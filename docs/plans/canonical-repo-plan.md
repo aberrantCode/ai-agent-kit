@@ -179,7 +179,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   (esp. its block-scalar frontmatter handling, lines ~129–144).
 
 ### T5 — Category frontmatter backfill + manifest generator update
-- [ ] **Status:** todo (P1 approved — sub-step 3b is in scope)
+- [x] **Status:** done — PR #62 (P1 approved — sub-step 3b delivered)
 - **Agent / model:** general-purpose / sonnet (script does the sweep; agent writes the script)
 - **Description:** Make `category:` frontmatter the single source of truth (D8).
 - **Work plan:**

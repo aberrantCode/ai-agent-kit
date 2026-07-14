@@ -1,5 +1,6 @@
 ---
 name: ac-logo
+category: UI & Design
 description: >
   Full lifecycle for AC "PCB phosphor console" brand logos in any repository — finding
   existing logo assets and judging them against the brand checklist, generating a new

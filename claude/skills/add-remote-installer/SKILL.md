@@ -1,5 +1,6 @@
 ---
 name: add-remote-installer
+category: Tooling & DevOps
 description: Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install directory, then applies the remote-installer skill to implement both artifacts correctly.
 requires: [remote-installer]
 ---

@@ -1,5 +1,6 @@
 ---
 name: shell-migration-skip-taxonomy
+category: DevOps & Tooling
 description: Use when deciding whether a shell script can safely be migrated to source a centralized helper library — classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.
 status: active
 version: 2026-07-05

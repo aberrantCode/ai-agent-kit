@@ -1,5 +1,6 @@
 ---
 name: user-journeys
+category: UI & Design
 description: User experience flows - journey mapping, UX validation, error recovery
 ---
 
