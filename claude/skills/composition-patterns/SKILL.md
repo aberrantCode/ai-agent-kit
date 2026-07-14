@@ -1,5 +1,5 @@
 ---
-name: vercel-composition-patterns
+name: composition-patterns
 category: Frontend Frameworks
 description:
   React composition patterns that scale. Use when refactoring components with

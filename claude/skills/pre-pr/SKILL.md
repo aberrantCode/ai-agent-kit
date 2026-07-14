@@ -1,5 +1,5 @@
 ---
-name: homeradar-pre-pr
+name: pre-pr
 category: Foundations & Workflow
 description: Use before opening any HomeRadar pull request — three self-gates must all pass
 ---

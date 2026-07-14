@@ -1,5 +1,5 @@
 ---
-name: homeradar-spec-align
+name: spec-align
 category: Foundations & Workflow
 description: Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev
 ---

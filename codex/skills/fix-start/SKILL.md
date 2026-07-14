@@ -1,5 +1,5 @@
 ---
-name: homeradar-fix-start
+name: fix-start
 description: Use when starting any HomeRadar bug fix or regression investigation, before writing any code
 ---
 
