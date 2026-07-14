@@ -77,3 +77,9 @@ logs/timing.jsonl             — `/ship` timing log
 Always use `/ship` to merge changes into `dev`, then `/release` for production releases.
 
 Feature branches: `type/short-description` branching off `dev`, PR back to `dev`.
+
+- **Local validation gate (P2, as modified — local, not GitHub Actions):** `/ship`
+  MUST run `pwsh ./scripts/validate.ps1` before opening any PR and abort if it exits
+  non-zero. See `scripts/README.md` ("Local validation gate + pre-push hook") for what
+  the gate checks and how it interacts with the optional `pre-push` git hook
+  (`scripts/install-hooks.ps1`, opt-in) and the global git-push-opens-Zed hook.
