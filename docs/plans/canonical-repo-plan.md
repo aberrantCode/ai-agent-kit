@@ -257,7 +257,7 @@ Sequencing constraints (the real dependencies, not folder aesthetics):
   follow-through); T4 (audit implementation).
 
 ### T5c — Category taxonomy consolidation
-- [ ] **Status:** todo
+- [x] **Status:** done — PR #66
 - **Agent / model:** general-purpose / sonnet
 - **Description:** T6's generated `CATALOG.md` surfaced category drift from T5's
   backfill: two near-identical category names (`Tooling & DevOps` / `DevOps &
