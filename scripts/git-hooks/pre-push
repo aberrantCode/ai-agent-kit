@@ -1,6 +1,7 @@
 #!/bin/sh
 # pre-push — runs scripts/validate.ps1 before allowing a push, rejecting the push if
-# it fails.
+# it fails. Deletion-only pushes (`git push --delete <branch>`) skip the gate — see the
+# stdin block below for why.
 #
 # Installed via `pwsh ./scripts/install-hooks.ps1 -Force` (opt-in; see
 # scripts/README.md — this hook only runs once someone has explicitly installed it,
@@ -33,6 +34,36 @@
 set -e
 
 repo_root=$(git rev-parse --show-toplevel)
+
+# Skip the gate for pushes that ship no commits — i.e. branch deletions.
+#
+# Git feeds pre-push one line per ref on stdin (the remote name and URL are the only
+# things that arrive as arguments):
+#     <local ref> <local oid> <remote ref> <remote oid>
+# `git push --delete <branch>` has no local side, so git sends the literal ref
+# "(delete)" and an all-zeros local oid. Such a push adds no commits to the remote, so
+# there is no new state for validate.ps1 to have an opinion about — gating it only
+# spends ~2s re-validating an unchanged working tree. `/prune` deletes branches in
+# batches, so that repeats per branch. A push mixing deletions with real commits still
+# runs the gate: one content-bearing ref is enough.
+#
+# The zeros are derived rather than hardcoded (the idiom is lifted from git's own
+# pre-push.sample) so this stays correct in a SHA-256 repo, where oids are 64 chars
+# rather than 40.
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+
+needs_validate=0
+while read -r _local_ref local_oid _remote_ref _remote_oid; do
+    if [ "$local_oid" != "$zero" ]; then
+        needs_validate=1
+        break
+    fi
+done
+
+if [ "$needs_validate" -eq 0 ]; then
+    echo "pre-push: no commits being pushed (deletion only) -- skipping scripts/validate.ps1"
+    exit 0
+fi
 
 if command -v pwsh >/dev/null 2>&1; then
     pwsh_cmd="pwsh"
