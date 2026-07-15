@@ -200,6 +200,10 @@ modified). Two pieces:
   `validate.ps1` and rejects the push on nonzero exit. Preview by default; `-Force`
   applies. Re-running it, installed or not, is always a safe no-op the second time.
   Uninstall with `git config --unset core.hooksPath`.
+  The hook reads git's stdin ref list and skips the gate when a push carries no commits
+  — `git push --delete <branch>` sends an all-zeros local oid, and there is no new state
+  to validate. This keeps batched `/prune` cleanups from paying the gate per deleted
+  branch. A push mixing deletions with real commits is still gated.
 - The repo `CLAUDE.md` also wires `/ship` to run `validate.ps1` before opening any PR
   and abort on failure — so the gate applies whether or not a contributor has
   installed the git hook.

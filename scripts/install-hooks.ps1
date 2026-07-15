@@ -7,8 +7,10 @@
     Points this repository's git `core.hooksPath` (a repo-local git config
     setting — never global, never applied to any other repo) at the committed
     `scripts/git-hooks/` directory, whose `pre-push` hook runs
-    `scripts/validate.ps1` on every `git push` against this repo and rejects
-    the push if it exits non-zero.
+    `scripts/validate.ps1` on every `git push` against this repo that carries
+    commits, and rejects the push if it exits non-zero. Deletion-only pushes
+    (`git push --delete <branch>`) skip the gate — they add no state to
+    validate; see `scripts/git-hooks/pre-push` for the stdin mechanics.
 
     Strictly opt-in: a fresh clone has no hooksPath set and this hook does not
     run until someone explicitly invokes this script with -Force. Running the
