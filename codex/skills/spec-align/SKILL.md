@@ -25,7 +25,7 @@ End-to-end workflow: find spec → gap analysis → plan → implement → ship 
 
 Inspect the spec's Capabilities section. If any capability bullet lacks a `[XX-CAP-NN]` prefix:
 
-1. Invoke **`homeradar-retro-fit-spec`** to add CAP-IDs.
+1. Invoke **`retro-fit-spec`** to add CAP-IDs.
 2. Commit the retro-fit alone before any other work:
    ```
    docs: retro-fit CAP-IDs to <spec-name>.md
@@ -158,7 +158,7 @@ Once plan is approved:
 
 ## Phase 7 — Pre-PR Gate
 
-Invoke **`homeradar-pre-pr`** and work through all three gates:
+Invoke **`pre-pr`** and work through all three gates:
 - Gate 1: Full test suite for all touched stacks
 - Gate 2: Lint + type-check, zero new errors
 - Gate 3: Every commit has a `Refs:` line; no `console.log`; PR description includes Spec Coverage table
@@ -204,14 +204,14 @@ Report the result to the user. If any service fails to start, diagnose before de
 
 ```
 0.  Find spec (filename or topic search)
-1.  Retro-fit CAP-IDs if missing        → homeradar-retro-fit-spec
+1.  Retro-fit CAP-IDs if missing        → retro-fit-spec
 2.  Gate 1: Status = Approved           → human sets this; STOP if not
 3.  Gap analysis                        → classify each CAP-ID: Implemented / Partial / Missing
     (skip phases 4-9 if all Implemented)
 4.  Write plan                          → docs/plans/YYYY-MM-DD-<slug>-align-impl.md
 5.  Gate 2: Plan approved               → ask user; STOP until approved
 6.  Implement                           → worktree + TDD per task + spec ACs checked off
-7.  Pre-PR gate                         → homeradar-pre-pr (all 3 gates)
+7.  Pre-PR gate                         → pre-pr (all 3 gates)
 8.  Ship to dev                         → ship-to-dev + Spec Coverage table
 9.  Start app                           → pwsh scripts/Start-App.ps1
 ```
