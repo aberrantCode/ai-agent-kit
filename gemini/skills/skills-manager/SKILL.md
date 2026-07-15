@@ -413,7 +413,7 @@ Infer subsection from keywords in the skill's `description` field:
 |----------|-----------|
 | git, branch, commit, PR, merge, workflow, session, team, coordination, repo | Foundations & Workflow |
 | TypeScript, Python, Node.js, runtime, language | Languages & Runtimes |
-| React, Vue, Next.js, frontend framework, PWA, Flutter | Frontend Frameworks |
+| React, Vue, Next.js, frontend framework, PWA, Flutter | Frontend |
 | Android, iOS, mobile native, Kotlin, Swift | Mobile (Native) |
 | UI, UX, design, Tailwind, accessibility, visual, diagram, explainer | UI & Design |
 | database, SQL, Supabase, Firebase, DynamoDB, Aurora, Cosmos, D1, schema | Databases & Storage |

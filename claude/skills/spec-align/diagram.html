@@ -522,7 +522,7 @@
         </div>
         <div class="tl-body">
           Inspect Capabilities section for <code>[XX-CAP-NN]</code> prefixes.
-          If any are missing → invoke <strong>homeradar-retro-fit-spec</strong> and commit the retro-fit alone.
+          If any are missing → invoke <strong>retro-fit-spec</strong> and commit the retro-fit alone.
           Only continue once all capabilities have prefixes.
         </div>
       </div>
@@ -606,7 +606,7 @@
           <span class="tl-title">Pre-PR Gate</span>
         </div>
         <div class="tl-body">
-          Invoke <strong>homeradar-pre-pr</strong>. All three gates must pass:
+          Invoke <strong>pre-pr</strong>. All three gates must pass:
           full test suite for all touched stacks · lint + type-check (zero new errors) ·
           every commit has <code>Refs:</code> line, no <code>console.log</code>, PR description has Spec Coverage table.
         </div>
@@ -667,7 +667,7 @@ flowchart TD
     I -->|Revise| H
     I -->|Stop| ISTOP["STOP — user\nimplements manually"]
     I -->|Approved| J["Implementation\nworktree + TDD per task"]
-    J --> K["Pre-PR Gate\nhomeradar-pre-pr"]
+    J --> K["Pre-PR Gate\npre-pr"]
     K --> L["Ship to Dev\nPR + Spec Coverage"]
     L --> M["Start App\nverify stack"]
     M --> DONE2(["Spec Status = Implemented"])
