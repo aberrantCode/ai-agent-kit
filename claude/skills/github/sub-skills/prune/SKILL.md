@@ -79,7 +79,5 @@ rule from the parent skill if a worktree dir resists removal.
 Removed 3 (worktree feat/login + its local & remote branch). Skipped 1 dirty (fix/wip). Failed 0.
 ```
 
-Then append one row per item to `docs/git-log.md` (create the file with Removed / Failed /
-Skipped tables if absent). Date `YYYY-MM-DD`; Scope column names what was deleted; Notes column
-records `Success`, `Failed: <error>`, or `Skipped: uncommitted changes`. Use `Edit` to insert
-rows — do not rewrite the whole file.
+Write no audit file. Git history is the archive of record for what was deleted; a tracked log
+would only restate it, and would land as an uncommitted file on `dev` every run.
