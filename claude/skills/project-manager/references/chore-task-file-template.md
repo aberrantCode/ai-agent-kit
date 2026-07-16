@@ -1,7 +1,8 @@
 ---
-feature: "{{feature-slug}}"
+feature: "chore-{{area}}"
 phase: {{N}}
 task: {{M}}
+backlog_ref: "BL-{{NNN}}"
 covers: ["XX-CAP-NN"]
 role: "{{role}}"
 agent: "{{agent-type}}"
@@ -10,7 +11,7 @@ created: "{{TODAY}}"
 claimed_by: "{{agent-or-user}}"
 claimed_at: "{{TIMESTAMP}}"
 lease_expires_at: "{{TIMESTAMP}}"
-assignee: ""                          # human or agent handle; optional
+assignee: ""
 external_issue: ""
 external_url: ""
 parallel: false
@@ -18,9 +19,10 @@ conflicts_with: []
 files_allowed: []
 files_shared: []
 depends_on_tasks: []
+# authz_snapshot: (frozen at promotion — added by the guard-enforcement step)
 ---
 
-# Task — `{{feature-slug}}-p{{N}}-t{{M}}`
+# Chore Task — `chore-{{area}}-BL-{{NNN}}`
 
 > **Agent contract.** Read this entire file. Perform every action in the Action Plan section. When done, append a final `## Completion` block at the bottom exactly as specified. Do not modify any content above your appended `## Completion` block.
 
@@ -30,33 +32,19 @@ depends_on_tasks: []
 
 ---
 
-## Spec excerpt
+## Backlog item
 
-Pulled verbatim from `docs/features/{{feature-slug}}.md` — the orchestrator inlines the relevant capabilities and acceptance criteria so this task is self-contained.
+Pulled from `docs/backlog.md` — the orchestrator inlines the backlog row so this task is self-contained.
 
-> **Capabilities in scope**
-> - `[XX-CAP-NN]` ...
->
-> **Acceptance criteria**
-> - **AC-NN** Given … When … Then …
-
----
-
-## Plan excerpt
-
-From `docs/plans/{{feature-slug}}-plan.md`:
-
-> **Phase {{N}} goal.** ...
-> **This task.** ...
-> **Exit criteria.** ...
+> | BL-{{NNN}} | {{type}} | {{area}} | {{pri}} | {{status}} | {{item}} | {{link}} |
 
 ---
 
 ## Related completed work
 
-The orchestrator lists previously archived task files in this feature that may inform the current task. Read them only if you need context.
+The orchestrator lists previously archived task files in this chore that may inform the current task. Read them only if you need context.
 
-- `docs/tasks/archive/{{feature-slug}}-p{{N-1}}-t{{Last}}.md` — summary line
+- `docs/tasks/archive/chore-{{area}}-BL-{{prev}}.md` — summary line
 
 ---
 
@@ -74,6 +62,7 @@ The orchestrator lists previously archived task files in this feature that may i
 
 - `docs/features/**` — specs are authority; if a change is needed, surface it in the completion notes, do not edit
 - `docs/plans/**` — orchestrator-owned
+- `docs/workflow/scope-manifest.md` and this task's `backlog_ref` row's authorization fields — a chore commit may not edit its own authorization
 - Other task files
 
 **Parallel execution metadata**
@@ -81,7 +70,7 @@ The orchestrator lists previously archived task files in this feature that may i
 - `parallel` remains `false` unless `/analyze-parallelism` has produced an approved batch plan.
 - `files_allowed` are exclusive ownership globs for this task.
 - `files_shared` require a single owning task and explicit merge coordination.
-- `conflicts_with` and `depends_on_tasks` use local task ids such as `{{feature-slug}}-p1-t2`.
+- `conflicts_with` and `depends_on_tasks` use local task ids such as `chore-{{area}}-BL-{{NNN}}`.
 
 ---
 
@@ -89,7 +78,7 @@ The orchestrator lists previously archived task files in this feature that may i
 
 - Tests-first. Write a failing test before implementation when adding behavior.
 - Do not introduce new dependencies without listing them in `Notes` below.
-- Do not silently expand scope. If a required change falls outside this task's `covers:` list, stop and surface it in `Notes`.
+- Do not silently expand scope. If a required change falls outside this chore's `covers:` list, stop and surface it in `Notes`.
 
 ---
 
