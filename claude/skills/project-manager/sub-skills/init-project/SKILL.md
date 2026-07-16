@@ -30,7 +30,8 @@ Before writing anything:
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
    - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
-   - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`
+   - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`, `docs/workflow/scope-manifest.md`
+   - `docs/backlog.md`, `docs/backlog-archive.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -68,15 +69,19 @@ For every directory and file from the discovery list that does **not** already e
 - **`.claude/settings.json`** — JSON merge. Read the existing file (or `{}`), shallow-merge the `hooks.PreToolUse` array (do not duplicate entries with the same `command`). Write back with 2-space indentation.
 - **`.github/pull_request_template.md`** — If absent, copy from template (no substitution). If present, leave it.
 - **`ROADMAP.md`** — If absent, copy from template with substitutions. If present, leave it.
-- **`docs/STATUS.md`** — If absent, copy from `references/init-project/STATUS.md.template`. This
-  is the single outstanding-work + next-action tracker: five `##` sections, both `pm:curated:*` and
-  `pm:generated:*` fence pairs, §1 seeded with a "no active run yet" line and §4 empty. If present,
+- **`docs/STATUS.md`** — If absent, copy from `references/init-project/STATUS.md.template` (substitute `{{TODAY}}`).
+  This is the single outstanding-work + next-action tracker: four `##` sections, both `pm:curated:*` and
+  `pm:generated:*` fence pairs, §1 seeded with a "no active run yet" line and §4 seeded as a GENERATED
+  `pm:generated:backlog` fence (because `docs/backlog.md` is scaffolded in the same pass). If present,
   leave it.
 - **`docs/workflow/SDLC.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/FOCUS.md`** — If absent, copy from template (a one-line retired stub pointing to
   `docs/STATUS.md` §1 — the runtime/next-action state lives there now, not here). If present, leave it.
 - **`docs/workflow/INDEX.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/runners.md`** — If absent, copy from `references/init-project/runners.md.template`. Phase 3.5 (Runner Discovery) fills in the table; this step only creates the file with the placeholder row so the path exists for downstream code.
+- **`docs/backlog.md`** — If absent, copy from `references/init-project/backlog.md.template` (substitute `{{TODAY}}`). If present, leave it. This is the canonical intake store; its presence is what makes STATUS §4 generated.
+- **`docs/backlog-archive.md`** — If absent, copy from `references/init-project/backlog-archive.md.template` (substitute `{{TODAY}}`). If present, leave it.
+- **`docs/workflow/scope-manifest.md`** — If absent, copy VERBATIM from `references/init-project/scope-manifest.md.template` (the conservative default: source/API/UI dirs → `product_scope`; `docs/**`, `scripts/**`, `.github/**`, `*.md`, `*.config.*` → `chore_safe`). If present, leave it. NOTE: this manifest is a hard prerequisite for the chore express lane (`/pm-task`) — without it the guard fails closed for every chore task.
 - **`docs/tasks/locks/`** — Create the directory and seed `.gitkeep`. Lock records are runtime
   artifacts using `references/init-project/task-lock.md.template` as their shape.
 - **`docs/tasks/logs/`** — Create the directory and seed `.gitkeep`. Task logs use
@@ -158,11 +163,14 @@ Created:
   docs/tasks/locks/.gitkeep
   docs/tasks/logs/.gitkeep
   docs/issues/.gitkeep
+  docs/backlog.md                  (canonical intake store)
+  docs/backlog-archive.md          (archive for completed backlog items)
   docs/STATUS.md                   (single outstanding-work + next-action tracker)
   docs/workflow/SDLC.md
   docs/workflow/FOCUS.md           (retired stub → points to STATUS.md §1)
   docs/workflow/INDEX.md
   docs/workflow/runners.md         (2 confirmed runners)
+  docs/workflow/scope-manifest.md  (chore-lane prerequisite)
   AGENTS.md
   ROADMAP.md
   scripts/guard-pm-flow.ps1
