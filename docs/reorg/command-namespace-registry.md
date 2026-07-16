@@ -27,6 +27,10 @@ not trigger `/apply`). Renames already applied by the board under this rule:
 | `/dashboard` | `/add-dashboard` | bare noun, no verb |
 | `/next-action-handoff` | `/handoff` | verb-first shortening (still specific) |
 | `/backlog-burndown` | `/burndown` | verb-first shortening (still specific) |
+| `/capture` | `/pm-capture` | bare verb; namespaced to the project-manager bundle (PM lifecycle redesign) |
+| `/groom` | `/pm-groom` | bare verb; namespaced to the project-manager bundle (PM lifecycle redesign) |
+| `/task` | `/pm-task` | bare noun; namespaced (spec §2.4 uses `/pm-task` as the example) |
+| `/retro` | `/pm-retro` | bare noun; namespaced to the project-manager bundle (PM lifecycle redesign) |
 | `/verify` | *(none)* | built-in verify skill + superpowers own the trigger |
 
 Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-script`,
@@ -108,6 +112,21 @@ duplicates, not separate names.
 | `/extract-video-resources`, `/extract-prd`, `/track-channel`, `/extract-talk` | youtube-extraction | 23 |
 | `/batch-run`, `/rename-files` | gated-batch | 24 |
 | `/clean-workspace`, `/onboard-credentials` | utilities-manager | 25 |
+
+## Project-Manager Lifecycle Redesign — new commands (2026-07-16)
+
+Source: `docs/reports/2026-07-16-pm-lifecycle-redesign.review.md` (§2.4, §3). All four are
+`pm-`-prefixed to satisfy the Generic-Verb Rule above (the bare forms are banned generic
+verbs/nouns); the spec's §3 "open naming question" is resolved here in favor of the prefix.
+Owner: **project-manager** bundle. Sub-skill names are unprefixed (`capture`, `groom`, `task`,
+`retro`); the command wrappers carry the prefix.
+
+| Command | Sub-skill | Build step | Status |
+|---|---|---|---|
+| `/pm-capture` | `capture` | 3 | shipped |
+| `/pm-groom` | `groom` | 3 | shipped |
+| `/pm-task` | `task` | 4 | planned |
+| `/pm-retro` | `retro` | 6 | planned |
 
 ## Cut Commands (do not reintroduce without a new board ruling)
 
