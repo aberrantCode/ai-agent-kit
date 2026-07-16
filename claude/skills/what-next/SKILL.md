@@ -125,37 +125,53 @@ Scan file-based markers in this order. The **first** match wins unless otherwise
 ### Important: Delegation Rule (Priority 1)
 
 If the framework is `project-manager`, operate *on top of* project-manager's state — do not create
-a parallel `backlog.md` and do not invent area-scoped IDs. The `project-manager` skill is the
-authoritative, battle-tested workflow for execution; `/what-next` makes it easier to choose *which*
-task to hand off next.
+a parallel `backlog.md`. With the PM lifecycle redesign, `docs/backlog.md` is THE backlog (not a
+competing one) that `/what-next` reads to inform executable ranking. The `project-manager` skill is
+the authoritative, battle-tested workflow for execution; `/what-next` makes it easier to choose
+*which* task to hand off next, and which items need grooming first.
 
 Flow:
 
 1. Read every `docs/plans/*.md`. Parse each phase table row-by-row. Classify by the `Status:`
-   column (`todo` | `in-progress` | `done` | `blocked`). Record totals per status.
-2. Apply Step 6's weighted heuristic to the `todo` tasks, using the plan's phase order + priority
-   + any `{blocks: ...}` tags to compute scores. Take the top 3 concrete todos (across all plans).
-   These tasks already have IDs like `auth P1-T3` — reuse them verbatim.
-3. Compose the Step 7 `AskUserQuestion` with these five options (in order):
+   column (`todo` | `in-progress` | `done` | `blocked`). Record totals per status. These plan
+   `todo` rows are eligible for the executable ranking.
+2. Also read `docs/backlog.md` if present. Parse the backlog table row-by-row. Classify rows by
+   `Status:` (open, triaged, promoted) and `Type:`. **Executable rows** are those with `Status:
+   promoted` (they link to a plan phase or materialized task) and any materialized chore tasks in
+   `docs/tasks/active/chore-*`. **Untriaged rows** — those with `Status: open` or `triaged`, and
+   any `Type: idea` rows — are NOT eligible for executable ranking; instead surface them in the
+   separate "Needs grooming" bucket (Step 4 below).
+3. Apply Step 6's weighted heuristic to the combined executable pool: plan `todo` tasks + promoted
+   backlog rows + materialized chore tasks. Use the plan's phase order + priority + any `{blocks:
+   ...}` tags to compute scores. Take the top 3 concrete executables (across all sources). These
+   tasks already have IDs — reuse them verbatim (e.g., `auth P1-T3` from a plan, `BL-042` from
+   the backlog).
+4. Separately, count the untriaged backlog rows (open/triaged status). If any exist, note them in
+   a separate "Needs grooming → `/pm-groom`" bucket so the user sees at a glance that triage is
+   needed before those items can run.
+5. Compose the Step 7 `AskUserQuestion` with these options (in order):
    - `{top-1 ID}: {short title}` — "{reason it ranked #1}"
    - `{top-2 ID}: {short title}` — "{reason}"
    - `{top-3 ID}: {short title}` — "{reason}"
    - `Run /review-tasks for a full snapshot` — read-only PM status report
+   - `Needs grooming: {count} untriaged backlog rows → /pm-groom` — surface if untriaged rows exist
    - `Invoke /continue-tasks to run the full orchestration loop` — hand control to project-manager
-4. On user choice:
-   - **Top-N task** → mark that row `in-progress` in its plan file (same mutation project-manager
-     would have made), then hand off to the right specialist agent per Step 8. Do not build a
-     backlog.md.
+6. On user choice:
+   - **Top-N task** → mark that row `in-progress` in its source (plan file or backlog), then hand
+     off to the right specialist agent per Step 8. Do not build a competing backlog.
    - **/review-tasks** → print the structured report (feature count, plan count, per-feature
      status table) without spawning anything.
+   - **Needs grooming** → invoke `/pm-groom` to triage untriaged backlog rows.
    - **/continue-tasks** → print a one-line confirmation recommending the user invoke it.
      Do not auto-spawn the project-manager orchestration loop from inside `/what-next`.
-5. Record `pm_framework: project-manager` in `docs/what-next.md`.
+7. Record `pm_framework: project-manager` in `docs/what-next.md`.
 
 Why this shape: just saying "go run /continue-tasks" hides the decision the user is actually
-making. Surfacing the top-3 todos first lets them prioritise cheaply, then chose the execution
-path (direct specialist vs. full PM loop). The "no competing backlog" invariant is preserved —
-the plans remain the single source of truth and mutation happens in place.
+making. Surfacing the top-3 executables first (only promoted/materialized work) lets them
+prioritise cheaply, then chose the execution path (direct specialist vs. full PM loop). Separating
+untriaged rows into a dedicated grooming bucket preserves the invariant that the feature-vs-chore
+lane is decided at `/pm-groom`, not smuggled in through a what-next recommendation. The backlog
+remains the single source of truth for intake; the plans are authoritative for execution.
 
 ---
 

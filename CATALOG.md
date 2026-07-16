@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-14, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-16, schemaVersion: 1)
 -->
 
 # Catalog
@@ -207,7 +207,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`shell-helper-migration`](claude/skills/shell-helper-migration/SKILL.md) | Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) — extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and pre... | — |
 | [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/SKILL.md) | Use when deciding whether a shell script can safely be migrated to source a centralized helper library — classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categorie... | — |
 | [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/SKILL.md) | Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own val... | — |
-| [`two-surface-observability-reconciliation`](claude/skills/two-surface-observability-reconciliation/SKILL.md) | Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two candidate sources of truth (a form... | — |
+| [`two-surface-observability-reconciliation`](claude/skills/two-surface-observability-reconciliation/SKILL.md) | Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two metrics pipelines disagree about w... | — |
 
 ### Research & OSINT
 

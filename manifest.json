@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-14",
+  "generated": "2026-07-16",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -510,7 +510,7 @@
           "category": "Research & OSINT"
         },
         "two-surface-observability-reconciliation": {
-          "description": "Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two candidate sources of truth (a formal tracking framework and a living backlog, or two metrics pipelines) disagree about what's actually going on. Reconciles them into one verdict instead of trusting either alone.",
+          "description": "Use when a system's true state can only be seen by combining two observability surfaces that can't see each other (an API/tool-level view and a backend/infra-level view), or when two metrics pipelines disagree about what's actually going on. Reconciles them into one verdict instead of trusting either alone.",
           "category": "Infrastructure & Ops"
         },
         "typescript": {
