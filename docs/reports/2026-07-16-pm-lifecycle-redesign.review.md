@@ -1,6 +1,6 @@
 # Project-Manager Lifecycle Redesign
 
-**Author:** Claude (Opus 4.8) · **Date:** 2026-07-16 · **Status:** proposal (react-before-code) · **Rev 3** — hardened after the Codex adversarial review (guard now *enforces* the chore lane, atomic BL-id allocation, `what-next` triaged-only). Rev 2 added the plan-review corrections (INDEX.md premise, codex/gemini parity, reorg governance, atomic fence-flip).
+**Author:** Claude (Opus 4.8) · **Date:** 2026-07-16 · **Status:** proposal (react-before-code) · **Rev 4** — machine-enforced scope boundary: a `scope-manifest.md` lets the guard *objectively* reject scope-changing work on the chore lane (2nd adversarial pass rejected the deferred `scope_confirmed`-only approach). Rev 3 added guard chore-validation, atomic BL-id allocation, `what-next` triaged-only. Rev 2 added the plan-review corrections.
 **Scope:** the `project-manager` skill bundle + its interplay with `what-next`, `sync-status`, `github`, and the reconciliation skills — **all changes land in `ai-agent-kit` only**. Behaviour was validated against a live consuming repo for realism, but this proposal touches no consuming repo.
 
 > **Decisions locked in from the scoping round:** dedicated `docs/backlog.md` as the canonical intake (my recommendation), a **hybrid chore track** where `/capture` triages each item into either the feature lane (spec+plan) or a lighter chore lane (backlog→task), and this rendered proposal *before* any skill edits.
@@ -118,16 +118,29 @@ last_updated: 2026-07-16
 | `/init-project` | changed | Scaffold `backlog.md`, `backlog-archive.md`, a `backlog` template row, and seed STATUS §4 as a generated fence. |
 | `what-next` | changed | In PM repos, read `backlog.md` so `backlog.md` becomes THE backlog in both worlds (removing the "two backlogs" divergence). **But rank only *executable* work as next tasks** — plan `todo`s, materialized chore tasks, and already-`promoted` rows. Untriaged `open`/`triaged`/`idea` rows are surfaced in a **separate "needs grooming → `/groom`"** bucket, never mixed into the top-3 executable ranking. This preserves the invariant that the feature-vs-chore lane is decided at `/groom`, not smuggled in through a recommendation. |
 
-### 2.5 Chore task-file variant
+### 2.5 Chore task-file variant + machine-enforced scope boundary
 
 Reuses `task-file-template.md` with three differences: `feature: chore-<area>`, a **Backlog item** excerpt block in place of the spec/plan excerpt, and a `backlog_ref: BL-NNN` frontmatter field linking the task to its backlog row. Same `## Completion` sentinel, same **verification gate** (a bugfix still needs a test), same archive path.
 
-> **The guard *enforces* the chore lane — it is not a documented bypass.** (Adversarial-review Finding 1.) An earlier draft made `covers: [CHORE-<area>]` a pseudo-CAP that passed only because the guard checks for a `covers:` field's *presence*. That is a rubber stamp: any hand-written task could wear a chore marker and skip spec review. Instead, `guard-pm-flow.ps1` gains an explicit chore-task validation path. For a staged task whose `feature:` is `chore-*`, the guard **fails closed unless all** of:
-> 1. `backlog_ref: BL-NNN` is present **and** that row exists in `backlog.md`/`backlog-archive.md`;
-> 2. the referenced row's `type` is chore-class (`bug`/`chore`/`debt`) and its `status` is `triaged`/`promoted` — an `idea` row (feature-lane) can never back a chore task;
-> 3. `scope_confirmed: true` is set — the explicit spec-authority acknowledgment `/groom`/`/task` write only after the human confirms the work does not change product scope.
->
-> **Scoped exception (buildable-parts principle).** Codex also asked the guard to fail when a chore "touches declared product-scope areas." Statically detecting that needs a product-scope-area manifest (a file→scope map) that does **not** exist in the archive today; inventing one is a separate initiative. So this round enforces the three checks above (which make bypass an explicit, logged operator lie rather than a silent default) and records "static scope-area detection" as a documented follow-up. The `CHORE-<area>` convention is still documented in the guard header + `tasks/README.md`, but as an *enforced* contract, not an honor-system one.
+**The chore lane is enforced by `guard-pm-flow.ps1`, not by convention or operator honesty.** (Adversarial-review Findings 1, iterated across two passes.) An earlier draft made `covers: [CHORE-<area>]` a pseudo-CAP that passed on mere presence — a rubber stamp — and a later draft still let a human `scope_confirmed: true` wave through scope-changing work. Both are rejected. For any staged commit whose active task has `feature: chore-*`, the guard **fails closed unless all** hold:
+
+1. **Backlog link.** `backlog_ref: BL-NNN` is present **and** that row exists in `backlog.md`/`backlog-archive.md`.
+2. **Chore-class row.** The referenced row's `type` is `bug`/`chore`/`debt` and `status` is `triaged`/`promoted` — an `idea` row (feature-lane) can never back a chore task.
+3. **Scope boundary — machine-checked against a manifest.** A new `docs/workflow/scope-manifest.md` declares two glob lists: `product_scope` (behaviour-bearing code) and `chore_safe` (docs, scripts, CI, config). The guard classifies every staged file:
+   - matches `product_scope` → **hard FAIL** — scope-changing work cannot ride the chore lane; route it through `/groom → feature` (spec + plan). `scope_confirmed` **cannot** override this.
+   - matches `chore_safe` → allowed.
+   - matches neither (unclassified) → allowed **only** if `scope_confirmed: true` — an explicit, logged operator acknowledgment for the gray zone.
+
+   The manifest is a **hard prerequisite**: if `scope-manifest.md` is absent, the guard fails closed for every chore task (the express lane is inert until a manifest exists).
+
+This puts the spec-authority invariant under machine enforcement on the exact path most likely to be used under pressure (`/task`) — the review's central objection. `init-project` scaffolds a conservative default manifest (source/API/UI dirs → `product_scope`; `docs/**`, `scripts/**`, `.github/**` → `chore_safe`); `reinit` ensures it exists. The `CHORE-<area>` marker and this whole contract are documented in the guard header + `tasks/README.md` — as an *enforced* contract, not an honor-system one.
+
+```markdown
+# docs/workflow/scope-manifest.md
+product_scope: [ "src/**", "api/**", "components/**", "app/**", "packages/*/src/**" ]
+chore_safe:    [ "docs/**", "scripts/**", ".github/**", "*.md", "*.config.*" ]
+# guard: chore task touching product_scope (and not chore_safe) → FAIL → route to feature lane
+```
 
 ### 2.6 Assignment (in scope this round)
 
@@ -143,9 +156,9 @@ Because a second writer now exists, `/retro` needs a **dedup contract**: each en
 
 ## 3. New & changed artifacts at a glance
 
-**New:** `docs/backlog.md` + `docs/backlog-archive.md` (+ templates), chore task-file variant, sub-skills `capture` + `groom` + `task` + `retro`, companion commands for each.
+**New:** `docs/backlog.md` + `docs/backlog-archive.md` (+ templates), `docs/workflow/scope-manifest.md` (+ template), chore task-file variant, sub-skills `capture` + `groom` + `task` + `retro`, companion commands for each.
 
-**Changed:** `sync-status/SKILL.md` (§4 generated from backlog + homeless issues; +`assignee` in §2/§3; **+`BL-*` uniqueness check across live+archive**), `project-manager/SKILL.md` (pipeline diagram + chore lane + directory conventions + command table), `init-project/SKILL.md` + templates (scaffold backlog files + §4 generated fence), **`guard-pm-flow.ps1.template` (new chore-task validation path: `backlog_ref` exists + row is chore-class + `scope_confirmed` — fail-closed)**, `reinit/SKILL.md` (lift a curated §4 into backlog rows on adoption), `update-tasks/SKILL.md` (flip `BL` row to `done`; reconcile merged PR↔task), `tasks/README.md` template (document *where ad-hoc work goes* + the enforced pseudo-CAP contract), `task-file-template.md` (+`assignee`, +`backlog_ref`, +`scope_confirmed`), `what-next/SKILL.md` (read backlog.md, **rank only triaged/executable work; untriaged rows route to `/groom`**), `validate.ps1` (BL-id uniqueness gate).
+**Changed:** `sync-status/SKILL.md` (§4 generated from backlog + homeless issues; +`assignee` in §2/§3; **+`BL-*` uniqueness check across live+archive**), `project-manager/SKILL.md` (pipeline diagram + chore lane + directory conventions + command table), `init-project/SKILL.md` + templates (scaffold backlog files + `scope-manifest.md` default + §4 generated fence), **`guard-pm-flow.ps1.template` (new chore-task validation path: `backlog_ref` resolves + row is chore-class + scope-manifest intersection check — `product_scope` hit fails closed, unclassified needs `scope_confirmed`; missing manifest fails closed)**, `reinit/SKILL.md` (lift a curated §4 into backlog rows on adoption), `update-tasks/SKILL.md` (flip `BL` row to `done`; reconcile merged PR↔task), `tasks/README.md` template (document *where ad-hoc work goes* + the enforced pseudo-CAP contract), `task-file-template.md` (+`assignee`, +`backlog_ref`, +`scope_confirmed`), `what-next/SKILL.md` (read backlog.md, **rank only triaged/executable work; untriaged rows route to `/groom`**), `validate.ps1` (BL-id uniqueness gate).
 
 **Trimmed:** `two-surface-observability-reconciliation` drops its "framework vs. backlog" half (obsoleted by generated §4) and keeps only its genuine split-observability/metrics use case. `REMAINING_WORK.md`/`FOCUS.md` are already retired stubs — no change.
 
@@ -203,15 +216,16 @@ All scoping decisions are locked; this section is the record.
 
 | Finding | Severity | Disposition |
 |---|---|---|
-| Pseudo-CAP chore tasks are a documented spec bypass | high | **Incorporated** — guard now *enforces* chore tasks (`backlog_ref` + chore-class row + `scope_confirmed`), fail-closed (§2.5). Static "touches product-scope" detection **deferred** with justification: needs a scope-area manifest that doesn't exist yet. |
-| BL-id allocation unsafe under concurrent capture | high | **Incorporated** — advisory `backlog.lock` around read-max→append + fail-closed duplicate rejection in `sync-status`/`validate.ps1` (§2.2). Kept human-readable ids by design. |
-| `what-next` can surface untriaged backlog as executable | medium | **Incorporated** — `what-next` ranks only executable work; untriaged rows go to a "needs grooming → `/groom`" bucket (§2.4). |
+| Pseudo-CAP chore tasks are a documented spec bypass | high | **Incorporated (Rev 3)** — guard enforces `backlog_ref` + chore-class row + `scope_confirmed`, fail-closed (§2.5). |
+| Chore guard still permits scope-changing work (2nd pass — rejected the deferral) | high | **Incorporated (Rev 4)** — added `docs/workflow/scope-manifest.md`; guard hard-fails a chore task whose staged files hit `product_scope`, `scope_confirmed` cannot override, missing manifest fails closed (§2.5). The scope boundary is now machine-enforced, not deferred. |
+| BL-id allocation unsafe under concurrent capture | high | **Incorporated (Rev 3)** — advisory `backlog.lock` around read-max→append + fail-closed duplicate rejection in `sync-status`/`validate.ps1` (§2.2). Kept human-readable ids by design. |
+| `what-next` can surface untriaged backlog as executable | medium | **Incorporated (Rev 3)** — `what-next` ranks only executable work; untriaged rows go to a "needs grooming → `/groom`" bucket (§2.4). |
 
 ### Residual notes (not blockers)
 
 - `/retro` dedup keys on `{date}+{task-id}`; acceptable because `INDEX.md` is a human-read ledger, not machine-consumed.
 - Command-name generality (`/task`, `/capture`, `/groom`) is resolved at namespace-registry time, not in code.
-- Static product-scope-area detection (Finding 1 sub-point) is a documented follow-up requiring a file→scope manifest; the three enforced guard checks make a bypass an explicit logged operator action, not a silent default.
+- The `scope-manifest.md` glob lists are themselves editable by an operator — the residual trust is now "who may edit the manifest," a far smaller and more auditable surface than "who may set `scope_confirmed`." Manifest edits are ordinary tracked diffs, reviewable in the PR.
 
 ---
 
@@ -222,7 +236,7 @@ Small, independently-shippable PRs into `dev`, each under the repo's size limit:
 1. **Store + templates** — `backlog.md`/`backlog-archive.md` templates, chore task variant, `+assignee` on task template. (No behavior yet; pure scaffolding.)
 2. **`sync-status` §4 generation** — the backward-compatible fence flip (falls back to curated when no `backlog.md`), plus the `BL-*` uniqueness gate in `sync-status`/`validate.ps1`.
 3. **`capture` + `groom` sub-skills + commands** — the intake + triage constructs, with the atomic `backlog.lock` allocation. **Register `/capture` + `/groom` in `docs/reorg/command-namespace-registry.md` and conform to the charter in the same PR** (resolve the generic-name question here).
-4. **`task` express + guard enforcement + `update-tasks` reconciliation** — the guard-honoring fast path and `BL`-row closeout. **Ship the `guard-pm-flow.ps1` chore-validation path** (`backlog_ref` + chore-class row + `scope_confirmed`) *in this PR*, so the chore lane is enforced the moment it exists. Register `/task`; write `scope_confirmed` only after the spec-authority re-assert.
+4. **`task` express + guard enforcement + `update-tasks` reconciliation** — the guard-honoring fast path and `BL`-row closeout. **Land `docs/workflow/scope-manifest.md` (+ template) and the full `guard-pm-flow.ps1` chore-validation path — `backlog_ref` + chore-class row + scope-manifest intersection — *in this PR, before or with `/task`*,** so the scope boundary is machine-enforced the moment the express lane exists (never shipped ahead of its guard). Register `/task`; write `scope_confirmed` only after the spec-authority re-assert, and only for unclassified files.
 5. **`init-project` / `reinit` scaffolding + adoption lift** — §4 of this doc, including the atomic rows-before-rename fence flip.
 6. **`retro` + `what-next` backlog-awareness + reconciliation-skill trim** — the loop-closers. Register `/retro`; log the trim in `docs/reorg/disposition-ledger.md`.
 7. **Parity + docs last** — `project-manager/SKILL.md`, `tasks/README.md` (incl. the pseudo-CAP note), **`codex/` + `gemini/` project-manager mirror updates**, and CATALOG/README parity — so every surface describes shipped reality.
