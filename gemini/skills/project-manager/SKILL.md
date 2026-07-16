@@ -19,6 +19,8 @@ worker agents.
 ```
 docs/
   INITIAL_PROMPT.md          # Source of truth for product intent (never modified)
+  backlog.md                 # Intake backlog with backlog items (BL-NNN)
+  backlog-archive.md         # Archived backlog items
   features/                  # Feature specs — final authority on scope
     {feature-slug}.md
   plans/                     # One plan per feature spec
@@ -28,12 +30,15 @@ docs/
       {feature-slug}-p{N}-t{M}.md
     archive/
       {feature-slug}-p{N}-t{M}.md
+  workflow/
+    scope-manifest.md        # Machine-enforced scope boundaries for chore lane
   guides/                    # Supporting docs, architecture notes (optional)
   issues/                    # Logged failures and blockers
 ```
 
 Read `references/feature-spec-template.md`, `references/plan-template.md`, and
-`references/task-file-template.md` for the exact file formats to use.
+`references/task-file-template.md` for the exact file formats to use. STATUS §4 is
+generated from `docs/backlog.md` and active issues.
 
 ---
 
@@ -272,6 +277,22 @@ Run `continue-tasks` from Step 1 (bootstrap check).
 
 ---
 
+### Two Lanes: Intake + Chore Express
+
+The lifecycle supports two decision paths for work: **feature** (product-scope changes) and **chore** (bugs, tech debt).
+
+**Intake:** `/pm-capture "<text>"` appends a `BL-NNN` row to `docs/backlog.md` (type ∈ {bug, chore, debt, idea}) — the single entry point. `/pm-groom [BL-NNN|issue]` triages to promote-to-feature, materialize-as-chore-task, merge-into-plan, or close.
+
+**Feature lane** (unchanged): spec → plan → task for scope changes.
+
+**Chore lane** (new): backlog-item → task, skipping spec + plan. `/pm-task "<desc>"` expresses chore work directly (capture + groom in one shot).
+
+Both lanes converge on the same task-file format, archive, and STATUS view. The chore lane is **machine-enforced** by `scripts/guard-pm-flow.ps1` against `docs/workflow/scope-manifest.md`: scope-changing files hard-fail and are routed to the feature lane. Authorization is frozen at promotion; stale manifest hash fails closed.
+
+**Learning capture:** `/pm-retro` harvests close-out notes into `docs/workflow/INDEX.md`, deduplicated.
+
+---
+
 ## Feature Interview
 
 Run this when `docs/features/` is empty or when new features need to be captured.
@@ -305,6 +326,8 @@ Read `references/feature-spec-template.md` for the exact format. Key fields:
 Feature specs are the final authority on scope. They may only be changed by:
 1. The user directly editing the file
 2. An agent that has confirmed the change with the user via a conversational prompt
+
+The chore lane does not weaken spec authority; scope-changing work is machine-enforced by `guard-pm-flow.ps1` + `scope-manifest.md` and hard-fails if feature-lane routing is required.
 
 Never silently update a spec during implementation to match what was built. If an implementation
 diverges from a spec, pause and surface the discrepancy.

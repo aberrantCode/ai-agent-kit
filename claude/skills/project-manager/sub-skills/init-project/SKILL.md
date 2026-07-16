@@ -32,6 +32,7 @@ Before writing anything:
    - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
    - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`, `docs/workflow/scope-manifest.md`
    - `docs/backlog.md`, `docs/backlog-archive.md`
+   - `docs/tasks/README.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -87,6 +88,9 @@ For every directory and file from the discovery list that does **not** already e
 - **`docs/tasks/logs/`** — Create the directory and seed `.gitkeep`. Task logs use
   `references/init-project/task-log.md.template` as their shape.
 - **`docs/features/README.md`** — If absent, copy from template. If present, leave it.
+- **`docs/tasks/README.md`** — If absent, copy from `references/init-project/tasks-README.md.template` 
+  (substitute `{{PROJECT_NAME}}`/`{{TODAY}}` if used). If present, leave it. Documents where ad-hoc work goes + 
+  the enforced chore-lane contract.
 
 Always create directory parents implicitly. Always preserve LF line endings on POSIX-targeted files and CRLF on Windows-only files.
 
@@ -165,6 +169,7 @@ Created:
   docs/issues/.gitkeep
   docs/backlog.md                  (canonical intake store)
   docs/backlog-archive.md          (archive for completed backlog items)
+  docs/tasks/README.md             (documents ad-hoc work + enforced chore-lane contract)
   docs/STATUS.md                   (single outstanding-work + next-action tracker)
   docs/workflow/SDLC.md
   docs/workflow/FOCUS.md           (retired stub → points to STATUS.md §1)

@@ -28,6 +28,8 @@ worker agents.
 ```
 docs/
   INITIAL_PROMPT.md          # Source of truth for product intent (never modified)
+  backlog.md                 # Canonical intake store (feature requests, bugs, chores, tech-debt)
+  backlog-archive.md         # Completed backlog items
   features/                  # Feature specs — final authority on scope
     {feature-slug}.md
   plans/                     # One plan per feature spec
@@ -47,13 +49,15 @@ docs/
   workflow/
     FOCUS.md                 # Retired stub → points to STATUS.md §1 (kept for back-compat)
     INDEX.md                 # Durable decisions and discoveries
+    scope-manifest.md        # Chore-lane product_scope/chore_safe boundary (hard prerequisite for /pm-task)
 ```
 
 `docs/STATUS.md` is the one file that answers "what is outstanding, and what should happen next?".
 Its `pm:generated:*` sections (progress + outstanding) are rewritten by the `sync-status` skill from
-the canonical specs/plans/tasks/issues; its `pm:curated:*` sections (§1 runtime/next-action, §4
-unowned backlog) are hand-maintained and preserved across regeneration. `/continue-tasks` and
-`/update-tasks` regenerate it automatically.
+the canonical specs/plans/tasks/issues and `docs/backlog.md`; its `pm:curated:*` sections (§1
+runtime/next-action) are hand-maintained and preserved across regeneration. Section §4 (unowned
+backlog) is GENERATED from `docs/backlog.md` rows that are not yet promoted to features + homeless
+open issues. `/continue-tasks` and `/update-tasks` regenerate it automatically.
 
 Read `references/feature-spec-template.md`, `references/plan-template.md`, and
 `references/task-file-template.md` for the exact file formats to use. These templates ship with
@@ -67,6 +71,53 @@ fall back to markdown scanning when they are unavailable.
 ---
 
 ## Commands
+
+### The Two Lanes — Intake, Triage, and the Chore Express Path
+
+This skill implements a two-lane model for work:
+
+- **FEATURE lane** (unchanged): spec → plan → task, for anything changing product scope/behavior.
+- **CHORE lane** (new): backlog-item → task, skipping spec + plan, for bugs/chores/tech-debt.
+
+Both lanes converge on the same task-file format, guard, verification gate, archive, and STATUS view.
+The chore lane is **machine-enforced** by `scripts/guard-pm-flow.ps1` against `docs/workflow/scope-manifest.md`
+to prevent scope-changing work from bypassing spec authority.
+
+---
+
+### `/pm-capture` — Single-Item Intake
+
+Appends a backlog row to `docs/backlog.md` with type (bug, chore, debt, or idea) and opens it for
+triage. This is the single front door for work intake. Detailed flow lives in
+`sub-skills/capture/SKILL.md`.
+
+---
+
+### `/pm-groom` — Triage and Classify
+
+Takes a backlog item (by ID or GitHub issue) and triages it: promote-to-feature (routes to `/add-feature`),
+materialize-as-chore-task (routes to `/pm-task`), merge-into-plan, or close. The moment the
+feature-vs-chore lane is decided, the item is classified. Machine-enforced by the guard.
+Detailed flow lives in `sub-skills/groom/SKILL.md`.
+
+---
+
+### `/pm-task` — Express Path for Chores
+
+Capture and promote a chore in one shot: `/pm-task "<desc>"` appends to backlog, triages as chore,
+and materializes a task file. Equivalent to `/pm-capture` + `/pm-groom` → materialize. Re-asserts
+spec authority: a chore task that hits `product_scope` hard-fails at the guard.
+Detailed flow lives in `sub-skills/task/SKILL.md`.
+
+---
+
+### `/pm-retro` — Close-Out and Learnings
+
+Harvests close-out learnings from archived task Notes/Handoff + resolved GitHub issues into
+`docs/workflow/INDEX.md` (durable decisions), deduped by {date}+{task-id}. Runs after task
+completion. Detailed flow lives in `sub-skills/retro/SKILL.md`.
+
+---
 
 ### `/init-project` — Bootstrap a New Project
 
@@ -453,6 +504,15 @@ Feature specs are the final authority on scope. They may only be changed by:
 Never silently update a spec during implementation to match what was built. If an implementation
 diverges from a spec, pause and surface the discrepancy.
 
+The chore lane does NOT weaken spec authority — it is **machine-enforced** by `scripts/guard-pm-flow.ps1`
++ `docs/workflow/scope-manifest.md`. When `/pm-task` or `/pm-groom` materialize a chore task, the guard
+will fail any commit that hits `product_scope` (triggering a hard fail). This ensures that scope-changing
+work cannot ride the chore express path; such work must be routed through `/pm-groom → /add-feature` to
+acquire a spec first. Authorization is frozen at promotion time (recorded in the task's `authz_snapshot`
+= bl_type/bl_status + manifest_sha), and a stale manifest hash fails closed. A chore commit may not edit
+its own scope-manifest or its backlog row's type/status (same-commit self-authorization is blocked).
+Missing `docs/workflow/scope-manifest.md` renders the chore lane inert.
+
 ---
 
 ## Working Principles
@@ -478,23 +538,33 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 ## Pipeline Order
 
 ```
-/init-project        →  scaffold the repo (docs/, AGENTS.md, hooks, PR template)
+/init-project        →  scaffold the repo (docs/, AGENTS.md, hooks, PR template, backlog.md)
+/pm-capture          →  intake a single backlog item (bug/chore/debt/idea)
+/pm-groom            →  triage and classify: promote to feature, materialize as chore, merge, or close
+/pm-task             →  express path: capture + promote chore in one shot
 /init-features       →  capture feature specs from INITIAL_PROMPT.md
 /add-feature         →  add a new spec at any later point
 /analyze-features    →  audit specs for template/CAP-ID/plan-coverage gaps
-/continue-tasks      →  generate plans, spawn agents, iterate
+/continue-tasks      →  generate plans, spawn agents, iterate (handles both feature and chore tasks)
 /continue-new-session →  emit a copy-ready prompt to resume the recap's next action in a fresh session
 /iterate-tasks       →  one self-perpetuating iteration: merge pending PR, dispatch next action as fresh subagent, emit next-next prompt
 /update-tasks        →  reconcile active task files with plan statuses (regenerates docs/STATUS.md)
 /review-tasks        →  read-only progress snapshot (persisted form is docs/STATUS.md)
-/sync-status         →  regenerate docs/STATUS.md generated sections; preserve curated sections
+/sync-status         →  regenerate docs/STATUS.md generated sections (including §4 from backlog.md); preserve curated sections
+/pm-retro            →  close-out learnings to docs/workflow/INDEX.md
 /sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative
 /analyze-parallelism →  read-only opt-in future parallel batch analysis
 /reinit              →  archive legacy state, normalize, then run /continue-tasks
 ```
 
-The first three commands are *one-time-per-feature* (or one-time-per-project); the rest are
-*repeatable* and idempotent.
+The pipeline has **two lanes that converge on execution**:
+- **FEATURE lane** (`/init-features` → `/add-feature` → `/continue-tasks`): specs drive plans drive tasks
+- **CHORE lane** (`/pm-capture` / `/pm-task` → `/pm-groom` → `/continue-tasks`): backlog items bypass spec/plan,
+  jump straight to tasks, but are machine-enforced by `scripts/guard-pm-flow.ps1` + `docs/workflow/scope-manifest.md`
+  to prevent scope-changing work
+
+The first six commands (init + intake/triage/express) are *foundational*; the rest are
+*repeatable* orchestration, validation, and retrospective operations.
 
 ## Diagram
 
