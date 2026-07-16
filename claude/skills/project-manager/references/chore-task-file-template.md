@@ -19,7 +19,11 @@ conflicts_with: []
 files_allowed: []
 files_shared: []
 depends_on_tasks: []
-# authz_snapshot: (frozen at promotion — added by the guard-enforcement step)
+scope_confirmed: false
+authz_snapshot:
+  bl_type: "{{type}}"        # bug|chore|debt — frozen copy of backlog row type at promotion
+  bl_status: "promoted"      # triaged|promoted — frozen copy of backlog row status at promotion
+  manifest_sha: "{{sha256}}" # sha256 of docs/workflow/scope-manifest.md at promotion (compute via Get-FileHash)
 ---
 
 # Chore Task — `chore-{{area}}-BL-{{NNN}}`
@@ -37,6 +41,8 @@ depends_on_tasks: []
 Pulled from `docs/backlog.md` — the orchestrator inlines the backlog row so this task is self-contained.
 
 > | BL-{{NNN}} | {{type}} | {{area}} | {{pri}} | {{status}} | {{item}} | {{link}} |
+
+**Authorization snapshot.** The `authz_snapshot` frontmatter fields (`bl_type`, `bl_status`, `manifest_sha`) are frozen at promotion and must not be hand-edited. The build-time guard validates them against the live backlog row and scope-manifest. Any mismatch indicates stale authorization and requires re-grooming.
 
 ---
 

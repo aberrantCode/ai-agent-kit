@@ -125,7 +125,7 @@ Owner: **project-manager** bundle. Sub-skill names are unprefixed (`capture`, `g
 |---|---|---|---|
 | `/pm-capture` | `capture` | 3 | shipped |
 | `/pm-groom` | `groom` | 3 | shipped |
-| `/pm-task` | `task` | 4 | planned |
+| `/pm-task` | `task` | 4 | shipped |
 | `/pm-retro` | `retro` | 6 | planned |
 
 ## Cut Commands (do not reintroduce without a new board ruling)
