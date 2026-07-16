@@ -83,6 +83,25 @@ foreach ($task in $state.ActiveTasks) {
     }
 }
 
+$backlogLivePath = Join-Path $state.Root 'docs/backlog.md'
+$backlogArchivePath = Join-Path $state.Root 'docs/backlog-archive.md'
+$backlogIds = New-Object System.Collections.Generic.List[string]
+foreach ($backlogPath in @($backlogLivePath, $backlogArchivePath)) {
+    if (-not (Test-Path -LiteralPath $backlogPath -PathType Leaf)) { continue }
+    $content = Get-Content -LiteralPath $backlogPath -Raw
+    if (-not $content) { continue }
+    $content = [regex]::Replace($content, '(?s)<!--.*?-->', '')
+    foreach ($line in ($content -split "\r?\n")) {
+        if ($line -match '^\s*\|\s*(BL-\d+)\s*\|') { $backlogIds.Add($Matches[1]) }
+    }
+}
+if ($backlogIds.Count -gt 0) {
+    $backlogReportPath = if (Test-Path -LiteralPath $backlogLivePath -PathType Leaf) { $backlogLivePath } else { $backlogArchivePath }
+    foreach ($dup in @($backlogIds | Group-Object | Where-Object Count -gt 1)) {
+        Add-Issue error 'duplicate-backlog-id' $backlogReportPath "$($dup.Name) appears $($dup.Count) times across backlog.md + backlog-archive.md -- ids must be unique and never reused."
+    }
+}
+
 "# Project Manager Validation"
 ""
 "Root: $($state.Root)"
