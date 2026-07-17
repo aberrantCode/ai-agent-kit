@@ -18,7 +18,8 @@ worker agents.
 
 ```
 docs/
-  INITIAL_PROMPT.md          # Source of truth for product intent (never modified)
+  REQUIREMENTS.md            # Product requirements — source of truth for intent (never modified)
+  INITIAL_PROMPT.md          # Legacy intake — still read as a fallback
   backlog.md                 # Intake backlog with backlog items (BL-NNN)
   backlog-archive.md         # Archived backlog items
   features/                  # Feature specs — final authority on scope
@@ -298,7 +299,7 @@ Both lanes converge on the same task-file format, archive, and STATUS view. The 
 Run this when `docs/features/` is empty or when new features need to be captured.
 
 ### Step 1 — Extract feature areas from the prompt
-Read `docs/INITIAL_PROMPT.md`. Group the implied features into 3–6 functional areas (e.g., "Data
+Read `docs/REQUIREMENTS.md` (fall back to `docs/INITIAL_PROMPT.md`). Group the implied features into 3–6 functional areas (e.g., "Data
 Models & Engine", "Onboarding & Profiles", "Dashboard & Logging", "Planner & Visualization",
 "Recovery & Reminders"). List the areas to the user and ask if the grouping makes sense before
 proceeding.

@@ -1,0 +1,49 @@
+# {{PROJECT_NAME}} — Product Requirements
+
+> **Source of truth for product intent (the PRD).** User-owned — agents never modify this file.
+> `/init-features` reads it to seed feature specs. If product direction changes, deprecate features
+> (`status: deprecated`) and add new ones rather than rewriting history here.
+>
+> _Migrating from a legacy `docs/INITIAL_PROMPT.md`? Rename it to `docs/REQUIREMENTS.md`, or leave
+> it — the tooling still reads `INITIAL_PROMPT.md` as a fallback when `REQUIREMENTS.md` is absent._
+
+---
+
+## Overview
+
+_(One paragraph. Who is the user, what problem this solves, the proposed solution.)_
+
+## Why now
+
+_(One paragraph. What changed that makes this worth building.)_
+
+## Goals
+
+- _(The outcomes this product must achieve.)_
+
+## Non-goals
+
+- _(What we are deliberately NOT building, even if it seems related.)_
+
+## Functional requirements
+
+_(Group into 3–6 functional areas — `/init-features` turns each area into one feature spec. Keep each
+area a short heading plus a few capability bullets.)_
+
+### {{Area 1}}
+- _(capability)_
+
+### {{Area 2}}
+- _(capability)_
+
+## Non-negotiable constraints
+
+- _(Technical, regulatory, performance — anything that cannot be traded off.)_
+
+## Success metrics
+
+- _(2–4 observable outcomes. These become acceptance-criteria seeds.)_
+
+---
+
+_Written: {{TODAY}}_
