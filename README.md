@@ -1,3 +1,11 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/ai-agent-kit.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/ai-agent-kit-light.png">
+    <img src="assets/ai-agent-kit.png" alt="AI Agent Kit — phosphor-green agent-module-chip badge" width="200">
+  </picture>
+</p>
+
 # AI Agent Kit
 
 **The canonical, vendor-agnostic source of truth for one workstation's AI-agent assets** —
