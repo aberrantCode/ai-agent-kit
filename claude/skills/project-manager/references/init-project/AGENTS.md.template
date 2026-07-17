@@ -23,7 +23,7 @@ This rule exists because untracked changes break the orchestration loop, leave p
 ## The Flow
 
 ```
-docs/INITIAL_PROMPT.md
+docs/REQUIREMENTS.md
         ↓ (/init-features)
 docs/features/*.md                    ← scope authority
         ↓ (/continue-tasks Step 2)

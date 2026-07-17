@@ -5,7 +5,7 @@ description: >
   Automated project implementation orchestrator that drives feature-driven development from a single
   initial prompt through to completed code. Use this skill when the user invokes /init-project,
   /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks,
-  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/INITIAL_PROMPT.md exists and the user says
+  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md (or legacy docs/INITIAL_PROMPT.md) exists and the user says
   anything like "move forward", "keep building", "what's next", "continue the implementation",
   or "start working on the project", AND when the user says "set up project management",
   "bootstrap a new project", "initialize the project workflow", or "make sure agents follow the
@@ -27,7 +27,8 @@ worker agents.
 
 ```
 docs/
-  INITIAL_PROMPT.md          # Source of truth for product intent (never modified)
+  REQUIREMENTS.md            # Product requirements — source of truth for intent (never modified)
+  INITIAL_PROMPT.md          # Legacy intake — still read as a fallback
   backlog.md                 # Canonical intake store (feature requests, bugs, chores, tech-debt)
   backlog-archive.md         # Completed backlog items
   features/                  # Feature specs — final authority on scope
@@ -132,13 +133,13 @@ layers installed are:
 4. **`.github/pull_request_template.md` + `ROADMAP.md`** — human review layer
 
 Run **before** `/init-features`. After `/init-project` completes, the user fills in
-`docs/INITIAL_PROMPT.md` and then runs `/init-features` to seed feature specs.
+`docs/REQUIREMENTS.md` and then runs `/init-features` to seed feature specs.
 
 ---
 
 ### `/init-features` — Feature Interview
 
-Use when `docs/INITIAL_PROMPT.md` exists but `docs/features/` is empty or incomplete. Extracts 3-6
+Use when `docs/REQUIREMENTS.md` (or legacy `docs/INITIAL_PROMPT.md`) exists but `docs/features/` is empty or incomplete. Extracts 3-6
 functional areas from the prompt, interviews the user one area at a time via `AskUserQuestion`, and
 writes one feature spec per area to `docs/features/`. Detailed flow lives in
 `sub-skills/init-features/SKILL.md`.
@@ -472,7 +473,7 @@ Run `/continue-tasks` from Step 1 (bootstrap check).
 Run this when `docs/features/` is empty or when new features need to be captured.
 
 ### Step 1 — Extract feature areas from the prompt
-Read `docs/INITIAL_PROMPT.md`. Group the implied features into 3–6 functional areas (e.g., "Data
+Read `docs/REQUIREMENTS.md` (fall back to `docs/INITIAL_PROMPT.md` if REQUIREMENTS.md is absent). Group the implied features into 3–6 functional areas (e.g., "Data
 Models & Engine", "Onboarding & Profiles", "Dashboard & Logging", "Planner & Visualization",
 "Recovery & Reminders"). List the areas to the user and ask if the grouping makes sense before
 proceeding.
@@ -542,7 +543,7 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /pm-capture          →  intake a single backlog item (bug/chore/debt/idea)
 /pm-groom            →  triage and classify: promote to feature, materialize as chore, merge, or close
 /pm-task             →  express path: capture + promote chore in one shot
-/init-features       →  capture feature specs from INITIAL_PROMPT.md
+/init-features       →  capture feature specs from REQUIREMENTS.md
 /add-feature         →  add a new spec at any later point
 /analyze-features    →  audit specs for template/CAP-ID/plan-coverage gaps
 /continue-tasks      →  generate plans, spawn agents, iterate (handles both feature and chore tasks)

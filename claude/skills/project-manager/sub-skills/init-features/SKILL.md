@@ -1,19 +1,19 @@
 ---
 name: init-features
-description: Run the Feature Interview to capture initial feature specs from docs/INITIAL_PROMPT.md — extracts functional areas, interviews the user one area at a time, and writes one feature spec per area to docs/features/
+description: Run the Feature Interview to capture initial feature specs from docs/REQUIREMENTS.md (or a legacy docs/INITIAL_PROMPT.md) — extracts functional areas, interviews the user one area at a time, and writes one feature spec per area to docs/features/
 ---
 
 # Init Features
 
-Run the **Feature Interview** to seed `docs/features/` from `docs/INITIAL_PROMPT.md`. This is Step 1 of the orchestration pipeline. Without feature specs, plans cannot be generated and tasks cannot be spawned.
+Run the **Feature Interview** to seed `docs/features/` from `docs/REQUIREMENTS.md` (fall back to `docs/INITIAL_PROMPT.md` if REQUIREMENTS.md is absent). This is Step 1 of the orchestration pipeline. Without feature specs, plans cannot be generated and tasks cannot be spawned.
 
-**Prerequisite:** `docs/INITIAL_PROMPT.md` must exist. If it does not, stop and tell the user to run `/init-project` first (or create the file manually).
+**Prerequisite:** `docs/REQUIREMENTS.md` must exist (or a legacy `docs/INITIAL_PROMPT.md`). If neither exists, stop and tell the user to run `/init-project` first (or create the file manually).
 
 ---
 
 ## Step 1 — Extract feature areas
 
-Read `docs/INITIAL_PROMPT.md` in full. Group the implied features into 3-6 functional areas (e.g. "Data Models & Engine", "Onboarding & Profiles", "Dashboard & Logging", "Planner & Visualization", "Recovery & Reminders").
+Read `docs/REQUIREMENTS.md` in full — fall back to `docs/INITIAL_PROMPT.md` if REQUIREMENTS.md is absent. Group the implied features into 3-6 functional areas (e.g. "Data Models & Engine", "Onboarding & Profiles", "Dashboard & Logging", "Planner & Visualization", "Recovery & Reminders").
 
 Use `AskUserQuestion` to confirm the grouping before proceeding. Allow the user to:
 
@@ -31,7 +31,7 @@ Iterate until the user accepts.
 For each accepted area, use `AskUserQuestion` to collect:
 
 - Which capabilities in this area are must-have (P0) vs. nice-to-have (P1/P2)
-- Constraints or non-obvious requirements not captured in `INITIAL_PROMPT.md`
+- Constraints or non-obvious requirements not captured in the requirements doc
 - Acceptance criteria: what does "done" look like for this area?
 - Known dependencies on other areas
 
@@ -61,6 +61,6 @@ Next: tell the user to run `/continue-tasks` to begin plan generation.
 
 ## Constraints
 
-- **Never invent requirements.** If the user did not state it and it is not derivable from `INITIAL_PROMPT.md`, ask via `AskUserQuestion` — do not infer silently.
+- **Never invent requirements.** If the user did not state it and it is not derivable from the requirements doc, ask via `AskUserQuestion` — do not infer silently.
 - **One spec per area.** Do not produce a single mega-spec; the orchestrator processes specs independently.
 - **Specs are authority.** Once `status: approved`, only the user (or an agent with explicit `AskUserQuestion` confirmation) may change the spec.
