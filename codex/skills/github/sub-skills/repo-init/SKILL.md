@@ -54,6 +54,12 @@ protection, because a pushed secret is the only failure in this list that cannot
 Three rulesets. Rulesets are used over the legacy `/branches/*/protection` API because they
 work on private repos without a paid plan, support bypass actors, and cover tags.
 
+A repo may carry **both** mechanisms at once — a ruleset on one branch and classic protection
+on another — and GitHub ANDs them together, so the effective policy is neither of the two you
+can see in isolation. That is drift even when each half looks reasonable. Migrate classic
+protection to a ruleset and **delete the classic rule afterwards**; leaving it in place is the
+whole problem.
+
 | Ruleset | Target | Rules |
 |---|---|---|
 | `Protect main` | `refs/heads/main` | `deletion`, `non_fast_forward`, `pull_request` (0 approvals, `allowed_merge_methods: ["merge"]`) |
@@ -88,12 +94,19 @@ the bundle's merge-commit rule. `deleteBranchOnMerge` complements `/prune`.
 | Setting | Desired | Degrade |
 |---|---|---|
 | Vulnerability (Dependabot) alerts | enabled | — |
-| Secret scanning | enabled | private repo without GHAS → warn, skip |
-| Secret-scanning **push protection** | enabled | private repo without GHAS → warn, skip |
+| Secret scanning | enabled | private repo without GHAS → offer a **waiver**, skip |
+| Secret-scanning **push protection** | enabled | private repo without GHAS → offer a **waiver**, skip |
 | `.github/dependabot.yml` | present, ecosystems auto-detected | — |
 
 Push protection is the deliberate exception to local-first: it is a server-side block that
 needs no workflow and no runner.
+
+**Expect the waiver path on private repos — it is the common case, not the edge case.**
+Secret scanning and push protection require GitHub Advanced Security, which private repos do
+not get by default. Do not treat the 403/422 as an error to retry or work around: offer to
+record the waiver once, and the repo stops being asked forever. On a waived repo the
+`pre-commit` gitleaks hook is the *only* secrets gate, so never leave Group 5 unaddressed
+when Group 3 is waived — say so explicitly in the summary.
 
 ### Group 4 — Actions policy
 
