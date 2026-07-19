@@ -1,5 +1,6 @@
 ---
 name: team-coordination
+category: Foundations & Workflow
 description: Multi-person projects - shared state, todo claiming, handoffs
 ---
 

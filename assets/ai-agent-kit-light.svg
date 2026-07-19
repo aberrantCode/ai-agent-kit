@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="AGENT / KIT — PCB phosphor console badge">
+  <title>AGENT / KIT — PCB phosphor console badge</title>
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="240"/></clipPath>
+    <filter id="phosphor" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- badge substrate (sni-console.svg geometry) -->
+  <circle cx="256" cy="256" r="240" fill="#e7ece9"/>
+
+  <!-- faint PCB grid, clipped to disc -->
+  <g clip-path="url(#disc)" stroke="#1c7049" stroke-width="1" opacity="0.14">
+    <path d="M40 160 H472 M40 224 H472 M40 288 H472 M40 352 H472"/>
+    <path d="M160 40 V472 M224 40 V472 M288 40 V472 M352 40 V472"/>
+  </g>
+
+    <g id="icon" filter="url(#phosphor)">
+      <g transform="translate(122.667 62.667) scale(1.333)">
+        <g fill="none" stroke="#1c7049" stroke-width="5" stroke-linecap="round">
+    <path d="M68 48 V24"/><path d="M88 48 V24"/><path d="M112 48 V24"/><path d="M132 48 V24"/>
+    <path d="M68 152 V176"/><path d="M88 152 V176"/><path d="M112 152 V176"/><path d="M132 152 V176"/>
+    <path d="M48 68 H24"/><path d="M48 88 H24"/><path d="M48 112 H24"/><path d="M48 132 H24"/>
+    <path d="M152 68 H176"/><path d="M152 88 H176"/><path d="M152 112 H176"/><path d="M152 132 H176"/>
+  </g>
+  <g fill="#1c7049">
+    <circle cx="68" cy="22" r="2.4"/><circle cx="88" cy="22" r="2.4"/><circle cx="112" cy="22" r="2.4"/><circle cx="132" cy="22" r="2.4"/>
+    <circle cx="68" cy="178" r="2.4"/><circle cx="88" cy="178" r="2.4"/><circle cx="112" cy="178" r="2.4"/><circle cx="132" cy="178" r="2.4"/>
+    <circle cx="22" cy="68" r="2.4"/><circle cx="22" cy="88" r="2.4"/><circle cx="22" cy="112" r="2.4"/><circle cx="22" cy="132" r="2.4"/>
+    <circle cx="178" cy="68" r="2.4"/><circle cx="178" cy="88" r="2.4"/><circle cx="178" cy="112" r="2.4"/><circle cx="178" cy="132" r="2.4"/>
+  </g>
+  <rect x="48" y="48" width="104" height="104" rx="12" fill="none" stroke="#1c7049" stroke-width="6"/>
+  <circle cx="61" cy="61" r="4" fill="none" stroke="#1c7049" stroke-width="3"/>
+  <g fill="none" stroke="#1c7049" stroke-width="4">
+    <circle cx="82" cy="92" r="9"/><circle cx="118" cy="92" r="9"/>
+  </g>
+  <g fill="#1c7049">
+    <circle cx="82" cy="92" r="3.6"/><circle cx="118" cy="92" r="3.6"/>
+  </g>
+  <path d="M80 120 Q100 136 120 120" fill="none" stroke="#1c7049" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </g>
+
+  <!-- double-pinstripe border, drawn on top so it is never occluded -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="#2f6a4d" stroke-width="4"/>
+  <circle cx="256" cy="256" r="231" fill="none" stroke="#1c7049" stroke-width="1.5"/>
+
+  <!-- stacked wordmark -->
+  <g font-family="'JetBrains Mono','Cascadia Code',ui-monospace,Consolas,monospace" text-anchor="middle" font-weight="700">
+    <text x="256" y="372" font-size="68" letter-spacing="8" fill="#22332b">AGENT</text>
+    <text x="256" y="424" font-size="38" letter-spacing="10" fill="#1c7049">KIT</text>
+  </g>
+</svg>

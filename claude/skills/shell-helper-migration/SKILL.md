@@ -1,5 +1,6 @@
 ---
 name: shell-helper-migration
+category: Infrastructure & Ops
 description: Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) — extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and preserving exact exit-code and output-contract semantics across a batch of scripts.
 status: active
 version: 2026-07-05
@@ -38,3 +39,7 @@ When consolidating duplicated shell helper functions (`log`, `ok`, `fail`, `die`
 - Never blind-`sed` replace `fail`→`die` or vice versa; the semantics must be read from both the definition and every call site.
 - Removing non-ASCII glyphs from helper bodies is fine for workstation-side code, but see the skip-taxonomy skill for cases (heredoc payloads) where this must NOT be touched.
 - "Looks the same" is not "is the same" — three helpers named identically across files can have three different exit-code contracts.
+
+## Diagram
+
+[View diagram](diagram.html)

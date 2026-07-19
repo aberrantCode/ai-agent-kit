@@ -1,5 +1,6 @@
 ---
 name: youtube-prd-forensics
+category: Research & OSINT
 description: Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments, keyframe evidence, and embedded screenshots persisted in the project.
 ---
 

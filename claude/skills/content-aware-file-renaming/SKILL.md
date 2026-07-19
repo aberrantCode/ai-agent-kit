@@ -1,5 +1,6 @@
 ---
 name: content-aware-file-renaming
+category: Tooling & DevOps
 description: >
   Use when renaming files into a structured naming formula based on their contents —
   especially batches of downloaded documents (statements, invoices, tax forms, receipts,
@@ -368,3 +369,7 @@ should be able to edit it and re-run without re-extracting zips.
 single non-negotiable constraint of this skill. If you find yourself about to write a
 question into your response text and stop, that is the wrong move — call
 `AskUserQuestion` instead. Always.
+
+## Diagram
+
+[View diagram](diagram.html)

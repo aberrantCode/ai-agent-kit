@@ -1,5 +1,6 @@
 ---
 name: side-effect-free-helper-library
+category: Infrastructure & Ops
 description: Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own validation or exit-code conventions.
 status: active
 version: 2026-07-05
@@ -71,3 +72,7 @@ across a large, heterogeneous set of existing scripts.
 - Bulk text substitution across hundreds of scripts via naive `sed`/pattern-match
   risks mojibake; use line-range-based, content-agnostic replacement instead, and
   verify with a full parse sweep after each batch, not just a sample.
+
+## Diagram
+
+[View diagram](diagram.html)

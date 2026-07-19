@@ -1,5 +1,6 @@
 ---
 name: grafana-dashboard-workflow
+category: Infrastructure & Ops
 description: Use when authoring, retrofitting, or verifying Grafana service-monitoring dashboards — enforces probing live metrics before writing PromQL, a standard four-row health baseline, and a four-rung verification ladder before declaring a dashboard done.
 status: active
 version: 2026-07-05
@@ -42,3 +43,7 @@ version: 2026-07-05
 - **Skipping ladder rungs causes the "60%-follow-up-fix trap"** — dashboards that pass a shallow check (JSON parses) still ship with broken queries discovered only after merge.
 - **Scene-load parser quirk:** large line-filter unions in a Loki query can defeat Grafana's metric-vs-log classification, forcing a range query even though the panel has a stored instant-query flag. Workaround: apply a `reduce` + `seriesToRows` transform to collapse the per-series matrix into a single table row.
 - **A dashboard can correctly measure the wrong thing.** If a dashboard fails to alert on a real outage, don't assume instrumentation is broken — audit whether the chosen metric is blind to the actual failure mode (e.g. `MemAvailable` reads "available" even while page-cache holding a mmap'd model is thrashing). Add the signals that would have caught the incident (memory current-vs-max, swap usage, PSI pressure) rather than just re-trusting the existing metric.
+
+## Diagram
+
+[View diagram](diagram.html)

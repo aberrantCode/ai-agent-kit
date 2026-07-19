@@ -60,7 +60,7 @@ Read the `## Capabilities` section. For each capability item, verify:
 - **Single-sentence, testable**: not vague ("improve performance"), not compound
   (two capabilities in one bullet)
 - **Logical coherence**: capability makes sense in the context of the feature and the overall
-  product (read `docs/INITIAL_PROMPT.md` for product intent)
+  product (read `docs/REQUIREMENTS.md` or legacy `docs/INITIAL_PROMPT.md` for product intent)
 
 Flag each deficient capability with a specific, actionable improvement suggestion.
 Also flag if the capability set has **obvious gaps** — e.g., a data model feature with no

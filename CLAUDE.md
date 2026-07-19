@@ -7,10 +7,13 @@ Manages domain-specific knowledge modules for Claude Code, OpenAI Codex CLI, and
 
 ## Directory Structure
 
+Asset inventory — every skill, instruction, and command — lives in the generated
+[`CATALOG.md`](CATALOG.md). Never restate counts here; they drift.
+
 ```
 claude/
-  instructions/                     — 15 agent instructions (invoked via Task tool)
-  commands/                   — 27 global slash commands
+  instructions/               — agent instructions (invoked via Task tool)
+  commands/                   — global slash commands
   skills/<name>/
     SKILL.md                  — main skill content
     diagram.html              — visual diagram (generated)
@@ -23,19 +26,20 @@ gemini/
   instructions/                     — agent instructions for Gemini CLI
   skills/<name>/SKILL.md
 .claude/commands/             — repo-local slash commands (skills-manager)
-logs/timing.jsonl             — ship-to-dev timing log
+logs/timing.jsonl             — `/ship` timing log
 ```
 
 ---
 
 ## Key Conventions
 
-- **Never delete** from archive — set `status: deprecated` instead
+- **Delete superseded skills/commands** — git history is the archive of record; `status: deprecated` is a transient "scheduled for removal" marker, not a permanent tombstone
 - **Flow direction** is always source → archive; only `/import-skill` reverses this
 - **Installed copies** carry `installed-from: ai-agent-kit` frontmatter (legacy copies: `installed-from: llm_skills`) — skip either during scans
 - **Skill bundles** may include optional `sub-skills/` and `commands/` subdirectories
 - **All changes** go through feature branch → PR → `dev` (never commit directly to `dev` or `main`)
 - **README parity** — every archived skill must have a README row; every row must point to a real file
+- **Master-skills reorg (in progress)** — every skill PR must conform to `docs/reorg/charter.md`; per-directory dispositions live in `docs/reorg/disposition-ledger.md`, command names in `docs/reorg/command-namespace-registry.md`
 
 ---
 
@@ -70,6 +74,12 @@ logs/timing.jsonl             — ship-to-dev timing log
 
 ## Git Workflow
 
-Always use `/ship-to-dev` to merge changes into `dev`, then `/release-to-main` for production releases.
+Always use `/ship` to merge changes into `dev`, then `/release` for production releases.
 
 Feature branches: `type/short-description` branching off `dev`, PR back to `dev`.
+
+- **Local validation gate (P2, as modified — local, not GitHub Actions):** `/ship`
+  MUST run `pwsh ./scripts/validate.ps1` before opening any PR and abort if it exits
+  non-zero. See `scripts/README.md` ("Local validation gate + pre-push hook") for what
+  the gate checks and how it interacts with the optional `pre-push` git hook
+  (`scripts/install-hooks.ps1`, opt-in) and the global git-push-opens-Zed hook.

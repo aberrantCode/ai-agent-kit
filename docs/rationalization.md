@@ -1,8 +1,8 @@
 # Skills Archive Rationalization Report
 
 > **Date:** 2026-04-09
-> **Scope:** 90 Claude skills across 10 categories
-> **Status:** Analysis complete — awaiting implementation decisions
+> **Scope:** 90 Claude skills across 10 categories (archive has since grown; Phase 1 executed against 144 skills)
+> **Status:** Phase 1 implemented 2026-07-10 (`refactor/rationalization-phase-1`) — Phases 2-4 awaiting implementation decisions
 
 ---
 
@@ -368,7 +368,7 @@ All language/framework skills are well-scoped and platform-specific. No merges r
 | C5 | base auto-invocation of Ralph Wiggum vs iterative-development optional | Resolve during M6 merge; make explicit: auto for non-trivial tasks, optional for simple fixes |
 | C6 | code-review vs base TDD step order | Add code-review as optional step in TDD workflow; mandatory before commit |
 | C7 | requesting-code-review vs subagent-driven-development review templates | Resolve during M8; standardize on one review subagent framework |
-| C8 | finishing-a-development-branch local merge vs ship-to-dev PR merge | Resolve via M10; remove local merge option |
+| C8 | finishing-a-development-branch local merge vs ship-to-dev PR merge | Resolve via M10; remove local merge option — ✅ resolved 2026-07-10 |
 
 ---
 
@@ -401,16 +401,16 @@ These 45+ skills are well-scoped, non-overlapping, and correctly positioned:
 
 ## Implementation Phases
 
-### Phase 1 — High Priority, Low Risk (Do First)
+### Phase 1 — High Priority, Low Risk (Do First) — ✅ DONE 2026-07-10
 
-| Action | Skills | Expected Outcome |
-|--------|--------|-----------------|
-| M1: Merge frontend design skills | design-taste-frontend + frontend-design | 1 unified skill with conceptual + prescriptive guidance |
-| M5: Merge security skills | security + security-review | 1 unified security skill; eliminate 85% duplication |
-| M9: Merge feature spec skills | add-feature + create-feature-spec | 1 skill with style selector (conversational vs template) |
-| M10: Refactor finishing-branch | finishing-a-development-branch | Remove local merge option; delegate to ship-to-dev |
+| Action | Skills | Expected Outcome | Status |
+|--------|--------|-----------------|--------|
+| M1: Merge frontend design skills | design-taste-frontend + frontend-design | 1 unified skill with conceptual + prescriptive guidance | ✅ Done — merged into `frontend-design` (kept surviving name instead of the proposed `production-frontend-design`); design-taste-frontend deleted in claude/ + codex/ |
+| M5: Merge security skills | security + security-review | 1 unified security skill; eliminate 85% duplication | ✅ Done — merged into `security`; security-review deleted in claude/ + codex/; gemini/security-review renamed to `security` with unified content |
+| M9: Merge feature spec skills | add-feature + create-feature-spec | 1 skill with style selector (conversational vs template) | ✅ Done — merged into `add-feature` (kept surviving name instead of the proposed `feature-spec-workflow`) with Phase 0 style selector; create-feature-spec deleted in claude/ + codex/ |
+| M10: Refactor finishing-branch | finishing-a-development-branch | Remove local merge option; delegate to ship-to-dev | ✅ Done — local-merge option removed; PR integration delegated to the github bundle's `ship` operation (successor of ship-to-dev) |
 
-**Estimated reduction:** 90 → 86 skills
+**Actual reduction:** 144 → 141 Claude skills (87 → 84 Codex; Gemini unchanged at 5)
 
 ### Phase 2 — High Priority, Medium Risk
 

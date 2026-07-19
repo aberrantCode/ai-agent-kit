@@ -1,5 +1,6 @@
 ---
 name: extraction-reporting
+category: Research & OSINT
 description: >
   Domain expertise for generating the final markdown report that summarises a YouTube
   extraction operation — files reconstructed, evidence trail, gaps, and follow-ups.
@@ -129,3 +130,7 @@ Diff the new report against the previous and:
 
 - Path to `EXTRACTION.md`
 - Counts: files reconstructed, screenshots embedded, gaps flagged
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -1,5 +1,6 @@
 ---
 name: codex-review
+category: Code Quality
 description: OpenAI Codex CLI code review with GPT-5.2-Codex, CI/CD integration
 ---
 

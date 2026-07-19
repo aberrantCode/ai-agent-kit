@@ -1,5 +1,6 @@
 ---
 name: code-review
+category: Code Quality
 description: Mandatory code reviews via /code-review before commits and deploys
 requires: [base]
 ---

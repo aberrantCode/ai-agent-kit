@@ -1,5 +1,6 @@
 ---
-name: vercel-composition-patterns
+name: composition-patterns
+category: Frontend
 description:
   React composition patterns that scale. Use when refactoring components with
   boolean prop proliferation, building flexible component libraries, or

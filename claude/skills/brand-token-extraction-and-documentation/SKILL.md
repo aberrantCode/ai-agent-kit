@@ -1,5 +1,6 @@
 ---
 name: brand-token-extraction-and-documentation
+category: Frontend
 description: Use when reskinning an app with a real brand's visual identity — extract the actual palette from a live site's raw CSS (not markdown), recreate logo/icon assets programmatically with documented extraction rationale, and codify everything as versioned, named design tokens rather than one-off hardcoded values.
 status: active
 version: 2026-07-05
@@ -37,3 +38,7 @@ You need to reskin or extend an app to match a real brand's colors, logo, and ty
 - Popular page-builder frameworks (Divi and similar) leave signature default colors in the stylesheet that will pollute an occurrence-count ranking if not explicitly filtered out.
 - A "baked" token (hard-coded into a generated asset) is a hidden maintenance liability — every baked value needs an explicit comment noting it won't auto-update, or it will silently drift from the source token.
 - Treating token names as a stable contract (not just their values) is what prevents downstream breakage — a value change is safe, a name change/removal is not.
+
+## Diagram
+
+[View diagram](diagram.html)

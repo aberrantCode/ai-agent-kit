@@ -1,5 +1,6 @@
 ---
 name: multi-perspective-dns-diagnostic-ladder
+category: Infrastructure & Ops
 description: Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any "mysterious" networked-service failure needs root-causing — apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and always verify a fix by re-checking logs after applying it.
 status: active
 version: 2026-07-05
@@ -45,3 +46,7 @@ When a fix looks plausible, re-apply it and then re-read the system logs/output 
 - Don't stop the network investigation at "server looks fine" without stating that conclusion explicitly and then continuing upstream — otherwise the investigation stalls exactly where it should pivot to client/AP-side capture.
 - A fix that "looks right" (e.g. restarting a service, editing a secret) is not confirmed until logs are re-read post-apply; treat an unverified fix as still-open.
 - Building a single-dependency probe (checking only the network, only the secret) instead of the full chain risks fixing a step that wasn't actually the broken one.
+
+## Diagram
+
+[View diagram](diagram.html)

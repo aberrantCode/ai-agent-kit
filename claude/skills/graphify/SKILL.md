@@ -1,5 +1,6 @@
 ---
-name: graphify-windows
+name: graphify
+category: Tooling & DevOps
 description: "any input (code, docs, papers, images) → knowledge graph → clustered communities → HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships — especially if graphify-out/ exists. Provides persistent graph with god nodes, community detection, and BFS/DFS query tools."
 trigger: /graphify
 ---
@@ -1432,3 +1433,7 @@ If vertical scrolling breaks in PowerShell after running graphify, this is cause
 - Always show token cost in the report.
 - Never hide cohesion scores behind symbols - show the raw number.
 - Never run HTML viz on a graph with more than 5,000 nodes without warning the user.
+
+## Diagram
+
+[View diagram](diagram.html)

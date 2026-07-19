@@ -1,5 +1,6 @@
 ---
 name: sops-secrets
+category: Security & Credentials
 description: Domain expertise for SOPS-encrypted secrets in this repo — reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. "what's the login for grafana"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally — always shell to ac-devops, which is the only host with the age key.
 ---
 
@@ -145,3 +146,7 @@ internal API token between services).
 The new skill's `_lib.sh` will eventually subsume `scripts/get-secret.sh`'s
 logic, but the existing script remains so that `sync-secrets-to-keepass.sh`
 and any external tooling that grew dependencies on its CLI shape don't break.
+
+## Diagram
+
+[View diagram](diagram.html)

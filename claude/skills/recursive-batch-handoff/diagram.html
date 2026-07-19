@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursive Batch Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--violet-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--slate   { background:var(--slate-dim);   color:var(--slate);   border:1px solid var(--slate); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--violet); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--violet-dim); color:var(--violet); padding:1px 5px; border-radius:3px; }
+
+  .lifecycle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-family:var(--font-mono); font-size:11px; }
+  .lc-node { padding:4px 10px; border-radius:6px; background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); font-weight:700; }
+  .lc-sep { color:var(--text-dim); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Recursive Batch Handoff</h1>
+<p class="subtitle">no-master-plan pattern · discovery-driven batching · self-similar handoff prompt</p>
+
+<div class="diagram">
+
+  <!-- Purpose -->
+  <div class="section section--violet section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Purpose</div>
+    <div class="callout">
+      Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations — each batch runs a <strong>discovery command</strong> to find what's left, executes one coherent chunk, and emits a <strong>self-similar handoff prompt</strong> so the next session (or run) continues without a central master plan.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--violet">
+        <div class="title">Large file migrations</div>
+        <div class="desc">Dozens to hundreds of homogeneous targets (e.g. ~200 scripts) that cannot fit in one session or one PR.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Live/queued operations</div>
+        <div class="desc">ffmpeg jobs, DB migrations, staged deployments that must proceed in controlled increments.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">Multi-phase infra/feature work</div>
+        <div class="desc">Spans many sessions, where a centralized master plan would go stale or drift out of sync.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    eight-step method, one recursive loop
+  </div>
+
+  <!-- Method -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Method · re-run every session</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">1</div>
+        <div><div class="step-title">Discovery command = source of truth</div><div class="step-desc">grep/query/count for "what's left." Re-run fresh at the start of every session — never trust a stale summary.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">2</div>
+        <div><div class="step-title">Select next batch</div><div class="step-desc">Coherent grouping heuristic — next largest prefix group, subdirectory, or glob. Cap size (~20-30 files) to stay under an ~800-line diff.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">3</div>
+        <div><div class="step-title">Execute with judgment-per-file</div><div class="step-desc">Not blind <code>sed</code>/find-replace — similar files can still need individual handling. Normal TDD discipline applies.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">4</div>
+        <div><div class="step-title">Commit the batch</div><div class="step-desc">One PR / one change per batch.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">5</div>
+        <div><div class="step-title">Update progress log</div><div class="step-desc">Prepend a new entry to <code>docs/progress.md</code> so the most recent state sits at the top — survey the whole sequence and spot stalls at a glance.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">6</div>
+        <div><div class="step-title">Log recurring failure modes</div><div class="step-desc">e.g. "already-fixed-in-code stale backlog rows" — logged at the top of the handoff so the next session doesn't rediscover it.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">7</div>
+        <div><div class="step-title">Emit self-similar handoff prompt</div><div class="step-desc">Same template, updated state, run verbatim next time. Embeds the discovery command, batch heuristic, execution recipe, and an instruction to repeat + re-emit itself.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">8</div>
+        <div><div class="step-title">Live/queued: verify drain before scaling</div><div class="step-desc">Confirm the prior batch's count is falling before increasing batch size — only scale up once it has fully cleared.</div></div>
+      </li>
+    </ul>
+    <div class="lifecycle">
+      <span class="lc-node">discover</span><span class="lc-sep">→</span>
+      <span class="lc-node">select</span><span class="lc-sep">→</span>
+      <span class="lc-node">execute</span><span class="lc-sep">→</span>
+      <span class="lc-node">commit</span><span class="lc-sep">→</span>
+      <span class="lc-node">log</span><span class="lc-sep">→</span>
+      <span class="lc-node">handoff</span><span class="lc-sep">→</span>
+      <span class="lc-node">repeat</span>
+    </div>
+  </div>
+
+  <!-- Decision branch -->
+  <div class="two-col" style="--i:3">
+    <div class="section section--emerald">
+      <div class="section-label"><span class="dot"></span> Branch A · File/refactor batches</div>
+      <div class="ve-card ve-card--emerald" style="margin-bottom:8px">
+        <div class="title">Fixed-scope targets</div>
+        <div class="desc">Files/scripts/configs. Batch size is capped by <strong>diff size</strong> (~20-30 files, ~800 lines) — cap stays constant across sessions.</div>
+      </div>
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Risk to guard</div>
+        <div class="desc">Treating a "coherent" batch as uniform and applying blind scripted replacement across it.</div>
+      </div>
+    </div>
+    <div class="section section--red">
+      <div class="section-label"><span class="dot"></span> Branch B · Live/queued operations</div>
+      <div class="ve-card ve-card--red" style="margin-bottom:8px">
+        <div class="title">In-flight targets</div>
+        <div class="desc">ffmpeg jobs, DB migrations, deployments. Batch size is <strong>dynamic</strong> — grows only after the prior batch is confirmed draining.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Risk to guard</div>
+        <div class="desc">Scaling up before the previous batch fully clears risks orphaning a queue across a service restart.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inputs / Outputs -->
+  <div class="section section--slate" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Inputs → Outputs · per iteration</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--teal">
+        <div class="title">Inputs</div>
+        <div class="desc">Fresh discovery-command output · the prior handoff prompt (as the recipe, not as scope truth) · <code>docs/progress.md</code> history.</div>
+      </div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">Outputs</div>
+        <div class="desc">One committed batch/PR · a prepended <code>docs/progress.md</code> entry · a self-similar handoff prompt ready to paste into the next session.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gotchas -->
+  <div class="section section--amber" style="--i:5">
+    <div class="section-label"><span class="dot"></span> Gotchas</div>
+    <ul class="princ-list">
+      <li>Skipping discovery and trusting a prior session's written summary lets scope drift out of sync with reality.</li>
+      <li>Blind scripted replacement (<code>sed</code>, mass find/replace) across a "coherent" batch causes regressions — similar files still need per-file judgment.</li>
+      <li>Omitting the recurring-failure-mode note means every future session rediscovers the same gotcha independently.</li>
+      <li>Batches over the size/line cap block review and reintroduce the exact master-plan bottleneck this pattern avoids.</li>
+      <li>For live/queued operations, scaling batch size before confirming the previous batch drained risks orphaning in-flight work.</li>
+      <li>Never run a separate master plan alongside this — the progress log and discovery command must stay the sole source of truth (proven to ~200 files across 15+ sessions).</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

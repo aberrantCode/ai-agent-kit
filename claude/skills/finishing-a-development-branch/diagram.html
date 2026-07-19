@@ -1,714 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finishing a Development Branch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ===== THEME: Forest Green / Warm Slate ===== */
-:root {
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', 'SF Mono', Consolas, monospace;
-
-  --bg: #f6faf6;
-  --surface: #ffffff;
-  --surface2: #eef5ee;
-  --surface3: #e4efe4;
-  --border: rgba(0, 0, 0, 0.07);
-  --border-bright: rgba(0, 0, 0, 0.14);
-  --text: #1c2b1c;
-  --text-dim: #5f7a5f;
-  --text-muted: #94aa94;
-
-  --green:  #16a34a;
-  --green-dim: rgba(22, 163, 74, 0.08);
-  --green-mid: rgba(22, 163, 74, 0.18);
-  --teal:   #0d9488;
-  --teal-dim: rgba(13, 148, 136, 0.08);
-  --blue:   #2563eb;
-  --blue-dim: rgba(37, 99, 235, 0.08);
-  --amber:  #d97706;
-  --amber-dim: rgba(217, 119, 6, 0.08);
-  --rose:   #e11d48;
-  --rose-dim: rgba(225, 29, 72, 0.08);
-  --slate:  #475569;
-  --slate-dim: rgba(71, 85, 105, 0.08);
-  --stop-red: #dc2626;
-  --stop-red-dim: rgba(220, 38, 38, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1a0d;
-    --surface: #132013;
-    --surface2: #1a2e1a;
-    --surface3: #203820;
-    --border: rgba(255,255,255,0.07);
-    --border-bright: rgba(255,255,255,0.15);
-    --text: #d4edda;
-    --text-dim: #82a882;
-    --text-muted: #4d6b4d;
-
-    --green: #4ade80;
-    --green-dim: rgba(74,222,128,0.10);
-    --green-mid: rgba(74,222,128,0.20);
-    --teal: #2dd4bf;
-    --teal-dim: rgba(45,212,191,0.10);
-    --blue: #60a5fa;
-    --blue-dim: rgba(96,165,250,0.10);
-    --amber: #fbbf24;
-    --amber-dim: rgba(251,191,36,0.10);
-    --rose: #fb7185;
-    --rose-dim: rgba(251,113,133,0.10);
-    --slate: #94a3b8;
-    --slate-dim: rgba(148,163,184,0.10);
-    --stop-red: #f87171;
-    --stop-red-dim: rgba(248,113,113,0.10);
-  }
-}
-
-/* ===== RESET ===== */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 60% 0%, var(--green-dim) 0%, transparent 60%),
-    radial-gradient(ellipse at 10% 80%, var(--teal-dim) 0%, transparent 50%);
-  color: var(--text);
-  font-family: var(--font-body);
-  padding: 48px 32px;
-  min-height: 100vh;
-  line-height: 1.5;
-  overflow-wrap: break-word;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.animate {
-  animation: fadeUp 0.45s ease-out both;
-  animation-delay: calc(var(--i,0) * 0.07s);
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration:0.01ms !important; }
-}
-
-/* ===== LAYOUT ===== */
-.container { max-width: 1060px; margin: 0 auto; }
-
-/* ===== HEADER ===== */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 10px;
-}
-h1 {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: -1.5px;
-  line-height: 1.05;
-  color: var(--text);
-  margin-bottom: 10px;
-}
-h1 span { color: var(--green); }
-.subtitle {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-.tagline {
-  font-size: 14px;
-  color: var(--text-dim);
-  max-width: 640px;
-  line-height: 1.7;
-  margin-bottom: 40px;
-}
-.tagline strong { color: var(--text); }
-
-/* ===== DIVIDER ===== */
-.section-head {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-/* ===== PIPELINE (top linear flow) ===== */
-.pipeline {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  margin-bottom: 40px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-.pipeline-step {
-  flex: 1;
-  min-width: 130px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-right: none;
-  padding: 16px 14px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.pipeline-step:first-child { border-radius: 10px 0 0 10px; }
-.pipeline-step:last-child  { border-radius: 0 10px 10px 0; border-right: 1px solid var(--border); }
-.pipeline-step.active {
-  background: var(--green-dim);
-  border-color: var(--green);
-  z-index: 1;
-  box-shadow: 0 0 0 1px var(--green);
-}
-.pipeline-step.stop-step {
-  background: var(--stop-red-dim);
-  border-color: var(--stop-red);
-}
-.pipeline-step::after {
-  content: '›';
-  position: absolute;
-  right: -10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 18px;
-  z-index: 2;
-  background: var(--bg);
-  line-height: 1;
-}
-.pipeline-step:last-child::after { display: none; }
-.step-num {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.step-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-}
-.step-note {
-  font-size: 11px;
-  color: var(--text-dim);
-  line-height: 1.4;
-}
-.step-badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-weight: 500;
-  margin-top: 3px;
-  width: fit-content;
-}
-.badge-green  { background: var(--green-dim);  color: var(--green); }
-.badge-red    { background: var(--stop-red-dim); color: var(--stop-red); }
-.badge-amber  { background: var(--amber-dim);  color: var(--amber); }
-.badge-blue   { background: var(--blue-dim);   color: var(--blue); }
-
-/* ===== DECISION GATE ===== */
-.decision-section {
-  margin-bottom: 40px;
-}
-.test-gate {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.diamond-big {
-  width: 52px; height: 52px;
-  background: var(--amber-dim);
-  border: 2px solid var(--amber);
-  transform: rotate(45deg);
-  border-radius: 6px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-}
-.diamond-big span {
-  transform: rotate(-45deg);
-  font-size: 20px;
-  display: block;
-}
-.gate-content { flex: 1; min-width: 200px; }
-.gate-question {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 12px;
-}
-.gate-branches {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.branch-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-}
-.branch-pass {
-  background: var(--green-dim);
-  border-color: var(--green);
-  color: var(--green);
-}
-.branch-fail {
-  background: var(--stop-red-dim);
-  border-color: var(--stop-red);
-  color: var(--stop-red);
-}
-.branch-pill .pill-icon { font-size: 14px; }
-
-/* ===== FOUR OPTIONS ===== */
-.options-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 40px;
-}
-@media (max-width: 800px) {
-  .options-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-  .options-grid { grid-template-columns: 1fr; }
-}
-.option-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-  transition: border-color 0.18s, box-shadow 0.18s;
-}
-.option-card:hover {
-  border-color: var(--border-bright);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-}
-.option-card.opt-green { border-top: 3px solid var(--green); }
-.option-card.opt-blue  { border-top: 3px solid var(--blue); }
-.option-card.opt-slate { border-top: 3px solid var(--slate); }
-.option-card.opt-rose  { border-top: 3px solid var(--rose); }
-
-.opt-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.opt-num {
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.num-green { background: var(--green-dim); color: var(--green); }
-.num-blue  { background: var(--blue-dim);  color: var(--blue); }
-.num-slate { background: var(--slate-dim); color: var(--slate); }
-.num-rose  { background: var(--rose-dim);  color: var(--rose); }
-
-.opt-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-}
-.opt-steps {
-  font-size: 11px;
-  color: var(--text-dim);
-  line-height: 1.6;
-  list-style: none;
-  padding: 0;
-}
-.opt-steps li {
-  padding-left: 14px;
-  position: relative;
-  margin-bottom: 3px;
-}
-.opt-steps li::before {
-  content: '›';
-  position: absolute;
-  left: 0;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-.opt-steps li code {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  background: var(--surface2);
-  color: var(--text-dim);
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-.opt-warning {
-  background: var(--rose-dim);
-  border: 1px solid var(--rose);
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 11px;
-  color: var(--rose);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.opt-tag {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  padding: 2px 7px;
-  border-radius: 10px;
-  width: fit-content;
-}
-.tag-worktree-keep { background: var(--blue-dim); color: var(--blue); }
-.tag-worktree-clean { background: var(--rose-dim); color: var(--rose); }
-
-/* ===== WORKTREE MATRIX ===== */
-.matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-bottom: 40px;
-  background: var(--surface);
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-.matrix-table th {
-  background: var(--surface2);
-  padding: 10px 14px;
-  text-align: left;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  font-weight: 500;
-  border-bottom: 1px solid var(--border);
-}
-.matrix-table td {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-dim);
-  vertical-align: middle;
-}
-.matrix-table tr:last-child td { border-bottom: none; }
-.matrix-table td:first-child {
-  font-weight: 600;
-  color: var(--text);
-}
-.cell-yes {
-  color: var(--green);
-  font-weight: 700;
-  font-family: var(--font-mono);
-}
-.cell-no {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-/* ===== RULES ===== */
-.rules-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 40px;
-}
-.rule-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 13px 14px;
-}
-.rule-icon { font-size: 16px; margin-bottom: 5px; }
-.rule-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-.rule-body  { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
-.rule-item.rule-never { border-color: var(--stop-red); background: linear-gradient(135deg, var(--surface), var(--stop-red-dim)); }
-.rule-item.rule-always { border-color: var(--green); background: linear-gradient(135deg, var(--surface), var(--green-dim)); }
-
-/* ===== INTEGRATION CHIPS ===== */
-.chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 40px;
-}
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-.chip .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finishing a Development Branch — Ship, Keep, or Discard</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #12100e;
+      --surface: #1a1714;
+      --surface-2: #221e1a;
+      --border: rgba(255,255,255,0.08);
+      --text: #ede7de;
+      --text-dim: #99907f;
+      --green: #7cb65f;
+      --green-dim: rgba(124,182,95,0.12);
+      --blue: #5f9fd6;
+      --blue-dim: rgba(95,159,214,0.12);
+      --red: #d66a5f;
+      --red-dim: rgba(214,106,95,0.12);
+      --amber: #d6a85f;
+      --amber-dim: rgba(214,168,95,0.12);
+      --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      background-image: radial-gradient(at 50% 0%, var(--green-dim) 0%, transparent 50%);
+      color: var(--text);
+      padding: 52px 24px 80px;
+    }
+    header { max-width: 880px; margin: 0 auto 44px; text-align: center; }
+    .badge {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--green);
+      border: 1px solid var(--green); border-radius: 999px; padding: 5px 16px; margin-bottom: 20px;
+    }
+    h1 { font-size: 2.5rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .tagline { font-size: 0.95rem; color: var(--text-dim); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+    main { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+    .step {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; display: flex; gap: 18px; align-items: flex-start;
+    }
+    .step .num {
+      font-family: var(--font-mono); font-size: 0.75rem; color: var(--green);
+      background: var(--green-dim); border-radius: 8px; padding: 6px 10px; flex-shrink: 0; margin-top: 2px;
+    }
+    .step h3 { font-size: 1rem; margin-bottom: 4px; }
+    .step p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+    .step .fail { color: var(--red); }
+    .arrow { text-align: center; color: var(--text-dim); font-size: 1.1rem; line-height: 1; }
+    .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .option { border-radius: 14px; padding: 20px 22px; border: 1px solid var(--border); background: var(--surface); }
+    .option.ship { border-top: 3px solid var(--green); }
+    .option.keep { border-top: 3px solid var(--blue); }
+    .option.discard { border-top: 3px solid var(--red); }
+    .option .tag { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 8px; }
+    .option.ship .tag { color: var(--green); }
+    .option.keep .tag { color: var(--blue); }
+    .option.discard .tag { color: var(--red); }
+    .option h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .option p { font-size: 0.79rem; color: var(--text-dim); line-height: 1.6; }
+    .option .detail { font-family: var(--font-mono); font-size: 0.7rem; margin-top: 10px; display: block; color: var(--text-dim); }
+    .delegate {
+      background: var(--green-dim); border: 1px dashed var(--green); border-radius: 12px;
+      padding: 16px 22px; text-align: center; font-size: 0.84rem; line-height: 1.6; color: var(--text-dim);
+    }
+    .delegate strong { color: var(--green); font-family: var(--font-mono); font-size: 0.8rem; }
+    .banned {
+      background: var(--red-dim); border: 1px solid var(--red); border-radius: 12px;
+      padding: 14px 22px; text-align: center; font-size: 0.82rem; color: var(--text-dim); line-height: 1.6;
+    }
+    .banned strong { color: var(--red); }
+    .cleanup {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 22px; text-align: center; font-size: 0.82rem; color: var(--text-dim); line-height: 1.6;
+    }
+    .merged-note {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+      text-align: center; margin-top: 34px; letter-spacing: 0.06em;
+    }
+    @media (max-width: 720px) { .options { grid-template-columns: 1fr; } h1 { font-size: 2rem; } }
+  </style>
 </head>
 <body>
-<div class="container">
+  <header>
+    <div class="badge">finishing-a-development-branch</div>
+    <h1>Ship, Keep, or Discard</h1>
+    <p class="tagline">Verify tests → present exactly three options → execute → clean up. Integration into dev always goes through a PR, owned by the github bundle's ship operation.</p>
+  </header>
+  <main>
+    <div class="step">
+      <span class="num">STEP 1</span>
+      <div><h3>Verify Tests</h3><p>Run the project's test suite. <span class="fail">Failing tests stop everything</span> — no options are offered until the suite is green.</p></div>
+    </div>
+    <div class="step">
+      <span class="num">STEP 2</span>
+      <div><h3>Determine Base Branch</h3><p>git merge-base against dev, then main/master — or confirm with the user.</p></div>
+    </div>
+    <div class="step">
+      <span class="num">STEP 3</span>
+      <div><h3>Present Exactly 3 Options</h3><p>Concise, structured, no added explanation.</p></div>
+    </div>
 
-  <!-- HEADER -->
-  <div class="eyebrow animate" style="--i:0">Skill Reference</div>
-  <h1 class="animate" style="--i:1">Finishing a<br><span>Development Branch</span></h1>
-  <p class="subtitle animate" style="--i:2">superpowers:finishing-a-development-branch</p>
-  <p class="tagline animate" style="--i:3">
-    Verifies tests pass, then presents <strong>exactly 4 structured options</strong> for completing feature work.
-    Executes the chosen path and cleans up the worktree appropriately — never guesses what to do next.
-  </p>
+    <div class="arrow">▼</div>
 
-  <!-- PIPELINE -->
-  <div class="section-head animate" style="--i:4">Process Overview</div>
-  <div class="pipeline animate" style="--i:5">
-    <div class="pipeline-step stop-step">
-      <div class="step-num">Step 1</div>
-      <div class="step-title">Verify Tests</div>
-      <div class="step-note">Run full test suite. If any fail, STOP here.</div>
-      <span class="step-badge badge-red">Gate</span>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">Step 2</div>
-      <div class="step-title">Determine Base Branch</div>
-      <div class="step-note">Find the branch this feature diverged from.</div>
-      <span class="step-badge badge-amber">Detect</span>
-    </div>
-    <div class="pipeline-step active">
-      <div class="step-num">Step 3</div>
-      <div class="step-title">Present Options</div>
-      <div class="step-note">Show exactly 4 options — no more, no less.</div>
-      <span class="step-badge badge-green">Required</span>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">Step 4</div>
-      <div class="step-title">Execute Choice</div>
-      <div class="step-note">Run the selected workflow path.</div>
-      <span class="step-badge badge-blue">Action</span>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">Step 5</div>
-      <div class="step-title">Cleanup Worktree</div>
-      <div class="step-note">Remove for opts 1 &amp; 4 only.</div>
-      <span class="step-badge badge-amber">Conditional</span>
-    </div>
-  </div>
-
-  <!-- TEST GATE DECISION -->
-  <div class="section-head animate" style="--i:6">Step 1 Decision Gate</div>
-  <div class="test-gate animate" style="--i:7">
-    <div class="diamond-big"><span>?</span></div>
-    <div class="gate-content">
-      <div class="gate-question">Do all tests pass?</div>
-      <div class="gate-branches">
-        <div class="branch-pill branch-pass">
-          <span class="pill-icon">✓</span>
-          Yes — continue to Step 2
-        </div>
-        <div class="branch-pill branch-fail">
-          <span class="pill-icon">✗</span>
-          No — STOP. Show failures. Cannot proceed until tests pass.
-        </div>
+    <div class="options">
+      <div class="option ship">
+        <span class="tag">Option 1</span>
+        <h3>Ship to dev</h3>
+        <p>Delegate to the github bundle's <b>ship</b> operation: branch naming, push, PR against dev, merge commit, branch cleanup.</p>
+        <span class="detail">→ then remove worktree</span>
+      </div>
+      <div class="option keep">
+        <span class="tag">Option 2</span>
+        <h3>Keep as-is</h3>
+        <p>Branch and worktree preserved untouched — the user handles integration later.</p>
+        <span class="detail">→ worktree kept</span>
+      </div>
+      <div class="option discard">
+        <span class="tag">Option 3</span>
+        <h3>Discard</h3>
+        <p>Permanently deletes branch, commits, and worktree. Requires the user to type <b>discard</b> exactly.</p>
+        <span class="detail">→ then remove worktree</span>
       </div>
     </div>
-  </div>
 
-  <!-- FOUR OPTIONS -->
-  <div class="section-head animate" style="--i:8" style="margin-top:32px;">Step 3 — The 4 Options (always presented in this order)</div>
-  <div class="options-grid animate" style="--i:9">
+    <div class="delegate">Option 1 delegates to <strong>github › ship</strong> (<strong>/ship</strong>) — the single owned path for landing work on dev.</div>
 
-    <!-- OPTION 1 -->
-    <div class="option-card opt-green">
-      <div class="opt-header">
-        <div class="opt-num num-green">1</div>
-        <div class="opt-title">Merge Locally</div>
-      </div>
-      <ul class="opt-steps">
-        <li>Checkout <code>&lt;base-branch&gt;</code></li>
-        <li><code>git pull</code></li>
-        <li><code>git merge &lt;feature&gt;</code></li>
-        <li>Run tests on merged result</li>
-        <li>If pass → <code>git branch -d &lt;feature&gt;</code></li>
-      </ul>
-      <span class="opt-tag tag-worktree-clean">Worktree: removed</span>
-    </div>
+    <div class="banned"><strong>Removed by design:</strong> local merges into the base branch. They bypass PR review, branch protection, and the merge-commit history convention. Never push directly to dev or main.</div>
 
-    <!-- OPTION 2 -->
-    <div class="option-card opt-blue">
-      <div class="opt-header">
-        <div class="opt-num num-blue">2</div>
-        <div class="opt-title">Push &amp; Create PR</div>
-      </div>
-      <ul class="opt-steps">
-        <li><code>git push -u origin &lt;feature&gt;</code></li>
-        <li><code>gh pr create</code> with Summary + Test Plan</li>
-        <li>Branch stays open for review</li>
-      </ul>
-      <span class="opt-tag tag-worktree-keep">Worktree: preserved</span>
-    </div>
+    <div class="cleanup"><b>Step 5 — Worktree cleanup:</b> remove for Options 1 &amp; 3 · keep for Option 2 · pairs with using-git-worktrees</div>
 
-    <!-- OPTION 3 -->
-    <div class="option-card opt-slate">
-      <div class="opt-header">
-        <div class="opt-num num-slate">3</div>
-        <div class="opt-title">Keep As-Is</div>
-      </div>
-      <ul class="opt-steps">
-        <li>Report branch name</li>
-        <li>Report worktree path</li>
-        <li>No changes made</li>
-      </ul>
-      <span class="opt-tag tag-worktree-keep">Worktree: preserved</span>
-    </div>
-
-    <!-- OPTION 4 -->
-    <div class="option-card opt-rose">
-      <div class="opt-header">
-        <div class="opt-num num-rose">4</div>
-        <div class="opt-title">Discard</div>
-      </div>
-      <ul class="opt-steps">
-        <li>Show branch + commits to be deleted</li>
-        <li>Require user to type <code>discard</code></li>
-        <li><code>git branch -D &lt;feature&gt;</code></li>
-      </ul>
-      <div class="opt-warning">
-        ⚠ Typed confirmation required
-      </div>
-      <span class="opt-tag tag-worktree-clean">Worktree: removed</span>
-    </div>
-
-  </div>
-
-  <!-- MATRIX TABLE -->
-  <div class="section-head animate" style="--i:10">Quick Reference Matrix</div>
-  <table class="matrix-table animate" style="--i:11">
-    <thead>
-      <tr>
-        <th>Option</th>
-        <th>Merges code</th>
-        <th>Pushes remote</th>
-        <th>Keeps worktree</th>
-        <th>Deletes branch</th>
-        <th>Requires confirmation</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1 — Merge Locally</td>
-        <td class="cell-yes">✓</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-        <td class="cell-yes">✓</td>
-        <td class="cell-no">—</td>
-      </tr>
-      <tr>
-        <td>2 — Push &amp; PR</td>
-        <td class="cell-no">—</td>
-        <td class="cell-yes">✓</td>
-        <td class="cell-yes">✓</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-      </tr>
-      <tr>
-        <td>3 — Keep As-Is</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-        <td class="cell-yes">✓</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-      </tr>
-      <tr>
-        <td>4 — Discard</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-        <td class="cell-no">—</td>
-        <td class="cell-yes">✓ <span style="font-size:10px;color:var(--rose)">(force)</span></td>
-        <td class="cell-yes" style="color:var(--rose)">type "discard"</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- RULES -->
-  <div class="section-head animate" style="--i:12">Key Rules</div>
-  <div class="rules-row animate" style="--i:13">
-    <div class="rule-item rule-never">
-      <div class="rule-icon">🚫</div>
-      <div class="rule-title">Never skip test verification</div>
-      <div class="rule-body">Tests must pass before presenting options. Merging broken code or creating a failing PR are both blocked outcomes.</div>
-    </div>
-    <div class="rule-item rule-never">
-      <div class="rule-icon">🚫</div>
-      <div class="rule-title">Never ask open-ended questions</div>
-      <div class="rule-body">"What should I do next?" is ambiguous. Always present exactly the 4 structured options — no deviation.</div>
-    </div>
-    <div class="rule-item rule-never">
-      <div class="rule-icon">🚫</div>
-      <div class="rule-title">Never auto-cleanup for Option 2/3</div>
-      <div class="rule-body">Worktree stays alive for PR review (Option 2) and deferred work (Option 3). Only remove for 1 and 4.</div>
-    </div>
-    <div class="rule-item rule-always">
-      <div class="rule-icon">✓</div>
-      <div class="rule-title">Always verify post-merge tests</div>
-      <div class="rule-body">After merging locally (Option 1), run the test suite again on the merged result before deleting the feature branch.</div>
-    </div>
-    <div class="rule-item rule-always">
-      <div class="rule-icon">✓</div>
-      <div class="rule-title">Always get typed confirmation</div>
-      <div class="rule-body">Option 4 requires the user to type the exact word <code style="font-family:var(--font-mono);font-size:10px;">discard</code> — prevents accidental deletion.</div>
-    </div>
-    <div class="rule-item rule-always">
-      <div class="rule-icon">✓</div>
-      <div class="rule-title">Announce the skill at start</div>
-      <div class="rule-body">Say "I'm using the finishing-a-development-branch skill to complete this work" before beginning.</div>
-    </div>
-  </div>
-
-  <!-- INTEGRATION -->
-  <div class="section-head animate" style="--i:14">Integration</div>
-  <div class="chip-row animate" style="--i:15">
-    <div class="chip"><div class="dot" style="background:var(--green)"></div>Called by: subagent-driven-development</div>
-    <div class="chip"><div class="dot" style="background:var(--teal)"></div>Called by: executing-plans</div>
-    <div class="chip"><div class="dot" style="background:var(--blue)"></div>Pairs with: using-git-worktrees (cleanup)</div>
-  </div>
-
-</div>
+    <p class="merged-note">refactored — local-merge option removed, PR path delegated to github ship · rationalization M10</p>
+  </main>
 </body>
 </html>

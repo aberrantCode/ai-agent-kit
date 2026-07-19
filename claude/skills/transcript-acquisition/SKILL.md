@@ -1,5 +1,6 @@
 ---
 name: transcript-acquisition
+category: Research & OSINT
 description: >
   Domain expertise for obtaining a timestamped transcript of a YouTube video — first via
   YouTube's own auto-subs/CC, falling back to local Whisper transcription of the downloaded
@@ -105,3 +106,7 @@ you do refresh, retain the previous transcript at `transcript.prev.md`.
 - Path to `transcript.md`
 - Source used (`youtube-auto-subs` | `youtube-manual-subs` | `whisper-cpp` | `whisper`)
 - Caveat flags (low confidence, partial coverage)
+
+## Diagram
+
+[View diagram](diagram.html)

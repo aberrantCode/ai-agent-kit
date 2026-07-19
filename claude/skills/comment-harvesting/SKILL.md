@@ -1,5 +1,6 @@
 ---
 name: comment-harvesting
+category: Research & OSINT
 description: >
   Domain expertise for harvesting comments and threads from a YouTube video using yt-dlp.
   Sub-skill of `youtube-extraction`. Use when the parent skill needs comments as a primary
@@ -94,3 +95,7 @@ If `comments.json` already exists for `<basename>`, only re-fetch on explicit
 refresh request (comment threads on older videos are mostly stable). Append a
 new `comments.<ISO-date>.json` instead of overwriting if the user does want a
 fresh pull.
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -1,5 +1,6 @@
 ---
 name: gemini-review
+category: Code Quality
 description: Google Gemini CLI code review with Gemini 2.5 Pro, 1M token context, CI/CD integration
 ---
 

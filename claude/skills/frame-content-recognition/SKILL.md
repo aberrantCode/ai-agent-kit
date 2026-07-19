@@ -1,5 +1,6 @@
 ---
 name: frame-content-recognition
+category: Research & OSINT
 description: >
   Domain expertise for visually inspecting extracted video frames to identify which ones
   show file content (IDE panes, terminal cat, slides, READMEs) and capture path, language,
@@ -122,3 +123,7 @@ changed. This step is expensive — avoid redoing it.
 - Path to `frames.recognition.json`
 - Count of distinct `file_path` values detected
 - Coverage stats: how many frames contained recognised file content vs. talking-head
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -1,5 +1,6 @@
 ---
 name: state-file-driven-multi-turn-resumption
+category: Foundations & Workflow
 description: Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them — a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one step, records evidence, and ends with a copy-ready resume prompt.
 status: active
 version: 2026-07-05
@@ -42,3 +43,7 @@ version: 2026-07-05
 - Omitting evidence (PR#, output, commit hash) turns checkboxes into unverifiable claims — future turns can't distinguish "done" from "claimed done."
 - Forgetting to surface recurring failure modes in the handoff prompt causes the same mistake to repeat across sessions.
 - Ignoring leftover uncommitted working-tree state from a prior session break can silently clobber or duplicate work.
+
+## Diagram
+
+[View diagram](diagram.html)

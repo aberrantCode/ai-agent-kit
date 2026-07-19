@@ -1,5 +1,6 @@
 ---
 name: reddit-ads
+category: Third-Party Integrations
 description: Reddit Ads API - campaigns, targeting, conversions, agentic optimization
 ---
 

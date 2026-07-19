@@ -1,5 +1,6 @@
 ---
 name: reddit-api
+category: Third-Party Integrations
 description: Reddit API with PRAW (Python) and Snoowrap (Node.js)
 ---
 
@@ -587,3 +588,7 @@ python -c "import praw; r = praw.Reddit(...); print(r.user.me())"
 | User info | `GET /user/{username}/about` |
 | Submit post | `POST /api/submit` |
 | Vote | `POST /api/vote` |
+
+## Diagram
+
+[View diagram](diagram.html)

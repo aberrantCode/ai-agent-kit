@@ -1,5 +1,6 @@
 ---
 name: grafana-dashboard-engineer
+category: Infrastructure & Ops
 description: >
   Production-grade Grafana dashboard engineer. Enables rapid research, design, build, deployment, 
   and validation of observability dashboards across Prometheus, Loki, and custom datasources. Supports 
@@ -1142,3 +1143,7 @@ export GRAFANA_API_KEY="glsa_xxxxxxxxxxxxx"
 - ML-based anomaly detection integration
 - Dashboard performance profiling (slow queries, heavy panels)
 - Auto-remediation for common misconfiguration patterns
+
+## Diagram
+
+[View diagram](diagram.html)

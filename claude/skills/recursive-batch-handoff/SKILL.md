@@ -1,5 +1,6 @@
 ---
 name: recursive-batch-handoff
+category: Foundations & Workflow
 description: Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations — each batch runs a discovery command to find what's left, executes one coherent chunk, and emits a self-similar handoff prompt so the next session (or run) continues without a central master plan.
 status: active
 version: 2026-07-05
@@ -30,3 +31,7 @@ version: 2026-07-05
 - For live/queued operations, increasing batch size before confirming the previous batch fully drained risks orphaning in-flight work (e.g., a service restart abandoning a queue that was still processing).
 - The pattern has scaled to ~200 files across 15+ sessions without state drift, but only because the progress log and discovery command remained the sole source of truth — don't also run a separate master plan that can fall out of sync with them.
 - Multi-phase feature/infra chains benefit from the same recursive copy-ready-prompt structure with explicit recursion clauses and decision gates, even when the "batch" is a follow-on task rather than a file group.
+
+## Diagram
+
+[View diagram](diagram.html)

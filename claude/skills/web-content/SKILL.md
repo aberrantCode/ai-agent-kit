@@ -1,5 +1,6 @@
 ---
 name: web-content
+category: SEO & Web Presence
 description: SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization
 ---
 

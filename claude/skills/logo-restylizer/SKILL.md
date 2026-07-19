@@ -1,5 +1,6 @@
 ---
 name: logo-restylizer
+category: UI & Design
 description: Restylize, retheme, or transform an existing logo or icon into a new visual variant. Use this skill whenever the user wants to: create a variation of an existing logo, change logo colors or style, apply a new theme or effect to an icon, make a dark/light/neon/flat/outlined version, apply new branding to an existing mark, generate a restyled copy of any SVG or image file, or modify a logo's visual treatment. Triggers on phrases like "restyle logo", "transform icon", "make a dark version", "change the colors on", "apply X style to", "create a variant of", or any request that combines an existing image with a desired visual outcome. Always invoke before attempting to modify an image file manually.
 ---
 

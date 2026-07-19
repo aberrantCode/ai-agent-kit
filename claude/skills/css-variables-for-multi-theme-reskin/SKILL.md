@@ -1,5 +1,6 @@
 ---
 name: css-variables-for-multi-theme-reskin
+category: Frontend
 description: Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to "reskin" or "retheme" an existing interface without touching its structure or interaction logic.
 status: active
 version: 2026-07-05
@@ -64,3 +65,7 @@ works: the goal is a pure token substitution, not a rebuild.
 - This turns a brand reskin into a data change (new token values) instead of a code
   refactor — if a "new brand" request still requires editing component files, the
   token boundary wasn't drawn correctly.
+
+## Diagram
+
+[View diagram](diagram.html)

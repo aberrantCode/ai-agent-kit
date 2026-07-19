@@ -1,5 +1,6 @@
 ---
 name: flutter
+category: Frontend
 description: Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing
 ---
 

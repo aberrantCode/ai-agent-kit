@@ -1,0 +1,1260 @@
+{
+ "consensus_summary": "The board approves a reduced, phase-gated reorganization: eleven final bundles instead of twelve masters, with the maintenance-skeptic's cuts applied throughout — architecture-manager is dissolved (its four pattern sub-skills redistribute to ops-manager and developer-manager, its absorbed skills stay standalone), data-manager shrinks to a single gated-batch skill, media-manager becomes an in-place extension of the shipped youtube-extraction bundle, and cross-cli-skill-transpiler is replaced by an on-demand mirror policy. The extend-in-place slug rule is applied universally (github, project-manager, skills-manager, youtube-extraction, ac-logo commands all keep their installed names), and every contested-ownership item was resolved to exactly one home: session handoff → project-manager, session-JSONL toolkit and token-efficiency → agent-manager, /diagnose-runbook → quality-manager, shell-fleet trio → ops-manager, /get-secret → ops-manager. Sub-skills trigger independently per the github precedent, so masters are ownership/routing heads, not runtime gates; every sub-skill keeps its own trigger-rich frontmatter, developer-manager's two mega-group files are cancelled in favor of a thin router over the 34 standalone stack skills, and ~25 commands were cut or merged (verb-first renames applied: /handoff, /burndown, /propose-enhancements deferred, /apply-script, /search-sessions). Verified counts (142/84/5, 25 commands) replace the taxonomy's stale figures, and a Phase-0 charter PR must ship the routing-model statement, the 142-directory disposition ledger, the command-namespace registry, and the boundary sentences before any skill PR lands. Phase 1 (github + project-manager + skills-manager) is hard-gated before Phase 2 masters proceed.",
+ "final_master_skills": [
+  {
+   "name": "github",
+   "mission": "Own all git and GitHub mechanics — branches, worktrees, PRs, merges, releases, and repo hygiene — as an in-place extension of the existing installed `github` bundle (slug unchanged), absorbing the nine satellite git skills and closing the mined gaps: sync-local-to-dev, PR 800-line splits, worktree lifecycle/lock recovery, changelog preview, big-binary policy.",
+   "priority": "P0",
+   "subskills": [
+    {
+     "name": "commit",
+     "description": "Sub-skill of `github`. Stage, pull with conflict resolution, conventional-commit, push. Unchanged.",
+     "source": "absorb-existing",
+     "existing_name": "github (sub-skill: commit)"
+    },
+    {
+     "name": "ship",
+     "description": "Sub-skill of `github`. Feature-branch PR into dev; gains the merge/keep/discard decision gate from finishing-a-development-branch and generic pre-PR gates (tests, 400-warn/800-hard size cap routing to pr-splitter) from pre-pr.",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: ship); absorbs finishing-a-development-branch, pre-pr (generic gates only)"
+    },
+    {
+     "name": "merge",
+     "description": "Sub-skill of `github`. Merge PR(s) with merge commit + full cleanup; ends with local dev fast-forward; optional post-merge apply-script location handed off to ops-manager (locate and delegate, never execute deploy logic here).",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: merge)"
+    },
+    {
+     "name": "release",
+     "description": "Sub-skill of `github`. Promote dev to main; adds version-parity gate (displayed app version must match derived tag).",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: release)"
+    },
+    {
+     "name": "release-init",
+     "description": "Sub-skill of `github`. Release-Automation Standard provisioning; extended with version-stamp wiring and README badge conformance (absorbs the repo-badge-audit opportunity — no separate command).",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: release-init)"
+    },
+    {
+     "name": "prune",
+     "description": "Sub-skill of `github`. Stale branch/remote cleanup; extended with orphaned-worktree detection under <repo>-wt/.worktrees and branch-drift reporting (absorbs the branch-sync-audit opportunity — no separate command).",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: prune)"
+    },
+    {
+     "name": "publish",
+     "description": "Sub-skill of `github`. Repo init/publish; gains suggest-only prototype-git-bootstrap mode (never auto-init — honcho-mcp-test is deliberately un-gitted for secrets reasons).",
+     "source": "extend-existing",
+     "existing_name": "github (sub-skill: publish)"
+    },
+    {
+     "name": "worktree-task-lifecycle",
+     "description": "Sub-skill of `github`. Full per-task worktree lifecycle: create under <repo>-wt/.worktrees, post-merge idempotent removal, Windows file-lock recovery, credentials-stay-in-primary-checkout rules, identical-file pull-collision handling. Single lifecycle authority that merge/prune and agent-manager delegate to.",
+     "source": "absorb-existing",
+     "existing_name": "using-git-worktrees, worktree-isolated-loop (git-isolation half; loop-handoff prose → project-manager loop-prompt-composer)"
+    },
+    {
+     "name": "pr-splitter",
+     "description": "Sub-skill of `github`. Split oversized branches/PRs into stacked atomic PRs under the 400/800 cap, preserving risk seams and generated-artifact groupings; documented cap-exemption path for test-heavy diffs.",
+     "source": "absorb-existing",
+     "existing_name": "commit-hygiene, accumulated-feature-branch-workflow"
+    },
+    {
+     "name": "additive-merge-conflict-resolution",
+     "description": "Sub-skill of `github`. Union-keep-both resolution for append-only/registry-file conflicts. Lifted into the bundle unchanged.",
+     "source": "absorb-existing",
+     "existing_name": "additive-merge-conflict-resolution"
+    },
+    {
+     "name": "crlf-gitattributes-normalization",
+     "description": "Sub-skill of `github`. Line-ending hygiene via .gitattributes for mixed Windows/Linux repos. Lifted unchanged.",
+     "source": "absorb-existing",
+     "existing_name": "crlf-gitattributes-normalization"
+    },
+    {
+     "name": "large-asset-vendoring",
+     "description": "Sub-skill of `github`. One big-binary policy: decision table first (LFS vs chunk-split vs don't-commit), then mechanics — LFS scoped to assets/ (ai-tag-browser) or ffmpeg split/stitch fallback (osint_worldview).",
+     "source": "new",
+     "existing_name": ""
+    }
+   ],
+   "commands": [
+    {
+     "name": "commit",
+     "description": "Existing command, unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "ship",
+     "description": "Existing command; gains size-cap gate routing to pr-splitter",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "merge",
+     "description": "Existing command; gains post-merge apply delegation + dev fast-forward",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "release",
+     "description": "Existing command; gains version-parity gate",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "release-init",
+     "description": "Existing command; extended with version stamp + badge conformance",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "prune",
+     "description": "Existing command; extended with orphan-worktree detection",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "publish",
+     "description": "Existing command; extended with suggest-only prototype bootstrap mode",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "sync-dev",
+     "description": "Fast-forward local dev to origin/dev + fetch --prune (requested near-verbatim in AC_OSM, WinAppProfiles, dropbox_audit — multi-repo evidence, survives the skeptic's single-incident criterion)",
+     "source": "new"
+    },
+    {
+     "name": "changelog-preview",
+     "description": "Dry-run dev→main release notes (asked twice in ac-repo-radar)",
+     "source": "new"
+    },
+    {
+     "name": "split-pr",
+     "description": "Invoke pr-splitter on the current oversized branch/PR with AskUserQuestion confirmation",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "github",
+    "commit-hygiene",
+    "using-git-worktrees",
+    "worktree-isolated-loop",
+    "finishing-a-development-branch",
+    "accumulated-feature-branch-workflow",
+    "additive-merge-conflict-resolution",
+    "crlf-gitattributes-normalization",
+    "pre-pr",
+    "stale-symbolic-ref-detection-and-repair (git slice only; general verify-before-destructive half → ops-manager diagnostics-probe)"
+   ],
+   "notes": "Keep slug `github` — never rename an installed bundle. Cut commands vs draft: /branch-sync-audit (folded into prune/sync-dev), /repo-badge-audit (folded into release-init), /prototype-git-bootstrap (mode of publish). superpowers:using-git-worktrees / finishing-a-development-branch precedence is declared via skills-manager's external-skill-intake (single owner of plugin-precedence declarations). Add hook-interaction note: unattended /burndown and /loop runs must document handling of the git-push-opens-Zed PreToolUse hook. Homeradar-branded pre-pr archive copy is deleted with README/manifest parity in the same PR. Regenerate diagram.html. Sub-skill descriptions open with 'Sub-skill of `github`.'"
+  },
+  {
+   "name": "project-manager",
+   "mission": "Own the spec→plan→task lifecycle, backlogs, session continuity, and handoff prompts — the SOLE owner of 'give me a prompt for the next session' and all single-agent multi-turn loop composition and durable state files. Extends the existing installed `project-manager` bundle in place (slug unchanged).",
+   "priority": "P0",
+   "subskills": [
+    {
+     "name": "what-next",
+     "description": "Sub-skill of `project-manager`. Existing triage head moved into the bundle; gains workspace mode (which of ~45 repos next, absorbing the repo-picker half of the workspace skill).",
+     "source": "absorb-existing",
+     "existing_name": "what-next"
+    },
+    {
+     "name": "session-handoff",
+     "description": "Sub-skill of `project-manager`. SOLE owner of copy-ready next-session prompts in ANY repo — absorbs session-management (checkpoint/tiered-summarization), continue-new-session, state-file-driven-multi-turn-resumption, and recursive-batch-handoff. The trigger phrase 'give me a prompt for the next session' lives here exclusively; agent-manager's description must not claim it.",
+     "source": "extend-existing",
+     "existing_name": "state-file-driven-multi-turn-resumption; absorbs session-management, recursive-batch-handoff, continue-new-session"
+    },
+    {
+     "name": "loop-prompt-composer",
+     "description": "Sub-skill of `project-manager`. Canonical STATE-block /loop prompt composition (40+ hand-written instances across 3 repos); absorbs self-paced-loop-iteration and iterative-development doctrine. Stall-recovery text REMOVED — references agent-manager's stalled-agent-recovery instead of duplicating reset --soft procedure.",
+     "source": "new",
+     "existing_name": "self-paced-loop-iteration, iterative-development"
+    },
+    {
+     "name": "backlog-burndown",
+     "description": "Sub-skill of `project-manager`. THIN WRAPPER composing loop-prompt-composer + existing /iterate-tasks dispatch + github /merge — must not re-describe the iteration contract /iterate-tasks already owns (redundancy-checker requirement).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "orchestrator-bookkeeping",
+     "description": "Sub-skill of `project-manager`. Batched chore(orchestrator) PR: checkbox flips, status transitions, task archival, doc-drift repair; absorbs spec-consistency-doc-refactoring-pattern and the project-tracking half of two-surface-observability-reconciliation (specs-vs-living-backlog reconciliation).",
+     "source": "extend-existing",
+     "existing_name": "project-plan-task-reconciliation"
+    },
+    {
+     "name": "learnings-ledger",
+     "description": "Sub-skill of `project-manager`. progress.md + learnings intake pen + generated STATUS.md rollup with rotation and staleness gates, ported from AC_OPBTA's mandatory pattern (228 sessions of use); wires into existing sync-status rather than replacing it.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "backfill-features",
+     "description": "Sub-skill of `project-manager`. Reverse-engineer specs for existing code via subagent fanout (WinAppProfiles 10-spec session); absorbs retro-fit-spec (de-branded), spec-align (gap-analysis companion mode), and existing-repo (mandatory analysis phase). feature-start merges into the existing add-feature sub-skill, not here.",
+     "source": "new",
+     "existing_name": "retro-fit-spec, spec-align, existing-repo"
+    },
+    {
+     "name": "operator-runbook-authoring",
+     "description": "Sub-skill of `project-manager`. Plan=why, runbook=how: pre-flight, canary ordering, resumable steps, dry-run-before-confirm (dropbox_audit + repo-radar evidence). Built on doc-coauthoring, whose GENERIC documentation workflow is preserved as a documented mode, not lost.",
+     "source": "extend-existing",
+     "existing_name": "doc-coauthoring"
+    }
+   ],
+   "commands": [
+    {
+     "name": "handoff",
+     "description": "Verb-first rename of /next-action-handoff; generates the next-session prompt in any repo; /continue-new-session kept as back-compat alias",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "burndown",
+     "description": "Verb-first rename of /backlog-burndown; unattended backlog drain via the thin-wrapper sub-skill",
+     "source": "new"
+    },
+    {
+     "name": "loop-prompt",
+     "description": "Emit (without running) the canonical STATE-block /loop prompt",
+     "source": "new"
+    },
+    {
+     "name": "backfill-features",
+     "description": "Reverse-engineer feature specs via subagent fanout against the canonical template",
+     "source": "new"
+    },
+    {
+     "name": "log-learning",
+     "description": "Append to intake pen/progress.md; end-of-session mode drains, rotates, regenerates STATUS.md",
+     "source": "new"
+    },
+    {
+     "name": "what-next",
+     "description": "Existing /what-next and /what-next-update move into the bundle unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "add-feature",
+     "description": "Standalone top-level add-feature skill merges into the existing project-manager add-feature sub-skill; one command remains",
+     "source": "absorb-existing"
+    }
+   ],
+   "absorbs_existing": [
+    "project-manager",
+    "add-feature",
+    "retro-fit-spec",
+    "spec-align",
+    "project-plan-task-reconciliation",
+    "what-next",
+    "workspace (repo-picker half only; API-contract half is a dissent)",
+    "feature-start (merged into add-feature sub-skill)",
+    "iterative-development",
+    "self-paced-loop-iteration",
+    "state-file-driven-multi-turn-resumption",
+    "recursive-batch-handoff",
+    "doc-coauthoring",
+    "spec-consistency-doc-refactoring-pattern",
+    "existing-repo",
+    "session-management"
+   ],
+   "notes": "CUT per skeptic single-incident criterion: product-inception-pack + /init-product (recovery_app only; also confusable with /init-project), enhancement-bundle + /propose-enhancements (one ai-prompt-optimizer session), /repo-ops-index (ops-manager defines the ops-index convention, skills-manager owns repo-local skill generation mechanics). pm-root spec-root convention lives in the master SKILL.md, not a sub-skill. Master SKILL.md must contain: (a) the ratified boundary sentence verbatim — 'project-manager owns single-agent multi-turn loop composition and durable state files; agent-manager owns multi-agent dispatch, recovery, and session-JSONL infrastructure'; (b) a hook-interaction section declaring progress.md, backlog.md, docs/learnings/, docs/alignment/ as sanctioned outputs for the doc-blocker PreToolUse hook; (c) diagram.html row. what-next-workspace directory is eval artifacts, not a skill — delete outright. zillow_tracker's 11 rebranded command copies get an /update-skill sweep in the same PR series."
+  },
+  {
+   "name": "skills-manager",
+   "mission": "Own the full lifecycle of the skill archive — discovery, sync, install, parity enforcement, rationalization, fleet installed-copy hygiene, external-catalog intake, and one-shot rollout. Slug stays `skills-manager` (no rename). Owns the reorg's own tooling: disposition ledger, command-namespace registry, and plugin-precedence declarations.",
+   "priority": "P0",
+   "subskills": [
+    {
+     "name": "lifecycle-operations",
+     "description": "Sub-skill of `skills-manager`. The nine existing operations carried over largely verbatim; every mutating operation now ends with a skill-parity-guard pass; /backfill-diagrams retires into parity fix mode; on-demand Codex mirroring documented here (replaces the transpiler).",
+     "source": "absorb-existing",
+     "existing_name": "skills-manager"
+    },
+    {
+     "name": "skill-parity-guard",
+     "description": "Sub-skill of `skills-manager`. Post-change validation/auto-fix: README rows, manifest.json regeneration (scripts/generate-manifest.py), diagram.html, installer bundle-spec completeness incl. rules/ and references/, global-profile copy agreement. Fix mode adds/repairs but only PROPOSES deletions — curators delete, never automation. Read-only mode IS /audit-skills.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "skill-rationalization",
+     "description": "Sub-skill of `skills-manager`. Pairwise overlap/conflict/merge methodology from docs/rationalization.md plus map-driven slug consolidation (consolidate_skills.py pattern) with reference rewriting and dangling-reference checks; ends with a parity pass.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "skill-batch-curation",
+     "description": "Sub-skill of `skills-manager`. Bulk-install staged drafts (generalizes curate_install.py): frontmatter validation, slug dedupe routing near-duplicates to rationalization, parity-guard instead of string surgery.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "installed-copy-sweep",
+     "description": "Sub-skill of `skills-manager`. One fleet scan merging four mined variants: marker backfill (neurorep_v3's 14 unmarked), legacy-format sweep (github-awesome flat files), rebranded-copy detection (zillow_tracker's 11 HomeRadar commands — reconciled via project-manager's conventions, not blind archive-align), vendored-skill discovery (honcho-src), plus script-repatriation hints.",
+     "source": "extend-existing",
+     "existing_name": "skills-manager"
+    },
+    {
+     "name": "external-skill-intake",
+     "description": "Sub-skill of `skills-manager`. Catalog diffing/import ranking; absorbs superpowers-overrides as the adapted-external-copy policy AND becomes the single owner of ALL plugin-precedence declarations (superpowers, impeccable, interface-design, codex collisions declared here, referenced by other masters).",
+     "source": "absorb-existing",
+     "existing_name": "superpowers-overrides"
+    }
+   ],
+   "commands": [
+    {
+     "name": "skill-rollout",
+     "description": "Parity pass → /ship → /push-skill → memory rollout note as one pipeline (invokes github /ship as-is, never reimplements it)",
+     "source": "new"
+    },
+    {
+     "name": "scout-external-skills",
+     "description": "Diff external catalog clones against the archive, rank imports",
+     "source": "new"
+    },
+    {
+     "name": "claude-md-skill-list-sync",
+     "description": "Reconcile repo CLAUDE.md Skills sections with installed reality — scoped strictly to Skills sections, never restructures other sections (claude-md-management plugin territory)",
+     "source": "new"
+    },
+    {
+     "name": "sweep-installed-copies",
+     "description": "Run installed-copy-sweep across one repo or the whole fleet",
+     "source": "new"
+    },
+    {
+     "name": "skills-manager",
+     "description": "Existing interactive dispatcher, extended operation set",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "find-skills",
+     "description": "Existing, extended with sweep anomaly classes",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "sync-skill",
+     "description": "Existing, now ends with parity pass; gains on-demand cross-CLI mirror mode",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "install-skill",
+     "description": "Existing, unchanged (bundle spec updated to include rules/)",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "update-skill",
+     "description": "Existing, unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "import-skill",
+     "description": "Existing, unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "push-skill",
+     "description": "Existing, unchanged; invoked by /skill-rollout",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "search-skill",
+     "description": "Existing, unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "audit-skills",
+     "description": "Existing; becomes parity-guard read-only mode + new anomaly classes; /backfill-diagrams retires into paired fix mode",
+     "source": "absorb-existing"
+    }
+   ],
+   "absorbs_existing": [
+    "skills-manager",
+    "superpowers-overrides"
+   ],
+   "notes": "CUT: cross-cli-skill-transpiler and /transpile-skill (skeptic) — replaced by policy: Codex mirrors created on demand when a skill is actually used from Codex, Gemini frozen at 5, /audit-skills reports the gap informationally, mirrors carry a source-version stamp so parity-guard flags staleness. base is NOT absorbed (universal coding patterns — stays standalone, remove architecture-manager's requires:[base] since that master is cut). This master owns three reorg deliverables shipped in Phase 0/1: the 142-directory disposition ledger, the command-namespace registry with a generic-verb naming rule, and CLAUDE.md (repo) count/command-table corrections (142/84/5, retired /backfill-diagrams, rules/ bundle subdirectory documented). skill-creator plugin boundary: skill-creator writes, skills-manager archives/ships."
+  },
+  {
+   "name": "agent-manager",
+   "mission": "Own multi-agent orchestration mechanics and agent-session infrastructure: fanout, batching, recovery, session-JSONL parsing/search/mining, token-efficiency (canonical single page), and agent/MCP/model configuration. Explicitly NOT session handoff prompts (project-manager) and NOT honcho/graphify (standalone, cross-referenced).",
+   "priority": "P1",
+   "subskills": [
+    {
+     "name": "fleet-repo-fanout",
+     "description": "Sub-skill of `agent-manager`. Parallel subagent per repo/lens with structured output contract and merged report (proven twice in ai-agent-kit: 11-repo rollout, 19-agent mining); absorbs subagent-driven-development's fresh-agent + two-stage-review doctrine as the single-repo case. Design-manager and project-manager delegate their fanout phases here.",
+     "source": "extend-existing",
+     "existing_name": "parallel-subagent-fanout; absorbs subagent-driven-development"
+    },
+    {
+     "name": "parallel-workstream-launcher",
+     "description": "Sub-skill of `agent-manager`. workstreams.json + worktree-per-agent harness (neurorep_v3 family), paths parameterized; worktree hygiene delegates to github worktree-task-lifecycle/prune.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "binpacked-batch-dispatch",
+     "description": "Sub-skill of `agent-manager`. Weight-balanced batch manifests + central serial merge invariant (ai-history-analysis pass2, ran the full mining pipeline twice).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "stalled-agent-recovery",
+     "description": "Sub-skill of `agent-manager`. CANONICAL stall/salvage/re-dispatch procedure (reset --soft, narrowed scope, never restart from dev) — project-manager's loops reference it, never duplicate it; cleanup delegates to github.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "llm-json-output-repair",
+     "description": "Sub-skill of `agent-manager`. CANONICAL single home of repair_results.py + UUID-stem-keyed merge (redundancy requirement — gated-batch references, never re-encodes).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "session-jsonl-toolkit",
+     "description": "Sub-skill of `agent-manager`. CANONICAL Claude Code JSONL parsing (noise filtering, sidechain exclusion, content-block extraction, token usage) — sole copy; the three duplicated implementations and utilities-manager's proposed fourth are all retired. Also the canonical token-efficiency page (session diagnosis + long-running-script mechanics: background runs, log sinks, summary scripts) per the skeptic's one-home rule; utilities and gated-batch cross-reference.",
+     "source": "new",
+     "existing_name": "absorbs usage-limit-reducer content"
+    },
+    {
+     "name": "history-mining-pipeline",
+     "description": "Sub-skill of `agent-manager`. Runnable index→extract→dispatch→repair→merge→consolidate→curate pipeline; absorbs analyze-conversations as its recurring-friction-audit mode.",
+     "source": "extend-existing",
+     "existing_name": "conversation-history-mining-for-domain-knowledge; absorbs analyze-conversations"
+    },
+    {
+     "name": "agent-coordination",
+     "description": "Sub-skill of `agent-manager`. Multi-agent shared-state claiming/handoff conventions ONLY (absorbs team-coordination) — all next-session handoff-prompt content and triggers stripped and ceded to project-manager session-handoff.",
+     "source": "absorb-existing",
+     "existing_name": "team-coordination"
+    },
+    {
+     "name": "agent-runtime-config",
+     "description": "Sub-skill of `agent-manager`. Model ids, SDK patterns, LLM-app patterns (absorbs ai-models, agentic-development, llm-patterns) plus the review-model-config convention (per-machine model ids) that quality-manager's code-review consumes.",
+     "source": "absorb-existing",
+     "existing_name": "ai-models, agentic-development, llm-patterns"
+    },
+    {
+     "name": "mcp-wiring-verification",
+     "description": "Sub-skill of `agent-manager`. .mcp.json authoring with env-var token indirection, tool-loading verification, SDK/REST parity cross-check (honcho-mcp-test).",
+     "source": "new",
+     "existing_name": ""
+    }
+   ],
+   "commands": [
+    {
+     "name": "fleet-fanout",
+     "description": "One-line launcher for an identical change/analysis across C:\\development repos",
+     "source": "new"
+    },
+    {
+     "name": "launch-workstreams",
+     "description": "Generate/execute a workstreams.json parallel run, dry-run default",
+     "source": "new"
+    },
+    {
+     "name": "recover-agent",
+     "description": "Salvage a stalled worker's branch and re-dispatch narrowed",
+     "source": "new"
+    },
+    {
+     "name": "search-sessions",
+     "description": "SOLE session-history command (verb-first name from utilities design, ownership per taxonomy): search local JSONL for past prompts/decisions with provenance, incl. cleared-session recovery",
+     "source": "new"
+    },
+    {
+     "name": "mine-history",
+     "description": "Run the full history-mining pipeline, resumable across tranches",
+     "source": "new"
+    },
+    {
+     "name": "token-report",
+     "description": "Token-usage diagnosis from local JSONL; absorbs usage-limit-reducer's user-facing flow — its verbatim triggers ('hit my limit', 'running out of tokens', 'which model should I use') MUST appear in the bundle frontmatter description (dx hard requirement)",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "verify-mcp",
+     "description": "Lint .mcp.json for secrets, confirm tool loading, run SDK/REST parity check",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "parallel-subagent-fanout",
+    "subagent-driven-development",
+    "agentic-development",
+    "team-coordination",
+    "analyze-conversations",
+    "conversation-history-mining-for-domain-knowledge",
+    "ai-models",
+    "llm-patterns",
+    "usage-limit-reducer"
+   ],
+   "notes": "honcho and graphify are NOT absorbed — live plugin/global-trigger wiring; they stay standalone and are cross-referenced under Session Infrastructure (disposition ledger entries). session-management goes to project-manager, NOT here. Boundary sentence written verbatim in this SKILL.md and project-manager's. Diagram.html row required. Sub-skill descriptions open with 'Sub-skill of `agent-manager`.'"
+  },
+  {
+   "name": "quality-manager",
+   "mission": "Own everything that proves code works before it ships: multi-engine code review, TDD enforcement, security gates, the CANONICAL launch-and-observe verification recipes (all surfaces), container smoke tests, compliance-gate authoring, and bug-fix kickoff.",
+   "priority": "P1",
+   "subskills": [
+    {
+     "name": "code-review",
+     "description": "Sub-skill of `quality-manager`. Merges code-review + codex-review + gemini-review + requesting-code-review into one multi-engine sub-skill; model IDs read from agent-manager's review-model-config convention, never hardcoded (gpt-5.2→5.5 override lesson); reports 800-line cap breaches but github adjudicates them.",
+     "source": "absorb-existing",
+     "existing_name": "code-review, codex-review, gemini-review, requesting-code-review"
+    },
+    {
+     "name": "security-review",
+     "description": "Sub-skill of `quality-manager`. OWASP patterns + secrets + supply-chain dependency review; references (not restates) the global security rules. Boundary with ops secrets-ops: this owns code-level secret hygiene, ops owns operational storage/rotation.",
+     "source": "absorb-existing",
+     "existing_name": "security"
+    },
+    {
+     "name": "tdd",
+     "description": "Sub-skill of `quality-manager`. RED/GREEN/IMPROVE + 80% floor; references, not restates, ~/.claude/rules/testing.md and superpowers:test-driven-development.",
+     "source": "absorb-existing",
+     "existing_name": "tdd-workflow"
+    },
+    {
+     "name": "e2e-playwright",
+     "description": "Sub-skill of `quality-manager`. Playwright E2E generation/maintenance + /e2e agent dispatch.",
+     "source": "absorb-existing",
+     "existing_name": "playwright-testing"
+    },
+    {
+     "name": "visual-verify-loop",
+     "description": "Sub-skill of `quality-manager`. THE canonical launch-and-observe recipe for every surface: web (incl. the browser-console classification table folded in from the deferred browser-console-triage design — hydration/SSR/silent-htmx symptom→cause→fix), Windows desktop (stop-instance/rebuild/launch/window-handle — dotnet-wpf REFERENCES this with WPF parameters only, no duplicate), generated-artifact HTML (serve dist/ + zero-console-error checklist), console apps. Launching delegates to start-app/run; this owns observe-and-judge.",
+     "source": "extend-existing",
+     "existing_name": "ui-testing"
+    },
+    {
+     "name": "container-smoke-test",
+     "description": "Sub-skill of `quality-manager`. Build, run, /healthz poll, endpoint matrix, log dump, guaranteed teardown (hand-rolled twice in ac-repo-radar + compose churn in ai-prompt-optimizer/phoneinfoga). Pre-ship only; post-deploy verification is ops-manager's.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "compliance-gate-authoring",
+     "description": "Sub-skill of `quality-manager`. check-* script families, git-hook installers, CI wiring, lint/coverage baseline regenerate-and-commit discipline (SOLE home — AC_OSM baseline content removed from developer-manager), and the /diagnose-runbook generator (SOLE owner).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "audit-gate",
+     "description": "Sub-skill of `quality-manager`. Two-consecutive-clean-rounds streak-reset convergence protocol, absorbed essentially unchanged.",
+     "source": "absorb-existing",
+     "existing_name": "iterative-audit-gate-with-streak-reset"
+    },
+    {
+     "name": "fix-start",
+     "description": "Sub-skill of `quality-manager`. Bug-fix kickoff generalized from homeradar-fix-start (SEV table, reproduce-first, verification pairing); HomeRadar paths become configurable; /update-skill pass for zillow_tracker's installed copy in the same PR series.",
+     "source": "extend-existing",
+     "existing_name": "fix-start"
+    },
+    {
+     "name": "code-deduplication",
+     "description": "Sub-skill of `quality-manager`. Capability-index check-before-write + versioned-script-sprawl consolidation, wired into the review checklist.",
+     "source": "absorb-existing",
+     "existing_name": "code-deduplication"
+    }
+   ],
+   "commands": [
+    {
+     "name": "code-review",
+     "description": "Existing global command moves into the bundle with name unchanged; fleet /update-skill sweep ships in the same PR series",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "tdd",
+     "description": "Existing global command, same move-with-sweep rule",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "test-coverage",
+     "description": "Existing global command, same move-with-sweep rule",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "e2e",
+     "description": "Existing global command, same move-with-sweep rule",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "dependency-security-review",
+     "description": "Supply-chain review of a named new dependency (backs the global pre-commit security checklist)",
+     "source": "new"
+    },
+    {
+     "name": "smoke-test",
+     "description": "One-shot container smoke harness",
+     "source": "new"
+    },
+    {
+     "name": "compliance-gate",
+     "description": "Author/refresh repo quality gates incl. baseline regeneration",
+     "source": "new"
+    },
+    {
+     "name": "diagnose-runbook",
+     "description": "SOLE owner (collision with developer-manager resolved): generate a repo-local /diagnose failure-catalog command",
+     "source": "new"
+    },
+    {
+     "name": "fix-start",
+     "description": "Existing bundle command, generalized",
+     "source": "absorb-existing"
+    }
+   ],
+   "absorbs_existing": [
+    "code-review",
+    "codex-review",
+    "gemini-review",
+    "requesting-code-review",
+    "security",
+    "tdd-workflow",
+    "playwright-testing",
+    "ui-testing",
+    "code-deduplication",
+    "iterative-audit-gate-with-streak-reset",
+    "fix-start"
+   ],
+   "notes": "NO /verify command ships — the built-in harness verify skill and superpowers:verification-before-completion already own that trigger; quality-manager's sub-skills are the deep per-surface recipes the built-in routes into, and this precedence is declared via skills-manager's external-skill-intake (resolves the collision this design round per dx). Aesthetic critique is design-manager's ('does it work' here vs 'is it good' there). Diagram.html row required."
+  },
+  {
+   "name": "developer-manager",
+   "mission": "Thin stack-router over the how-to-build knowledge for every stack: detect the stack from repo signals, route to the matching skill, enforce the verify-before-done contract by reference to quality-manager. The 34 existing stack/platform/db/commerce skills STAY STANDALONE with improved trigger-rich frontmatter — no mega-group files, no relocation (skeptic resolution satisfying the architect's independent-triggering requirement).",
+   "priority": "P1",
+   "subskills": [
+    {
+     "name": "powershell",
+     "description": "Sub-skill of `developer-manager`. Dedupes three independent formulations (AC_OSM, ac-work-launcher, batch-4): Pester 5 TDD, PSScriptAnalyzer baselines (discipline content points to quality-manager's compliance-gate-authoring), $PROFILE marker blocks, wt.exe/pwsh pitfalls, elevation/env-scope; references remote-installer (utilities) for install.ps1.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "dotnet-wpf",
+     "description": "Sub-skill of `developer-manager`. MVVM layering, DI, XAML theming, xUnit/Moq, Deploy-Local/MSIX (WinAppProfiles). Verification loop is a REFERENCE to quality-manager's visual-verify-loop with WPF-specific parameters only — no embedded duplicate (architect + redundancy requirement).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "local-dev-harness",
+     "description": "Sub-skill of `developer-manager`. Discovery AND generation: forward-auth dev proxy, idempotent seed data with -NoSeed, Start-App.ps1 generation (hand-rolled in 4+ repos); /dev-proxy and /seed-dev become documented modes, not commands.",
+     "source": "extend-existing",
+     "existing_name": "start-app, project-tooling"
+    },
+    {
+     "name": "openapi-contract-codegen",
+     "description": "Sub-skill of `developer-manager` (relocated from cut architecture-manager). openapi.yaml SoT → dockerized dual codegen + drift checks (zillow_tracker).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "deterministic-build-fingerprinting",
+     "description": "Sub-skill of `developer-manager` (relocated). Code semver + content hash8, manifest sidecar, no-timestamps contract, build-twice gate (ai-tag-browser + AC_OPBTA deploy dependency); hard cross-reference to ops deploy-idempotency gate — this side owns the 'no timestamps' contract as canonical.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "data-tracker-scaffold",
+     "description": "Sub-skill of `developer-manager` (relocated). Scrape→dedupe/retention→JSON→static dashboard→Docker/nginx shape (telegram_url_tracker/zillow/flights family); delegates HTML rendering conventions to design-manager's html-mockup-prototyper packaging layer and startup-script consumption to start-app.",
+     "source": "new",
+     "existing_name": ""
+    }
+   ],
+   "commands": [
+    {
+     "name": "start-app",
+     "description": "Existing command rewired to local-dev-harness; gains a generation mode (absorbs the /gen-start-app proposal per dx)",
+     "source": "absorb-existing"
+    }
+   ],
+   "absorbs_existing": [
+    "start-app",
+    "project-tooling"
+   ],
+   "notes": "web-stacks and data-and-platform-stacks mega-sub-skills are CANCELLED (architect + skeptic + consistency): the 34 stack skills (typescript, react-* family, nodejs-backend, marko, pwa, chrome-extension-builder, ms-teams-apps, web-content, aeo-optimization, web-payments, supabase x4, firebase, aws-*, azure-cosmosdb, cloudflare-d1, react-native, android-*, flutter, medusa, shopify-apps, woocommerce, klaviyo, reddit-*, posthog-analytics, python, composition-patterns, etc.) stay standalone; their frontmatter descriptions are improved in place; the master SKILL.md carries only a signal→skill routing index. DEFERRED until a second project needs them (skeptic): go-development, fastapi-htmx, python-app-scaffolds (pyqt/CLI scaffold), ollama-integration, /scaffold-cli. browser-console-triage content folds into quality-manager's visual-verify-loop. /diagnose-runbook removed (quality owns; routing pointer only). explain-code NOT absorbed — stays standalone (ledger). Diagram.html row required."
+  },
+  {
+   "name": "design-manager",
+   "mission": "Single routing head for visual/UX expertise: AC design system and token pipeline, brand/logo lifecycle with deterministic rasterization, reference-site parity, screenshot-driven critique loops, single-file HTML prototyping, console-output style. Routing table disambiguating critique-driven vs reference-driven vs contract-driven loops is load-bearing and must state plugin-defer rules.",
+   "priority": "P1",
+   "subskills": [
+    {
+     "name": "frontend-aesthetics",
+     "description": "Sub-skill of `design-manager`. Absorbs frontend-design wholesale (design direction + prescriptive UI engineering rules).",
+     "source": "absorb-existing",
+     "existing_name": "frontend-design"
+    },
+    {
+     "name": "ui-standards",
+     "description": "Sub-skill of `design-manager`. Merges ui-web + ui-mobile + web-design-guidelines + user-journeys into one stack-aware audit rubric; deletion ships with fleet reference-rewrite in the same PR series.",
+     "source": "absorb-existing",
+     "existing_name": "ui-web, ui-mobile, web-design-guidelines, user-journeys"
+    },
+    {
+     "name": "design-token-pipeline",
+     "description": "Sub-skill of `design-manager`. tokens.json SoT, OKLCH math, marker regions, multi-platform emitters, drift tests (AC_DESIGN tokenkit); absorbs css-variables-for-multi-theme-reskin as the lightweight layer.",
+     "source": "extend-existing",
+     "existing_name": "css-variables-for-multi-theme-reskin"
+    },
+    {
+     "name": "design-system-alignment",
+     "description": "Sub-skill of `design-manager`. Archives AC_DESIGN's proven repo-local align-to-ac (audit → committed gap checklist → review gate → fix fanout); the fanout phase DELEGATES to agent-manager's fleet-repo-fanout, never re-encodes it; folds in phoneinfoga's apply-ac-design-system.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "design-parity",
+     "description": "Sub-skill of `design-manager`. Reference-site computed-style extraction → property diff table → screenshot-verified fix loop (repo-radar masthead, 4+ improvised rounds).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "screenshot-ux-review",
+     "description": "Sub-skill of `design-manager`. Pasted screenshots → numbered defect list → safe fixes → re-verify; absorbs ui-redesign-with-snapshot-regeneration (verification hygiene) and the sheltair 20-round batch-feedback pattern (the /apply-ux-feedback proposal merges here as batch mode per redundancy).",
+     "source": "extend-existing",
+     "existing_name": "design-critique-to-safe-refactor; absorbs ui-redesign-with-snapshot-regeneration"
+    },
+    {
+     "name": "html-mockup-prototyper",
+     "description": "Sub-skill of `design-manager`. Single-file interactive mockups with edit-survivable section markers, mobile preflight checklist, sanctioned 800-line exemption protocol; keeps self-contained-html packaging rules as the canonical layer other masters (data-tracker-scaffold, youtube-extraction dashboards) reference.",
+     "source": "extend-existing",
+     "existing_name": "self-contained-html-artifact-with-inline-assets"
+    },
+    {
+     "name": "brand-extraction",
+     "description": "Sub-skill of `design-manager`. Live-site palette/typography → dual-mode theme tokens + placeholder logo SVG.",
+     "source": "extend-existing",
+     "existing_name": "brand-token-extraction-and-documentation"
+    },
+    {
+     "name": "logo-pipeline",
+     "description": "Sub-skill of `design-manager`. Full logo lifecycle: absorbs ac-logo bundle + logo-restylizer + the merged rasterization expertise (headless-Chrome + pinned JetBrains Mono — the failure that cost fix-PRs in 3 repos; elevated-session Chrome-kill gotcha; committed regeneration-script pattern). ac-logo commands keep their exact names; global-profile stale-copy cleanup + /update-skill sweep ship in the same PR series (ac-logo was pushed globally 2026-07-10).",
+     "source": "absorb-existing",
+     "existing_name": "ac-logo, logo-restylizer"
+    },
+    {
+     "name": "console-output-style",
+     "description": "Sub-skill of `design-manager`. Terminal/installer UX standard + paste-review loop + ConsoleDiscipline test pattern (AC_OSM, 3+ sessions); cp1252 defers to utilities' fleet-cp1252-mojibake-fix.",
+     "source": "new",
+     "existing_name": ""
+    }
+   ],
+   "commands": [
+    {
+     "name": "align-to-design-system",
+     "description": "Audit → gap checklist → approval → fix fanout",
+     "source": "new"
+    },
+    {
+     "name": "screenshot-review",
+     "description": "Screenshot critique + implemented verified fixes, with a batch tester-feedback mode (the merged /apply-ux-feedback)",
+     "source": "new"
+    },
+    {
+     "name": "design-parity",
+     "description": "Match the app to a reference site/repo via diff checklist + verified fix loop",
+     "source": "new"
+    },
+    {
+     "name": "codify-design-laws",
+     "description": "Persist accepted critique outcomes as an enforceable named CLAUDE.md design-laws section — scoped to that section only, delegating file-edit conventions to the claude-md plugin",
+     "source": "new"
+    },
+    {
+     "name": "mockup",
+     "description": "Kick off a single-file interactive HTML mockup with markers + preflight",
+     "source": "new"
+    },
+    {
+     "name": "find-logo",
+     "description": "Existing ac-logo command, name unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "generate-logo",
+     "description": "Existing ac-logo command, name unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "reskin-logo",
+     "description": "Existing ac-logo command merged with logo-restylizer's variant engine, name unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "archive-logo",
+     "description": "Existing ac-logo command, name unchanged",
+     "source": "absorb-existing"
+    }
+   ],
+   "absorbs_existing": [
+    "ac-logo",
+    "logo-restylizer",
+    "frontend-design",
+    "web-design-guidelines",
+    "css-variables-for-multi-theme-reskin",
+    "brand-token-extraction-and-documentation",
+    "design-critique-to-safe-refactor",
+    "ui-web",
+    "ui-mobile",
+    "ui-redesign-with-snapshot-regeneration",
+    "user-journeys",
+    "self-contained-html-artifact-with-inline-assets"
+   ],
+   "notes": "DEFERRED per skeptic single-repo criterion: raw-json-to-domain-panel (phoneinfoga only). visual-explainer is NOT absorbed — stays standalone (plugin-installed, third-party, non-product-UI scope; ledger entry). grafana dashboards → ops-manager. Plugin boundary rows (impeccable:*, interface-design:*, frontend-design plugin) are declared via skills-manager's external-skill-intake and referenced in this routing table. AC brand requirements read at runtime from AC_DESIGN_ROOT, never copied. Diagram.html row required."
+  },
+  {
+   "name": "ops-manager",
+   "mission": "Own live-infrastructure operations on the self-hosted fleet: idempotent apply scripts with two-pass gates, diagnostics-first probes and domain ladders, service/host lifecycle, internal-registry deploys, operational secrets (sole owner of /get-secret), observability dashboards, GPU placement — plus the shell-fleet runtime/helper consolidation work inherited from the dissolved architecture-manager.",
+   "priority": "P1",
+   "subskills": [
+    {
+     "name": "idempotent-apply-script",
+     "description": "Sub-skill of `ops-manager`. The AC_OPBTA apply-script contract (200+ instances): lock, control-node SSH, two-pass gate, verify, self-commit, lint contract, naming/retention policy killing fix-v2/v3 sprawl. Branch discipline stated explicitly: self-commits flow through feature-branch → PR per global git-workflow rules; AC_OPBTA's direct-commit convention is a repo-local exception documented in that repo's thin installed index, never taught as archive default (dx requirement).",
+     "source": "extend-existing",
+     "existing_name": "deploy-idempotency-two-pass-gate"
+    },
+    {
+     "name": "diagnostics-probe",
+     "description": "Sub-skill of `ops-manager`. Read-only multi-hypothesis probe before any fix; absorbs the observability half of two-surface-observability-reconciliation AND the general verify-cached-state-before-destructive-action pattern from stale-symbolic-ref-detection-and-repair (closing that orphan; git slice went to github).",
+     "source": "absorb-existing",
+     "existing_name": "diagnostics-probe-design"
+    },
+    {
+     "name": "diagnostic-ladders",
+     "description": "Sub-skill of `ops-manager`. Reference catalog: DNS three-perspective ladder, LVM thin-pool recovery, Postgres-worker/Honcho-deriver queue health (honcho skills point here; ops keeps the generalized ladder).",
+     "source": "absorb-existing",
+     "existing_name": "multi-perspective-dns-diagnostic-ladder, lvm-thin-pool-diagnostics-recovery, honcho-deriver-queue-health-diagnostics"
+    },
+    {
+     "name": "service-lifecycle",
+     "description": "Sub-skill of `ops-manager`. Onboard/update/retire checklist (compose, proxy, OIDC, monitor, dashboard, tunnel, secrets, alias-based firewall rules; reverse teardown with consumer tracing), host-role parameterized; absorbs firewall-alias-as-indirection. Owns the repo-local ops-index CONVENTION (project-manager's /repo-ops-index command dropped; skills-manager owns generation mechanics).",
+     "source": "new",
+     "existing_name": "firewall-alias-as-indirection"
+    },
+    {
+     "name": "internal-registry-deploy",
+     "description": "Sub-skill of `ops-manager`. APP_VERSION build-arg, registry push, compose pull/up, operator checklist, edit-the-release-tag-never-the-derived-pin discipline; ends with two-pass gate + smoke verify (pre-ship container smoke itself is quality-manager's).",
+     "source": "extend-existing",
+     "existing_name": "deployment-driver-pin-rewrite-from-release-tag-source-of-truth"
+    },
+    {
+     "name": "fleet-host-onboarding",
+     "description": "Sub-skill of `ops-manager`. Inventory, apt-cache, monitoring/security groups, vault sync, update-slot table; requires gpu-placement classification when the host carries a GPU.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "secrets-ops",
+     "description": "Sub-skill of `ops-manager`. SOLE owner of operational secrets (control-node-only SOPS decryption, rotation, seeding) — utilities' proposed /get-secret wrappers are cut, quality's security-review owns code-level hygiene; adds mined anti-patterns (worktree .env token loss, literal Bearer tokens in .mcp.json).",
+     "source": "absorb-existing",
+     "existing_name": "sops-secrets"
+    },
+    {
+     "name": "observability-dashboards",
+     "description": "Sub-skill of `ops-manager`. Merges grafana-dashboard-engineer + grafana-dashboard-workflow (resolving the documented rationalization pair); deploys via apply-script contract; /update-skill sweep for github-awesome's stale flat copy in the same PR series.",
+     "source": "absorb-existing",
+     "existing_name": "grafana-dashboard-engineer, grafana-dashboard-workflow"
+    },
+    {
+     "name": "gpu-placement",
+     "description": "Sub-skill of `ops-manager`. Direct-vs-proxied classification, serialized arbitration, VRAM coexistence, upgrade triggers. Absorbed unchanged.",
+     "source": "absorb-existing",
+     "existing_name": "gpu-workload-placement-and-arbitration"
+    },
+    {
+     "name": "shared-runtime-extraction",
+     "description": "Sub-skill of `ops-manager` (relocated from cut architecture-manager per skeptic). Extract a shared runtime from scripts/ sprawl at the 3rd duplication, RUNTIME_GUIDE.md contract, byte-equivalent migration (dropbox_audit 45 scripts, AC_OPBTA 400+).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "shell-fleet-migration",
+     "description": "Sub-skill of `ops-manager`. Co-locates the full shell trio per redundancy-checker: side-effect-free-helper-library design + shell-helper-migration mechanics + the skip taxonomy, as one workflow (evidence is AC_OPBTA's bash fleet).",
+     "source": "absorb-existing",
+     "existing_name": "side-effect-free-helper-library, shell-helper-migration, shell-migration-skip-taxonomy"
+    }
+   ],
+   "commands": [
+    {
+     "name": "apply-script",
+     "description": "Renamed from /apply (dx: bare /apply misfires on everyday 'apply this change'): author + lint + run an idempotent apply script for the current change",
+     "source": "new"
+    },
+    {
+     "name": "probe-incident",
+     "description": "Renamed from /probe per the generic-verb naming rule: author + run a read-only diagnostic probe, routing to domain ladders",
+     "source": "new"
+    },
+    {
+     "name": "add-service",
+     "description": "Full service onboarding checklist (generalizes AC_OPBTA's repo-local /new-deployment)",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "update-service",
+     "description": "Config/version change via apply-script contract, affected rows only",
+     "source": "new"
+    },
+    {
+     "name": "retire-service",
+     "description": "Reverse-order teardown after consumer tracing",
+     "source": "new"
+    },
+    {
+     "name": "deploy-internal",
+     "description": "Automates ac-repo-radar's manual DEPLOY.md runbook",
+     "source": "new"
+    },
+    {
+     "name": "add-host",
+     "description": "Fleet host onboarding, each step an apply script",
+     "source": "new"
+    },
+    {
+     "name": "get-secret",
+     "description": "SOLE owner (generalizes AC_OPBTA's repo-local command; --rotate flag for rotation); utilities cross-references",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "add-dashboard",
+     "description": "Renamed from /dashboard per the generic-verb rule: probe-first Grafana dashboard authoring as IaC",
+     "source": "new"
+    },
+    {
+     "name": "extract-runtime",
+     "description": "Relocated from architecture-manager: propose + execute a shared-runtime extraction with output-equivalence verification",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "ac-opbta-ops (cross-cutting invariants only; the repo retains a thin installed index with requires: ops-manager)",
+    "deploy-idempotency-two-pass-gate",
+    "diagnostics-probe-design",
+    "sops-secrets",
+    "grafana-dashboard-engineer",
+    "grafana-dashboard-workflow",
+    "firewall-alias-as-indirection",
+    "multi-perspective-dns-diagnostic-ladder",
+    "lvm-thin-pool-diagnostics-recovery",
+    "gpu-workload-placement-and-arbitration",
+    "two-surface-observability-reconciliation (observability half; project-tracking half → project-manager orchestrator-bookkeeping)",
+    "deployment-driver-pin-rewrite-from-release-tag-source-of-truth",
+    "honcho-deriver-queue-health-diagnostics",
+    "side-effect-free-helper-library",
+    "shell-helper-migration",
+    "shell-migration-skip-taxonomy",
+    "stale-symbolic-ref-detection-and-repair (general half)"
+   ],
+   "notes": "vercel-deploy-claimable is NOT absorbed — vendor-authored, contradicts the internal-hosts mission; stays standalone (ledger). Handoff section: /apply-script composes AFTER github's /merge for the merge-then-apply routine, never re-implements git. Environment map is host-role parameterized; AC_OPBTA concrete values live in the repo-local index. Cross-CLI mirrors: on-demand per the skills-manager policy. Diagram.html row required."
+  },
+  {
+   "name": "utilities-manager",
+   "mission": "Own Windows workstation utility expertise: wt.exe terminal/workspace launchers, $PROFILE and machine-scope automation (incl. profile-performance instrumentation), install/uninstall lifecycle for local tools, credential onboarding for gated services, and workspace hygiene — trimmed of everything the board reassigned (session search → agent-manager, token-efficiency → agent-manager, shell fleet → ops-manager, secrets → ops-manager).",
+   "priority": "P2",
+   "subskills": [
+    {
+     "name": "windows-terminal-automation",
+     "description": "Sub-skill of `utilities-manager`. wt.exe argument grammar, ';' quoting, --suppressApplicationTitle title pinning vs agent OSC renames, chooser tabs, .ps1/.cmd dual entry points (merges the two mined wt formulations; derived from scratch in 2 repos).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "windows-profile-automation",
+     "description": "Sub-skill of `utilities-manager`. Env-var scope (machine scope to survive elevation — GITHUB_PAT fixed twice), CurrentUser/AllUsers targets, idempotent marker blocks, scheduled-task/logon triggers, fleet-managed-file ownership check before editing machine-wide config, PLUS the profile-startup stopwatch-instrumentation and prune-remeasure section (the standalone powershell-profile-performance sub-skill and /profile-perf command are folded in here — single-incident evidence, skeptic cut).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "installer-lifecycle",
+     "description": "Sub-skill of `utilities-manager`. Extends remote-installer (install.ps1/self-update/elevation/.env merge) with the ps-utility-installer pattern (shortcuts + $PROFILE alias + clean uninstall, ac-work-launcher) and dotnet-local-deploy (WinAppProfiles publish/stop-instance/mirror/MSIX); enforces install/uninstall/reinstall parity testing. Absorbs the add-remote-installer skill as this bundle's command.",
+     "source": "extend-existing",
+     "existing_name": "remote-installer, add-remote-installer"
+    },
+    {
+     "name": "credential-onboarding",
+     "description": "Sub-skill of `utilities-manager`. Extends credentials into the full loop: enumerate keys → provider signups → .env → DryRun verification → report why anything stays disabled (phoneinfoga + AC_OPBTA); durability gotchas (no worktree-local tokens) cross-referenced from github/ops.",
+     "source": "extend-existing",
+     "existing_name": "credentials"
+    },
+    {
+     "name": "fleet-cp1252-mojibake-fix",
+     "description": "Sub-skill of `utilities-manager`. Absorbed as-is; also surfaced proactively in the master's Windows Ground Rules table since it kept recurring despite existing.",
+     "source": "absorb-existing",
+     "existing_name": "fleet-cp1252-mojibake-fix"
+    },
+    {
+     "name": "guide-assistant",
+     "description": "Sub-skill of `utilities-manager`. Absorbed unchanged as the runbook-execution front-end; NO /guide command (skill already triggers on 'walk me through' — skeptic cut).",
+     "source": "absorb-existing",
+     "existing_name": "guide-assistant"
+    }
+   ],
+   "commands": [
+    {
+     "name": "clean-workspace",
+     "description": "Scan the workspace root for stray nul/aux files, mangled dirs, orphaned empties, untracked byte-identical copies — evidence-listed findings behind an AskUserQuestion gate, NEVER auto-delete (files outside git have no safety net)",
+     "source": "new"
+    },
+    {
+     "name": "add-remote-installer",
+     "description": "Existing standalone skill demoted to this bundle's command (it was already command-shaped); standalone deleted with /update-skill handling in the same PR series",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "onboard-credentials",
+     "description": "Front the credential-onboarding loop end-to-end",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "credentials",
+    "remote-installer",
+    "add-remote-installer",
+    "fleet-cp1252-mojibake-fix",
+    "guide-assistant"
+   ],
+   "notes": "CUT per board: session-history-search sub-skill + /search-sessions (→ agent-manager, sole owner), token-efficient-scripts (→ agent-manager canonical page, cross-reference row only), shell-helper-migration/skip-taxonomy (→ ops-manager), /get-secret + /rotate-secret (→ ops-manager outright), /guide, /profile-perf (folded), /publish-report (single incident, skeptic), /check-mirrors (reintroduced the explicitly-rejected dual-artifact-sync-check — taxonomy self-contradiction, dropped per redundancy). Diagram.html row required."
+  },
+  {
+   "name": "youtube-extraction",
+   "mission": "Media and knowledge extraction from video, extended IN PLACE under the existing shipped slug (no media-manager rename): reconcile the diverged flat/bundled pipeline sub-skill duplicates, add channel curation and conference-talk extraction (the two multi-use mined gaps), absorb prd-forensics, and park single-use media recipes (TTS, manual generation, repair/chunking) as references/ rather than sub-skills.",
+   "priority": "P2",
+   "subskills": [
+    {
+     "name": "video-acquisition",
+     "description": "Sub-skill of `youtube-extraction`. Existing; flat top-level duplicate deleted after content reconciliation.",
+     "source": "absorb-existing",
+     "existing_name": "video-acquisition"
+    },
+    {
+     "name": "transcript-acquisition",
+     "description": "Sub-skill of `youtube-extraction`. Existing; flat duplicate deleted.",
+     "source": "absorb-existing",
+     "existing_name": "transcript-acquisition"
+    },
+    {
+     "name": "comment-harvesting",
+     "description": "Sub-skill of `youtube-extraction`. Existing; flat duplicate deleted.",
+     "source": "absorb-existing",
+     "existing_name": "comment-harvesting"
+    },
+    {
+     "name": "frame-extraction",
+     "description": "Sub-skill of `youtube-extraction`. Reconcile the CONFIRMED-diverged flat vs bundle copies, keep the bundle copy, add the slide-boundary sampling profile for talk extraction.",
+     "source": "extend-existing",
+     "existing_name": "frame-extraction"
+    },
+    {
+     "name": "frame-content-recognition",
+     "description": "Sub-skill of `youtube-extraction`. Existing + slide-classification cues; flat duplicate deleted.",
+     "source": "absorb-existing",
+     "existing_name": "frame-content-recognition"
+    },
+    {
+     "name": "file-reconstruction",
+     "description": "Sub-skill of `youtube-extraction`. Existing; flat duplicate deleted.",
+     "source": "absorb-existing",
+     "existing_name": "file-reconstruction"
+    },
+    {
+     "name": "extraction-reporting",
+     "description": "Sub-skill of `youtube-extraction`. Extended with the llm_ai_labs post-processing scripts repatriated into the bundle (frame-index, VTT→markdown, comment summaries) and the RESOURCES.md/resources.json format that currently has no owning sub-skill.",
+     "source": "extend-existing",
+     "existing_name": "extraction-reporting"
+    },
+    {
+     "name": "prd-forensics",
+     "description": "Sub-skill of `youtube-extraction`. youtube-prd-forensics relocated into the bundle; output scoped as video-derived forensic PRDs under docs/, NOT docs/features/ specs (project-manager owns those).",
+     "source": "absorb-existing",
+     "existing_name": "youtube-prd-forensics"
+    },
+    {
+     "name": "youtube-channel-tracker",
+     "description": "Sub-skill of `youtube-extraction`. The github-awesome 19-script pipeline as a resumable state-file sequence (sync → summaries → entity/repo extraction → scoring → reconcile → index/HTML regen) incl. the repair playbook; references gated-batch for generic batch mechanics and agent-manager's llm-json-output-repair — owns only the YouTube-specific pipeline. Also serves /extract-video-resources single-video mode, closing the five documented-but-missing sub-skills gap.",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "conference-talk-extraction",
+     "description": "Sub-skill of `youtube-extraction`. Slide dedupe, deck reconstruction, TOOLS.md enumeration, enrichment report (attacking_ai_talk).",
+     "source": "new",
+     "existing_name": ""
+    }
+   ],
+   "commands": [
+    {
+     "name": "recreate-files",
+     "description": "Existing command, unchanged",
+     "source": "absorb-existing"
+    },
+    {
+     "name": "extract-video-resources",
+     "description": "Command file for the operation already specified in SKILL.md with no implementation today",
+     "source": "new"
+    },
+    {
+     "name": "extract-prd",
+     "description": "Thin wrapper over prd-forensics (which currently has no command)",
+     "source": "new"
+    },
+    {
+     "name": "track-channel",
+     "description": "Incremental channel sync + full curation pipeline, resumable",
+     "source": "new"
+    },
+    {
+     "name": "extract-talk",
+     "description": "Conference-talk extraction into deck + TOOLS.md + report",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "youtube-extraction",
+    "video-acquisition",
+    "frame-extraction",
+    "frame-content-recognition",
+    "transcript-acquisition",
+    "comment-harvesting",
+    "file-reconstruction",
+    "extraction-reporting",
+    "youtube-prd-forensics"
+   ],
+   "notes": "media-manager is NOT created (skeptic; dx/architect slug rule concurs). Parked as references/ recipes, not sub-skills or commands: multi-format-manual-generation + local-tts-narration (proxmark3, single use), media-repair-toolbox (untrunc/ffmpeg/split-join — the git-storage policy half lives in github's large-asset-vendoring). /generate-manual, /narrate, /repair-video commands cut. Installed copies in llm_ai_labs, attacking_ai_talk, osint_worldview, github-awesome get the /update-skill sweep in the same PR series. Codex-side mirrors handled per the on-demand policy."
+  },
+  {
+   "name": "gated-batch",
+   "mission": "Single consolidated skill (data-manager master dissolved per the maintenance-skeptic): resumable per-item batch pipelines over files/corpora with LLM/VLM steps, plus the safety contract for destructive batches — dry-run default, --confirm, append-only journal, baseline diff-verify, canary-first, reverse-replay rollback. Owns data-plane (per-item) state; project-manager owns session-plane resumption.",
+   "priority": "P2",
+   "subskills": [
+    {
+     "name": "resumable-batch-pipeline",
+     "description": "Sub-skill of `gated-batch`. CSV state-column pipelines (absorbed csv-driven-llm-pipeline) + folder-walk progress.json variant (irs/house_purchase pattern), skip-if-done, provenance fields, committed driver scripts; score-distribution audit and surgical flag-reset notes folded in (JSON repair itself references agent-manager's llm-json-output-repair).",
+     "source": "absorb-existing",
+     "existing_name": "csv-driven-llm-pipeline"
+    },
+    {
+     "name": "gated-destructive-batch",
+     "description": "Sub-skill of `gated-batch`. The dropbox_audit safety architecture generalized (5 repos hand-rolled variants): dry-run default, explicit --confirm, path allowlist, append-only journal, pre/post baseline inventory diff-verify, smallest-slice canary loop, reverse-replay rollback, summary-script output shape (token-efficiency mechanics cross-reference agent-manager's canonical page).",
+     "source": "new",
+     "existing_name": ""
+    },
+    {
+     "name": "content-aware-file-renaming",
+     "description": "Sub-skill of `gated-batch`. Absorbed unchanged (%who% - %what% - %where% - %when% - %extra% formula, AskUserQuestion-only) as the corpus-normalization front door.",
+     "source": "absorb-existing",
+     "existing_name": "content-aware-file-renaming"
+    }
+   ],
+   "commands": [
+    {
+     "name": "batch-run",
+     "description": "Author or resume a gated batch pipeline: state store design, safety + context-isolation contracts, dry-run default, --confirm for destructive phases",
+     "source": "new"
+    },
+    {
+     "name": "rename-files",
+     "description": "Thin wrapper for content-aware batch renaming",
+     "source": "new"
+    }
+   ],
+   "absorbs_existing": [
+    "csv-driven-llm-pipeline",
+    "content-aware-file-renaming"
+   ],
+   "notes": "DROPPED per skeptic single-use criterion (evidence preserved as references/ pointers in this skill): pdf-document-mining (irs), human-review-gate-webui (dropbox_audit), report-then-apply-merge (KeepassMerge), dropbox-api (dropbox_audit), rule-based-taxonomy-classifier, batch-scoring-reconciliation (repair half was agent-manager's anyway). Boundary sentence cross-referenced with project-manager: gated-batch owns per-ITEM machine state; project-manager owns per-SESSION handoff/loop pacing — 'resume the batch' routes on whether durable item state exists. Diagram.html required."
+  }
+ ],
+ "changes_applied": [
+  "Stated the routing/triggering model in a Phase-0 charter: sub-skills trigger independently via their own frontmatter (github precedent), masters are ownership/routing heads not runtime gates, every sub-skill keeps a trigger-rich description opening with 'Sub-skill of `<master>`.' (architect, consistency)",
+  "Cut architecture-manager as a master: shared-runtime-extraction + the shell trio → ops-manager; openapi-contract-codegen, deterministic-build-fingerprinting, data-tracker-scaffold → developer-manager; database-schema, security-aware-persistence-design, scanner-plugin-integration stay standalone; worldview-layer-scaffold + worldview-shader-preset merge into one standalone worldview-scaffolds skill (maintenance-skeptic)",
+  "Shrunk data-manager to the single gated-batch skill absorbing csv-driven-llm-pipeline + content-aware-file-renaming; dropped pdf-document-mining, human-review-gate, report-then-apply-merge, dropbox-api, taxonomy-classifier pending second use (maintenance-skeptic)",
+  "Cancelled media-manager: youtube-extraction extended in place under its shipped slug, adding only channel-tracker, talk-extraction, and prd-forensics; TTS/manual-generation/media-repair parked as references/ (maintenance-skeptic, dx, architect)",
+  "Applied the extend-in-place slug rule universally: github, project-manager, skills-manager (rename to skill-manager dropped), youtube-extraction, and all ac-logo command names retained; every absorption that deletes a referenced name ships its fleet /update-skill + CLAUDE.md reference-rewrite sweep in the same PR series (architect, dx, consistency, skeptic)",
+  "Killed cross-cli-skill-transpiler; replaced with policy — Codex mirrors on demand, Gemini frozen at 5, /audit-skills reports the gap informationally, mirrors carry source-version stamps (skeptic, consistency)",
+  "Resolved every contested ownership to one home: session-management + all next-session-handoff triggers → project-manager session-handoff exclusively; session-jsonl-toolkit + history search → agent-manager with the single verb-first /search-sessions command (utilities' duplicate deleted); /diagnose-runbook → quality-manager only; token-efficiency → one canonical page in agent-manager; /get-secret → ops-manager outright; shell-fleet trio co-located under ops-manager (architect, redundancy, dx, skeptic)",
+  "Removed duplicated recipes: windows-desktop-verify lives only in quality-manager's visual-verify-loop (dotnet-wpf references it), browser-console classification and serve-dist checklist fold into visual-verify-loop, lint-baseline discipline lives only in compliance-gate-authoring, stall-recovery (reset --soft) lives only in agent-manager's stalled-agent-recovery, llm-json-output-repair is the single home of the repair scripts, worktree OAuth-loss lesson canonical in github's worktree-task-lifecycle with pointers elsewhere (redundancy, architect)",
+  "Replaced developer-manager's web-stacks and data-and-platform-stacks mega-files with a thin router over the 34 standalone stack skills whose frontmatter is improved in place; deferred go-development, fastapi-htmx, python-app-scaffolds, ollama-integration, browser-console-triage pending second-project evidence (skeptic resolution satisfying architect's independent-triggering and no-merged-files requirements)",
+  "Cut ~25 commands: /verify (built-in wins — precedence declared, no rename shipped), /guide, /profile-perf, /check-mirrors (reintroduced a rejected taxonomy item), /publish-report, /repo-badge-audit, /branch-sync-audit, /prototype-git-bootstrap, /transpile-skill, /repo-ops-index, /init-product, /enhancement-bundle, /apply-ux-feedback (merged into /screenshot-review batch mode), /gen-start-app (mode of /start-app), /scaffold-cli, /dev-proxy, /seed-dev, /triage-console, /generate-manual, /narrate, /repair-video, /search-sessions duplicate, /get-secret duplicate, /rotate-secret (skeptic, redundancy, dx)",
+  "Applied verb-first naming: /handoff, /burndown, /loop-prompt, /apply-script, /probe-incident, /add-dashboard, /search-sessions; commissioned a command-namespace registry with a generic-verb rule as a Phase-0 deliverable (dx, architect)",
+  "Ratified and required verbatim boundary sentences: project-manager (single-agent loops + state files) vs agent-manager (multi-agent dispatch/recovery/JSONL); gated-batch (per-item data-plane state) vs project-manager (session-plane resumption); quality (observe/judge + pre-ship smoke) vs developer (launch) vs ops (post-deploy); design (is it good) vs quality (does it work) (architect, dx, redundancy)",
+  "Named skills-manager's external-skill-intake the single owner of all plugin-precedence declarations (superpowers, impeccable, interface-design, codex, built-in verify) (redundancy)",
+  "Commissioned the 142-directory disposition ledger closing every orphan: base, explain-code, visual-explainer, vercel-deploy-claimable, site-architecture, honcho, graphify, database-schema, security-aware-persistence-design, scanner-plugin-integration, worldview-scaffolds stay standalone; feature-start merges into add-feature; stale-symbolic-ref splits git-half→github / general-half→ops diagnostics-probe; two-surface-observability splits observability→ops / project-tracking→project-manager; what-next-workspace eval artifacts deleted outright; workspace API-contract half escalated to human (architect, redundancy, consistency)",
+  "Corrected all counts to the verified 142/84/5 (+25 global commands) and required CLAUDE.md (repo) updates — Management Commands table, retired /backfill-diagrams, rules/ bundle subdirectory — in the owning PRs (consistency)",
+  "Added mandatory package-wide follow-through to every deletion PR: README row + manifest.json regeneration + diagram.html + installed-copy sweep, via skill-parity-guard; parity-guard fix mode proposes but never executes deletions (consistency, skill-manager design)",
+  "Added hook-interaction sections: PM state files declared sanctioned outputs for the doc-blocker PreToolUse hook; unattended /burndown and /loop runs document handling of the git-push Zed-review hook (dx)",
+  "Made ops-manager's apply-script contract state feature-branch → PR discipline explicitly, with AC_OPBTA direct-commit as a repo-local exception in that repo's thin installed index (dx)",
+  "Preserved usage-limit-reducer's verbatim trigger phrases in agent-manager's frontmatter as a hard requirement, and preserved doc-coauthoring's generic documentation workflow as a documented mode inside operator-runbook-authoring (dx, PM design risk note)",
+  "Adopted the skeptic's hard phase gate: Phase 1 = github + project-manager + skills-manager only; P1 masters proceed only after Phase 1 ships and its sub-skills have demonstrably fired in real sessions",
+  "Added diagram.html rows to all master SKILL.md outlines and standardized sub-skill frontmatter to the 'Sub-skill of `<master>`.' convention (consistency)"
+ ],
+ "dissents_unresolved": [
+  "workspace skill's API-contract-tracking / cross-repo-topology half has no willing owner (repo-picker half went to project-manager's what-next): fold into project-manager orchestrator-bookkeeping, give to developer-manager, or delete outright — human decision required before the workspace skill directory is removed.",
+  "Deferred single-repo sub-skills (go-development, fastapi-htmx, python-app-scaffolds/PyQt, ollama-integration, product-inception-pack, enhancement-bundle, raw-json-to-domain-panel, pdf-document-mining, human-review-gate-webui, report-then-apply-merge, dropbox-api, rule-based-taxonomy-classifier, TTS/manual-generation recipes): the maintenance-skeptic says drop until a second project needs them; the domain designs treat the mined content as real production expertise worth staging. Decide: drop entirely (git history is the archive) vs stage as status:draft references/ inside the owning bundles. The plan currently follows the skeptic (drop/park), but this discards authored evidence the human may want captured now.",
+  "Quality-manager's absorption of the global code-review/tdd/test-coverage/e2e commands: applied as move-into-bundle-keeping-names with the fleet sweep in the same PR series, but the maintenance-skeptic's wording ('stay where installed copies reference them... or not happen') also supports leaving them as standalone global commands forever. Zero-churn option remains open to the human.",
+  "Phase-gating strictness: the maintenance-skeptic (sole reject-restructure verdict) requires Phase 2 to wait for demonstrated real-session usage of Phase-1 sub-skills; the four approve-with-changes reviewers accepted the full package. The implementation order encodes the hard gate — human should confirm whether P1 masters may proceed on calendar/capacity instead of usage evidence.",
+  "console-output-style placement in design-manager (visual-review-loop argument) vs a tooling/PowerShell home (AC_OSM/Spectre/Pester argument): design-manager claims it per its designer, no reviewer contested it directly, but the design itself asked for board confirmation — flagging for the human since it's a judgment call, not an evidence call."
+ ],
+ "implementation_order": [
+  "0. charter+ledger (docs-only): reorg charter (routing model, boundary sentences, slug rules, mirror policy, command-namespace registry + generic-verb rule), full 142-directory disposition ledger, delete what-next-workspace eval artifacts, correct counts in README/CLAUDE.md",
+  "1. github pt1: master SKILL.md extension (routing rows, principles absorbing stale-symbolic-ref git slice + commit conventions) + worktree-task-lifecycle sub-skill; delete using-git-worktrees, worktree-isolated-loop; parity pass",
+  "2. github pt2: pr-splitter + large-asset-vendoring; lift additive-merge-conflict-resolution + crlf-gitattributes-normalization into the bundle; delete commit-hygiene, accumulated-feature-branch-workflow, pre-pr; /split-pr",
+  "3. github pt3: /sync-dev + /changelog-preview; ship/merge/release/release-init/prune/publish extensions; regenerate diagram; /push-skill github to global profile",
+  "4. skills-manager pt1: skill-parity-guard + installed-copy-sweep sub-skills; /sweep-installed-copies; extend /audit-skills; retire /backfill-diagrams; CLAUDE.md command-table update",
+  "5. skills-manager pt2: lifecycle-operations restructure + external-skill-intake (absorb superpowers-overrides, plugin-precedence declarations) + mirror policy + /skill-rollout, /scout-external-skills, /claude-md-skill-list-sync; push to global",
+  "6. project-manager pt1: master SKILL.md (pm-root, boundary sentence, hook-sanctioned outputs, diagram) + session-handoff sub-skill + /handoff (alias /continue-new-session); delete session-management, state-file-driven-multi-turn-resumption, recursive-batch-handoff",
+  "7. project-manager pt2: loop-prompt-composer + backlog-burndown + /loop-prompt + /burndown; delete self-paced-loop-iteration, iterative-development",
+  "8. project-manager pt3: orchestrator-bookkeeping + learnings-ledger + /log-learning; absorb spec-consistency-doc-refactoring-pattern + two-surface project-tracking half",
+  "9. project-manager pt4: backfill-features + /backfill-features (absorb retro-fit-spec, spec-align, existing-repo; merge feature-start + standalone add-feature) + operator-runbook-authoring (doc-coauthoring) + what-next move with workspace mode; push project-manager to global",
+  "10. fleet sweep #1: /sweep-installed-copies + /claude-md-skill-list-sync across C:\\development for all Phase-1 deletions/renames (incl. zillow_tracker rebranded copies) — HARD GATE: review Phase-1 sub-skill firing before proceeding",
+  "11. agent-manager pt1: bundle head (usage-limit-reducer triggers verbatim in frontmatter, boundary sentence) + session-jsonl-toolkit (canonical, absorbs usage-limit-reducer) + /search-sessions + /token-report",
+  "12. agent-manager pt2: fleet-repo-fanout (absorb parallel-subagent-fanout, subagent-driven-development) + stalled-agent-recovery + llm-json-output-repair + /fleet-fanout + /recover-agent",
+  "13. agent-manager pt3: binpacked-batch-dispatch + history-mining-pipeline (absorb conversation-history-mining, analyze-conversations) + parallel-workstream-launcher + agent-coordination (team-coordination) + agent-runtime-config (ai-models, agentic-development, llm-patterns) + mcp-wiring-verification + remaining commands; push to global",
+  "14. quality-manager pt1: bundle head + code-review merge (4 skills) + security-review + tdd + e2e-playwright; global command moves with fleet sweep in same series",
+  "15. quality-manager pt2: visual-verify-loop (absorb ui-testing + windows-desktop + browser-console content) + container-smoke-test + audit-gate + fix-start generalization + code-deduplication + compliance-gate-authoring + remaining commands (/diagnose-runbook sole owner); push to global",
+  "16. ops-manager pt1: bundle head + idempotent-apply-script (branch-discipline section) + diagnostics-probe (absorb probes + stale-symbolic-ref general half + two-surface observability half) + diagnostic-ladders trio + /apply-script + /probe-incident",
+  "17. ops-manager pt2: service-lifecycle (firewall-alias) + internal-registry-deploy (pin-rewrite) + secrets-ops (sops-secrets, /get-secret) + observability-dashboards merge + gpu-placement + fleet-host-onboarding + service/host commands",
+  "18. ops-manager pt3: shared-runtime-extraction + shell-fleet-migration (absorb shell trio) + /extract-runtime; thin AC_OPBTA installed index; push to global",
+  "19. developer-manager: thin router head + powershell + dotnet-wpf + local-dev-harness (absorb start-app, project-tooling) + relocated pattern sub-skills (openapi-contract-codegen, deterministic-build-fingerprinting, data-tracker-scaffold) + /start-app rewire; push to global",
+  "20. stack-skill description pass: in-place frontmatter improvements for the 34 standalone stack skills (batched 2-3 PRs, no relocations)",
+  "21. design-manager pt1: bundle head (routing table with plugin-defer rows) + logo-pipeline (absorb ac-logo + logo-restylizer, global stale-copy cleanup in same series) + frontend-aesthetics + ui-standards merge (delete 4 skills + fleet reference rewrite)",
+  "22. design-manager pt2: design-token-pipeline + design-system-alignment (archive align-to-ac) + design-parity + screenshot-ux-review + html-mockup-prototyper + brand-extraction + console-output-style + commands; push to global",
+  "23. youtube-extraction extension: reconcile flat/bundle duplicate sub-skills (delete 7 flat copies) + channel-tracker + talk-extraction + prd-forensics absorption + new commands + references/ parking; /update-skill sweep for 4 repos",
+  "24. gated-batch: new skill absorbing csv-driven-llm-pipeline + content-aware-file-renaming + gated-destructive-batch + /batch-run + /rename-files",
+  "25. utilities-manager: bundle head + windows sub-skills + installer-lifecycle (absorb remote-installer, add-remote-installer) + credential-onboarding (credentials) + fleet-cp1252 + guide-assistant + commands; push to global",
+  "26. closeout: final fleet sweep, full /audit-skills parity run, disposition-ledger reconciliation, count corrections, memory rollout note"
+ ],
+ "human_resolutions": {
+  "resolved_by": "erik",
+  "date": "2026-07-10",
+  "note": "Binding resolutions of dissents_unresolved, gathered by interview. Override encoded defaults where they differ (#2, #4).",
+  "decisions": [
+   {
+    "id": 1,
+    "topic": "workspace API-contract/cross-repo-topology half",
+    "resolution": "delete",
+    "detail": "Nothing migrates; remove the workspace skill directory once the repo-picker half lands in what-next (iteration 9). Git history is the archive."
+   },
+   {
+    "id": 2,
+    "topic": "deferred single-repo sub-skills",
+    "resolution": "stage-as-draft",
+    "detail": "OVERRIDES encoded drop default. Author each of the 13 items as a thin status: draft stub inside its owning bundle (developer-manager: go-development, fastapi-htmx, python-app-scaffolds, ollama-integration; project-manager: product-inception-pack, enhancement-bundle; design-manager: raw-json-to-domain-panel; gated-batch: pdf-document-mining, human-review-gate-webui, report-then-apply-merge, rule-based-taxonomy-classifier; ops-manager: dropbox-api; youtube-extraction: TTS/manual-generation recipes). Promote to active only when a second project needs them."
+   },
+   {
+    "id": 3,
+    "topic": "global command moves into quality-manager",
+    "resolution": "move-with-sweep",
+    "detail": "Encoded default confirmed: code-review, tdd, test-coverage, e2e move into quality-manager, names unchanged, fleet sweep in the same PR series."
+   },
+   {
+    "id": 4,
+    "topic": "phase-gate strictness",
+    "resolution": "soft-gate",
+    "detail": "OVERRIDES encoded hard gate. At iteration 10, review and report Phase-1 sub-skill firing evidence in the iteration summary, then proceed to iteration 11 without stopping to ask."
+   },
+   {
+    "id": 5,
+    "topic": "console-output-style placement",
+    "resolution": "design-manager",
+    "detail": "Encoded default confirmed: ships in design-manager pt2 (iteration 22)."
+   }
+  ]
+ }
+}

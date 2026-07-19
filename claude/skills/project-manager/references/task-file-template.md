@@ -10,6 +10,7 @@ created: "{{TODAY}}"
 claimed_by: "{{agent-or-user}}"
 claimed_at: "{{TIMESTAMP}}"
 lease_expires_at: "{{TIMESTAMP}}"
+assignee: ""                          # human or agent handle; optional
 external_issue: ""
 external_url: ""
 parallel: false

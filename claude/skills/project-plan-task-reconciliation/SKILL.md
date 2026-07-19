@@ -1,5 +1,6 @@
 ---
 name: project-plan-task-reconciliation
+category: Foundations & Workflow
 description: Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, and auditing for features that shipped without a formal plan/task trail.
 status: active
 version: 2026-07-05
@@ -31,3 +32,7 @@ In any project-management framework where feature specs define scope, plans brea
 - Architectural drift can creep into hand-off prompts too (e.g. a subagent proposing an approach the plan explicitly rejected) — catch and downgrade this during reconciliation, not after the next session has already acted on it.
 - "Implemented but missing a plan" and "unimplemented with a plan" look similar in a status report but require completely different responses — conflating them misdirects remediation effort.
 - Freeze protocols on backlog directories are easy to violate accidentally by bundling the closure edit into the substance PR — always check whether the target directory is frozen before deciding PR boundaries.
+
+## Diagram
+
+[View diagram](diagram.html)

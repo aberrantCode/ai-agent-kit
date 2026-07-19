@@ -1,5 +1,6 @@
 ---
-name: homeradar-pre-pr
+name: pre-pr
+category: Foundations & Workflow
 description: Use before opening any HomeRadar pull request — three self-gates must all pass
 ---
 
@@ -45,3 +46,7 @@ git diff origin/dev..HEAD -- '*.ts' '*.tsx' '*.py' | grep '^\+.*console\.log'
 Also verify: PR description includes a Spec Coverage table (CAP-ID → ACs → test).
 
 **A PR without all three gates passing will be rejected at review.**
+
+## Diagram
+
+[View diagram](diagram.html)

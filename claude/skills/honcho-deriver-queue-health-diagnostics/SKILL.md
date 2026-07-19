@@ -1,5 +1,6 @@
 ---
 name: honcho-deriver-queue-health-diagnostics
+category: Infrastructure & Ops
 description: Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts — check both the MCP-visible layer and the server-side queue table directly, distinguish "broken" from "contended," and audit stored conclusions for pollution.
 status: active
 version: 2026-07-05
@@ -46,3 +47,7 @@ A Honcho instance (or structurally similar background-processing queue — ffmpe
 - Never bulk-reset queue errors without excluding special categories (`reconciler`, `dream`) and without holding the coordination lock — a concurrent reset can race an active deriver.
 - Resource contention (playback transcoding starving an extraction pipeline) looks identical to "broken" from throughput alone — always check the three falsifiable criteria before declaring a pipeline dead.
 - Pollution cleanup should be targeted (trace to origin) not wholesale — indiscriminate deletion risks removing legitimate operator-approved memory alongside noise.
+
+## Diagram
+
+[View diagram](diagram.html)

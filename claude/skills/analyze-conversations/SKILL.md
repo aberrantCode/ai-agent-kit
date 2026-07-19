@@ -1,5 +1,6 @@
 ---
 name: analyze-conversations
+category: Foundations & Workflow
 description: Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting — "what keeps going wrong", "find issues we've hit more than once", "audit our conversation history", "what should we change so this stops happening". Mines the JSONL transcripts for repeated tool errors, rejections, and operator corrections, then proposes concrete prevention patches.
 ---
 
@@ -157,3 +158,7 @@ opbta-ansible key drift); `Blocked: sleep N` (reaching for a forbidden
 `sleep`); and a correction cluster of "the command you gave me threw an error" /
 "don't see that it ran" — the agent claiming completion it hadn't verified.
 Each maps cleanly to a surface in Step 4.
+
+## Diagram
+
+[View diagram](diagram.html)

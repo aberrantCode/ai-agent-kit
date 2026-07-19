@@ -1,5 +1,6 @@
 ---
 name: ui-redesign-with-snapshot-regeneration
+category: Frontend
 description: Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes — to avoid masking real regressions as "just snapshot drift."
 status: active
 version: 2026-07-05
@@ -68,3 +69,7 @@ non-snapshot failures if done carelessly.
 - Regenerating snapshots before confirming the visual change is actually intended
   can permanently bake a regression into the baseline — regenerate at merge-ready
   time, not reflexively whenever a test fails.
+
+## Diagram
+
+[View diagram](diagram.html)

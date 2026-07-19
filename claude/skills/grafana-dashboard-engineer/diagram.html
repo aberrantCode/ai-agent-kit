@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grafana Dashboard Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:11px; font-weight:700; padding:6px 8px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--emerald); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  .decision-chain { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+  .decision-node { display:flex; align-items:center; gap:10px; font-size:11px; }
+  .decision-node .rank { font-family:var(--font-mono); font-weight:700; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--amber-dim); color:var(--amber); border:1px solid var(--amber); flex-shrink:0; }
+  .decision-node .body { flex:1; }
+  .decision-node .body strong { color:var(--text); }
+  .decision-node code { font-family:var(--font-mono); font-size:10px; background:var(--surface2); color:var(--text-dim); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Grafana Dashboard Engineer</h1>
+<p class="subtitle">research → design → build → deploy → validate → ship · Prometheus/Loki · IaC-integrated</p>
+
+<div class="diagram">
+
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Purpose</div>
+    <div class="callout">
+      Production-grade Grafana dashboard engineer. Enables rapid research, design, build, deployment, and validation of observability dashboards across Prometheus, Loki, and custom datasources — with IaC (Ansible/PowerShell), application-specific templates, and full git workflow integration for homelab and enterprise environments.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Domain expertise</div>
+        <div class="desc">Dashboard JSON, PromQL/LogQL, app-specific templates, Ansible/PowerShell IaC, SLO/SLA tracking.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Workflow integration</div>
+        <div class="desc">AskUserQuestion requirements gathering, feature-branch worktree, live API sync, ship-to-dev.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">Application templates</div>
+        <div class="desc">Searchable library of pre-built monitoring patterns, auto-researched when missing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    five slash commands, one dashboard lifecycle
+  </div>
+
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Slash Commands</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">/new-dashboard</div>
+        <div><div class="step-title">Create from scratch, interactive</div><div class="step-desc">Detect structure → find/research template → <code>AskUserQuestion</code> requirements → build JSON → test queries → generate docs → offer live deploy.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">/update-dashboard</div>
+        <div><div class="step-title">Modify with change tracking</div><div class="step-desc">Fetch repo + live API → parse change request → show diff → worktree branch → test → update JSON + docs + changelog.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">/remove-dashboard</div>
+        <div><div class="step-title">Delete safely</div><div class="step-desc">List dependent alert rules/doc links → confirm impact → remove from repo + live Grafana → archive backup.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">/audit-dashboard</div>
+        <div><div class="step-title">Validate config and best practices</div><div class="step-desc">JSON schema, PromQL/LogQL validity, alert thresholds, datasource connectivity, drift vs. repo version.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">/list-dashboards</div>
+        <div><div class="step-title">Inventory with health status</div><div class="step-desc">Scans all known dashboard locations; filter by <code>application</code>, <code>status</code>, <code>category</code>, or <code>location</code>.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section section--amber" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Decision Point · project structure detection (priority order)</div>
+    <div class="decision-chain">
+      <div class="decision-node"><div class="rank">1</div><div class="body"><strong>Ansible roles</strong> — <code>roles/grafana/files/dashboards/</code> exists → ask category → store under <code>&lt;category&gt;/&lt;name&gt;.json</code>, doc as <code>.README.md</code></div></div>
+      <div class="decision-node"><div class="rank">2</div><div class="body"><strong>Project-root grafana/</strong> — <code>grafana/dashboards/</code> exists, no Ansible → store there, doc in <code>grafana/docs/</code></div></div>
+      <div class="decision-node"><div class="rank">3</div><div class="body"><strong>Docker Compose</strong> — <code>docker-compose.yml</code> exists, no roles/ → store in <code>monitoring/grafana/dashboards/</code>, doc in <code>docs/dashboards/</code></div></div>
+      <div class="decision-node"><div class="rank">4</div><div class="body"><strong>Fallback</strong> — none match → create <code>grafana/dashboards/</code> + <code>grafana/docs/</code> automatically</div></div>
+    </div>
+    <div class="ve-card ve-card--amber" style="margin-top:10px">
+      <div class="title">User override</div>
+      <div class="desc">Explicit <code>--path</code> flag always wins; detected location is always shown before proceeding.</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="--i:4">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Template Discovery</div>
+      <ol class="princ-list" style="list-style:decimal; padding-left:16px;">
+        <li style="padding-left:2px">Search local <code>[APPNAME].md</code> in the skill directory</li>
+        <li style="padding-left:2px">Found → present metric categories for selection</li>
+        <li style="padding-left:2px">Not found → web search + repo inspection + live metrics endpoint</li>
+        <li style="padding-left:2px">Generate comprehensive template, save for reuse</li>
+      </ol>
+    </div>
+    <div class="section section--slate">
+      <div class="section-label"><span class="dot"></span> Methodologies Encoded</div>
+      <ul class="princ-list">
+        <li><strong>RED</strong> for services — Rate, Errors, Duration.</li>
+        <li><strong>USE</strong> for infrastructure — Utilization, Saturation, Errors.</li>
+        <li>SLO/SLA tracking with runbook links per alert rule.</li>
+        <li>Green/amber/red thresholds; dev vs. prod alert tuning.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section section--slate" style="--i:5">
+    <div class="section-label"><span class="dot"></span> Good Fit vs. Not This Skill</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Good fit</div>
+        <div class="desc">Creating/updating dashboards, designing observability, investigating monitoring gaps, optimizing alert thresholds, deploying via IaC.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Not this skill</div>
+        <div class="desc">General Grafana admin (users/orgs), datasource configuration, incident-response triage, log-forensics tooling.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

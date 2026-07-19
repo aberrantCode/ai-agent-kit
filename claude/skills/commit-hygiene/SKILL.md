@@ -1,5 +1,6 @@
 ---
 name: commit-hygiene
+category: Foundations & Workflow
 description: Atomic commits, PR size limits, commit thresholds, stacked PRs
 ---
 

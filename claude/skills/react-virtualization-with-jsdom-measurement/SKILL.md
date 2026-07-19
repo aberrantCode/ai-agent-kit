@@ -1,5 +1,6 @@
 ---
 name: react-virtualization-with-jsdom-measurement
+category: Frontend
 description: Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser.
 status: active
 version: 2026-07-05
@@ -62,3 +63,7 @@ element sizes needs a deliberate testing strategy — this is that strategy.
 - Dynamic `measureElement` sizing requires the `getBoundingClientRect` shim to exist
   in test setup ahead of time — without it, tests either fail or force falling back
   to a fixed `estimateSize`, which doesn't exercise the same code path as production.
+
+## Diagram
+
+[View diagram](diagram.html)

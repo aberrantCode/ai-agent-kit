@@ -1,0 +1,28 @@
+{
+  "_comment": "Branch ruleset template. Substitute <BRANCH> with main or dev, and set name to 'Protect <BRANCH>'. POST to /repos/{owner}/{repo}/rulesets to create; PUT to /repos/{owner}/{repo}/rulesets/{id} to update an existing ruleset of the same name. Never POST a duplicate name.",
+  "name": "Protect <BRANCH>",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/<BRANCH>"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "allowed_merge_methods": ["merge"]
+      }
+    }
+  ],
+  "bypass_actors": []
+}

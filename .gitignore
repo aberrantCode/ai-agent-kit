@@ -19,3 +19,6 @@ Thumbs.db
 # Local shell helpers / scratch
 *.local
 *.local.*
+
+# Local telemetry — untracked per P5 (docs/requirements/canonical-repo.md)
+logs/

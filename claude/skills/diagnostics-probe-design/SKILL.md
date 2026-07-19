@@ -1,5 +1,6 @@
 ---
 name: diagnostics-probe-design
+category: Infrastructure & Ops
 description: Use when investigating a service or infrastructure failure and before proposing any fix — verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.
 status: active
 version: 2026-07-05
@@ -35,3 +36,7 @@ version: 2026-07-05
 - Don't write PromQL/LogQL against assumed metric names — exporter drift silently breaks queries; pre-validate against the live scraper first.
 - Don't paraphrase captured error messages — verbatim text (timestamps included) preserves the signal needed for bisection.
 - Recorded metrics and live state answer different questions (what happened vs. what's true now) — use both, not one as a substitute for the other.
+
+## Diagram
+
+[View diagram](diagram.html)

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC_OPBTA Ops — Repo Operator Knowledge Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:120px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--slate   { background:var(--slate-dim);   color:var(--slate);   border:1px solid var(--slate); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .lifecycle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-family:var(--font-mono); font-size:11px; }
+  .lc-node { padding:4px 10px; border-radius:6px; background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); font-weight:700; }
+  .lc-sep { color:var(--text-dim); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--emerald); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>AC_OPBTA Ops</h1>
+<p class="subtitle">home-network repo operator knowledge index · Ansible / SOPS / Proxmox / OPNsense stack · points at runbooks, doesn't duplicate them</p>
+
+<div class="diagram">
+
+  <!-- Applies when -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Applies When</div>
+    <div class="callout">
+      Operational work — deploy, change, diagnose, or read — against anything in the
+      <strong>AC_OPBTA</strong> stack: Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale,
+      OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki,
+      ntopng, ntfy, Uptime Kuma, Cloudflare — even when the tool isn't named explicitly.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Tool + operational verb</div>
+        <div class="desc">A stack tool is mentioned and the ask is deploy / change / diagnose / read — not theory.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Explicit slash command</div>
+        <div class="desc"><code>/new-deployment</code>, <code>/new-firewall-rule</code>, or <code>/get-secret</code> invoked directly.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">"How do I…" question</div>
+        <div class="desc">About anything under <code>playbooks/</code>, <code>roles/</code>, <code>scripts/</code>, or <code>secrets/</code>.</div>
+      </div>
+    </div>
+    <div class="ve-card ve-card--red" style="margin-top:12px">
+      <div class="title">Skip when</div>
+      <div class="desc">Pure code authoring in an unrelated part of the tree, e.g. editing <code>docs/llms/chatgpt_instructions.md</code>.</div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    index into operator knowledge — cross-cutting invariants live here, runbooks live elsewhere
+  </div>
+
+  <!-- Invariants -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Invariants · memorise, repo-wide</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">control</div>
+        <div><div class="step-title">Env-changing Ansible runs from ac-devops</div><div class="step-desc"><code>ssh ubuntu@192.168.30.15</code> → <code>~/repos/AC_OPBTA</code>. Windows local runner is bootstrap / syntax-check / dry-run only.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">secrets</div>
+        <div><div class="step-title">SOPS age key lives on one host only</div><div class="step-desc">ac-devops <code>~/.config/sops/age/keys.txt</code>. Load with <code>community.sops.load_vars</code> (name: <code>X_creds</code>) — never <code>vars_files:</code>.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">firewall</div>
+        <div><div class="step-title">ac-firewall connection is local</div><div class="step-desc"><code>ansible_connection: local</code>, <code>ansible_become: false</code> for the OPNsense host.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">git</div>
+        <div><div class="step-title">Feature branch → PR → dev → main</div><div class="step-desc">Release PR is <code>dev</code> → <code>main</code>. Never push directly to <code>dev</code> or <code>main</code>.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">scripts</div>
+        <div><div class="step-title">Every action is a committed script</div><div class="step-desc"><code>scripts/*.sh</code>, idempotent, <code>set -euo pipefail</code> — no ad hoc one-off commands.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- VLAN map + gotchas -->
+  <div class="two-col" style="--i:3">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> VLAN ↔ OPNsense Interface Map</div>
+      <ul class="princ-list">
+        <li><code>10 Management</code> 192.168.10.0/24 → <code>opt2</code> · <code>opnsense_if_mgmt</code></li>
+        <li><code>20 Trusted</code> 192.168.20.0/24 → <code>opt3</code> · <code>opnsense_if_trusted</code></li>
+        <li><code>30 Servers</code> 192.168.30.0/24 → <code>opt4</code> · <code>opnsense_if_servers</code></li>
+        <li><code>40 IoT</code> 192.168.40.0/24 → <code>opt5</code> · <code>opnsense_if_iot</code></li>
+        <li><code>50 Guest</code> 192.168.50.0/24 → <code>opt6</code> · <code>opnsense_if_guest</code></li>
+        <li><code>60 Untrusted</code> 192.168.60.0/24 → <code>opt7</code> · <code>opnsense_if_untrusted</code></li>
+        <li><code>70 VPN clients</code> 192.168.70.0/24 → <code>opt8</code> · <code>opnsense_if_vpn</code></li>
+        <li><code>99 Quarantine</code> 192.168.99.0/24 → <code>opt9</code> · <code>opnsense_if_quarantine</code></li>
+      </ul>
+    </div>
+    <div class="section section--red">
+      <div class="section-label"><span class="dot"></span> Top Gotchas Across Tools</div>
+      <ul class="princ-list">
+        <li>OPNsense rules need <code>opt*</code> vars, never UI descriptions (ISSUE-008).</li>
+        <li><code>vars_files:</code> does not decrypt SOPS — use <code>community.sops.load_vars</code> (ISSUE-004).</li>
+        <li><code>community.general.yaml</code> callback removed in ansible-core 2.20 — use <code>result_format = yaml</code> (ISSUE-006).</li>
+        <li>OPNsense module needs <code>ansible_become: false</code> (ISSUE-013) and <code>api_port</code> not <code>port</code> (ISSUE-007).</li>
+        <li>Never run <code>sops</code> from the workstation — the age key isn't there; always shell to ac-devops.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tool index -->
+  <div class="section section--slate" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Tool Index · blurb + pointer, not the runbook</div>
+    <div class="three-col" style="margin-bottom:12px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Configuration mgmt</div>
+        <div class="desc">Ansible (<code>playbooks/</code>, <code>roles/</code>, ac-devops), Semaphore (devops.opbta.com), SOPS + age — see <strong>sops-secrets</strong> skill for credential reads/writes.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Network / firewall</div>
+        <div class="desc">OPNsense REST API from ac-devops, Pi-hole + Unbound on ac-unbound, ntopng NetFlow on ac-docker1.</div>
+      </div>
+      <div class="ve-card ve-card--amber">
+        <div class="title">Hypervisor</div>
+        <div class="desc">Proxmox VE 9 two-node cluster + qdevice, Docker compose stack on ac-docker1, SSH via <code>ansible</code>/<code>ubuntu</code> keys.</div>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="ve-card ve-card--violet">
+        <div class="title">Remote access</div>
+        <div class="desc">WireGuard (primary, UDP 13231), OpenVPN (TCP/443 fallback), Tailscale mesh for admin access.</div>
+      </div>
+      <div class="ve-card ve-card--red">
+        <div class="title">Observability</div>
+        <div class="desc">Wazuh SIEM, Prometheus/Grafana/Loki/Promtail/Alertmanager, ntfy alerts, Uptime Kuma + Blackbox + exporters.</div>
+      </div>
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Ingress / DNS</div>
+        <div class="desc">Traefik + tls_acme (Let's Encrypt via Cloudflare DNS-01), Cloudflare public DNS, split-brain Windows DNS.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mutating commands -->
+  <div class="section section--emerald" style="--i:5">
+    <div class="section-label"><span class="dot"></span> Mutating Commands · scaffold → PR → apply</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">/new-deployment</div>
+        <div><div class="step-title">Deploy a new service</div><div class="step-desc">Scaffolds catalog entry, role wiring, compose fragment, DNS, Traefik route; applies via ac-devops.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">/retire-service</div>
+        <div><div class="step-title">Inverse of /new-deployment</div><div class="step-desc">Removes catalog entry, role wiring, compose fragment, Cloudflare + Unbound DNS, Traefik route, optionally OIDC + secrets + dashboard tile. Backs up to <code>docs/audits/&lt;date&gt;-retired-&lt;name&gt;/</code> first; takes the ac-devops lock.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">/new-firewall-rule</div>
+        <div><div class="step-title">Add an OPNsense rule</div><div class="step-desc">Uses the <code>opt*</code> interface map above, not UI descriptions.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">/rotate-secret</div>
+        <div><div class="step-title">Rotate a non-auth key</div><div class="step-desc">Generated 48-hex value or <code>--value</code>; commits to current branch, syncs KeePass. Refuses auth-catalog keys and refuses to create new keys.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--violet">/add-host</div>
+        <div><div class="step-title">Provision a VM / LXC end-to-end</div><div class="step-desc"><code>AskUserQuestion</code> interview, per-guest <code>.env</code>, runs <code>provision-{vm,lxc}.sh</code>, patches inventory, <code>ansible -m ping</code> bootstrap, opens PR. Refuses on hostname/IP/VMID/VLAN/OS-tag collisions.</div></div>
+      </li>
+    </ul>
+    <div class="lifecycle">
+      <span class="lc-node">AskUserQuestion</span><span class="lc-sep">→</span>
+      <span class="lc-node">scaffold script</span><span class="lc-sep">→</span>
+      <span class="lc-node">PR to dev</span><span class="lc-sep">→</span>
+      <span class="lc-node">apply via ac-devops</span><span class="lc-sep">→</span>
+      <span class="lc-node">report status</span>
+    </div>
+  </div>
+
+  <!-- Read-only + credential-mutating -->
+  <div class="two-col" style="--i:6">
+    <div class="section section--teal">
+      <div class="section-label"><span class="dot"></span> Read-Only · helper script, no PR</div>
+      <div class="two-col">
+        <div class="ve-card ve-card--teal"><div class="title">/get-secret</div><div class="desc">Single key from any <code>secrets/*.enc.yml</code> — non-auth PSKs, webhooks, tokens.</div></div>
+        <div class="ve-card ve-card--teal"><div class="title">/get-service-auth</div><div class="desc">URL + admin user + password, catalog-driven.</div></div>
+        <div class="ve-card ve-card--teal"><div class="title">/list-service-auth</div><div class="desc">Every catalog service with source file + key paths.</div></div>
+        <div class="ve-card ve-card--teal"><div class="title">/sops-status</div><div class="desc">Diagnoses SSH reach, age key, sops binary, KeePass mirror.</div></div>
+      </div>
+      <div class="ve-card ve-card--teal" style="margin-top:12px"><div class="title">/check-hosts [scope]</div><div class="desc">Probes REACH / AUTH / SERVICE per host or group; auto-routes through ac-devops when ansible isn't on PATH.</div></div>
+    </div>
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Credential-Mutating · sops-secrets skill</div>
+      <div class="ve-card ve-card--violet" style="margin-bottom:10px"><div class="title">/update-auth</div><div class="desc">Sets username/password via <code>sops --set</code> on ac-devops, commits, syncs KeePass, auto-runs the consuming playbook.</div></div>
+      <div class="ve-card ve-card--violet" style="margin-bottom:10px"><div class="title">/rotate-service-password</div><div class="desc">Same, but generates the password first via <code>openssl rand -hex 24</code>.</div></div>
+      <div class="ve-card ve-card--violet"><div class="title">/sync-keepass</div><div class="desc">Re-mirrors SOPS → KeePass on demand.</div></div>
+    </div>
+  </div>
+
+  <!-- References -->
+  <div class="section section--slate" style="--i:7">
+    <div class="section-label"><span class="dot"></span> References · load on demand</div>
+    <div class="two-col">
+      <div class="ve-card ve-card--slate" style="border-left:3px solid var(--slate)"><div class="title">knowledge-map.md</div><div class="desc">Full tool → authoritative-doc lookup table.</div></div>
+      <div class="ve-card ve-card--slate" style="border-left:3px solid var(--slate)"><div class="title">deployment-targets.md</div><div class="desc">Docker / LXC / VM decision matrix + scaffold templates.</div></div>
+      <div class="ve-card ve-card--slate" style="border-left:3px solid var(--slate)"><div class="title">firewall-rule-shape.md</div><div class="desc"><code>ansibleguy.opnsense.rule</code> field cheatsheet, ISSUE-001 / ISSUE-008 workarounds.</div></div>
+      <div class="ve-card ve-card--slate" style="border-left:3px solid var(--slate)"><div class="title">secrets-map.md</div><div class="desc">App name → <code>secrets/*.enc.yml</code> → known keys.</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

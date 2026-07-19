@@ -1,5 +1,6 @@
 ---
 name: deployment-driver-pin-rewrite-from-release-tag-source-of-truth
+category: Infrastructure & Ops
 description: Use when a deployment or build system has both a human-editable "intent" field (a release tag, plan row) and a derived "pin" artifact (an image pin file, lockfile) — ensures edits always go to the source-of-truth field and the driver/loop re-derives the pin, rather than hand-editing the derived artifact.
 status: active
 version: 2026-07-05
@@ -30,3 +31,7 @@ version: 2026-07-05
 - Hand-editing the pin file is a *silent* no-op — there's no error, the system just quietly redeploys the old version on the next build, which makes this bug easy to miss during review.
 - If two things both claim to be "the pin" (a checked-in tag and a derived file), always verify which one the driver actually reads at build time before assuming an edit will take effect.
 - A loop that reasons from its own prior output instead of live repo state will drift: always re-fetch and re-read the plan/tag source per iteration rather than carrying forward an in-memory "current version."
+
+## Diagram
+
+[View diagram](diagram.html)

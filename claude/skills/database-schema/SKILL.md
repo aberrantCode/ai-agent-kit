@@ -1,5 +1,6 @@
 ---
 name: database-schema
+category: Databases & Storage
 description: Schema awareness - read before coding, type generation, prevent column errors
 ---
 

@@ -116,6 +116,91 @@ The Verification Gate consults `docs/workflow/runners.md` to confirm a code-chan
 
 If `docs/workflow/runners.md` does not exist yet (the repo was init'd before this phase existed), copy the template from `references/init-project/runners.md.template` first and then run steps 1-5 as if it were a fresh discovery.
 
+## Step 5.5 - Adopt the intake lane (backlog + scope-manifest)
+
+This step transitions a repo from **curated STATUS §4** (hand-maintained backlog list) to **generated STATUS §4**
+(sourced from `docs/backlog.md`). It is the highest-consequence step in reinit: a malformed or incomplete lift can
+cause data loss. Follow the atomic rows-before-rename discipline: **WRITE and VERIFY every row FIRST, THEN and ONLY THEN
+rename the fence. If any curated item cannot be fully accounted for, ABORT the lift and leave §4 curated.**
+
+### 5.5.1 - Ensure prerequisite files exist
+
+- **`docs/workflow/scope-manifest.md`** — If absent, copy VERBATIM from
+  `references/init-project/scope-manifest.md.template`. Do not modify or substitute. This file is the
+  chore-lane guard's hard-coded dependency; without it, every chore task fails closed.
+- **`docs/backlog.md`** — If absent, copy from `references/init-project/backlog.md.template` (substitute
+  `{{TODAY}}`). If present, leave it.
+- **`docs/backlog-archive.md`** — If absent, copy from `references/init-project/backlog-archive.md.template`
+  (substitute `{{TODAY}}`). If present, leave it.
+
+### 5.5.2 - Detect whether STATUS §4 is curated
+
+Read `docs/STATUS.md`. Check whether §4 begins with `<!-- pm:curated:backlog:start -->` or
+`<!-- pm:generated:backlog:start -->`.
+
+- If **generated** (`pm:generated:backlog`): the intake lane is already adopted. Skip to Step 6 (Launch).
+- If **curated** (`pm:curated:backlog`): proceed to 5.5.3 (lift).
+- If **missing or malformed** (fence not found, or mismatch between start/end tags): **STOP and report the malformed
+  fence to the user.** Do not guess or overwrite curated content. This is a fail-closed discipline.
+
+### 5.5.3 - Lift curated items into backlog rows (atomic rows-before-rename)
+
+Read the current content between `<!-- pm:curated:backlog:start -->` and `<!-- pm:curated:backlog:end -->`. Parse
+each bullet point or list item as a candidate backlog row.
+
+For each curated item:
+
+1. **Infer type** — examine the text for keywords: "bug" / "crash" / "error" → `bug`; "doc" / "update" / "test" /
+   "refactor" / "upgrade deps" → `chore`; "tech debt" / "legacy" / "cleanup" → `debt`; otherwise `idea`.
+2. **Infer area** — look for a domain hint in the text (e.g., "auth", "ui", "infra", "api") or use `general`.
+3. **Allocate a unique BL-NNN id** — use the same max(BL-*) rule as backlog.md itself: scan both the live
+   `docs/backlog.md` and `docs/backlog-archive.md` for all existing `BL-*` ids, compute `next_id = max(all ids) + 1`,
+   and assign it to this item.
+4. **Check scope change** — if the item's text clearly indicates a change to product behavior or API surface
+   (e.g., "add new endpoint", "change auth flow", "redesign dashboard"), flag it as a **scope-change candidate**.
+   Do **NOT** make a chore row for scope-change items; instead, note them separately and offer the user a choice:
+   defer to feature lane (`/pm-groom` → `/add-feature`) or demote to a more conservative backlog type.
+5. **Write the BL row to `docs/backlog.md`** — append a markdown table row:
+   ```
+   | BL-NNN | <type> | <area> | p2 | open | <item text> | |
+   ```
+   Use `p2` as the default priority unless the original text contains an explicit priority marker.
+6. **Verify the row was written** — re-read `docs/backlog.md` and confirm the new row is present and well-formed.
+
+**Important: Write EVERY curated item as a BL row (or explicitly defer it to the feature lane), BEFORE proceeding to
+the rename step.** If any item cannot be parsed or accounted for, or if there is ambiguity about whether it belongs in
+the intake lane vs. the feature lane, **ABORT the lift here. Do NOT proceed to the rename.** Leave §4 curated. Use
+`AskUserQuestion` to resolve scope-change judgments with the user (e.g., "Does 'add new endpoint' require a feature
+spec, or is it a chore-scoped change?").
+
+### 5.5.4 - Atomic fence rename (rows-before-rename discipline)
+
+Once every curated item is either written as a BL row in `docs/backlog.md` or explicitly deferred, proceed to rename
+the fence. This is the single highest-consequence atomic operation: the fence name switch tells `sync-status` whether
+§4 is canonical (curated) or derived (generated).
+
+**Rename in `docs/STATUS.md`:**
+- Replace `<!-- pm:curated:backlog:start -->` with `<!-- pm:generated:backlog:start -->`
+- Replace `<!-- pm:curated:backlog:end -->` with `<!-- pm:generated:backlog:end -->`
+
+Do this atomically (single edit, not two separate edits). After the rename, `sync-status` will treat §4 as generated
+and recompute it from `docs/backlog.md` + homeless open issues.
+
+**If the rename cannot proceed because a curated item was unaccounted for:** Abort the fence rename entirely. Leave §4
+in `pm:curated:backlog` mode. Nothing is deleted; git history retains the old text. The user can examine the git diff,
+investigate the ambiguous item, and re-run reinit after resolving it.
+
+### 5.5.5 - Regenerate
+
+Once the fence is successfully renamed, run `/sync-status`. This regenerates §4 from the canonical sources
+(`docs/backlog.md` + open issues), and confirms the new mode is operational.
+
+### 5.5.6 - Triage residue
+
+Run `/pm-groom`. This analyzes any open issues that were not matched to a backlog row and surfaces them as candidates for
+promotion (feature lane) or closure. The output should have zero homeless issues; if not, investigate whether those
+issues need their own BL rows.
+
 ## Step 6 - Launch
 
 Run the `/continue-tasks` workflow from its bootstrap step. The launched loop must still enforce:

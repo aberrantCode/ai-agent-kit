@@ -1,5 +1,6 @@
 ---
 name: usage-limit-reducer
+category: Tooling & DevOps
 description: Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like "hit my limit", "running out of tokens", "usage limit", "save tokens", "reduce usage", "am I wasting tokens", "this chat is getting long", "which model should I use". Diagnoses the current session, runs a real token-usage report from local JSONL logs, and applies Dubi's 11 rules for reducing Claude usage.
 ---
 
@@ -68,3 +69,7 @@ Don't recite every rule. Don't lecture. Match the advice to what the session act
 - It does not silently change the user's model or settings. Recommend, then act only on confirmation.
 - It does not summarize-and-clear without asking — the user may have unsaved context in the conversation.
 - It does not send data anywhere. The usage report is strictly local.
+
+## Diagram
+
+[View diagram](diagram.html)

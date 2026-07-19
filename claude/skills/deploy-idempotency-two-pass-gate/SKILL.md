@@ -1,5 +1,6 @@
 ---
 name: deploy-idempotency-two-pass-gate
+category: Infrastructure & Ops
 description: Use when running any live infrastructure apply (Ansible playbook, Terraform, Docker Compose stack, or similar) — before declaring a deployment successful or moving on to smoke tests, run the apply twice and require the second pass to report zero changes, so latent non-idempotent tasks are caught before they corrupt future deploys.
 status: active
 version: 2026-07-05
@@ -29,3 +30,7 @@ version: 2026-07-05
 - Concurrent agents or processes touching shared rendering tasks (dashboard configs, compose stacks) can make an otherwise-idempotent task look broken — this is why a coordination lock matters, and why isolating unrelated churn (step 4) is necessary before blaming your own change.
 - Don't confuse a legitimate one-time settle (step 5) with a real bug — the distinguishing signal is monotonic convergence across a third pass, not just "pass 2 wasn't zero."
 - Skipping the second pass or accepting `changed > 0` on faith defeats the entire point of the gate; every exception must be documented as a known pre-existing flap, not silently ignored.
+
+## Diagram
+
+[View diagram](diagram.html)

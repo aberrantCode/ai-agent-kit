@@ -1,5 +1,6 @@
 ---
 name: react-native
+category: Frontend
 description: React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code
 ---
 

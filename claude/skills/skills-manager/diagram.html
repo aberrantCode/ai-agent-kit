@@ -1110,7 +1110,7 @@ flowchart LR
   <section class="invariants-block animate" style="--i:7">
     <div class="section-title">Archive Invariants — Never Violate</div>
     <div class="invariants-grid">
-      <div class="invariant-item"><strong>1. Never delete from archive.</strong> Copies are permanent. Deletions are manual curatorial decisions only.</div>
+      <div class="invariant-item"><strong>1. Sync never auto-deletes; curators do.</strong> Superseded skills are intentionally deleted (git history is the record); deprecated is a transient "scheduled for removal" marker, not a permanent tombstone.</div>
       <div class="invariant-item"><strong>2. Flow is source → archive</strong> — except <code>/import-skill</code>, the only explicit reverse path.</div>
       <div class="invariant-item"><strong>3. README is the authoritative index.</strong> Every archived skill has a row; every row points to a real file.</div>
       <div class="invariant-item"><strong>4. Toolset by directory, not content.</strong> <code>claude/</code>, <code>codex/</code>, <code>gemini/</code> determine the toolset column.</div>

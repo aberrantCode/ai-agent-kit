@@ -1,5 +1,5 @@
 ---
-name: homeradar-feature-start
+name: feature-start
 description: Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree
 ---
 

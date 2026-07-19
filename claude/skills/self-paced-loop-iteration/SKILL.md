@@ -1,5 +1,6 @@
 ---
 name: self-paced-loop-iteration
+category: Foundations & Workflow
 description: Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, commits, and schedules the next wakeup based on what just happened rather than wall-clock time.
 status: active
 version: 2026-07-05
@@ -29,3 +30,7 @@ For any multi-iteration workload — a phased feature plan, a backlog of 5-50 sm
 - The pattern must tolerate multi-session resumption: if a loop is interrupted or restarted, it should re-read the progress doc and re-confirm `origin/<integration-branch>` state rather than resuming from stale in-context assumptions — it's safe to pause after any merged unit.
 - Phase gating matters: don't start a downstream task before its documented predecessor phase is actually complete, even if the loop "has time."
 - Self-pacing is about cadence, not about skipping verification — every iteration still needs its own gate-to-green and review step; the fixed-interval-vs-self-paced choice only affects when the next iteration starts.
+
+## Diagram
+
+[View diagram](diagram.html)

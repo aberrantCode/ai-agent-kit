@@ -1,5 +1,6 @@
 ---
 name: lvm-thin-pool-diagnostics-recovery
+category: Infrastructure & Ops
 description: Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space — covers layered diagnosis and safe recovery of the thin pool and any affected filesystems.
 status: active
 version: 2026-07-05
@@ -36,3 +37,7 @@ Thin-pool writes can silently stall under *metadata* pressure (not just data-spa
 - Don't run `fstrim` unprivileged from inside the guest expecting it to reclaim space — it silently fails or no-ops; it must run privileged from the host.
 - Pool exhaustion is fleet-wide: recovering one guest's symptom doesn't mean the pool is safe — verify `lvs` shows healthy headroom before considering the incident closed.
 - When stalls (not hard failures) are the symptom, don't assume the pool is "fine" just because it isn't reporting 100% full — metadata pressure can stall writes below that threshold; always drain offline, never online, once confirmed.
+
+## Diagram
+
+[View diagram](diagram.html)

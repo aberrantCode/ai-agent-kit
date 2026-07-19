@@ -36,6 +36,8 @@ Deploying a bundle to a repo copies:
 - `SKILL.md` → `<target>/.gemini/skills/<name>/SKILL.md`
 - Each `sub-skills/<sub>/SKILL.md` → `<target>/.gemini/skills/<sub>/SKILL.md`
 - Each `commands/<cmd>.md` → `<target>/.gemini/commands/<cmd>.md`
+- Each `references/**` file → `<target>/.gemini/skills/<name>/references/**`
+- Each `rules/**` file → `<target>/.gemini/skills/<name>/rules/**`
 
 ### Installed Copy
 A skill file is an installed copy when its YAML frontmatter carries an `installed-from:` marker pointing at this archive. New installs stamp `installed-from: ai-agent-kit`; copies installed before the repository was renamed carry the legacy value `installed-from: llm_skills`. **Treat either value as an installed copy** — throughout this document, `installed-from: ai-agent-kit` is shorthand for *either the current or the legacy marker*. The sync and find operations skip these — they are not project-developed skills.
@@ -65,7 +67,7 @@ All `SKILL.md` files support these optional frontmatter fields beyond the requir
 - **`status`**: `draft` | `active` (default) | `deprecated`
   - `draft` — skill is in development; `/install-skill` skips unless forced
   - `active` — production-ready; normal install/sync behaviour
-  - `deprecated` — superseded or obsolete; `/install-skill` skips and warns; `/find-skills` classifies as **Deprecated** rather than New/Changed
+  - `deprecated` — superseded or obsolete, and **scheduled for deletion**; `/install-skill` skips and warns; `/find-skills` classifies as **Deprecated** rather than New/Changed
 
 - **`version`**: semver string (e.g. `1.2.0`) or ISO date (e.g. `2026-04-05`) — displayed by `/update-skill` so the user sees the version delta before accepting an update
 
@@ -145,7 +147,7 @@ Archive a specific skill (or all discovered skills) including its full bundle.
 - Bundled commands: document on the skill's row as `— ships with /cmd1, /cmd2`; do NOT add standalone rows for them in the Commands table
 - Sub-skills in bundles: do NOT list as standalone rows; implied by parent skill row
 - **Diagram link**: every skill row that has a `diagram.html` in its archive directory must include a diagram link in the Skill column cell, formatted as: `` [`<name>`](gemini/skills/<name>/) [(diagram)](gemini/skills/<name>/diagram.html) ``
-- Never delete from archive; never remove rows
+- When a skill is deleted from the archive, delete its README row too — every row must point to a real file
 
 ---
 
@@ -176,6 +178,8 @@ Deploy a skill bundle from the archive into a project.
    - `SKILL.md` (1 file per skill)
    - Sub-skills from `sub-skills/` (N files)
    - Commands from `commands/` (N files)
+   - References from `references/` (N files)
+   - Rules from `rules/` (N files)
 
 6. If `name` was given, prompt the user to confirm:
    - Question: "Install `<name>` (+ N dependencies) into `<target>`? This will write N files."
@@ -185,6 +189,8 @@ Deploy a skill bundle from the archive into a project.
    - Write `<target>/.gemini/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (add after existing fields)
    - Write each sub-skill to `<target>/.gemini/skills/<sub>/SKILL.md` with same marker
    - Write each command to `<target>/.gemini/commands/<cmd>.md` (no marker — commands are not skills)
+   - Copy each `references/**` file to `<target>/.gemini/skills/<name>/references/**` (no marker)
+   - Copy each `rules/**` file to `<target>/.gemini/skills/<name>/rules/**` (no marker)
 
 8. Report all files written
 
@@ -213,6 +219,7 @@ Update installed skills in the current project when the archive has newer versio
    - Overwrite each `SKILL.md`, preserving the `installed-from: ai-agent-kit` marker in frontmatter
    - Also check `commands/` in the archive bundle — write any new or changed commands to `<project>/.gemini/commands/`
    - Also check `sub-skills/` — update any installed sub-skills that are outdated
+   - Also check `references/` and `rules/` in the archive bundle — write any new or changed files to `<project>/.gemini/skills/<name>/references/**` and `<project>/.gemini/skills/<name>/rules/**`
    - Regenerate the diagram: delegate to a subagent to create a diagram for each updated skill and overwrite `gemini/skills/<name>/diagram.html`; update the `## Diagram` section in SKILL.md if the path changed
 
 6. Report updated files
@@ -369,6 +376,8 @@ Push a skill bundle from the archive to the global user profile (`~/.gemini/`) s
    - Write `SKILL.md` to `~/.gemini/skills/<name>/SKILL.md` (do NOT add `installed-from` marker — the global profile is a source, not a deployment target)
    - Write each sub-skill from `sub-skills/` to `~/.gemini/skills/<sub>/SKILL.md`
    - Write each companion command from `commands/` to `~/.gemini/commands/<cmd>.md`
+   - Write each `references/**` file to `~/.gemini/skills/<name>/references/**`
+   - Write each `rules/**` file to `~/.gemini/skills/<name>/rules/**`
 
 4. Report all files written
 
@@ -404,7 +413,7 @@ Infer subsection from keywords in the skill's `description` field:
 |----------|-----------|
 | git, branch, commit, PR, merge, workflow, session, team, coordination, repo | Foundations & Workflow |
 | TypeScript, Python, Node.js, runtime, language | Languages & Runtimes |
-| React, Vue, Next.js, frontend framework, PWA, Flutter | Frontend Frameworks |
+| React, Vue, Next.js, frontend framework, PWA, Flutter | Frontend |
 | Android, iOS, mobile native, Kotlin, Swift | Mobile (Native) |
 | UI, UX, design, Tailwind, accessibility, visual, diagram, explainer | UI & Design |
 | database, SQL, Supabase, Firebase, DynamoDB, Aurora, Cosmos, D1, schema | Databases & Storage |
@@ -423,7 +432,7 @@ If no keywords match: **Uncategorized**. Multiple matches: most keyword hits win
 
 ## Archive Invariants — Never Violate
 
-1. **Never delete from archive.** Even if a source file no longer exists, the archive copy stays. Deletions are manual curatorial decisions.
+1. **Sync never auto-deletes; curators do.** The automated flow won't remove an archive copy just because its source file vanished — but superseded skills/commands are *intentionally* deleted (folded-in or obsolete → removed; git history is the record), never kept as permanent `deprecated` tombstones.
 2. **Flow is always source → archive** — except `/import-skill`, which explicitly reverses this.
 3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
 4. **Toolset is determined by directory, not content.**

@@ -1,6 +1,6 @@
 ---
 name: init-project
-description: Use when starting a new project from scratch or retrofitting the project-manager workflow onto an existing repo. Scaffolds the docs/ tree, copies canonical templates, installs agent-enforcement artifacts (AGENTS.md, CLAUDE.md fragment, pre-commit guard, Claude Code hook, PR template, ROADMAP), and seeds INITIAL_PROMPT.md. Idempotent: re-running only fills gaps.
+description: Use when starting a new project from scratch or retrofitting the project-manager workflow onto an existing repo. Scaffolds the docs/ tree, copies canonical templates, installs agent-enforcement artifacts (AGENTS.md, CLAUDE.md fragment, pre-commit guard, Claude Code hook, PR template, ROADMAP), and seeds the product-requirements doc (docs/REQUIREMENTS.md). Idempotent: re-running only fills gaps.
 ---
 
 # Init Project
@@ -25,12 +25,14 @@ Bootstraps a repository so that every agent and operator who touches it is funne
 Before writing anything:
 
 1. **Detect existing state.** Glob each of these and record which exist:
-   - `docs/INITIAL_PROMPT.md`
+   - `docs/REQUIREMENTS.md`, `docs/INITIAL_PROMPT.md` (legacy)
    - `docs/features/template.md`, `docs/features/README.md`
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
    - `docs/tasks/active/`, `docs/tasks/archive/`, `docs/tasks/locks/`, `docs/tasks/logs/`
-   - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`
+   - `docs/STATUS.md`, `docs/issues/`, `docs/workflow/SDLC.md`, `docs/workflow/FOCUS.md`, `docs/workflow/INDEX.md`, `docs/workflow/runners.md`, `docs/workflow/scope-manifest.md`
+   - `docs/backlog.md`, `docs/backlog-archive.md`
+   - `docs/tasks/README.md`
    - `AGENTS.md`, `CLAUDE.md`, `ROADMAP.md`
    - `scripts/guard-pm-flow.ps1`
    - `.git/hooks/pre-commit`
@@ -47,9 +49,9 @@ Before writing anything:
    - Claude Code PreToolUse hook in `.claude/settings.json` (only meaningful if user uses Claude Code)
    - PR template + ROADMAP.md (only meaningful if hosted on GitHub)
 
-5. **Use `AskUserQuestion` to ask for the INITIAL_PROMPT seed.** Offer:
+5. **Use `AskUserQuestion` to ask for the PRD seed.** Offer:
    - (a) "I have product intent ready — paste it now" (preview opens an `AskUserQuestion` follow-up to capture the text)
-   - (b) "Use a stub and I'll fill in `docs/INITIAL_PROMPT.md` myself" (Recommended)
+   - (b) "Use a stub and I'll fill in `docs/REQUIREMENTS.md` myself" (Recommended)
    - (c) "Skip — project is too early to define"
 
 ---
@@ -58,7 +60,8 @@ Before writing anything:
 
 For every directory and file from the discovery list that does **not** already exist, create it. For each path that **does** exist, follow these rules:
 
-- **`docs/INITIAL_PROMPT.md`** — Never overwrite. If it exists, leave it. If the user pasted product intent in Phase 0(a), write only when the file is absent. If the user picked Phase 0(a) and the file exists, use `AskUserQuestion` to choose between (i) leave existing, (ii) write to `docs/INITIAL_PROMPT.md.new` for manual merge.
+- **`docs/REQUIREMENTS.md`** — If absent, copy from `references/init-project/REQUIREMENTS.md.template` (substitute `{{PROJECT_NAME}}`/`{{TODAY}}`); never overwrite — if it exists, leave it, and on a Phase 0(a) paste with the file present, offer (i) leave, (ii) write `docs/REQUIREMENTS.md.new` for manual merge.
+- **`docs/INITIAL_PROMPT.md`** (legacy) — If a legacy file exists, LEAVE IT untouched (never overwrite, never create a new one); the tooling still reads it as a fallback when REQUIREMENTS.md is absent.
 - **`docs/features/template.md`** — If absent, copy from `references/feature-spec-template.md` in the skill bundle. If present, diff: if different, ask via `AskUserQuestion` whether to overwrite, keep, or write `.new` alongside.
 - **`docs/plans/template.md`, `docs/tasks/template.md`** — Same diff-and-ask flow.
 - **`AGENTS.md`** — If absent, copy from `references/init-project/AGENTS.md.template` with `{{PROJECT_NAME}}` substituted. If present, check whether it already contains the marker `<!-- BEGIN project-manager fragment -->`. If yes, do nothing. If no, **append** the contents of `CLAUDE_FRAGMENT.md.template` (yes, named for CLAUDE but the same fragment is valid for AGENTS); never replace existing content.
@@ -68,20 +71,27 @@ For every directory and file from the discovery list that does **not** already e
 - **`.claude/settings.json`** — JSON merge. Read the existing file (or `{}`), shallow-merge the `hooks.PreToolUse` array (do not duplicate entries with the same `command`). Write back with 2-space indentation.
 - **`.github/pull_request_template.md`** — If absent, copy from template (no substitution). If present, leave it.
 - **`ROADMAP.md`** — If absent, copy from template with substitutions. If present, leave it.
-- **`docs/STATUS.md`** — If absent, copy from `references/init-project/STATUS.md.template`. This
-  is the single outstanding-work + next-action tracker: five `##` sections, both `pm:curated:*` and
-  `pm:generated:*` fence pairs, §1 seeded with a "no active run yet" line and §4 empty. If present,
+- **`docs/STATUS.md`** — If absent, copy from `references/init-project/STATUS.md.template` (substitute `{{TODAY}}`).
+  This is the single outstanding-work + next-action tracker: four `##` sections, both `pm:curated:*` and
+  `pm:generated:*` fence pairs, §1 seeded with a "no active run yet" line and §4 seeded as a GENERATED
+  `pm:generated:backlog` fence (because `docs/backlog.md` is scaffolded in the same pass). If present,
   leave it.
 - **`docs/workflow/SDLC.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/FOCUS.md`** — If absent, copy from template (a one-line retired stub pointing to
   `docs/STATUS.md` §1 — the runtime/next-action state lives there now, not here). If present, leave it.
 - **`docs/workflow/INDEX.md`** — If absent, copy from template. If present, leave it.
 - **`docs/workflow/runners.md`** — If absent, copy from `references/init-project/runners.md.template`. Phase 3.5 (Runner Discovery) fills in the table; this step only creates the file with the placeholder row so the path exists for downstream code.
+- **`docs/backlog.md`** — If absent, copy from `references/init-project/backlog.md.template` (substitute `{{TODAY}}`). If present, leave it. This is the canonical intake store; its presence is what makes STATUS §4 generated.
+- **`docs/backlog-archive.md`** — If absent, copy from `references/init-project/backlog-archive.md.template` (substitute `{{TODAY}}`). If present, leave it.
+- **`docs/workflow/scope-manifest.md`** — If absent, copy VERBATIM from `references/init-project/scope-manifest.md.template` (the conservative default: source/API/UI dirs → `product_scope`; `docs/**`, `scripts/**`, `.github/**`, `*.md`, `*.config.*` → `chore_safe`). If present, leave it. NOTE: this manifest is a hard prerequisite for the chore express lane (`/pm-task`) — without it the guard fails closed for every chore task.
 - **`docs/tasks/locks/`** — Create the directory and seed `.gitkeep`. Lock records are runtime
   artifacts using `references/init-project/task-lock.md.template` as their shape.
 - **`docs/tasks/logs/`** — Create the directory and seed `.gitkeep`. Task logs use
   `references/init-project/task-log.md.template` as their shape.
 - **`docs/features/README.md`** — If absent, copy from template. If present, leave it.
+- **`docs/tasks/README.md`** — If absent, copy from `references/init-project/tasks-README.md.template` 
+  (substitute `{{PROJECT_NAME}}`/`{{TODAY}}` if used). If present, leave it. Documents where ad-hoc work goes + 
+  the enforced chore-lane contract.
 
 Always create directory parents implicitly. Always preserve LF line endings on POSIX-targeted files and CRLF on Windows-only files.
 
@@ -148,7 +158,7 @@ Print a structured summary to the user:
 Init Project Report — {{PROJECT_NAME}}
 
 Created:
-  docs/INITIAL_PROMPT.md          (stub)
+  docs/REQUIREMENTS.md            (PRD stub)
   docs/features/template.md
   docs/features/README.md
   docs/plans/template.md
@@ -158,11 +168,15 @@ Created:
   docs/tasks/locks/.gitkeep
   docs/tasks/logs/.gitkeep
   docs/issues/.gitkeep
+  docs/backlog.md                  (canonical intake store)
+  docs/backlog-archive.md          (archive for completed backlog items)
+  docs/tasks/README.md             (documents ad-hoc work + enforced chore-lane contract)
   docs/STATUS.md                   (single outstanding-work + next-action tracker)
   docs/workflow/SDLC.md
   docs/workflow/FOCUS.md           (retired stub → points to STATUS.md §1)
   docs/workflow/INDEX.md
   docs/workflow/runners.md         (2 confirmed runners)
+  docs/workflow/scope-manifest.md  (chore-lane prerequisite)
   AGENTS.md
   ROADMAP.md
   scripts/guard-pm-flow.ps1
@@ -177,7 +191,7 @@ Skipped (already present):
   ...
 
 Next steps:
-  1. Fill in docs/INITIAL_PROMPT.md with product intent.
+  1. Fill in docs/REQUIREMENTS.md with product intent (the PRD).
   2. Run /init-features to capture feature specs.
   3. Run /continue-tasks to enter the orchestration loop.
   4. Verify the pre-commit guard with: git commit --allow-empty -m "chore: verify guard"

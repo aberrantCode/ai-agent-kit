@@ -1,5 +1,6 @@
 ---
 name: reactive-ui-state-with-delegated-event-routing
+category: Frontend
 description: Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-color-scheme/prefers-reduced-motion in a testable way.
 status: active
 version: 2026-07-05
@@ -33,3 +34,7 @@ Keep a single callback (e.g. `onCardAction(id, action)`) defined at the state-ow
 - If you skip the shared-callback pattern in React and let each layout own its own handler, you will end up wiring the same action twice and one copy will silently drift out of sync.
 - Without a `matchMedia` shim, tests that assert on preference-driven classes will pass vacuously (the hook will throw or default, hiding real regressions) — always verify the test actually fails when the implementation is reverted.
 - CSS-only media queries are fine for pure styling; only escalate to the JS hook when the preference gates component *behavior* (e.g. skipping an animation entirely) that needs to be asserted in tests.
+
+## Diagram
+
+[View diagram](diagram.html)

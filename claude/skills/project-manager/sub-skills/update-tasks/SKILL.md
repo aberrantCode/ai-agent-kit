@@ -31,6 +31,16 @@ For each `docs/tasks/active/*.md`:
 
 Parse `Summary:`, `Artifacts:`, `Tests:`, and `Notes:`.
 
+**Chore task completion (feature: `chore-*`):**
+
+- Locate the `backlog_ref` field (e.g., `BL-042`).
+- Open `docs/backlog.md` and find the corresponding row.
+- Set its `Status: done`.
+- Move (cut and append) the completed row from `docs/backlog.md` to `docs/backlog-archive.md`, preserving the BL id.
+- Proceed to archive the active task file (below).
+
+**Standard task completion:**
+
 - If `Tests: passing: false`, add a corrective build/test task and do not mark the implementation
   final.
 - If the task requires verification and no matching verification task exists, insert a review/test
@@ -89,6 +99,21 @@ If no valid sentinel exists and the task is older than 24 hours:
   manually cancels them.
 - **Manual cancellation**: set lock status to `cancelled`, record the reason, and leave the task
   active unless the user authorizes archiving.
+
+## PR Reconciliation
+
+When a merged PR body or Next-session block references a task id (via assignee/PR↔task link):
+
+1. Locate the referenced task file in `docs/tasks/active/` or `docs/tasks/archive/`.
+2. Cross-reference the PR's merge status and the task's completion status.
+3. If the PR is merged and the task has a `## Completion` block with `Status: success`:
+   - Record the PR merge link in the task's `Notes:` section if not already present.
+   - Record the task completion in the PR's check suite / Next-session block.
+4. If the PR is merged but the task is still `in-progress` or has no completion block:
+   - Mark the task as needing completion verification.
+   - Report the discrepancy in the reconciliation output.
+
+This ensures that task completions and their associated merged PRs stay in sync.
 
 ## Refresh the tracker
 

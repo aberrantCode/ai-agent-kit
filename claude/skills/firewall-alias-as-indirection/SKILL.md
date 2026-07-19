@@ -1,5 +1,6 @@
 ---
 name: firewall-alias-as-indirection
+category: Infrastructure & Ops
 description: Use when designing or editing firewall rules for a group of devices (e.g. cameras, IoT clusters) — reference a named alias instead of hardcoded IPs so device-set changes never require rule edits, and use config-tracing (not assumption) to decide whether a public endpoint is actually load-bearing before retiring it.
 status: active
 version: 2026-07-05
@@ -26,3 +27,7 @@ You're writing or modifying firewall rules for a set of devices that share a con
 - Config is the source of truth for "is this used," not memory of the deployment's intended design or a written recap — grep the actual config for references before deciding something is dead.
 - Range-based aliases still need enough headroom: sizing `192.168.40.30-36` for 4 current devices leaves room for roaming/DHCP additions without triggering a range resize later.
 - This pattern generalizes beyond firewalls: any indirection where "the identity of the target set" and "the policy applied to it" change on different timelines benefits from a named alias/group layer instead of inline enumeration.
+
+## Diagram
+
+[View diagram](diagram.html)

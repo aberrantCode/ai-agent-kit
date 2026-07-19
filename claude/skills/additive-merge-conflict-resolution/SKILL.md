@@ -1,5 +1,6 @@
 ---
 name: additive-merge-conflict-resolution
+category: Foundations & Workflow
 description: Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the conflict as a false signal and resolves it as a union-keep-both operation instead of a real semantic merge.
 status: active
 version: 2026-07-05
@@ -33,3 +34,7 @@ version: 2026-07-05
 - Order matters for logs with a chronological convention — if the file is newest-first, appending the older entry at the top instead of below the newer one silently breaks the convention even though no content was lost.
 - This pattern recurs constantly on shared append-only files (backlog/progress/intake docs) touched by multiple concurrent sessions or PRs — recognizing the shape quickly (rather than re-deriving it each time) is the actual point of this skill.
 - Always re-run tests after resolving registry-style additive conflicts — "both blocks are present" doesn't guarantee the combined registration is still syntactically/semantically valid (e.g., duplicate keys).
+
+## Diagram
+
+[View diagram](diagram.html)

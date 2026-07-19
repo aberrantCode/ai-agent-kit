@@ -1,5 +1,6 @@
 ---
 name: iterative-audit-gate-with-streak-reset
+category: Foundations & Workflow
 description: Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification gates repeatedly, resetting a "clean streak" to zero on any finding, until two consecutive rounds come back clean — forcing convergence instead of accepting the first green result.
 status: active
 version: 2026-07-05
@@ -35,3 +36,7 @@ version: 2026-07-05
 - A gate that emits nothing on success (e.g., zero violation pairs) can look identical to a hung or misconfigured run — verify the script's actual success contract before trusting silence.
 - Recurring stale-task classes (e.g., "fixed in a follow-up PR but the backlog row was never closed") indicate a verify-before-promote discipline gap — treat repeat occurrences as a process signal, not just a one-off cleanup.
 - Independent auditors lose their value if they're given the same framing/bias each round — vary the review lens or angle slightly, or the second "independent" pass just re-confirms the first.
+
+## Diagram
+
+[View diagram](diagram.html)

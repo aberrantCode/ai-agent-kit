@@ -1,5 +1,6 @@
 ---
 name: parallel-subagent-fanout
+category: Foundations & Workflow
 description: Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature branch — to dispatch multiple subagents concurrently and reconcile their results into one verdict.
 status: active
 version: 2026-07-05
@@ -36,3 +37,7 @@ version: 2026-07-05
 - Never hand a subagent raw claims to trust blindly; unverified findings that don't trace to a concrete source value should be dropped, not merged in.
 - Fanning out edits to files/roles that overlap between subtasks causes merge conflicts — check the dependency graph before assuming everything is parallelizable.
 - Subagents can't see screenshots or other images; omitting a written translation of visual context silently degrades their output.
+
+## Diagram
+
+[View diagram](diagram.html)

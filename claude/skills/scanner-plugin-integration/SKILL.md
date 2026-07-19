@@ -1,5 +1,6 @@
 ---
 name: scanner-plugin-integration
+category: Code Quality
 description: Use when importing, fixing, or adding a new provider/scanner plugin (e.g. OSINT lookup services, external-API integrations) into an existing Go-style package tree — merge orphaned scaffolds into the real package, preserve the plugin interface pattern, keep gating in DryRun not Run, and verify live endpoints before coding against docs.
 status: active
 version: 2026-07-05
@@ -39,3 +40,7 @@ You're integrating a set of similar external-service plugins (scanners, provider
 - Don't put gating logic in `Run()` "for safety" — it duplicates the aggregate-level check in `DryRun()` and creates two sources of truth for whether a scanner should execute.
 - Vendor/API docs go stale — always confirm exact URL/auth/response shape against the live endpoint before writing integration code, not after tests fail.
 - Decommissioning is easy to do partially (delete the backend file but forget the UI branch or `.env.example` entry) — treat it as a checklist, not a single deletion.
+
+## Diagram
+
+[View diagram](diagram.html)

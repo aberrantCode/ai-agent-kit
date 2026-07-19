@@ -1,0 +1,151 @@
+---
+name: github-merge
+description: >
+  Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers,
+  branches, worktrees, or the current context) into dev with a merge commit, then clean up the
+  worktree, local branch, and remote branch in the correct order. Triggers on "merge 1209",
+  "merge this branch", "merge the current worktree". Honors the parent skill's Output Contract —
+  silent run, errors as they occur, one concise summary.
+---
+
+# Operation: merge
+
+**Goal.** Merge already-open pull request(s) into `dev` with a merge commit, then fully clean
+up. The merge unit is always a **PR** — targets that are branches or worktrees are resolved to
+their open PR. This operation does not create PRs; if a branch has commits but no open PR, stop
+and point the user at the ship operation.
+
+Obey the parent **Output Contract**: no narration, errors surfaced as they occur, one concise
+summary at the end.
+
+---
+
+## Step 1 — Resolve targets to PR numbers
+
+Parse the request per the parent **Parameter Contract**. Build a list of PR numbers:
+
+- **Digits** → that PR number directly.
+- **Branch name** → `gh pr list --head <branch> --base dev --state open --json number` — take
+  the number. No open PR → record an error for this target: "no open PR for `<branch>` — run
+  the ship operation."
+- **Worktree path** → read its checked-out branch
+  (`git -C <path> branch --show-current`), then resolve as a branch above. Remember the path
+  for Step 4 cleanup.
+- **Empty request** → the current context:
+  - If you are inside a secondary worktree, use that worktree's branch.
+  - Otherwise use the current branch: `gh pr view --json number,headRefName`.
+  - If neither yields an open PR, ask the user a plain, concise question for a PR number or
+    branch and wait for the answer.
+
+Resolve the repo root and the primary worktree root once, up front:
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+PRIMARY_ROOT=$(git worktree list --porcelain | awk 'NR==1{print $2}')
+```
+
+Process each resolved PR through Steps 2–5 in turn. A per-target error does not abort the
+whole run — record it and continue to the next target.
+
+---
+
+## Step 2 — Pre-merge checks (per PR)
+
+```bash
+gh pr view <n> --json state,mergeable,mergeStateStatus,headRefName,title
+gh pr checks <n>
+```
+
+Gate before merging:
+
+- `state` must be `OPEN`. Already `MERGED` → skip to cleanup (Step 4) and note it.
+- `mergeable` must be `MERGEABLE`. `CONFLICTING` → **stop this target**, surface the conflict,
+  do not attempt to resolve remotely.
+- `mergeStateStatus` of `BLOCKED` or `BEHIND`, or any failing/pending check in
+  `gh pr checks` → **stop this target** and print the failing check. Never bypass a required
+  gate. If checks are merely still running, say so and let the user re-run the merge operation
+  later.
+
+If the user wants to eyeball the change before merging, point them at their own diff-review
+tooling — do not run it as part of this operation.
+
+---
+
+## Step 3 — Merge with a merge commit (per PR)
+
+Always run from `$REPO_ROOT`, never from a secondary worktree:
+
+```bash
+cd "$REPO_ROOT"
+```
+
+If this PR's branch is checked out in a secondary worktree, **remove that worktree first** —
+otherwise `--delete-branch` fails with "cannot delete branch … used by worktree":
+
+```bash
+git worktree remove <worktree-path> --force 2>/dev/null || git worktree prune
+```
+
+Then merge:
+
+```bash
+gh pr merge <n> --merge --delete-branch --subject "<pr-title>"
+```
+
+`--merge` preserves history; `--delete-branch` removes the remote branch. Confirm:
+
+```bash
+gh pr view <n> --json state --jq '.state'   # expect "MERGED"
+```
+
+---
+
+## Step 4 — Clean up (worktree → local branch → remote)
+
+Remote branch is already gone via `--delete-branch`. Handle the local side, in order:
+
+```bash
+cd "$REPO_ROOT"
+
+# 1. Worktree directory — remove if it survived Step 3.
+git worktree prune
+[ -d "<worktree-path>" ] && rm -rf "<worktree-path>"
+
+# 2. Local branch — safe delete; only escalate to -D after confirming state == MERGED.
+git branch --list "<branch>" | grep -q . && git branch -d "<branch>"
+```
+
+**Windows worktree-lock footgun.** If `rm -rf` fails with "Permission denied", a file handle
+is still open on the directory. Retry once after `git worktree prune`; if it still fails,
+**leave the directory** and record the caveat for the summary — do not loop.
+
+---
+
+## Step 5 — Sync dev
+
+After all targets are processed:
+
+```bash
+cd "$REPO_ROOT"
+[ "$(git branch --show-current)" != "dev" ] && git checkout dev
+git pull origin dev
+```
+
+If the user has uncommitted work on their primary `dev` checkout, do not clobber it — the
+remote-tracking ref is updated regardless; note in the summary that they can `git pull` when
+ready.
+
+---
+
+## Step 6 — Summary (the only expected output)
+
+One concise block. Example shape:
+
+```
+Merged PR #1209 (feat/deploy-fitness) → dev — merge commit 791befa.
+Cleanup: remote + local branch deleted, worktree removed.
+```
+
+For multiple targets, one line each. Prefix any target that failed its gate with its error.
+If a worktree dir was left on disk, add a single caveat line telling the user to delete it
+manually.

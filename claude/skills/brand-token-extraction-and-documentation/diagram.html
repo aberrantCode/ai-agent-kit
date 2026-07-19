@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Token Extraction and Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+  .ve-card--emerald { border-left:3px solid var(--emerald); }
+  .ve-card--teal    { border-left:3px solid var(--teal); }
+  .ve-card--red     { border-left:3px solid var(--red); }
+  .ve-card--amber   { border-left:3px solid var(--amber); }
+  .ve-card--violet  { border-left:3px solid var(--violet); }
+
+  /* Step pipeline */
+  .step-list { list-style:none; }
+  .step-item { display:grid; grid-template-columns:34px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); align-items:start; }
+  .step-item:last-child { border-bottom:none; }
+  .op-cmd { font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 10px; border-radius:8px; text-align:center; flex-shrink:0; }
+  .op-cmd--emerald { background:var(--emerald-dim); color:var(--emerald); border:1px solid var(--emerald); }
+  .op-cmd--teal    { background:var(--teal-dim);    color:var(--teal);    border:1px solid var(--teal); }
+  .op-cmd--amber   { background:var(--amber-dim);   color:var(--amber);   border:1px solid var(--amber); }
+  .op-cmd--red     { background:var(--red-dim);     color:var(--red);     border:1px solid var(--red); }
+  .op-cmd--violet  { background:var(--violet-dim);  color:var(--violet);  border:1px solid var(--violet); }
+  .op-cmd--slate   { background:var(--slate-dim);   color:var(--slate);   border:1px solid var(--slate); }
+  .step-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .step-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .step-desc code { font-family:var(--font-mono); font-size:10px; background:var(--teal-dim); color:var(--teal); padding:1px 5px; border-radius:3px; }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .lifecycle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; font-family:var(--font-mono); font-size:11px; }
+  .lc-node { padding:4px 10px; border-radius:6px; background:var(--teal-dim); color:var(--teal); border:1px solid var(--teal); font-weight:700; }
+  .lc-sep { color:var(--text-dim); }
+
+  .princ-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .princ-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .princ-list li::before { content:"→"; position:absolute; left:0; color:var(--red); font-family:var(--font-mono); }
+  .princ-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .two-col,.three-col{grid-template-columns:1fr;} .step-item{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Brand Token Extraction and Documentation</h1>
+<p class="subtitle">real palette from raw CSS · recreated assets · versioned named tokens</p>
+
+<div class="diagram">
+
+  <!-- Purpose — from frontmatter description -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> When to Use</div>
+    <div class="callout">
+      Reskinning an app with a real brand's visual identity: extract the actual palette from a live site's <strong>raw CSS</strong> (never markdown), recreate logo/icon assets programmatically with documented extraction rationale, and codify everything as <strong>versioned, named design tokens</strong> rather than one-off hardcoded values.
+    </div>
+    <div class="three-col" style="margin-top:14px">
+      <div class="ve-card ve-card--emerald">
+        <div class="title">Live site, no source access</div>
+        <div class="desc">Pull the real palette straight out of the stylesheets the browser actually loads.</div>
+      </div>
+      <div class="ve-card ve-card--teal">
+        <div class="title">Client logo/asset pack</div>
+        <div class="desc">Inspect the rendered mark and rebuild its construction programmatically.</div>
+      </div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">Existing design system</div>
+        <div class="desc">Derive new tokens from established primitives instead of a parallel scale.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    phase 1 · extract from a live site
+  </div>
+
+  <!-- Phase 1: Extracting from a live site -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Extracting · steps 1–5</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">1</div>
+        <div><div class="step-title">Fetch raw HTML/CSS, never markdown</div><div class="step-desc">Markdown conversion strips all styling — exactly the data needed.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">2</div>
+        <div><div class="step-title">Pull every linked stylesheet</div><div class="step-desc"><code>curl</code> the page, <code>grep</code> <code>&lt;link&gt;</code> tags, fetch each linked CSS file.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">3</div>
+        <div><div class="step-title">Rank colors by occurrence count</div><div class="step-desc">Find the <em>real</em> palette across the combined stylesheet — don't take the first hex values seen.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">4</div>
+        <div><div class="step-title">Skip page-builder default colors</div><div class="step-desc">e.g. Divi's <code>#2ea3f2</code> — frequent, but an artifact of the framework, not a brand choice.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">5</div>
+        <div><div class="step-title">Recreate imagery programmatically</div><div class="step-desc">No official source file? Inspect the rendered SVG/PNG construction (two-tone split, italic wordmark) and rebuild it — don't approximate by eye.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="flow-arrow" style="--i:3">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    phase 2 · capture &amp; document as tokens
+  </div>
+
+  <!-- Phase 2: Capturing and documenting tokens -->
+  <div class="section section--amber" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Capturing &amp; Documenting · steps 6–10</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">6</div>
+        <div><div class="step-title">Record both color spaces</div><div class="step-desc"><strong>OKLCH</strong> for perceptual editing/theming, <strong>sRGB hex</strong> for contexts needing a literal value (data-URIs).</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--red">7</div>
+        <div><div class="step-title">Comment source + flag "baked" values</div><div class="step-desc">Note the source CSS file per token; flag values hard-coded into a generated output — they need manual re-sync when the source token changes.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">8</div>
+        <div><div class="step-title">Light + dark theme variants</div><div class="step-desc">All four-value substitutions for a complete palette swap — not just the primary color.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">9</div>
+        <div><div class="step-title">Version-control the real values</div><div class="step-desc">Never leave a generic/placeholder token doc in the repo once real brand values are known.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--amber">10</div>
+        <div><div class="step-title">Token names are the API</div><div class="step-desc">Rename/remove = <strong>MAJOR</strong> (breaks every consumer). Add a new token = <strong>MINOR</strong>.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Phase 3 + Gotchas -->
+  <div class="two-col" style="--i:5">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Extending an Existing System · steps 11–12</div>
+      <div class="ve-card ve-card--violet" style="margin-bottom:8px">
+        <div class="title">Derive, don't invent</div>
+        <div class="desc">New tokens come from existing primitives — e.g. a "projection" type scale derived from container-query percentages of the base ramp, so it inherits proportional relationships instead of drifting.</div>
+      </div>
+      <div class="ve-card ve-card--violet">
+        <div class="title">Reproducible asset generation</div>
+        <div class="desc">Document extraction rationale in the PR, commit a high-res master asset, build a script that deterministically scales/keys/crops from it — re-provisioning becomes a script re-run.</div>
+      </div>
+    </div>
+    <div class="section section--red">
+      <div class="section-label"><span class="dot"></span> Gotchas</div>
+      <ul class="princ-list">
+        <li>Markdown-converted content silently discards the CSS you need — always fetch raw HTML/CSS.</li>
+        <li>Page-builder frameworks (Divi and similar) pollute occurrence-count ranking with signature default colors.</li>
+        <li>A <code>baked</code> token is a hidden maintenance liability — comment it or it silently drifts from the source.</li>
+        <li>Token <strong>names</strong> are the stable contract, not just values — a name change/removal breaks downstream.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Lifecycle -->
+  <div class="section section--slate" style="--i:6">
+    <div class="section-label"><span class="dot"></span> End-to-End Lifecycle</div>
+    <div class="lifecycle">
+      <span class="lc-node">fetch raw CSS</span><span class="lc-sep">→</span>
+      <span class="lc-node">rank colors</span><span class="lc-sep">→</span>
+      <span class="lc-node">filter defaults</span><span class="lc-sep">→</span>
+      <span class="lc-node">recreate assets</span><span class="lc-sep">→</span>
+      <span class="lc-node">record OKLCH+hex</span><span class="lc-sep">→</span>
+      <span class="lc-node">flag baked</span><span class="lc-sep">→</span>
+      <span class="lc-node">version tokens</span><span class="lc-sep">→</span>
+      <span class="lc-node">extend system</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+</content>

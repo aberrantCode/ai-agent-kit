@@ -1,5 +1,6 @@
 ---
 name: worldview-layer-scaffold
+category: Research & OSINT
 description: Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern — DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.
 ---
 

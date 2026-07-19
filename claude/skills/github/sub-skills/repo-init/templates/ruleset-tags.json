@@ -1,0 +1,17 @@
+{
+  "_comment": "Tag ruleset. Makes published release tags immutable: a tag cannot be deleted or repointed at a different commit. This is what guarantees that a consumer pinning v1.4.0 gets the same bytes the release notes describe. Consequence: a bad tag is fixed by publishing a new version, never by moving the old one.",
+  "name": "Protect release tags",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/tags/v*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" }
+  ],
+  "bypass_actors": []
+}

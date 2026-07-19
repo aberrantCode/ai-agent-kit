@@ -1,5 +1,6 @@
 ---
 name: gpu-workload-placement-and-arbitration
+category: Infrastructure & Ops
 description: Use when planning or deploying services that touch a GPU (ML inference, image/video generation, upscaling) and multiple such services must share one physical card. Covers deciding which services need direct GPU access, designing serialized arbitration so processes don't collide, and validating VRAM coexistence with no regressions.
 status: active
 version: 2026-07-05
@@ -37,3 +38,7 @@ version: 2026-07-05
 - A service that "can see" the GPU isn't the same as one that's safe to run concurrently — visibility and arbitration are separate concerns.
 - Stale or frozen healthchecks can mask a wedged GPU process; always confirm with a live `nvidia-smi` process-table read, not just container health status.
 - Don't rely on total-VRAM headroom alone — validate the timeline, not just the peak, since transient spikes during model load/unload are where OOMs happen.
+
+## Diagram
+
+[View diagram](diagram.html)

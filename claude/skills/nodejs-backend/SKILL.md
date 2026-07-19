@@ -1,5 +1,6 @@
 ---
 name: nodejs-backend
+category: Languages & Runtimes
 description: Node.js backend patterns with Express/Fastify, repositories
 ---
 

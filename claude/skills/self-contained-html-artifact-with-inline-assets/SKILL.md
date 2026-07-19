@@ -1,5 +1,6 @@
 ---
 name: self-contained-html-artifact-with-inline-assets
+category: Frontend
 description: Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests — no CDNs, no relative-path assets, no build step — and correctly render in both light and dark themes.
 status: active
 version: 2026-07-05
@@ -28,3 +29,7 @@ Whenever a deliverable needs to be portable enough to email, copy to a USB drive
 - Testing theme appearance with an active CSS transition captures a blended, wrong-looking frame — always disable transitions before a theme screenshot.
 - "Opens in a browser" is not the same as "has zero external requests" — check the network tab, not just visual rendering, especially when a strict CSP is a hard requirement.
 - Don't let the generated `dist/` artifact become the source of truth — always edit the modular source pieces and regenerate.
+
+## Diagram
+
+[View diagram](diagram.html)
