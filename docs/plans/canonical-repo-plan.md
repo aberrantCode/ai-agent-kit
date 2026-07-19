@@ -425,10 +425,18 @@ then escalate to erik.
 
 ## Backlog (recorded, not scheduled)
 
-- **P3 execution** — CHANGELOG-per-release + published SHA256 for `install-skills.ps1`
-  belong to the `/release` flow (github skill, reorg-governed). Coordinate with the
-  github bundle rather than tasking it here; T3's `scripts/README.md` documents the
-  SHA256 verification step for consumers once releases carry it.
+- **P3 execution — CHANGELOG-per-release: done.** The archive was in the MISSING
+  state of its own Release-Automation Standard (no generator, no `.github/`), which
+  is why `CHANGELOG.md` sat three releases stale at v0.5.0. Resolved by installing
+  `scripts/Generate-Changelog.ps1` + `.github/workflows/release.yml` verbatim from
+  `claude/skills/github/sub-skills/release-init/templates/`, rebuilding the changelog
+  across all 9 tags, and adding a `changelog-staleness` check to `validate.ps1` so the
+  gap cannot silently reopen. Note this does **not** reverse P2: the *validation* gate
+  stays local; `release.yml` only publishes a GitHub Release on an already-cut tag.
+- **P3 execution — published SHA256** for `install-skills.ps1` remains open; it belongs
+  to the `/release` flow (github skill, reorg-governed). Coordinate with the github
+  bundle rather than tasking it here; T3's `scripts/README.md` documents the SHA256
+  verification step for consumers once releases carry it.
 - Hosted-CI mirror of the T8 local validation gate (P2 as modified).
 - OQ1 asset-first layout study (post reorg iteration 26).
 - OQ2 Python ports of all PowerShell lifecycle scripts (contract = requirements §6

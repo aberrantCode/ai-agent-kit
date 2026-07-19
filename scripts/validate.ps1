@@ -29,6 +29,18 @@
          audit's own exit-code contract (0 = clean/warnings-only, 1 = any
          error-severity finding, 2 = execution failure) is propagated as-is.
 
+      3. Changelog staleness — every release tag (`v*`) must have a matching
+         `## [<version>]` section in CHANGELOG.md. This is deliberately NOT the
+         byte-equality check used for CATALOG.md in (1): CATALOG.md derives from
+         the committed manifest.json, so regenerate-and-compare is stable, but
+         CHANGELOG.md derives from HEAD — any commit invalidates it, and the very
+         commit that refreshes it invalidates it again, so byte-equality would be
+         unsatisfiable and the gate would never be green. Only the *released*
+         sections are immutable (each derives from `prevTag..tag`), so only their
+         presence is asserted; the volatile `[Unreleased]` section is ignored.
+         This is the STALE CHANGELOG condition defined by the Release-Automation
+         Standard (claude/skills/github/sub-skills/release-init/SKILL.md). [error]
+
     Working tree safety: CATALOG.md is regenerated in place (via -Force) purely
     to obtain byte-for-byte output identical to what a committed regeneration
     would produce, then its original bytes (captured before the regeneration,
@@ -63,9 +75,9 @@
 
 .NOTES
     Exit codes (requirements §6, mirrors audit.ps1's refinement):
-      0  clean — CATALOG.md is fresh and audit.ps1 exited 0
-      1  findings — CATALOG.md is stale, and/or audit.ps1 exited 1
-         (error-severity findings present)
+      0  clean — CATALOG.md and CHANGELOG.md are fresh and audit.ps1 exited 0
+      1  findings — CATALOG.md is stale, CHANGELOG.md is missing a released
+         section, and/or audit.ps1 exited 1 (error-severity findings present)
       2  execution failure — could not complete validation (missing
          prerequisite script, no pwsh/python on PATH, unexpected exception, or
          audit.ps1 itself exited 2)
@@ -131,6 +143,12 @@ $catalogResult = [ordered]@{
     stale   = $false
     message = ''
 }
+$changelogResult = [ordered]@{
+    checked = $false
+    stale   = $false
+    message = ''
+    missing = @()
+}
 $auditResult = $null
 $auditExitCode = $null
 
@@ -188,6 +206,42 @@ try {
     }
 
     # -----------------------------------------------------------------------
+    # Check 3: CHANGELOG.md carries a section for every release tag.
+    # Read-only — no regeneration, so no working-tree restoration is needed.
+    # -----------------------------------------------------------------------
+    $changelogPath = Join-Path $RepoRoot 'CHANGELOG.md'
+    $tags = @(git -C $RepoRoot tag -l 'v*' --sort=v:refname 2>$null | Where-Object { $_.Trim() -ne '' })
+
+    if ($tags.Count -eq 0) {
+        # Untagged repo: the whole history lives under [Unreleased] by design.
+        $changelogResult.checked = $true
+        $changelogResult.message = 'No release tags — nothing to assert.'
+    }
+    elseif (-not (Test-Path -LiteralPath $changelogPath)) {
+        $changelogResult.checked = $true
+        $changelogResult.stale = $true
+        $changelogResult.missing = $tags
+        $changelogResult.message = 'CHANGELOG.md is missing — run: pwsh ./scripts/Generate-Changelog.ps1'
+    }
+    else {
+        $changelogText = [System.IO.File]::ReadAllText($changelogPath)
+        # Ordinal, culture-invariant containment — section headers are literal.
+        $missing = @($tags | Where-Object {
+            -not $changelogText.Contains(("## [{0}]" -f $_.TrimStart('v')), [StringComparison]::Ordinal)
+        })
+
+        $changelogResult.checked = $true
+        $changelogResult.missing = $missing
+        if ($missing.Count -gt 0) {
+            $changelogResult.stale = $true
+            $changelogResult.message = "CHANGELOG.md has no section for: $($missing -join ', ') — run: pwsh ./scripts/Generate-Changelog.ps1"
+        }
+        else {
+            $changelogResult.message = "All $($tags.Count) release tag(s) documented."
+        }
+    }
+
+    # -----------------------------------------------------------------------
     # Check 2: audit.ps1 (covers manifest freshness, frontmatter, category,
     # installed-from, secrets, catalog parity, mirror-gap, diagrams).
     # -----------------------------------------------------------------------
@@ -213,7 +267,7 @@ if ($exitCode -ne 2) {
     elseif ($auditExitCode -eq 2) {
         $exitCode = 2
     }
-    elseif ($catalogResult.stale -or $auditExitCode -eq 1) {
+    elseif ($catalogResult.stale -or $changelogResult.stale -or $auditExitCode -eq 1) {
         $exitCode = 1
     }
     else {
@@ -231,6 +285,7 @@ if ($Json) {
     [pscustomobject]@{
         summary = [pscustomobject]@{
             catalogStale    = $catalogResult.stale
+            changelogStale  = $changelogResult.stale
             auditExitCode   = $auditExitCode
             auditErrors     = if ($auditResult) { $auditResult.summary.errors } else { $null }
             auditWarnings   = if ($auditResult) { $auditResult.summary.warnings } else { $null }
@@ -239,8 +294,9 @@ if ($Json) {
             runtimeSeconds  = $runtimeSeconds
             executionError  = if ($script:ExecError) { "$($script:ExecError)" } else { $null }
         }
-        catalog  = $catalogResult
-        audit    = $auditResult
+        catalog   = $catalogResult
+        changelog = $changelogResult
+        audit     = $auditResult
     } | ConvertTo-Json -Depth 8
 }
 else {
@@ -249,6 +305,11 @@ else {
             Check  = 'catalog-staleness'
             Status = if (-not $catalogResult.checked) { 'SKIPPED' } elseif ($catalogResult.stale) { 'FAIL' } else { 'PASS' }
             Detail = $catalogResult.message
+        }
+        [pscustomobject]@{
+            Check  = 'changelog-staleness'
+            Status = if (-not $changelogResult.checked) { 'SKIPPED' } elseif ($changelogResult.stale) { 'FAIL' } else { 'PASS' }
+            Detail = $changelogResult.message
         }
         [pscustomobject]@{
             Check  = 'audit.ps1'
