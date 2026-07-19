@@ -1,0 +1,28 @@
+#!/bin/sh
+# Managed by github:repo-init — conventional-commit format gate. OFF by default;
+# enable by adding "commit-msg" to hooks.set in .github/repo-standard.yml.
+#
+# The release automation derives semantic versions from these prefixes, so a
+# malformed message is not a style nit - it silently drops a change out of the
+# generated changelog.
+
+MSG_FILE="$1"
+FIRST_LINE=$(head -n1 "$MSG_FILE")
+
+# Allow merge, revert, and fixup commits through untouched.
+case "$FIRST_LINE" in
+  Merge*|Revert*|fixup!*|squash!*) exit 0 ;;
+esac
+
+if ! printf '%s' "$FIRST_LINE" | grep -qE '^(feat|fix|refactor|docs|test|chore|perf|ci)(\([a-z0-9._-]+\))?!?: .+'; then
+  echo ""
+  echo "  Commit message does not match conventional-commit format."
+  echo ""
+  echo "    <type>[(scope)][!]: <description>"
+  echo "    types: feat fix refactor docs test chore perf ci"
+  echo ""
+  echo "  Got: $FIRST_LINE"
+  exit 1
+fi
+
+exit 0

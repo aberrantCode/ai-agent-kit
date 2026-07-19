@@ -1,0 +1,37 @@
+#!/bin/sh
+# Managed by github:repo-init — full local validation gate.
+#
+# This is the local-first replacement for a CI workflow. It is the LAST gate
+# before code leaves the machine, so it runs the repo's full validator rather
+# than a fast subset.
+#
+# Bypass with `git push --no-verify` when you genuinely need to. That is a
+# deliberate escape hatch, not a defect: the server-side guarantee in this
+# model is the pull-request requirement in the branch ruleset, plus GitHub's
+# secret-scanning push protection.
+#
+# Note: on this workstation a Claude Code PreToolUse hook also fires on push
+# (opens Zed for review). That is a harness-layer hook and is independent of
+# this one; both will run.
+
+set -e
+
+FOUND=0
+
+if [ -f scripts/validate.ps1 ] && command -v pwsh >/dev/null 2>&1; then
+  FOUND=1
+  pwsh -NoProfile -File scripts/validate.ps1
+elif [ -f scripts/validate.sh ]; then
+  FOUND=1
+  sh scripts/validate.sh
+elif [ -f Makefile ] && grep -qE '^validate:' Makefile; then
+  FOUND=1
+  make validate
+fi
+
+if [ "$FOUND" -eq 0 ]; then
+  echo "  No validate script found - local gate is a no-op for this repo."
+  echo "  Add scripts/validate.sh or scripts/validate.ps1 to enable it."
+fi
+
+exit 0
