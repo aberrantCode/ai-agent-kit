@@ -17,6 +17,16 @@
       * CATALOG.md parity, both directions, if CATALOG.md exists  [error]
       * Claude<->Codex mirror gap ............................. [info]
       * Missing diagram.html ................................. [info]
+      * Profile skill shadowing a bundle sub-skill ............ [warn]
+
+    The profile-shadowing check is the one check that reads outside the archive. A
+    loose top-level skill in `~/.claude/skills/<name>` whose name matches a sub-skill
+    of an installed bundle wins name resolution over the bundle's copy, so `/<name>`
+    silently runs the stale loose file instead of the maintained bundle sub-skill.
+    Severity is `warn`, never `error`: this is a condition of one developer's profile,
+    and validate.ps1 gates pull requests on this script's exit code — an archive PR
+    must never fail because of unrelated local state. The check no-ops when the
+    profile directory does not exist (CI, fresh clones).
 
     Frontmatter parsing is delegated entirely to
     `generate-manifest.py --validate --json` — one parser for the whole repo, two
@@ -30,6 +40,13 @@
 
 .PARAMETER Json
     Emit findings + summary as a JSON document to stdout instead of a console table.
+
+.PARAMETER ProfileRoot
+    Installed-skills directory to check for bundle shadowing. Defaults to
+    `~/.claude/skills`. Ignored when the path does not exist.
+
+.PARAMETER SkipProfile
+    Skip the profile-shadowing check entirely (archive-only audit).
 
 .OUTPUTS
     Console table (default) or JSON (-Json). Findings are also reflected in the exit code.
@@ -54,7 +71,9 @@
 [CmdletBinding()]
 param(
     [string]$RepoRoot,
-    [switch]$Json
+    [switch]$Json,
+    [string]$ProfileRoot,
+    [switch]$SkipProfile
 )
 
 Set-StrictMode -Version Latest
@@ -284,6 +303,56 @@ try {
     foreach ($name in $codexNames) {
         if (-not $claudeSet.Contains($name)) {
             Add-Finding info 'mirror-gap' $name 'present in codex but absent from claude'
+        }
+    }
+
+    # --- CHECK 8: profile skill shadowing a bundle sub-skill [warn] -----------
+    # A loose top-level skill whose name matches a sub-skill of an INSTALLED bundle
+    # wins name resolution, so /<name> runs the stale loose copy and the bundle's
+    # maintained sub-skill never loads. This is how /merge and /release silently
+    # resolved to six stale standalone skills until 2026-07-19.
+    #
+    # Reads outside the archive by design, so it is guarded three ways: it is
+    # skippable, it no-ops when the profile is absent, and it can only ever emit
+    # `warn` - an archive PR must not fail on one developer's local state.
+    if (-not $SkipProfile) {
+        if (-not $ProfileRoot) {
+            $homeDir = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
+            if ($homeDir) { $ProfileRoot = Join-Path $homeDir '.claude/skills' }
+        }
+
+        if ($ProfileRoot -and (Test-Path -LiteralPath $ProfileRoot)) {
+            $installed = @(Get-ChildItem -LiteralPath $ProfileRoot -Directory -ErrorAction SilentlyContinue)
+
+            # sub-skill name -> owning bundle name
+            $subSkillOwner = @{}
+            foreach ($bundle in $installed) {
+                $subDir = Join-Path $bundle.FullName 'sub-skills'
+                if (-not (Test-Path -LiteralPath $subDir)) { continue }
+                foreach ($sub in @(Get-ChildItem -LiteralPath $subDir -Directory -ErrorAction SilentlyContinue)) {
+                    # First bundle wins; a name owned by two bundles is reported against
+                    # the first encountered, which is enough to surface the collision.
+                    if (-not $subSkillOwner.ContainsKey($sub.Name)) {
+                        $subSkillOwner[$sub.Name] = $bundle.Name
+                    }
+                }
+            }
+
+            foreach ($top in $installed) {
+                if (-not $subSkillOwner.ContainsKey($top.Name)) { continue }
+                # A bundle is not a shadow of its own sub-skill namespace.
+                if ($subSkillOwner[$top.Name] -eq $top.Name) { continue }
+
+                $owner = $subSkillOwner[$top.Name]
+                $hasSkillMd = Test-Path -LiteralPath (Join-Path $top.FullName 'SKILL.md')
+                $detail = if ($hasSkillMd) { 'loose SKILL.md' } else { 'empty stub directory' }
+
+                Add-Finding warn 'profile-shadowing' $top.Name (
+                    "$detail in the profile shadows sub-skill '$($top.Name)' of bundle " +
+                    "'$owner' - /$($top.Name) resolves to the loose copy, not the bundle. " +
+                    "Import anything unique to the archive, then delete " +
+                    "$(Join-Path $ProfileRoot $top.Name)")
+            }
         }
     }
 }

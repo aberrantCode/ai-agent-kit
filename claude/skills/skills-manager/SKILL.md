@@ -336,6 +336,33 @@ Run a comprehensive read-only health check across the entire archive. No changes
 4. **Malformed frontmatter**: `SKILL.md` files missing required `name:` or `description:` fields
 5. **Deprecated installs**: scan all projects under `C:\development\` for installed skills (`installed-from: ai-agent-kit`) where the archive copy has `status: deprecated` — list project and skill name
 6. **Codex/Gemini parity gaps**: README rows with `✓` only in the Claude column — grouped by subsection, sorted by description length as a proxy for skill complexity (longer = more porting value)
+7. **Profile skill shadowing**: loose top-level skills in `~/.claude/skills/<name>/` whose name matches a **sub-skill of an installed bundle**
+
+### Check 7 — profile skill shadowing
+
+A loose top-level skill wins name resolution over a bundle's sub-skill of the same
+name. `/<name>` then runs the loose copy, and the bundle's maintained sub-skill never
+loads — silently, with no error. This is not hypothetical: six standalone skills
+(`ship`, `merge`, `release`, `prune`, `commit`, `publish`) shadowed the `github`
+bundle's sub-skills until 2026-07-19, so `/merge` and `/release` had been resolving
+to stale copies. Four more (`continue-tasks`, `reinit`, `review-tasks`,
+`update-tasks`) shadowed `project-manager` sub-skills and were removed the same day.
+
+Implemented in `scripts/audit.ps1` as check `profile-shadowing`. It builds a
+sub-skill-name → owning-bundle map from every installed bundle, then flags any
+top-level directory whose name appears in it. A bundle is never treated as a shadow
+of its own sub-skill namespace.
+
+**Severity is `warn`, never `error`.** `validate.ps1` gates pull requests on
+`audit.ps1`'s exit code, and an archive PR must not fail because of state in one
+developer's profile. The check no-ops when the profile directory is absent (CI,
+fresh clones) and can be disabled with `-SkipProfile`; `-ProfileRoot` overrides the
+default `~/.claude/skills`.
+
+**Resolution order is mandatory — never delete first.** For each finding: diff the
+loose copy against the bundle sub-skill; if it holds anything unique, `/import-skill`
+that content into the archive *before* removing anything. Only a copy that is a
+strict subset of the bundle version is safe to delete outright.
 
 ### Output format
 
@@ -346,6 +373,7 @@ Run a comprehensive read-only health check across the entire archive. No changes
 │ README missing rows (N): skill-dir has no README entry         │
 │ Bad frontmatter (N):    skill-c (missing description)          │
 │ Deprecated installs (N): project-x uses deprecated skill-d     │
+│ Profile shadowing (N):  merge shadows github/sub-skills/merge  │
 │ Parity gaps — Claude only (N skills, top candidates):          │
 │   - security (Security & Credentials)                          │
 │   - typescript (Languages & Runtimes)                          │
