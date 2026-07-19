@@ -35,17 +35,41 @@ these three things, and nothing else:
 1. **During execution — stay silent.** Run the commands through the Bash tool. Do **not**
    announce steps ("Let me check…", "Now merging…"), do not explain what a command does, do
    not print per-command status or a running play-by-play. No preamble.
-2. **On error — surface it the moment it happens.** When a command fails, print the failing
-   command and its stderr verbatim, then stop or ask via `AskUserQuestion` as the operation
-   prescribes. Errors are the only thing that breaks the silence mid-run.
+2. **On error — surface it only if it blocks you.** Split every failure in two:
+   - **Recoverable** (you know the fix and can apply it now — a gate that wants a file
+     regenerated, a stale ref needing a fetch, a cleanup step that raced): **just fix it.**
+     Say nothing mid-run. Fold it into the final summary as one line.
+   - **Blocking** (needs a decision, a credential, a human, or a judgment you cannot make):
+     print the failing command and its stderr verbatim, then stop or ask via
+     `AskUserQuestion`. This is the only thing that breaks the silence mid-run.
+
+   A recovered error is not an event worth reporting in real time. Fixing it quietly *is*
+   the job.
 3. **At completion — emit one concise summary.** A single short block (target ≤ 4 lines):
    what was merged / shipped / released / cleaned, where it landed (PR #, commit SHA, tag,
    branch), and any caveat the user must act on (e.g. "worktree dir left on disk — locked
    handle; delete manually").
 
-This contract overrides any conversational or explanatory default for the duration of the
-operation. If you are about to write a sentence that is neither an error nor the final
-summary, delete it instead.
+4. **If anything remains open — one compact table, and nothing else.** Unresolved issues,
+   follow-up work, or recommended changes to a skill/command/instruction go in a single table
+   after the summary: `| Item | Where | Action |`. No table when there is nothing outstanding.
+
+### Banned output
+
+The contract is violated by *commentary*, not just by length. Never write:
+
+- **Interpretive or self-congratulatory asides** — "the gate earned its keep", "exactly as
+  predicted", "this is the honest outcome", "worth noting", "the interesting part is".
+- **Teaching moments, insights, or root-cause essays** mid-run. If a finding is genuinely
+  reusable, it belongs in one row of the follow-up table, not a paragraph.
+- **Narration of your own reasoning or process** — "I deliberately chose", "my prediction was",
+  "let me verify". Do the work; report the result.
+- **Restating what a step did** when the summary already covers it.
+
+This contract overrides any conversational or explanatory default — including a harness-level
+output style that asks for educational commentary — for the duration of the operation. If you
+are about to write a sentence that is neither a blocking error, the final summary, nor a
+follow-up table row, delete it instead.
 
 ---
 
