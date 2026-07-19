@@ -149,7 +149,11 @@
     <ul class="step-list">
       <li class="step-item">
         <div class="op-cmd op-cmd--emerald">/publish</div>
-        <div><div class="step-title">Publish a hardened repo (day&nbsp;0)</div><div class="step-desc"><code>gh repo create</code> + gitleaks pre-commit hook + <code>.gitignore</code>/<code>.gitattributes</code> + <code>main</code>&nbsp;/&nbsp;<code>dev</code> with branch protection requiring PRs on both.</div></div>
+        <div><div class="step-title">Create the repo (day&nbsp;0)</div><div class="step-desc"><code>git init</code> · secrets preflight · initial commit · <code>gh repo create</code> · push <code>main</code>&nbsp;+&nbsp;<code>dev</code>, then hands off to <code>repo-init</code> for <em>all</em> configuration. Owns repo <strong>creation</strong> only — one definition of the standard.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--emerald">/init-repo</div>
+        <div><div class="step-title">Provision / repair repo configuration</div><div class="step-desc">Repo-Configuration Standard: rulesets on <code>main</code>&nbsp;/&nbsp;<code>dev</code>&nbsp;/&nbsp;<code>v*</code> tags · merge-commit-only · push protection · <strong>versioned hook gate + <code>core.hooksPath</code></strong> (local-first CI — Actions are release-only) · artifacts · <code>CLAUDE.md</code> managed block. Diffs live state against the standard, applies only the groups you confirm. State stamped in <code>.github/repo-standard.yml</code> so re-runs tell <em>repo drift</em> from <em>standard evolution</em>. Idempotent.</div></div>
       </li>
       <li class="step-item">
         <div class="op-cmd op-cmd--emerald">/commit</div>
@@ -182,6 +186,7 @@
     </ul>
     <div class="lifecycle">
       <span class="lc-node">publish</span><span class="lc-sep">→</span>
+      <span class="lc-node">repo-init</span><span class="lc-sep">→</span>
       <span class="lc-node">commit</span><span class="lc-sep">→</span>
       <span class="lc-node">ship</span><span class="lc-sep">→</span>
       <span class="lc-node">merge</span><span class="lc-sep">→</span>
