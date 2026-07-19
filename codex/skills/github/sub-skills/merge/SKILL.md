@@ -1,6 +1,6 @@
 ---
 name: github-merge
-description: Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers, branches, worktrees, or the current context) into dev with a merge commit, then clean up the worktree, local branch, and remote branch in the correct order. Honors the parent skill's Output Contract — silent run, errors as they occur, one concise summary.
+description: Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers, branches, worktrees, or the current context) into dev with a merge commit, then clean up the worktree, local branch, and remote branch in the correct order. Honors the Output Contract inlined in this file — silent run, errors as they occur, one concise summary.
 ---
 
 # Operation: merge
@@ -10,7 +10,7 @@ up. The merge unit is always a **PR** — targets that are branches or worktrees
 their open PR. This operation does not create PRs; if a branch has commits but no open PR,
 stop and point the user at `/ship`.
 
-Obey the parent **Output Contract**: no narration, errors surfaced as they occur, one concise
+Obey the **Output Contract** below: no narration, errors surfaced as they occur, one concise
 summary at the end.
 
 ---

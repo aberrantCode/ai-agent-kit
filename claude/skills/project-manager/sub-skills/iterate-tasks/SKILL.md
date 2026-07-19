@@ -208,9 +208,40 @@ Document `/loop /iterate-tasks` as the canonical pairing for unattended runs.
 - **The next-next prompt is the contract.** Every invocation MUST end with either
   a copy-ready next prompt or the explicit "pipeline is idle" terminal message.
   Never end the turn ambiguously.
-- **Do not modify feature specs.** Spec authority rule from the parent skill applies.
-- **Do not skip verification.** The Verification Gate from `/continue-tasks` applies
-  to any code-changing subagent dispatched here.
+- **Do not modify feature specs.** Spec authority applies in full — see below.
+- **Do not skip verification.** The Verification Gate applies to any code-changing
+  subagent dispatched here — see below.
+
+## Verification Gate (binding — inlined, not a reference)
+
+The `/iterate-tasks` command may load this file without the parent `project-manager`
+SKILL.md in context, in which case a pointer to "the Verification Gate from
+`/continue-tasks`" resolves to nothing. The gate is therefore restated here in full
+and is binding either way.
+
+Implementation, API, build, security, UI, backend/frontend/database, migration, refactor, cleanup,
+and other code-changing tasks require verification before final completion. A plan task is not
+final until a matching review/test/security/e2e task covering the same CAP-ID and artifacts succeeds.
+If no such task exists, insert one after implementation success.
+
+If a completion block reports `Tests: passing: false`, create corrective build/test work and do not
+mark the implementation done.
+
+**Runner awareness.** The gate reads `docs/workflow/runners.md` (populated by `/init-project` and
+refreshed by `/reinit`) as the source of truth for which test runners exist and where they live —
+this matters in monorepos where pytest, npm test, cargo test, etc. are nested under `backend/`,
+`frontend/`, `packages/*`, `apps/*`, or `services/*` rather than at the repo root. When inserting a
+verification task, quote the relevant runner command(s) from `runners.md` into the task body so the
+verifier doesn't re-guess. If `runners.md` is missing or empty, run
+`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warn the user that the
+runner list should be confirmed via `/reinit` for deterministic future runs.
+
+**Spec authority (inlined for the same reason).** Anything changing product scope or behavior
+goes through the FEATURE lane (spec → plan → task); bugs, chores, and tech-debt go through the
+CHORE lane (backlog-item → task). Both converge on the same task format, guard, verification
+gate, archive, and STATUS view. The chore lane does **not** weaken spec authority — it is
+machine-enforced by `scripts/guard-pm-flow.ps1` against `docs/workflow/scope-manifest.md`, and a
+chore task that touches `product_scope` hard-fails at the guard.
 
 ## Output Contract
 

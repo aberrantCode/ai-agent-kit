@@ -1,11 +1,11 @@
 ---
 name: github-release
-description: Sub-skill of `github`. Promote dev to main as a versioned production release — rebase dev if behind, auto-derive the next semantic version from conventional commits, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the parent Output Contract.
+description: Sub-skill of `github`. Promote dev to main as a versioned production release — rebase dev if behind, auto-derive the next semantic version from conventional commits, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the Output Contract inlined in this file.
 ---
 
 # Operation: release
 
-**Goal.** Promote `dev` → `main` as a versioned release. Obey the parent **Output Contract**:
+**Goal.** Promote `dev` → `main` as a versioned release. Obey the **Output Contract** below:
 silent run, errors as they occur, one concise summary.
 
 ---
