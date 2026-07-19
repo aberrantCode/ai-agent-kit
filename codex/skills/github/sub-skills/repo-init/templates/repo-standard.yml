@@ -1,0 +1,70 @@
+# Repo-Configuration Standard — applied state.
+#
+# Written and maintained by the `github` skill's repo-init operation (/init-repo).
+# This file is the record of what was applied and the place to declare deliberate
+# deviations. Re-running /init-repo diffs live state against BOTH this file and the
+# skill's current standard, so it can tell repo drift apart from standard evolution.
+#
+# Edit `waivers` by hand when a rule genuinely cannot apply here. Everything else is
+# managed — hand edits will show up as drift on the next run.
+
+standardVersion: 1.0.0
+appliedAt: <YYYY-MM-DD>
+appliedBy: repo-init
+
+protection:
+  model: rulesets
+  branches: [main, dev]
+  approvals: 0
+  tags: "v*"
+  # Local-first CI: checks run in git hooks, not Actions. Intentionally empty.
+  requiredStatusChecks: []
+
+merge:
+  commit: true
+  squash: false
+  rebase: false
+  deleteBranchOnMerge: true
+  autoMerge: true
+
+security:
+  vulnerabilityAlerts: true
+  secretScanning: true
+  pushProtection: true
+
+actions:
+  # release-only: tag-triggered release.yml is allowed; push/pull_request CI is drift.
+  policy: release-only
+  defaultWorkflowPermissions: read
+  canApprovePullRequestReviews: false
+
+hooks:
+  # Discovered from core.hooksPath, not imposed. A repo already using
+  # scripts/git-hooks/ keeps it.
+  path: .githooks
+  set: [pre-commit, pre-push]
+
+artifacts:
+  - gitignore
+  - gitattributes
+  - gitleaks
+  - pr-template
+  - issue-templates
+  - security
+  - contributing
+
+claudeMd:
+  # repo-init maintains ONLY the <!-- repo-init:begin --> ... <!-- repo-init:end -->
+  # span. Everything outside those markers belongs to other writers and is preserved.
+  managedBlock: true
+  blockVersion: 1.0.0
+
+# Deliberate deviations. Each MUST carry a reason. Waived items are reported as
+# waived, never as drift, and are never re-offered.
+#
+# waivers:
+#   - key: security.secretScanning
+#     reason: private repo, no GitHub Advanced Security entitlement
+#   - key: actions.policy
+#     reason: upstream fork requires the inherited CI workflow
+waivers: []

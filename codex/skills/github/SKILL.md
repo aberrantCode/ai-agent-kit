@@ -8,7 +8,8 @@ description: >
   a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as
   "merge 1209", "merge this branch", "merge the current worktree", "ship it", "cut a release",
   "set up releases", "release init", "provision release workflow", "fix changelog automation",
-  "commit this", "clean up branches", "publish this repo" — even when the word "git" is absent. This is a thin
+  "commit this", "clean up branches", "publish this repo", "init the repo", "harden this repo",
+  "set up branch protection", "apply the repo standard" — even when the word "git" is absent. This is a thin
   orchestrator: match the request to one operation below and run that operation's sub-skill
   against the current repo with minimal terminal output.
 ---
@@ -68,6 +69,7 @@ never guess silently.
 | Operation | Sub-skill |
 |---|---|
 | publish | `sub-skills/publish/SKILL.md` |
+| repo-init | `sub-skills/repo-init/SKILL.md` |
 | commit | `sub-skills/commit/SKILL.md` |
 | ship | `sub-skills/ship/SKILL.md` |
 | merge | `sub-skills/merge/SKILL.md` |

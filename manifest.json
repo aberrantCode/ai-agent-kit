@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-16",
+  "generated": "2026-07-19",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -241,7 +241,7 @@
           "category": "Code Quality"
         },
         "github": {
-          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; pruning stale branches and worktrees; or creating, working in, and tearing down an isolated per-task worktree. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", \"create a worktree\", \"set up an isolated workspace\", \"remove the worktree\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; pruning stale branches and worktrees; bringing a repo's configuration up to standard (branch protection, merge policy, security settings, local hook gate); or creating, working in, and tearing down an isolated per-task worktree. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", \"init the repo\", \"initialize this repo\", \"harden this repo\", \"set up branch protection\", \"why can I push straight to dev\", \"apply the repo standard\", \"create a worktree\", \"set up an isolated workspace\", \"remove the worktree\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
           "category": "Foundations & Workflow",
           "has_commands": true,
           "has_sub_skills": true
@@ -780,7 +780,7 @@
           "category": "Code Quality"
         },
         "github": {
-          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; publishing a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"cut a release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit this\", \"clean up branches\", \"publish this repo\" \u2014 even when the word \"git\" is absent. This is a thin orchestrator: match the request to one operation below and run that operation's sub-skill against the current repo with minimal terminal output.",
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; publishing a new repo; or pruning stale branches and worktrees. Triggers on natural phrasings such as \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"cut a release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit this\", \"clean up branches\", \"publish this repo\", \"init the repo\", \"harden this repo\", \"set up branch protection\", \"apply the repo standard\" \u2014 even when the word \"git\" is absent. This is a thin orchestrator: match the request to one operation below and run that operation's sub-skill against the current repo with minimal terminal output.",
           "category": "Foundations & Workflow",
           "has_sub_skills": true
         },
