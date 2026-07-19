@@ -69,7 +69,7 @@ $sectionMap = [ordered]@{
 # Order in which sections appear within a release
 $sectionOrder = @('Added', 'Changed', 'Fixed', 'Documentation', 'Tests', 'Internal', 'Style', 'Other')
 
-function Parse-CommitSubject {
+function ConvertFrom-CommitSubject {
     param([string]$Subject)
 
     if ($Subject -match '^(?<type>[a-z]+)(?:\([^)]+\))?(?<bang>!?):\s*(?<desc>.+)$') {
@@ -103,7 +103,7 @@ function Get-CommitsInRange {
     $raw | ForEach-Object {
         $parts = $_ -split [char]0x1f, 2
         if ($parts.Count -ne 2) { return }
-        $parsed = Parse-CommitSubject $parts[1]
+        $parsed = ConvertFrom-CommitSubject $parts[1]
         if ($parsed.Type -eq 'release') { return }  # skip the tag-bump commits themselves
         # Unparseable subject + .gitkeep-only diff = directory scaffolding, not a change.
         if ($parsed.Type -eq 'other' -and (Test-ScaffoldOnlyCommit $parts[0])) { return }
@@ -219,6 +219,10 @@ $body | Set-Content -Path $outputPath -Encoding utf8NoBOM
 
 [Console]::OutputEncoding = $previousOutputEncoding
 
-Write-Host "CHANGELOG.md written: $outputPath"
-Write-Host "Tags documented: $($tags.Count)"
-Write-Host "Unreleased commits: $($unreleased.Count)"
+# Summary goes to the information stream, not stdout: callers that capture this
+# script's output (e.g. /release) must not receive these lines as data.
+# -InformationAction Continue is required — $InformationPreference defaults to
+# SilentlyContinue, so a bare Write-Information would silently emit nothing.
+Write-Information "CHANGELOG.md written: $outputPath" -InformationAction Continue
+Write-Information "Tags documented: $($tags.Count)" -InformationAction Continue
+Write-Information "Unreleased commits: $($unreleased.Count)" -InformationAction Continue
