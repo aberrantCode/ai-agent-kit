@@ -11,8 +11,14 @@ proper version header.
 
 ## [Unreleased]
 
+_No user-facing changes recorded._
+
+## [0.9.0] - 2026-07-19
+
 ### Added
 
+- assert every release tag has a changelog section (`d8b5231`)
+- provision release automation and rebuild CHANGELOG (`46758ce`)
 - add repo-init sub-skill and /init-repo command (`d8ac5b0`)
 - add ai-agent-kit badge assets (dark+light) (`ef50bad`)
 - standardize product intent on docs/REQUIREMENTS.md (INITIAL_PROMPT legacy) (`227d411`)
@@ -43,6 +49,7 @@ proper version header.
 
 ### Fixed
 
+- pin UTF-8 decoding and skip scaffolding in changelog template (`23e856a`)
 - repair /init-repo frontmatter YAML (`173eb39`)
 - mark repo-init hook templates executable (`98d1ff1`)
 - tolerate server-side branch auto-delete in merge cleanup (`f19050d`)
@@ -54,6 +61,7 @@ proper version header.
 
 ### Documentation
 
+- record P3 changelog execution as done (`b2cb83e`)
 - fold dry-run findings into the repo-init standard (`d52f895`)
 - register /init-repo, record /init as a built-in collision (`2ce6801`)
 - add theme-aware badge masthead (`4f44c7c`)
