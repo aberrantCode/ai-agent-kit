@@ -1,5 +1,5 @@
 ---
-description: Bring this repository's configuration up to the Repo-Configuration Standard — ruleset-protected main/dev, immutable release tags, merge-commit-only policy, secret-scanning push protection, an active local hook gate, and the standard artifact set. Re-runnable: diffs live state against the standard and applies only the groups you confirm. Responds with minimal output — a concise summary at the end, errors as they occur.
+description: Bring this repository's configuration up to the Repo-Configuration Standard — ruleset-protected main/dev, immutable release tags, merge-commit-only policy, secret-scanning push protection, an active local hook gate, and the standard artifact set. Re-runnable — diffs live state against the standard and applies only the groups you confirm. Responds with minimal output — a concise summary at the end, errors as they occur.
 ---
 
 Apply the `github` skill and execute its `repo-init` operation (`sub-skills/repo-init`).
