@@ -1,0 +1,23 @@
+# gitleaks configuration — consumed by the pre-commit hook and by any manual
+# `gitleaks detect` run. Managed by github:repo-init.
+
+[extend]
+# Start from the maintained upstream ruleset; only add repo-specific exceptions below.
+useDefault = true
+
+[allowlist]
+description = "Repo-specific false positives"
+
+paths = [
+  '''\.gitleaks\.toml$''',
+  '''(^|/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|poetry\.lock|Cargo\.lock)$''',
+  '''(^|/)tests?/fixtures?/''',
+  '''(^|/)docs?/.*\.(md|png|svg)$''',
+]
+
+regexes = [
+  # Documentation placeholders — keep these narrow. A broad allowlist regex here
+  # silently disables scanning for the pattern it matches, everywhere.
+  '''(?i)(example|sample|placeholder|dummy|redacted|xxxxx|your[-_]?(api[-_]?)?key)''',
+  '''sk-(proj-)?x{5,}''',
+]

@@ -1,0 +1,31 @@
+#!/bin/sh
+# Managed by github:repo-init — secret scan on staged changes.
+#
+# Degrades to a warning when gitleaks is absent. A hook that hard-fails on a
+# missing tool makes every commit impossible on a machine that has not been
+# set up yet, which is exactly when a new contributor first hits it.
+
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact --verbose; then
+    echo ""
+    echo "  Secret(s) detected by gitleaks. Commit ABORTED."
+    echo "  False positive? Add an exclusion to .gitleaks.toml"
+    exit 1
+  fi
+else
+  echo "  gitleaks not found - secret scanning skipped for this commit."
+fi
+
+# Fast local validation, if the repo defines one. The full gate runs in pre-push;
+# this only runs a validator that advertises a --quick/--staged fast path, so
+# committing stays cheap.
+for v in scripts/validate.sh scripts/validate.ps1; do
+  [ -f "$v" ] || continue
+  case "$v" in
+    *.ps1) command -v pwsh >/dev/null 2>&1 && pwsh -NoProfile -File "$v" -Quick || true ;;
+    *)     sh "$v" --quick || true ;;
+  esac
+  break
+done
+
+exit 0

@@ -6,10 +6,13 @@ description: >
   merging a pull request, branch, or worktree into dev; shipping working changes through a
   feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
   automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
-  stale branches and worktrees; or creating, working in, and tearing down an isolated per-task
-  worktree. Triggers on "merge 1209", "merge this branch", "merge the
-  current worktree", "ship it", "release", "set up releases", "release init", "provision
-  release workflow", "fix changelog automation", "commit", "clean up branches", "create a
+  stale branches and worktrees; bringing a repo's configuration up to standard (branch
+  protection, merge policy, security settings, local hook gate); or creating, working in, and
+  tearing down an isolated per-task worktree. Triggers on "merge 1209", "merge this branch",
+  "merge the current worktree", "ship it", "release", "set up releases", "release init",
+  "provision release workflow", "fix changelog automation", "commit", "clean up branches",
+  "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
+  "why can I push straight to dev", "apply the repo standard", "create a
   worktree", "set up an isolated workspace", "remove the worktree", and similar
   phrasings — even
   when the word "git" is absent. This is a thin-command bundle: each command names one
@@ -70,6 +73,7 @@ question.
 | Command | Operation | Sub-skill |
 |---|---|---|
 | `/publish` | publish | `sub-skills/publish` |
+| `/init-repo` | repo-init | `sub-skills/repo-init` |
 | `/commit` | commit | `sub-skills/commit` |
 | `/ship` | ship | `sub-skills/ship` |
 | `/merge [targets]` | merge | `sub-skills/merge` |
@@ -88,10 +92,26 @@ recovery, and credential rules. `merge` and `prune` delegate their worktree hand
 so do multi-agent harnesses (agent-manager) that run one worktree per agent.
 
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
-`release-init` sits beside `release`: an idempotent provisioning pass that brings a repo's
-changelog generator + tag-triggered release workflow up to the Release-Automation Standard
-(notes derived from git at tag time — see `sub-skills/release-init`). `release` verifies
-conformance and warns; only `release-init` fixes.
+
+Two `*-init` operations sit beside that lifecycle. Both are idempotent provisioning passes
+that own one standard each, are safe to re-run forever, and never commit — they leave files
+in the working tree for `/ship` to land:
+
+| Operation | Owns | Standard |
+|---|---|---|
+| `repo-init` | repository **configuration** | Repo-Configuration Standard — ruleset-protected `main`/`dev`, immutable `v*` tags, merge-commit-only, push protection, an active local hook gate, the standard artifact set |
+| `release-init` | release **automation** | Release-Automation Standard — notes derived from git at tag time |
+
+`release` verifies release conformance and warns; only `release-init` fixes. `repo-init` and
+`publish` are two entry points onto the same configuration standard: **`publish` owns repo
+creation, `repo-init` owns repo configuration.** `publish` hands off to `repo-init` once the
+repo exists; `repo-init` invokes `publish` when there is no remote yet. Either path converges
+on the same configured repo, and neither duplicates the other's logic.
+
+**Local-first CI.** Repository checks run on this workstation through versioned git hooks,
+not GitHub Actions. Actions are reserved for tag-triggered release automation. The single
+server-side exception is secret-scanning push protection, because a pushed secret is the one
+failure in this model that cannot be undone. `repo-init` owns and enforces that policy.
 When a new thin command is added, append a row here and a sub-skill under `sub-skills/`.
 
 ### Companion commands (not part of this bundle)
@@ -111,9 +131,15 @@ re-implement:
 These hold for every operation, present or future:
 
 - **Protected branches.** Never push directly to `dev` or `main`; never delete them. Feature
-  work merges into `dev` via PR; `dev` merges into `main` only for releases.
+  work merges into `dev` via PR; `dev` merges into `main` only for releases. Enforcement is
+  a **ruleset** per branch (`repo-init` provisions them) — rulesets are used over the legacy
+  branch-protection API because they work on private repos without a paid plan and can also
+  protect tags.
 - **Merge strategy is a merge commit.** Use `--merge` / `--no-ff` to preserve feature-branch
-  history. Never squash a feature branch into `dev`.
+  history. Never squash a feature branch into `dev`. `repo-init` disables squash and rebase
+  merges at the repo level so the GitHub UI cannot violate this either.
+- **Release tags are immutable.** A `v*` tag ruleset blocks deletion and force-update. Fix a
+  bad release by publishing a new version, never by repointing a published tag.
 - **Default merge base is `dev`.** `/merge` targets `dev` unless told otherwise.
 - **Run destructive git/gh from the repo root**, never from inside a secondary worktree —
   `cd "$(git rev-parse --show-toplevel)"` first, and if you are in a worktree, resolve the

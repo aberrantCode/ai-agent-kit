@@ -9,3 +9,10 @@ manifest.json text eol=lf
 # scripts/validate.ps1, T8) — a CRLF shebang line is a broken interpreter path on
 # POSIX shells, including Git for Windows' bundled sh.exe.
 scripts/git-hooks/* text eol=lf
+
+# Deployable git-hook templates shipped inside the github:repo-init skill bundle. Same
+# CRLF-shebang hazard as above, but one step removed: nothing in THIS repo executes them,
+# so a CRLF corruption here would only surface in whatever downstream repo /init-repo
+# deploys them into. Pin them at the source.
+claude/skills/github/sub-skills/repo-init/templates/hooks/* text eol=lf
+codex/skills/github/sub-skills/repo-init/templates/hooks/*  text eol=lf

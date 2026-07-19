@@ -91,11 +91,22 @@ gh pr merge <n> --merge --delete-branch --subject "<pr-title>"
 gh pr view <n> --json state --jq '.state'   # expect "MERGED"
 ```
 
+**`--delete-branch` may report the branch is already gone — that is success, not failure.**
+Repos configured by `repo-init` have `deleteBranchOnMerge: true`, so GitHub deletes the
+remote branch server-side the instant the merge lands, before `gh` gets to it. Treat a
+"branch not found" / "reference does not exist" response from the delete step as the desired
+end state and continue silently; only a non-`MERGED` PR state is a real error.
+
+This is deliberately belt-and-braces: cleanup must work identically whether or not
+auto-delete is enabled on the repo, because `/merge` runs against repos that predate the
+standard as well as ones that follow it.
+
 ---
 
 ## Step 4 — Clean up (worktree → local branch → remote)
 
-Remote branch is already gone via `--delete-branch`. Handle the local side, in order:
+The remote branch is already gone — deleted either by `--delete-branch` in Step 3 or by the
+repo's `deleteBranchOnMerge` setting. Handle the local side, in order:
 
 ```bash
 cd "$REPO_ROOT"
@@ -106,7 +117,16 @@ git worktree prune
 
 # 2. Local branch — safe delete; only escalate to -D after confirming state == MERGED.
 git branch --list "<branch>" | grep -q . && git branch -d "<branch>"
+
+# 3. Stale remote-tracking ref — server-side auto-delete leaves origin/<branch> behind
+#    locally until something prunes it.
+git fetch --prune origin
 ```
+
+**Every deletion here is idempotent by design.** Each is guarded so that "already absent" is
+a no-op rather than an error — the branch may have been removed by auto-delete, by a previous
+partial run, or by the user. Cleanup that only works from a pristine starting state is
+cleanup that fails exactly when you need it.
 
 **Windows worktree-lock footgun.** If `rm -rf` fails with "Permission denied", a file handle
 is still open on the directory. Retry once after `git worktree prune`; if it still fails,

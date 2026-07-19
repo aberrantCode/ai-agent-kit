@@ -1,0 +1,52 @@
+# Dependabot — security and version updates.
+#
+# Managed by github:repo-init. Ecosystems below are a superset template: KEEP ONLY the
+# blocks whose manifests actually exist in this repo. A block pointing at an absent
+# ecosystem produces a recurring Dependabot error on the repo's Insights tab.
+#
+# Detection signals:
+#   npm         package.json
+#   pip         requirements.txt | pyproject.toml | setup.py
+#   gomod       go.mod
+#   cargo       Cargo.toml
+#   nuget       *.csproj | *.sln
+#   bundler     Gemfile
+#   docker      Dockerfile | compose.yml
+#   github-actions  .github/workflows/*  (include whenever ANY workflow exists)
+
+version: 2
+updates:
+  # Always include when the repo has any workflow at all — this is what keeps
+  # third-party actions from silently rotting, and it costs nothing.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    target-branch: "dev"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    target-branch: "dev"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    target-branch: "dev"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]

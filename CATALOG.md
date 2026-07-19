@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-16, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-19, schemaVersion: 1)
 -->
 
 # Catalog
