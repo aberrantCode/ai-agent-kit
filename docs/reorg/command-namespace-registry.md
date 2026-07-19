@@ -32,6 +32,7 @@ not trigger `/apply`). Renames already applied by the board under this rule:
 | `/task` | `/pm-task` | bare noun; namespaced (spec §2.4 uses `/pm-task` as the example) |
 | `/retro` | `/pm-retro` | bare noun; namespaced to the project-manager bundle (PM lifecycle redesign) |
 | `/verify` | *(none)* | built-in verify skill + superpowers own the trigger |
+| `/init` | `/init-repo` | collides with the Claude Code **built-in** `/init` (scaffolds CLAUDE.md); built-ins win collisions silently, so `/init` would never reach the github bundle. Natural-language triggers ("init the repo", "initialize this repo") are registered on the sub-skill instead, so the spoken form still works. |
 
 Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-script`,
 `/probe-incident`, `/add-dashboard`, `/search-sessions`.
@@ -71,6 +72,7 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | Command | Bundle today | Final owner | Change |
 |---|---|---|---|
 | `/commit` `/ship` `/merge` `/release` `/release-init` `/prune` `/publish` | github | github | extended in place (iters 1–3), names unchanged |
+| `/init-repo` | github | github | **new** — repo-configuration provisioning pass (Repo-Configuration Standard). Verb-first per the Generic-Verb Rule; `/init` rejected as a built-in collision (see above) |
 | `/add-feature` `/analyze-features` `/analyze-parallelism` `/continue-tasks` `/init-features` `/init-project` `/iterate-tasks` `/reinit` `/review-tasks` `/sync-status` `/sync-tracker` `/update-tasks` | project-manager | project-manager | unchanged (standalone add-feature skill merges into the bundle sub-skill, iter 9) |
 | `/continue-new-session` | project-manager | project-manager | kept as back-compat **alias** of new `/handoff` (iter 6) |
 | `/audit-skills` `/find-skills` `/import-skill` `/install-skill` `/push-skill` `/search-skill` `/sync-skill` `/update-skill` | skills-manager | skills-manager | extended in place (iters 4–5), names unchanged |
