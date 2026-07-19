@@ -1,12 +1,12 @@
 ---
 name: github-ship
-description: Sub-skill of `github`. Ship current working changes (or an already-committed feature branch) into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge commit, and clean up. Honors the parent Output Contract.
+description: Sub-skill of `github`. Ship current working changes (or an already-committed feature branch) into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge commit, and clean up. Honors the Output Contract inlined in this file.
 ---
 
 # Operation: ship
 
 **Goal.** Take whatever is ready — uncommitted changes or a pre-committed feature branch — and
-land it on `dev` through a PR, then clean up. Obey the parent **Output Contract**: silent run,
+land it on `dev` through a PR, then clean up. Obey the **Output Contract** below: silent run,
 errors as they occur, one concise summary.
 
 ---
