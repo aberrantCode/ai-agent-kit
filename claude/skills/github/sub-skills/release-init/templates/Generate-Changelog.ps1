@@ -22,6 +22,12 @@
     history, never a source of truth. If the repo has no `v*` tags yet, the
     entire history is emitted under `[Unreleased]`.
 
+    Scaffolding commits are skipped: a commit whose subject does not parse as a
+    conventional commit AND which touches nothing but `.gitkeep` placeholders is
+    directory scaffolding, not a user-facing change. Restricting the file check
+    to unparseable subjects keeps the extra `git show` off the hot path — a
+    well-formed `chore: ...` commit is classified from its subject alone.
+
 .EXAMPLE
     pwsh scripts/Generate-Changelog.ps1
 
@@ -32,6 +38,16 @@
 #>
 
 $ErrorActionPreference = 'Stop'
+
+# Git emits UTF-8 unconditionally, but PowerShell decodes a native command's
+# stdout using [Console]::OutputEncoding. When that is the legacy OEM codepage,
+# an em-dash (E2 80 94) decodes to three CP437 characters and is then re-encoded
+# to UTF-8 as mojibake that round-trips cleanly — so it survives review. Pinning
+# the decoder here makes the rebuild independent of ambient console state; without
+# it the script is only correct when a profile happens to have set UTF-8, and
+# corrupts under -NoProfile (i.e. every automated invocation).
+$previousOutputEncoding = [Console]::OutputEncoding
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outputPath = Join-Path $repoRoot 'CHANGELOG.md'
@@ -70,6 +86,14 @@ function Parse-CommitSubject {
     }
 }
 
+function Test-ScaffoldOnlyCommit {
+    param([string]$Sha)
+
+    $files = @(git show --name-only --format='' $Sha 2>$null | Where-Object { $_.Trim() -ne '' })
+    if ($files.Count -eq 0) { return $false }   # merge/empty commit — not our call to make
+    return -not ($files | Where-Object { (Split-Path $_ -Leaf) -ne '.gitkeep' })
+}
+
 function Get-CommitsInRange {
     param([string]$Range)
 
@@ -81,6 +105,8 @@ function Get-CommitsInRange {
         if ($parts.Count -ne 2) { return }
         $parsed = Parse-CommitSubject $parts[1]
         if ($parsed.Type -eq 'release') { return }  # skip the tag-bump commits themselves
+        # Unparseable subject + .gitkeep-only diff = directory scaffolding, not a change.
+        if ($parsed.Type -eq 'other' -and (Test-ScaffoldOnlyCommit $parts[0])) { return }
         [pscustomobject]@{
             Sha      = $parts[0].Substring(0, 7)
             Type     = $parsed.Type
@@ -189,7 +215,9 @@ for ($i = 0; $i -lt $reversed.Count; $i++) {
 }
 
 $body = $header + ($sections -join "`n")
-$body | Set-Content -Path $outputPath -Encoding UTF8
+$body | Set-Content -Path $outputPath -Encoding utf8NoBOM
+
+[Console]::OutputEncoding = $previousOutputEncoding
 
 Write-Host "CHANGELOG.md written: $outputPath"
 Write-Host "Tags documented: $($tags.Count)"
