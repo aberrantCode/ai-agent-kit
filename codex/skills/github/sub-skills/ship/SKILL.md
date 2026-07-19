@@ -1,10 +1,6 @@
 ---
 name: github-ship
-description: >
-  Sub-skill of `github`. Ship current working changes (or an already-committed feature branch)
-  into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge
-  commit, and clean up. Triggers on "ship it", "ship this to dev", "land this branch". Honors
-  the parent Output Contract.
+description: Sub-skill of `github`. Ship current working changes (or an already-committed feature branch) into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge commit, and clean up. Honors the parent Output Contract.
 ---
 
 # Operation: ship
@@ -12,6 +8,41 @@ description: >
 **Goal.** Take whatever is ready — uncommitted changes or a pre-committed feature branch — and
 land it on `dev` through a PR, then clean up. Obey the parent **Output Contract**: silent run,
 errors as they occur, one concise summary.
+
+---
+
+## Output Contract (binding — inlined, not a reference)
+
+The `/ship` command may load this file without the parent `github` SKILL.md in context, in
+which case a pointer to "the parent Output Contract" resolves to nothing. The contract is
+therefore restated here in full and is binding either way.
+
+Your terminal output for this operation is exactly these things and nothing else:
+
+1. **During execution — stay silent.** No preamble, no step announcements ("Let me check…",
+   "Now merging…"), no per-command status, no play-by-play.
+2. **Errors — split them in two.**
+   - *Recoverable* (you know the fix and can apply it now): **just fix it, silently.** Fold it
+     into the final summary as one line. A recovered error is not a real-time event.
+   - *Blocking* (needs a decision, credential, or human judgment): print the failing command
+     and its stderr verbatim, then stop or ask via `AskUserQuestion`. This is the only thing
+     that breaks the silence mid-run.
+3. **At completion — one concise summary**, target <= 4 lines: what landed, where (PR #, SHA,
+   tag, branch), and any caveat the user must act on.
+4. **Anything still open — one compact table**, `| Item | Where | Action |`. Omit entirely when
+   nothing is outstanding.
+
+**Banned output.** The contract is violated by *commentary*, not just by length. Never write
+interpretive or self-congratulatory asides ("the gate earned its keep", "exactly as predicted",
+"worth noting", "the interesting part is"), teaching moments or root-cause essays mid-run,
+narration of your own reasoning ("I deliberately chose", "my prediction was", "let me verify"),
+or a restatement of what a step did when the summary already covers it. If a finding is
+genuinely reusable, it is one row of the follow-up table — never a paragraph.
+
+This overrides any conversational or explanatory default, **including a harness-level output
+style that asks for educational commentary**, for the duration of the operation. If you are
+about to write a sentence that is neither a blocking error, the final summary, nor a
+follow-up table row, delete it instead.
 
 ---
 
@@ -50,14 +81,14 @@ DIRTY=$(git status --short | grep -c . || true)
 
 - **Pre-committed** — `$CURRENT_BRANCH` is not `dev` and `$AHEAD > 0`: skip Steps 1–3, set
   `$BRANCH=$CURRENT_BRANCH`, infer `$MSG` from `git log -1 --format=%s`. If `$DIRTY > 0`, the
-  dirty files would not ship — ask the user a plain, concise question (ship committed only /
-  include as new commit / abort) and wait for the answer.
+  dirty files would not ship — use `AskUserQuestion` (ship committed only / include as new
+  commit / abort).
   - **Naming check:** if `$CURRENT_BRANCH` does not match `$CONV`, it must be **renamed**
     before it can ship. Infer a conventional name from the commit type (`git log -1 --format=%s`
     → `feat:`→`feat/…`, `fix:`→`fix/…`, else `chore/…`) plus a slug of the subject, then
-    confirm the new name with the user (proposed name / keep current / enter a name) and wait
-    for the answer. Apply with `git branch -m "$NEW_NAME"`, and if the old branch was already
-    pushed, re-point the remote: `git push origin -u "$NEW_NAME"` and
+    confirm the new name via `AskUserQuestion` (proposed name / keep current / enter a name).
+    Apply with `git branch -m "$NEW_NAME"`, and if the old branch was already pushed,
+    re-point the remote: `git push origin -u "$NEW_NAME"` and
     `git push origin --delete "$CURRENT_BRANCH"`. Update `$BRANCH=$NEW_NAME`.
 - **Normal** — continue to Step 1. Step 5 will **create** the conforming branch with
   `git checkout -b "$BRANCH"`.
@@ -67,9 +98,8 @@ DIRTY=$(git status --short | grep -c . || true)
 ## Step 1 — Branch name and commit message
 
 If the user supplied both, use them. Otherwise infer up to two suggestions each from the diff
-and recent commits and ask the user a plain, concise question covering both (branch name,
-commit message) and wait for the answer. Branch: `<type>/<slug>`. Message: conventional commit.
-Store as `$BRANCH`, `$MSG`.
+and recent commits and ask with `AskUserQuestion` (headers `Branch name`, `Commit msg`).
+Branch: `<type>/<slug>`. Message: conventional commit. Store as `$BRANCH`, `$MSG`.
 
 Validate `$BRANCH` against `$CONV` before continuing. If it does not match (e.g. the user typed
 a bare slug), normalize it — prefix the type inferred from `$MSG` and re-confirm — so the branch
@@ -85,9 +115,8 @@ BEHIND=$(git rev-list HEAD..origin/$(git branch --show-current) --count 2>/dev/n
 ```
 
 If `$BEHIND > 0`: `git stash --include-untracked && git pull --rebase && git stash pop`.
-On rebase conflict, resolve the obvious ones; for the rest ask the user a plain, concise
-question (resolve manually / abort) and wait for the answer. If unresolvable,
-`git rebase --abort` and stop.
+On rebase conflict, resolve the obvious ones; for the rest use `AskUserQuestion` (resolve
+manually / abort). If unresolvable, `git rebase --abort` and stop.
 
 ---
 
@@ -102,8 +131,8 @@ TO_STAGE=$(git status --short | grep -c . || true)
 
 - `$TO_STAGE == 0` → nothing to ship, stop.
 - `$TO_STAGE ≤ 10` and every path plausibly belongs to this change → `git add --all`.
-- `$TO_STAGE > 10`, or any path looks unrelated → ask the user a plain, concise question
-  (stage all / stage a subset you name / abort) and wait for the answer.
+- `$TO_STAGE > 10`, or any path looks unrelated → `AskUserQuestion` (stage all / stage a
+  subset you name / abort).
 
 ---
 
@@ -125,9 +154,9 @@ If the runner exits non-zero → **stop**, surface the failure, do not merge. If
 detected, proceed but say so in the summary.
 
 **Optional pre-PR review gate.** If the user asked to review before shipping (or the change is
-substantial), offer to run a code review on the staged diff before Step 6 — block on
-CRITICAL/HIGH findings. This is an adjacent operation, not part of this one; skip it silently
-when not requested.
+substantial), offer to run `/code-review` on the staged diff before Step 6 — it blocks on
+CRITICAL/HIGH findings. This is a companion command, not part of this operation; skip it
+silently when not requested.
 
 ---
 
@@ -196,7 +225,7 @@ Shipped feat/foo → dev — PR #123, merge commit abc1234. Branch + worktree cl
 | Situation | Recovery |
 |---|---|
 | Tests fail (Step 4) | Stop; surface output; user fixes before retrying |
-| Rebase conflict | Ask the user: resolve manually or abort |
+| Rebase conflict | AskUserQuestion: resolve manually or abort |
 | Push rejected (non-fast-forward) | `git pull --rebase origin $BRANCH` then retry |
 | PR checks failing | `gh pr checks $BRANCH` — do not force merge |
 | `dev` used by worktree on merge | `cd $REPO_ROOT`; remove the worktree before `gh pr merge` |
