@@ -1,5 +1,5 @@
 ---
-name: worktree-task-lifecycle
+name: github-worktree-task-lifecycle
 description: >
   Sub-skill of `github`. Full per-task worktree lifecycle: create an isolated worktree under
   `<repo>-wt/.worktrees/`, work in it safely, and remove it idempotently after merge — with

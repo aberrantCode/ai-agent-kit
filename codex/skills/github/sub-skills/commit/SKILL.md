@@ -57,7 +57,7 @@ git add -A
 ```
 
 If any staged path looks sensitive (`.env`, credentials, keys, tokens), **stop** and confirm
-with the user — ask a plain, concise question and wait for the answer — before continuing.
+via `AskUserQuestion` before continuing.
 
 ---
 

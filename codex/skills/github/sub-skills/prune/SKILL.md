@@ -94,9 +94,8 @@ delete); not merged → active (ignore).
 ## Step 4 — Present and confirm
 
 Show a grouped list (worktrees / local branches / remote branches) plus a "blocked — dirty"
-section. If nothing is stale, say so and stop. Otherwise ask the user a plain, concise
-question — delete all listed, or exclude some (follow up with a list of items to **keep**) —
-and wait for the answer. Confirm the final list.
+section. If nothing is stale, say so and stop. Otherwise `AskUserQuestion`: delete all listed,
+or exclude some (follow up with a multi-select of items to **keep**). Confirm the final list.
 
 ---
 

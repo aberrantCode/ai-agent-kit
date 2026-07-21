@@ -105,8 +105,8 @@ gitleaks version    # missing → install (choco/scoop/winget/brew/release binar
 
 ## Phase 4 — Visibility
 
-If the invocation contains "public" or "private", use it. Otherwise ask the user a plain,
-concise question — Public or Private — and wait for the answer.
+If the invocation contains "public" or "private", use it. Otherwise ask via `AskUserQuestion`
+(Public / Private).
 
 ---
 
