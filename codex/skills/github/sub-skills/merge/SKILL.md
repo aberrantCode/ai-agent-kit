@@ -1,41 +1,70 @@
 ---
 name: github-merge
-description: >
-  Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers,
-  branches, worktrees, or the current context) into dev with a merge commit, then clean up the
-  worktree, local branch, and remote branch in the correct order. Triggers on "merge 1209",
-  "merge this branch", "merge the current worktree". Honors the parent skill's Output Contract —
-  silent run, errors as they occur, one concise summary.
+description: Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers, branches, worktrees, or the current context) into dev with a merge commit, then clean up the worktree, local branch, and remote branch in the correct order. Honors the Output Contract inlined in this file — silent run, errors as they occur, one concise summary.
 ---
 
 # Operation: merge
 
 **Goal.** Merge already-open pull request(s) into `dev` with a merge commit, then fully clean
 up. The merge unit is always a **PR** — targets that are branches or worktrees are resolved to
-their open PR. This operation does not create PRs; if a branch has commits but no open PR, stop
-and point the user at the ship operation.
+their open PR. This operation does not create PRs; if a branch has commits but no open PR,
+stop and point the user at `/ship`.
 
-Obey the parent **Output Contract**: no narration, errors surfaced as they occur, one concise
+Obey the **Output Contract** below: no narration, errors surfaced as they occur, one concise
 summary at the end.
+
+---
+
+## Output Contract (binding — inlined, not a reference)
+
+The `/merge` command may load this file without the parent `github` SKILL.md in context, in
+which case a pointer to "the parent Output Contract" resolves to nothing. The contract is
+therefore restated here in full and is binding either way.
+
+Your terminal output for this operation is exactly these things and nothing else:
+
+1. **During execution — stay silent.** No preamble, no step announcements ("Let me check…",
+   "Now merging…"), no per-command status, no play-by-play.
+2. **Errors — split them in two.**
+   - *Recoverable* (you know the fix and can apply it now): **just fix it, silently.** Fold it
+     into the final summary as one line. A recovered error is not a real-time event.
+   - *Blocking* (needs a decision, credential, or human judgment): print the failing command
+     and its stderr verbatim, then stop or ask via `AskUserQuestion`. This is the only thing
+     that breaks the silence mid-run.
+3. **At completion — one concise summary**, target <= 4 lines: what landed, where (PR #, SHA,
+   tag, branch), and any caveat the user must act on.
+4. **Anything still open — one compact table**, `| Item | Where | Action |`. Omit entirely when
+   nothing is outstanding.
+
+**Banned output.** The contract is violated by *commentary*, not just by length. Never write
+interpretive or self-congratulatory asides ("the gate earned its keep", "exactly as predicted",
+"worth noting", "the interesting part is"), teaching moments or root-cause essays mid-run,
+narration of your own reasoning ("I deliberately chose", "my prediction was", "let me verify"),
+or a restatement of what a step did when the summary already covers it. If a finding is
+genuinely reusable, it is one row of the follow-up table — never a paragraph.
+
+This overrides any conversational or explanatory default, **including a harness-level output
+style that asks for educational commentary**, for the duration of the operation. If you are
+about to write a sentence that is neither a blocking error, the final summary, nor a
+follow-up table row, delete it instead.
 
 ---
 
 ## Step 1 — Resolve targets to PR numbers
 
-Parse the request per the parent **Parameter Contract**. Build a list of PR numbers:
+Parse the invocation message per the parent **Parameter Contract**. Build a list of PR numbers:
 
 - **Digits** → that PR number directly.
 - **Branch name** → `gh pr list --head <branch> --base dev --state open --json number` — take
   the number. No open PR → record an error for this target: "no open PR for `<branch>` — run
-  the ship operation."
+  /ship".
 - **Worktree path** → read its checked-out branch
   (`git -C <path> branch --show-current`), then resolve as a branch above. Remember the path
   for Step 4 cleanup.
-- **Empty request** → the current context:
+- **Empty message** → the current context:
   - If you are inside a secondary worktree, use that worktree's branch.
   - Otherwise use the current branch: `gh pr view --json number,headRefName`.
-  - If neither yields an open PR, ask the user a plain, concise question for a PR number or
-    branch and wait for the answer.
+  - If neither yields an open PR, use `AskUserQuestion` to ask for a PR number or branch.
 
 Resolve the repo root and the primary worktree root once, up front:
 
@@ -63,11 +92,10 @@ Gate before merging:
   do not attempt to resolve remotely.
 - `mergeStateStatus` of `BLOCKED` or `BEHIND`, or any failing/pending check in
   `gh pr checks` → **stop this target** and print the failing check. Never bypass a required
-  gate. If checks are merely still running, say so and let the user re-run the merge operation
-  later.
+  gate. If checks are merely still running, say so and let the user re-run `/merge` later.
 
-If the user wants to eyeball the change before merging, point them at their own diff-review
-tooling — do not run it as part of this operation.
+If the user wants to eyeball the change before merging, point them at the companion
+`/diff-review <pr#>` command (a visual HTML diff) — do not run it as part of this operation.
 
 ---
 
@@ -98,11 +126,22 @@ gh pr merge <n> --merge --delete-branch --subject "<pr-title>"
 gh pr view <n> --json state --jq '.state'   # expect "MERGED"
 ```
 
+**`--delete-branch` may report the branch is already gone — that is success, not failure.**
+Repos configured by `repo-init` have `deleteBranchOnMerge: true`, so GitHub deletes the
+remote branch server-side the instant the merge lands, before `gh` gets to it. Treat a
+"branch not found" / "reference does not exist" response from the delete step as the desired
+end state and continue silently; only a non-`MERGED` PR state is a real error.
+
+This is deliberately belt-and-braces: cleanup must work identically whether or not
+auto-delete is enabled on the repo, because `/merge` runs against repos that predate the
+standard as well as ones that follow it.
+
 ---
 
 ## Step 4 — Clean up (worktree → local branch → remote)
 
-Remote branch is already gone via `--delete-branch`. Handle the local side, in order:
+The remote branch is already gone — deleted either by `--delete-branch` in Step 3 or by the
+repo's `deleteBranchOnMerge` setting. Handle the local side, in order:
 
 ```bash
 cd "$REPO_ROOT"
@@ -113,7 +152,16 @@ git worktree prune
 
 # 2. Local branch — safe delete; only escalate to -D after confirming state == MERGED.
 git branch --list "<branch>" | grep -q . && git branch -d "<branch>"
+
+# 3. Stale remote-tracking ref — server-side auto-delete leaves origin/<branch> behind
+#    locally until something prunes it.
+git fetch --prune origin
 ```
+
+**Every deletion here is idempotent by design.** Each is guarded so that "already absent" is
+a no-op rather than an error — the branch may have been removed by auto-delete, by a previous
+partial run, or by the user. Cleanup that only works from a pristine starting state is
+cleanup that fails exactly when you need it.
 
 **Windows worktree-lock footgun.** If `rm -rf` fails with "Permission denied", a file handle
 is still open on the directory. Retry once after `git worktree prune`; if it still fails,

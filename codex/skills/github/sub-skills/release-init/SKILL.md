@@ -6,15 +6,50 @@ description: >
   that regenerates release notes from git at tag time. Detects missing artifacts, the
   stale-changelog anti-pattern, and unrolled [Unreleased] blocks, then installs or repairs
   idempotently. Triggers on "set up releases", "release init", "provision release workflow",
-  "fix changelog automation". Honors the parent Output Contract.
+  "fix changelog automation". Honors the Output Contract inlined below.
 ---
 
 # Operation: release-init
 
 **Goal.** Bring the current repo into conformance with the **Release-Automation Standard**.
-Obey the parent **Output Contract**: silent run, errors as they occur, one concise summary.
+Obey the **Output Contract** below: silent run, errors as they occur, one concise summary.
 Confirm before writing anything; stay silent otherwise. Idempotent — a conformant repo is a
 no-op.
+
+---
+
+## Output Contract (binding — inlined, not a reference)
+
+The `/release-init` command may load this file without the parent `github` SKILL.md in
+context, in which case a pointer to "the parent Output Contract" resolves to
+nothing. The contract is therefore restated here in full and is binding either way.
+
+Your terminal output for this operation is exactly these things and nothing else:
+
+1. **During execution — stay silent.** No preamble, no step announcements ("Let me check…",
+   "Now provisioning…"), no per-command status, no play-by-play.
+2. **Errors — split them in two.**
+   - *Recoverable* (you know the fix and can apply it now): **just fix it, silently.** Fold it
+     into the final summary as one line. A recovered error is not a real-time event.
+   - *Blocking* (needs a decision, credential, or human judgment): print the failing command
+     and its stderr verbatim, then stop or ask via `AskUserQuestion`. This is the only thing
+     that breaks the silence mid-run.
+3. **At completion — one concise summary**, target <= 4 lines: what landed, where (PR #, SHA,
+   tag, branch), and any caveat the user must act on.
+4. **Anything still open — one compact table**, `| Item | Where | Action |`. Omit entirely when
+   nothing is outstanding.
+
+**Banned output.** The contract is violated by *commentary*, not just by length. Never write
+interpretive or self-congratulatory asides ("the gate earned its keep", "exactly as predicted",
+"worth noting", "the interesting part is"), teaching moments or root-cause essays mid-run,
+narration of your own reasoning ("I deliberately chose", "my prediction was", "let me verify"),
+or a restatement of what a step did when the summary already covers it. If a finding is
+genuinely reusable, it is one row of the follow-up table — never a paragraph.
+
+This overrides any conversational or explanatory default, **including a harness-level output
+style that asks for educational commentary**, for the duration of the operation. If you are
+about to write a sentence that is neither a blocking error, the final summary, nor a
+follow-up table row, delete it instead.
 
 ---
 
@@ -90,9 +125,8 @@ Classify — a repo can match several states at once; handle every one that appl
 
 ## Step 2 — Confirm
 
-Ask the user one plain, concise question listing the detected state(s) and every file about to
-be written or edited (install / repair / roll), and wait for the answer. On decline, stop with
-zero changes made.
+One `AskUserQuestion` listing the detected state(s) and every file about to be written or
+edited (install / repair / roll). On decline, stop with zero changes made.
 
 ---
 
@@ -122,8 +156,8 @@ Minimal edits, in place:
 3. Delete any `[Unreleased]` fallback: a missing `## [<version>]` section degrades to a
    placeholder line, never to stale notes.
 
-If the existing workflow is too customized to patch safely, ask the user whether to replace it
-wholesale with the `release.yml` template.
+If the existing workflow is too customized to patch safely, offer via `AskUserQuestion` to
+replace it wholesale with the `release.yml` template.
 
 ---
 
@@ -168,6 +202,6 @@ Release automation already conformant — no changes.
 |---|---|
 | Not a git repo | **STOP** — tell the user |
 | Generator run fails | Surface stderr verbatim; seed `CHANGELOG.md` with header + empty `[Unreleased]` and say so |
-| Workflow too customized to patch | Ask the user: minimal patch / replace with template / abort |
-| `CHANGELOG.md` is hand-curated (not generator-formatted) | Ask the user before any rewrite — never silently discard curated prose |
+| Workflow too customized to patch | `AskUserQuestion`: minimal patch / replace with template / abort |
+| `CHANGELOG.md` is hand-curated (not generator-formatted) | `AskUserQuestion` before any rewrite — never silently discard curated prose |
 | User declines at Step 2 | Stop — zero changes |

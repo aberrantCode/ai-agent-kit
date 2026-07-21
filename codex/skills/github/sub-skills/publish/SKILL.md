@@ -1,19 +1,71 @@
 ---
 name: github-publish
 description: >
-  Sub-skill of `github`. Publish a local project as a new GitHub repository with security
-  hardening — gitleaks pre-commit hook, .gitignore/.gitattributes, main + dev branches, and
-  branch protection rules requiring PRs on both. Triggers on "publish this repo", "push this to
-  GitHub", "create a new repo for this". Honors the parent Output Contract.
+  Sub-skill of `github`. Publish a local project as a new GitHub repository — git init, initial
+  commit, repo creation, and pushing main + dev — then hand off to `repo-init` for all
+  configuration hardening. Triggers on "publish this repo", "push this to GitHub", "create a
+  new repo for this". Honors the Output Contract inlined below.
 ---
 
 # Operation: publish
 
-**Goal.** Turn the current local project into a hardened GitHub repo: `main` (protected) + `dev`
-(protected, self-merge), gitleaks secrets hook, and sane ignore/attributes files. This is the
-**day-0 bookend** to the bundle's day-N ops. Obey the parent **Output Contract**: silent run,
-errors as they occur, one concise summary. Security hardening is never optional — even on a
-"just push it quickly" request.
+**Goal.** Get the current local project onto GitHub as a repo with `main` and `dev` pushed.
+This is the **day-0 bookend** to the bundle's day-N ops. Obey the **Output Contract** below:
+silent run, errors as they occur, one concise summary.
+
+---
+
+## Output Contract (binding — inlined, not a reference)
+
+The `/publish` command may load this file without the parent `github` SKILL.md in
+context, in which case a pointer to "the parent Output Contract" resolves to
+nothing. The contract is therefore restated here in full and is binding either way.
+
+Your terminal output for this operation is exactly these things and nothing else:
+
+1. **During execution — stay silent.** No preamble, no step announcements ("Let me check…",
+   "Now publishing…"), no per-command status, no play-by-play.
+2. **Errors — split them in two.**
+   - *Recoverable* (you know the fix and can apply it now): **just fix it, silently.** Fold it
+     into the final summary as one line. A recovered error is not a real-time event.
+   - *Blocking* (needs a decision, credential, or human judgment): print the failing command
+     and its stderr verbatim, then stop or ask via `AskUserQuestion`. This is the only thing
+     that breaks the silence mid-run.
+3. **At completion — one concise summary**, target <= 4 lines: what landed, where (PR #, SHA,
+   tag, branch), and any caveat the user must act on.
+4. **Anything still open — one compact table**, `| Item | Where | Action |`. Omit entirely when
+   nothing is outstanding.
+
+**Banned output.** The contract is violated by *commentary*, not just by length. Never write
+interpretive or self-congratulatory asides ("the gate earned its keep", "exactly as predicted",
+"worth noting", "the interesting part is"), teaching moments or root-cause essays mid-run,
+narration of your own reasoning ("I deliberately chose", "my prediction was", "let me verify"),
+or a restatement of what a step did when the summary already covers it. If a finding is
+genuinely reusable, it is one row of the follow-up table — never a paragraph.
+
+This overrides any conversational or explanatory default, **including a harness-level output
+style that asks for educational commentary**, for the duration of the operation. If you are
+about to write a sentence that is neither a blocking error, the final summary, nor a
+follow-up table row, delete it instead.
+
+---
+
+## Scope — publish creates, repo-init configures
+
+`publish` owns exactly one thing: **turning a local directory into a GitHub repository.**
+Every configuration decision — branch protection, merge policy, security settings, hooks,
+`.gitignore`/`.gitattributes`, templates — belongs to `sub-skills/repo-init`, which owns the
+Repo-Configuration Standard.
+
+This split exists so the standard has **one** definition. When `publish` carried its own copy
+of the protection and ignore-file logic, the two drifted, and a repo's configuration depended
+on which command happened to create it.
+
+Hardening is still never optional — it is simply applied by `repo-init` at the end of this
+operation rather than inline here.
+
+**Loop guard.** `repo-init` invokes `publish` when a repo has no remote. When `publish` was
+reached that way, skip Phase 9 and return control — do not call back into `repo-init`.
 
 ---
 
@@ -39,39 +91,27 @@ gitleaks version    # missing → install (choco/scoop/winget/brew/release binar
 
 ---
 
-## Phase 3 — Project files
+## Phase 3 — Minimum-viable ignore file (pre-commit safety only)
 
-- **`.gitignore`** — if absent, write a comprehensive generic one covering: OS cruft, editor
-  dirs, **secrets** (`.env*` except examples, `*.pem/*.key/*.p12`, `credentials.json`,
-  `*.token`), build outputs, `node_modules/` + framework caches, Python venv/caches, coverage,
-  logs/temp. If it exists, leave it.
-- **`.gitattributes`** — if absent/empty, write: `* text=auto eol=lf`; CRLF for
-  `*.bat/*.cmd/*.ps1`; `binary` for common media/archive/db extensions.
-- **gitleaks pre-commit hook** — write `.git/hooks/pre-commit`:
+The full artifact set is `repo-init`'s job. `publish` writes only what is needed so that
+Phase 5's initial commit cannot capture a secret — because once a secret is in the first
+commit and pushed, it is leaked regardless of what happens afterwards.
 
-  ```sh
-  #!/bin/sh
-  if command -v gitleaks >/dev/null 2>&1; then
-    gitleaks protect --staged --redact --verbose
-    if [ $? -ne 0 ]; then
-      echo "Secret(s) detected by gitleaks. Commit ABORTED."
-      echo "    False positive? Add an exclusion to .gitleaks.toml"
-      exit 1
-    fi
-  else
-    echo "gitleaks not found — secrets scanning skipped."
-  fi
-  ```
+If `.gitignore` is absent, write a minimal secrets-only stub: `.env*` (except `*.example`),
+`*.pem`, `*.key`, `*.p12`, `credentials.json`, `*.token`. If it exists, leave it alone.
 
-  Make it executable (`chmod +x .git/hooks/pre-commit`; on Windows ensure the `#!/bin/sh`
-  shebang + LF endings).
+Then run `gitleaks detect --redact --verbose` over the working tree. Findings **block** —
+surface them and stop; publishing a leaked secret is not recoverable by a later cleanup.
+
+Everything else — the comprehensive `.gitignore`, `.gitattributes`, the versioned hook gate,
+`.gitleaks.toml`, templates — is applied by `repo-init` in Phase 9.
 
 ---
 
 ## Phase 4 — Visibility
 
-If the invocation contains "public" or "private", use it. Otherwise ask the user a plain,
-concise question — Public or Private — and wait for the answer.
+If the invocation contains "public" or "private", use it. Otherwise ask via `AskUserQuestion`
+(Public / Private).
 
 ---
 
@@ -102,34 +142,36 @@ git push -u origin dev
 
 ---
 
-## Phase 8 — Branch protection
+## Phase 8 — Switch to dev
 
 ```bash
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+git checkout dev
 ```
-
-**main** — require a PR with ≥1 approval, dismiss stale reviews, no direct push/force/delete:
-
-```bash
-gh api -X PUT "/repos/$REPO/branches/main/protection" --input - << 'EOF'
-{ "required_status_checks": null, "enforce_admins": false,
-  "required_pull_request_reviews": { "required_approving_review_count": 1, "dismiss_stale_reviews": true, "require_code_owner_reviews": false },
-  "restrictions": null, "allow_force_pushes": false, "allow_deletions": false }
-EOF
-```
-
-**dev** — same but `required_approving_review_count: 0` (self-merge). If GitHub returns **422**,
-retry with count 1 and warn the user they'll need an approver (or a CODEOWNER bypass). A **403**
-on a private repo means branch protection needs a paid plan — give manual UI steps.
 
 ---
 
-## Phase 9–10 — Switch to dev, summarize
+## Phase 9 — Hand off to repo-init
 
-`git checkout dev`. Then the single summary block (only expected output):
+Invoke `sub-skills/repo-init` against the now-published repo. It applies the entire
+Repo-Configuration Standard: branch and tag rulesets, merge policy, security settings, the
+versioned hook gate, the full artifact set, and the `.github/repo-standard.yml` manifest.
+
+On a brand-new repo everything is drift by definition, so `repo-init` presents one grouped
+confirmation covering the whole standard. Do not pre-answer it on the user's behalf.
+
+**Skip this phase entirely if `repo-init` invoked `publish`** — it will continue on its own
+once control returns.
+
+---
+
+## Phase 10 — Summarize
+
+One summary block covering both halves (only expected output):
 
 ```
-Published <owner>/<repo> (private) — main protected (1 reviewer), dev protected (self-merge). gitleaks hook installed. On dev.
+Published <owner>/<repo> (private) — main + dev pushed. Standard applied via repo-init:
+rulesets on main/dev/tags, merge-commit only, push protection on, hooks active in .githooks.
+On dev.
 ```
 
 Offer `gh repo view --web`.
@@ -141,7 +183,8 @@ Offer `gh repo view --web`.
 | Error | Action |
 |---|---|
 | `gh repo create` name taken | suggest `<name>-2` or ask for a new name |
-| Branch protection 403/422 | warn; give manual GitHub UI steps |
+| `gitleaks detect` finds a secret pre-commit | **STOP** — do not publish. Rotate, remove, re-scan |
 | `gitleaks protect` crashes | fall back to `gitleaks detect`; note it |
 | Existing repo dirty | ask to commit/stash first |
 | `--initial-branch` unsupported | `git init` + `git symbolic-ref HEAD refs/heads/main` |
+| `repo-init` fails at Phase 9 | The repo **is** published — report that plainly, note it is unconfigured, and tell the user to re-run `/init-repo`. Never imply the publish itself failed |
