@@ -13,6 +13,27 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.10.0] - 2026-07-21
+
+### Added
+
+- mirror worktree-task-lifecycle to codex (`81f095f`)
+- detect profile skills shadowing bundle sub-skills (`5438e19`)
+- inline binding Output Contract, document release changelog ordering (`cae4382`)
+
+### Fixed
+
+- sync codex publish to the delegated architecture (`23411db`)
+- normalize codex prompts to AskUserQuestion (`47bc043`)
+- make changelog generator pure ASCII (`2064051`)
+- normalize worktree-task-lifecycle name to github- prefix (`e3c4326`)
+- inline dangling contract pointers in sub-skills (`d1f51c7`)
+- silence PSScriptAnalyzer warnings in changelog generator (`90697fc`)
+
+### Internal
+
+- regenerate CHANGELOG for v0.9.0 (`13f1cb6`)
+
 ## [0.9.0] - 2026-07-19
 
 ### Added
