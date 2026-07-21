@@ -15,7 +15,7 @@
       ci, build, chore  -> Internal
       test              -> Tests
       style             -> Style
-      release           -> (skipped — the tag itself represents the release)
+      release           -> (skipped - the tag itself represents the release)
 
     Output is written to CHANGELOG.md at the repo root. The rebuild is
     deterministic: the file is derived entirely from git, so it is a cache of
@@ -25,7 +25,7 @@
     Scaffolding commits are skipped: a commit whose subject does not parse as a
     conventional commit AND which touches nothing but `.gitkeep` placeholders is
     directory scaffolding, not a user-facing change. Restricting the file check
-    to unparseable subjects keeps the extra `git show` off the hot path — a
+    to unparseable subjects keeps the extra `git show` off the hot path - a
     well-formed `chore: ...` commit is classified from its subject alone.
 
 .EXAMPLE
@@ -33,7 +33,7 @@
 
 .NOTES
     Intended to be re-runnable. When a new release tag is cut, re-run this
-    script and commit the refreshed CHANGELOG.md — the `[Unreleased]` section
+    script and commit the refreshed CHANGELOG.md - the `[Unreleased]` section
     will move into a proper version section automatically.
 #>
 
@@ -42,7 +42,7 @@ $ErrorActionPreference = 'Stop'
 # Git emits UTF-8 unconditionally, but PowerShell decodes a native command's
 # stdout using [Console]::OutputEncoding. When that is the legacy OEM codepage,
 # an em-dash (E2 80 94) decodes to three CP437 characters and is then re-encoded
-# to UTF-8 as mojibake that round-trips cleanly — so it survives review. Pinning
+# to UTF-8 as mojibake that round-trips cleanly - so it survives review. Pinning
 # the decoder here makes the rebuild independent of ambient console state; without
 # it the script is only correct when a profile happens to have set UTF-8, and
 # corrupts under -NoProfile (i.e. every automated invocation).
@@ -90,7 +90,7 @@ function Test-ScaffoldOnlyCommit {
     param([string]$Sha)
 
     $files = @(git show --name-only --format='' $Sha 2>$null | Where-Object { $_.Trim() -ne '' })
-    if ($files.Count -eq 0) { return $false }   # merge/empty commit — not our call to make
+    if ($files.Count -eq 0) { return $false }   # merge/empty commit - not our call to make
     return -not ($files | Where-Object { (Split-Path $_ -Leaf) -ne '.gitkeep' })
 }
 
@@ -141,7 +141,10 @@ function Format-Section {
     # --- Breaking changes callout at top ---
     $breaking = $Commits | Where-Object Breaking
     if ($breaking) {
-        $lines.Add('### ⚠ BREAKING CHANGES')
+        # Emit the warning sign via its code point so this source file stays pure ASCII
+        # (no PSUseBOMForUnicodeEncodedFile warning, no BOM needed). Output is the literal
+        # U+26A0 character, byte-identical to a hard-coded glyph.
+        $lines.Add("### $([char]0x26A0) BREAKING CHANGES")
         $lines.Add('')
         foreach ($c in $breaking) {
             # Use -f formatter with a single-quoted template so the literal backticks
@@ -221,7 +224,7 @@ $body | Set-Content -Path $outputPath -Encoding utf8NoBOM
 
 # Summary goes to the information stream, not stdout: callers that capture this
 # script's output (e.g. /release) must not receive these lines as data.
-# -InformationAction Continue is required — $InformationPreference defaults to
+# -InformationAction Continue is required - $InformationPreference defaults to
 # SilentlyContinue, so a bare Write-Information would silently emit nothing.
 Write-Information "CHANGELOG.md written: $outputPath" -InformationAction Continue
 Write-Information "Tags documented: $($tags.Count)" -InformationAction Continue
