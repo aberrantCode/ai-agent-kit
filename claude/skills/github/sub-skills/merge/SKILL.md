@@ -86,6 +86,11 @@ gh pr view <n> --json state,isDraft,mergeable,mergeStateStatus,reviewDecision,he
 gh pr checks <n>
 ```
 
+If the repo declares `generatedCommitted` files in `.github/repo-standard.yml`, run each
+`regen` command on `dev`'s tip before the merge and stage the result — a date-keyed generated
+doc (e.g. a changelog/status file) goes stale across a midnight boundary and only surfaces as a
+CI `BLOCKED` *after* a failed merge attempt. Regenerating first turns that into a no-op.
+
 Gate, in order — each blocker stops *this target* only (record it, continue to the next):
 
 1. `state == MERGED` → skip to cleanup (Step 4), note it. `state != OPEN` otherwise → stop.
