@@ -150,10 +150,13 @@ session to record outcomes with `scripts/log-delegation-outcome.ps1`:
   task the subagent could not complete — log it with a `-Category`, a `-FailureMode` from the fixed
   vocabulary, and one line of concrete `-Evidence` (the wrong value, the invented path, the ignored
   constraint).
-- Once at the end of the session, log the totals: `-Outcome ok -Dispatches N` per category. This is
-  the denominator, and it is the part sessions skip. Escalations alone produce a list of failures
-  with no way to tell whether that is five out of eight or five out of four hundred — the first
-  means stop using haiku for that work, the second means the default is working fine.
+- Once at the end of the session, log the totals: `-Outcome ok -Dispatches N` per category, **each
+  tagged with `-PromptPath <this handoff's prompt file>`** (or `-Branch`). This is the denominator,
+  and it is the part sessions skip. Escalations alone produce a list of failures with no way to tell
+  whether that is five out of eight or five out of four hundred — the first means stop using haiku
+  for that work, the second means the default is working fine. The tag is not optional bookkeeping:
+  the retirement gate (Step 7) refuses to run unless it finds a tally correlated to this session, so
+  an untagged totals row reads as "no tally logged" and blocks cleanup.
 
 Be explicit that a failure is worth logging even when it was recovered in seconds. The recovery is
 invisible later; only the ledger remembers, and the whole point is to answer next month's question
@@ -259,13 +262,16 @@ pwsh -File <skill-dir>/scripts/complete-task-session.ps1 `
     -Branch 'refactor/reset-move-queue' -Confirmed
 ```
 
-It refuses to delete anything unless all four hold:
+It refuses to delete anything unless all five hold:
 
 1. the branch is an ancestor of `origin/<base>` — actually merged, not just PR'd;
 2. local `<base>` matches `origin/<base>` exactly — no unpushed or unpulled commits;
 3. the repo's tests pass (auto-detected, or `-TestCommand`, or `-SkipTests` with the reason
    printed so a skip is never silent);
-4. `-Confirmed` is present.
+4. `-Confirmed` is present;
+5. the delegation ledger holds an `ok` tally correlated to this session — matched by the prompt
+   filename, the branch, or a `-Task` tagged with the prompt slug — or `-NoDelegation` is passed to
+   declare, out loud, that nothing was delegated.
 
 That fourth gate is the one that cannot be automated, and it is deliberately not a formality. A
 merged branch with green tests can still be the wrong solution — that is exactly what a human
@@ -273,6 +279,11 @@ review catches and what no repo state can tell you. So **only pass `-Confirmed` 
 actually looked at the work and said it is right.** Asking them is the point of the gate; inferring
 it defeats it. If they have not responded yet, run without the flag: the mechanical checks still
 report, and nothing is deleted.
+
+The fifth gate closes the hole this skill kept hitting: the end-of-session tally is the step a
+tired session drops, and once retirement has run nothing is left to notice. Tying deletion to a
+correlated tally means the session must either log its dispatch totals (tagged with `-PromptPath`)
+or say `-NoDelegation` explicitly — it can no longer skip the denominator in silence.
 
 On success it deletes the prompt, removes the worktree (unforced, so it refuses on uncommitted
 changes rather than discarding them), and deletes the local branch. On any failure it prints the
