@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-21",
+  "generated": "2026-07-22",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -35,7 +35,7 @@
           "has_commands": true
         },
         "ac-opbta-ops": {
-          "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
+          "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare, XPipe). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, manage XPipe connections / identities on the workstation, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
           "category": "Tooling & DevOps"
         },
         "accumulated-feature-branch-workflow": {
@@ -174,6 +174,10 @@
         "design-critique-to-safe-refactor": {
           "description": "Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.",
           "category": "Code Quality"
+        },
+        "design-taste-frontend": {
+          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
+          "category": "UI & Design"
         },
         "diagnostics-probe-design": {
           "description": "Use when investigating a service or infrastructure failure and before proposing any fix \u2014 verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.",
@@ -323,6 +327,10 @@
           "description": "Node.js backend patterns with Express/Fastify, repositories",
           "category": "Languages & Runtimes"
         },
+        "opbta-service": {
+          "description": "Use when deploying, updating, retiring, inspecting, managing, or listing an internal service on svc.opbta.com (OPBTA) from any repo, not only AC_OPBTA. Covers deploy a service, add a container, stand up X on svc.opbta.com, day-2 ops, rotate a secret, re-expose a service, rename/move/resize a service, service catalog / list services, cross-repo OPBTA service lifecycle.",
+          "category": "Infrastructure & Ops"
+        },
         "parallel-subagent-fanout": {
           "description": "Use when a task splits into independent lenses or disjoint-file subtasks \u2014 multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature branch \u2014 to dispatch multiple subagents concurrently and reconcile their results into one verdict.",
           "category": "Foundations & Workflow"
@@ -457,7 +465,7 @@
           "has_commands": true
         },
         "sops-secrets": {
-          "description": "Domain expertise for SOPS-encrypted secrets in this repo \u2014 reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. \"what's the login for grafana\"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally \u2014 always shell to ac-devops, which is the only host with the age key.",
+          "description": "Domain expertise for SOPS-encrypted secrets in this repo \u2014 reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. \"what's the login for grafana\"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally \u2014 always shell to ac-devops, which is the only host with the age key. For agents: the Secrets-Broker MCP server is the reference-only path for checking/provisioning/rotating secrets without plaintext; this skill handles human plaintext reads and raw SOPS access.",
           "category": "Security & Credentials"
         },
         "spec-align": {
