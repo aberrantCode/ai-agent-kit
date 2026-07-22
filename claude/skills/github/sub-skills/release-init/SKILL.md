@@ -1,6 +1,6 @@
 ---
 name: github-release-init
-description: Sub-skill of `github`. Provision or repair a repo's release automation to the Release-Automation Standard — a persistent changelog generator plus a tag-triggered workflow that regenerates release notes from git at tag time. Detects missing artifacts, the stale-changelog anti-pattern, and unrolled [Unreleased] blocks, then installs or repairs idempotently. Honors the Output Contract inlined below.
+description: Sub-skill of `github`. Provision or repair a repo's release automation to the Release-Automation Standard — a persistent changelog generator, a tag-triggered workflow that regenerates release notes from git at tag time, and a pre-push changelog-staleness gate. Detects missing artifacts, the stale-changelog anti-pattern, and unrolled [Unreleased] blocks, then installs or repairs idempotently. Honors the Output Contract inlined below.
 ---
 
 # Operation: release-init
@@ -58,17 +58,23 @@ tagging.)
 
 ---
 
-## The Standard — two artifacts
+## The Standard — three artifacts
 
 | Artifact | Location | Contract |
 |---|---|---|
 | Changelog generator | `scripts/Generate-Changelog.ps1` (or stack equivalent) | Deterministic full rebuild of `CHANGELOG.md` from git: `[Unreleased]` = `latestTag..HEAD` (entire history if untagged), each version = `prevTag..tag`, conventional-commit grouping, skips `release:` bump commits. Re-runnable at any time. |
 | Release workflow | `.github/workflows/release.yml` | On `push: tags: ['v*']`: checkout with `fetch-depth: 0`, **regenerate** the changelog at tag time, extract the `## [<version>]` section, `gh release create` with those notes. A missing section degrades to a placeholder — **never** to `[Unreleased]`. |
+| Changelog-staleness gate | `scripts/check-changelog-staleness.ps1` + a `pre-push` hook line | Asserts every `v*` tag has a matching `## [<version>]` section in `CHANGELOG.md`, so a release tag can never be pushed while its section is missing (the "silently fell a release behind" failure). Exit 0 = documented, 1 = STALE, 2 = execution error. |
 
 Deployable templates live beside this file:
 
 - `./templates/Generate-Changelog.ps1`
 - `./templates/release.yml`
+- `./templates/check-changelog-staleness.ps1`
+
+The gate is the enforcement half of the generator: the generator *produces* the released
+section, the gate *refuses a tag push* that lacks it. Without the gate a repo can tag a release
+whose changelog was never rolled and only discover it after the fact.
 
 ### Language-agnostic fallback
 
@@ -102,16 +108,18 @@ LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
 ```bash
 ls scripts/Generate-Changelog.ps1 cliff.toml .release-please-config.json 2>/dev/null
 ls .github/workflows/release.yml 2>/dev/null
+ls scripts/check-changelog-staleness.ps1 2>/dev/null
 grep -n 'fetch-depth: 0' .github/workflows/release.yml 2>/dev/null
 grep -n 'Unreleased' .github/workflows/release.yml CHANGELOG.md 2>/dev/null
+grep -rn 'check-changelog-staleness' .githooks scripts/git-hooks .git-hooks .git/hooks 2>/dev/null
 ```
 
 Classify — a repo can match several states at once; handle every one that applies:
 
 | State | Detected when | Repair |
 |---|---|---|
-| **CONFORMANT** | generator present, workflow tag-triggered with `fetch-depth: 0` + a regenerate step (or `--generate-notes`), no `[Unreleased]` fallback | none — report and stop |
-| **MISSING** | no generator and/or no tag-triggered release workflow | Step 3A |
+| **CONFORMANT** | generator present, workflow tag-triggered with `fetch-depth: 0` + a regenerate step (or `--generate-notes`), no `[Unreleased]` fallback, **and** the changelog-staleness gate is installed and wired into `pre-push` | none — report and stop |
+| **MISSING** | no generator and/or no tag-triggered release workflow **and/or the staleness gate is absent or not wired into `pre-push`** | Step 3A |
 | **ANTI-PATTERN** | release.yml extracts notes from the committed `CHANGELOG.md` with an `[Unreleased]` fallback, and/or has no regenerate step, and/or checks out shallow | Step 3B |
 | **STALE CHANGELOG** | `$LATEST_TAG` exists but `CHANGELOG.md` has no `## [<version>]` section for it — already-released content still sits under `[Unreleased]` | Step 3C |
 
@@ -136,6 +144,18 @@ mkdir -p scripts .github/workflows
   generator was chosen, swap the regenerate step for that tool's invocation.
 - Seed `CHANGELOG.md` if absent: run the generator (it handles the no-tag case by emitting
   everything under `[Unreleased]`).
+- Copy `./templates/check-changelog-staleness.ps1` → `scripts/`, then **wire it into the
+  repo's `pre-push` gate** so a tag push is blocked while its changelog section is missing.
+  Append a line to the repo's `pre-push` hook (the local gate `repo-init` Group 5 owns) that
+  runs the check and fails the push on a non-zero exit:
+
+  ```sh
+  pwsh -NoProfile -File scripts/check-changelog-staleness.ps1 || exit 1
+  ```
+
+  If the repo has no `pre-push` hook yet, `repo-init` provisions the hook gate — direct the
+  user to `/init-repo` and note that the gate line belongs in that hook. Never create a
+  competing hooks mechanism here.
 
 ---
 
