@@ -391,6 +391,10 @@ ls .github/workflows/ 2>/dev/null
 cat .github/repo-standard.yml 2>/dev/null                   # prior manifest, if any
 ```
 
+On Git-Bash, prefix every leading-slash `gh api "/repos/…"` above with `MSYS_NO_PATHCONV=1`
+(or drop the leading slash) — MSYS otherwise rewrites `/repos/...` into a filesystem path and
+the read silently returns nothing, making a configured repo look unconfigured.
+
 Read the manifest **first** if it exists — its `waivers` suppress drift and its `hooks.set`
 and `hooks.path` override the defaults for this repo.
 
@@ -455,6 +459,11 @@ Order matters — cheapest and most reversible first, so a mid-run failure leave
 Rulesets are applied by name: `PUT` when a ruleset with that name exists (preserving its id),
 `POST` when it does not. Never blind-`POST` — that creates a duplicate ruleset with the same
 name, and the two then AND together into rules nobody wrote.
+
+On Git-Bash, run the ruleset `PUT`/`POST` as `MSYS_NO_PATHCONV=1 gh api "/repos/$REPO/rulesets…"`
+and **re-read `gh api "/repos/$REPO/rulesets"` afterward to confirm it actually applied** — a
+leading-slash path gets mangled by MSYS and the call exits 0 while doing nothing, so protection
+can look applied when it was silently dropped.
 
 **Self-lockout guard.** Before applying a branch ruleset, confirm the authenticated user has
 admin on the repo (`gh api "/repos/$REPO" --jq '.permissions.admin'`). Without admin, a

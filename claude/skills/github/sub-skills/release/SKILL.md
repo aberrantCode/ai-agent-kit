@@ -221,7 +221,8 @@ burns a round-trip. Detect up front:
 # 1. Project rule — grep the repo contract for a PR-only mandate on main
 PR_ONLY_RULE=$(grep -riE "release PR|only .*(via|through) .*PR|push.*main.*forbidden" \
   CLAUDE.md AGENTS.md GEMINI.md docs/ 2>/dev/null | grep -ic main || true)
-# 2. GitHub branch protection on main
+# 2. GitHub branch protection on main (no leading slash is DELIBERATE — a leading "/..."
+#    is rewritten by MSYS on Git-Bash and the call silently no-ops; this form is MSYS-safe)
 PROTECTED=$(gh api "repos/{owner}/{repo}/branches/main/protection" --jq '.url' 2>/dev/null | grep -c . || true)
 # 3. A tracked pre-push hook that refuses main (best-effort textual signal)
 HOOK_BLOCKS=$(grep -rilE "refus.*push.*main|push.*main.*forbidden" .githooks .git/hooks 2>/dev/null | grep -c . || true)

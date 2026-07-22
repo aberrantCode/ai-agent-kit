@@ -257,3 +257,4 @@ Shipped feat/foo → dev — PR #123, merge commit abc1234. Branch + worktree cl
 | PR checks failing | `gh pr checks $BRANCH` — do not force merge |
 | `dev` used by worktree on merge | `cd $REPO_ROOT`; remove the worktree before `gh pr merge` |
 | Local changes block post-merge checkout | Stash before merge (Step 7 does this); PR may already be merged — check `gh pr view` |
+| git-bash `fork`/`add_item … failed` mid-run (Windows Cygwin) | Not a git failure — bash could not fork. Re-run the same `git`/`gh` step through `pwsh`; shell state doesn't persist but repo state does, so just repeat the last command |
