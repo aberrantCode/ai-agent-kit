@@ -26,22 +26,44 @@ write it down. A handoff prompt that says "continue where we left off" produces 
 re-derives what you already know, and often re-derives it wrong. Most of your effort belongs in
 capturing state, not in describing tasks.
 
+## Entry modes
+
+There are two ways into this skill, distinguished by where the task scope comes from. Everything
+from Step 2 onward is identical regardless of entry mode — only how Step 1 is satisfied differs.
+
+- **Continue mode** (`/continue-new-session-prompt`, no arguments) — the scope is *recovered*
+  from this conversation: the numbered decision list in your most recent response. This is the
+  original, still-default entry point. Use Step 1 below as written.
+- **Scope mode** (`/dispatch-session-prompt <task description>`) — the scope *arrives with the
+  invocation* instead of being recovered. Skip the "recover from conversation" half of Step 1
+  entirely — there may be no prior decision list, and even if one exists it is not the source of
+  truth here. Instead, parse the supplied argument/message into the same shape Step 1 would have
+  produced (an ordered list of concrete instructions), resolving ambiguity via `AskUserQuestion`
+  under the same rule: an unattended session cannot ask, so settle it now. Once you have that
+  list, proceed from Step 2 exactly as continue mode does.
+
 ## When you have nothing to hand off
 
 If your last response had no decision list, or every item on it was informational rather than
 actionable, say so and stop. Do not manufacture tasks to fill a prompt. Ask the user what they
-want the new session to do instead.
+want the new session to do instead. (Scope mode: this applies only if the supplied scope itself
+is empty or purely informational — a missing decision list in prior conversation is not a reason
+to stop when scope arrived via argument.)
 
 ## Step 1 — Recover the items
 
-Take the numbered decision list from your most recent response. For each item, resolve it into a
-concrete instruction using the recommendation you already gave. The user asking for this skill is
-usually accepting your recommendations wholesale; if any item genuinely has no default and the
-answer changes the work, use `AskUserQuestion` to settle it before writing the prompt rather than
-passing the ambiguity downstream — an unattended session cannot ask.
+**Continue mode:** Take the numbered decision list from your most recent response. For each item,
+resolve it into a concrete instruction using the recommendation you already gave. The user asking
+for this skill is usually accepting your recommendations wholesale; if any item genuinely has no
+default and the answer changes the work, use `AskUserQuestion` to settle it before writing the
+prompt rather than passing the ambiguity downstream — an unattended session cannot ask.
 
 Drop items that are questions about the handoff itself ("should the new session self-merge?") —
 resolve those here and encode the answer as a constraint.
+
+**Scope mode:** skip the recovery above. Parse the supplied task scope into the same ordered,
+concrete-instruction shape instead (see "Entry modes" above), then apply the same
+drop-questions-about-the-handoff-itself rule before continuing to Step 2.
 
 ## Step 2 — Order the tasks by dependency
 
@@ -263,3 +285,7 @@ recoverable by fixing the cause and re-running.
 back to launching `pwsh` in a plain console window automatically. If even that fails, do not
 silently give up: report the prompt file path and the exact command the user can run themselves,
 since the prompt — the expensive part — is already written and still useful.
+
+## Diagram
+
+[View diagram](diagram.html)
