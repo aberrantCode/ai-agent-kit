@@ -70,6 +70,14 @@
     payload + summary + exit code + runtime) to stdout instead of a console
     summary table.
 
+.PARAMETER IncludeSmoke
+    Also run the github-template deploy-and-run smoke test
+    (scripts/test-github-templates.ps1) and fold its exit code into the gate.
+    Off by default so the local pre-PR gate stays under its ~60s target; the
+    tag-release CI carve-out passes it. Catches deploy-only template bugs (CRLF
+    shebang, mojibake under -NoProfile, hooks that hard-fail on a missing tool)
+    that never surface in this repo's own source.
+
 .OUTPUTS
     Console summary table (default) or JSON (-Json).
 
@@ -108,7 +116,15 @@ param(
     [Alias('TargetDir')]
     [string]$RepoRoot,
 
-    [switch]$Json
+    [switch]$Json,
+
+    # Opt-in: run the template deploy-and-run smoke test
+    # (scripts/test-github-templates.ps1). Off by default to keep the local pre-PR
+    # gate under its ~60s target; enabled in the tag-release CI carve-out, where the
+    # extra scratch-repo run is affordable and catches deploy-only template bugs
+    # (CRLF shebang, mojibake under -NoProfile, a hook that hard-fails on a missing
+    # tool) that are invisible in this repo's source.
+    [switch]$IncludeSmoke
 )
 
 Set-StrictMode -Version Latest
@@ -151,6 +167,8 @@ $changelogResult = [ordered]@{
 }
 $auditResult = $null
 $auditExitCode = $null
+$smokeResult = $null
+$smokeExitCode = $null
 
 $catalogPath = Join-Path $RepoRoot 'CATALOG.md'
 $originalCatalogBytes = $null
@@ -248,6 +266,19 @@ try {
     $auditJsonRaw = & $pwshExe @('-NoProfile', '-File', $auditScript, '-RepoRoot', $RepoRoot, '-Json')
     $auditExitCode = $LASTEXITCODE
     $auditResult = ($auditJsonRaw -join "`n") | ConvertFrom-Json
+
+    # -----------------------------------------------------------------------
+    # Check 4 (opt-in): template deploy-and-run smoke test. Off by default to
+    # keep this gate under its ~60s target; the tag-release CI carve-out passes
+    # -IncludeSmoke. Runs as a child process (its own exit-code contract, 0/1/2).
+    # -----------------------------------------------------------------------
+    if ($IncludeSmoke) {
+        $smokeScript = Join-Path $RepoRoot 'scripts/test-github-templates.ps1'
+        if (-not (Test-Path -LiteralPath $smokeScript)) { throw "not found: $smokeScript" }
+        $smokeJsonRaw = & $pwshExe @('-NoProfile', '-File', $smokeScript, '-Json')
+        $smokeExitCode = $LASTEXITCODE
+        $smokeResult = ($smokeJsonRaw -join "`n") | ConvertFrom-Json
+    }
 }
 catch {
     $script:ExecError = $_
@@ -264,10 +295,11 @@ if ($exitCode -ne 2) {
             $script:ExecError = "audit.ps1 did not report an exit code."
         }
     }
-    elseif ($auditExitCode -eq 2) {
+    elseif ($auditExitCode -eq 2 -or ($IncludeSmoke -and $smokeExitCode -eq 2)) {
         $exitCode = 2
     }
-    elseif ($catalogResult.stale -or $changelogResult.stale -or $auditExitCode -eq 1) {
+    elseif ($catalogResult.stale -or $changelogResult.stale -or $auditExitCode -eq 1 -or
+            ($IncludeSmoke -and $smokeExitCode -eq 1)) {
         $exitCode = 1
     }
     else {
@@ -290,6 +322,7 @@ if ($Json) {
             auditErrors     = if ($auditResult) { $auditResult.summary.errors } else { $null }
             auditWarnings   = if ($auditResult) { $auditResult.summary.warnings } else { $null }
             auditInfo       = if ($auditResult) { $auditResult.summary.info } else { $null }
+            smokeExitCode   = $smokeExitCode
             exitCode        = $exitCode
             runtimeSeconds  = $runtimeSeconds
             executionError  = if ($script:ExecError) { "$($script:ExecError)" } else { $null }
@@ -297,6 +330,7 @@ if ($Json) {
         catalog   = $catalogResult
         changelog = $changelogResult
         audit     = $auditResult
+        smoke     = $smokeResult
     } | ConvertTo-Json -Depth 8
 }
 else {
@@ -321,6 +355,15 @@ else {
             } else { 'not run' }
         }
     )
+    if ($IncludeSmoke) {
+        $rows += [pscustomobject]@{
+            Check  = 'template-smoke'
+            Status = if ($null -eq $smokeExitCode) { 'SKIPPED' } elseif ($smokeExitCode -eq 0) { 'PASS' } else { 'FAIL' }
+            Detail = if ($smokeResult) {
+                "{0} passed, {1} failed; exit {2}" -f $smokeResult.passed, $smokeResult.failed, $smokeExitCode
+            } else { 'not run' }
+        }
+    }
     $rows | Format-Table -AutoSize Check, Status, Detail | Out-String -Width 200 | Write-Host
 
     if ($auditResult -and $auditResult.summary.errors -gt 0) {
