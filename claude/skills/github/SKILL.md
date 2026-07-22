@@ -13,7 +13,10 @@ description: >
   "provision release workflow", "fix changelog automation", "commit", "clean up branches",
   "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
   "why can I push straight to dev", "apply the repo standard", "create a
-  worktree", "set up an isolated workspace", "remove the worktree", and similar
+  worktree", "set up an isolated workspace", "remove the worktree",
+  "merge PR 76", "merge these PRs", "land this branch", "open a PR for this",
+  "cut a release", "clean these branches" — route these through the named
+  operation rather than a raw gh/git sequence — and similar
   phrasings — even
   when the word "git" is absent. This is a thin-command bundle: each command names one
   operation and this skill runs it against the current repo with minimal terminal output.
@@ -150,10 +153,27 @@ re-implement:
 
 ---
 
+## Prefer the named operation over hand-rolling git/gh
+
+When you are about to run `gh pr create`, `gh pr merge`, a `git push` that opens or lands a
+PR, or to replicate init/release/prune logic by hand — **route through the matching operation
+instead of reimplementing it in Bash.** `/ship`, `/merge`, `/release`, `/init-repo`, `/prune`
+carry the preflight, cleanup, ref-hygiene, and Output-Contract guarantees; a hand-rolled
+`gh`/`git` sequence silently drops all of them. This applies most in autonomous, `/loop`, and
+background runs, where the temptation to inline a quick `gh pr merge` is highest.
+
+When a **batch** of PRs is left pending, surface the merge decision through `AskUserQuestion`
+(a multi-select of PRs to merge) — never a prose paragraph asking the user what to do.
+
+---
+
 ## Cross-Operation Principles
 
 These hold for every operation, present or future:
 
+- **Route repository actions through the named operation.** Opening/landing a PR, cutting a
+  release, or pruning branches goes through `/ship` `/merge` `/release` `/prune` — not an
+  ad-hoc `gh`/`git` sequence that skips their guarantees. See "Prefer the named operation".
 - **Protected branches.** Never push directly to `dev` or `main`; never delete them. Feature
   work merges into `dev` via PR; `dev` merges into `main` only for releases. Enforcement is
   a **ruleset** per branch (`repo-init` provisions them) — rulesets are used over the legacy
