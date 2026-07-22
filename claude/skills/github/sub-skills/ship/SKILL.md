@@ -165,6 +165,21 @@ silently when not requested.
 ```bash
 git checkout -b "$BRANCH"   # skip if already on the pre-committed branch
 git commit -m "$MSG"        # skip if pre-committed
+```
+
+After committing, verify the commit is the one you intended — a `prepare-commit-msg` hook or a
+harness intercept can hijack `-m` (observed: correct 9 files, unrelated message). Do not rely
+on vigilance:
+
+```bash
+HEAD_MSG=$(git log -1 --format=%s)
+HEAD_FILES=$(git show --name-only --format= HEAD | sort)
+```
+
+If `$HEAD_MSG` does not match `$MSG`, or the file list differs from what was staged, **bail
+loudly** (print both, stop) rather than pushing a mislabeled commit. Only then push:
+
+```bash
 git push -u origin "$BRANCH"
 ```
 

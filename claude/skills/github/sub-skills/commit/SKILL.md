@@ -87,6 +87,11 @@ git commit -m "fix: …"
 printf '%s\n\n%s\n' "fix: subject" "- bullet one" > "$TMP" && git commit -F "$TMP"; rm -f "$TMP"
 ```
 
+After committing, confirm `git log -1 --format=%s` matches the message you wrote and
+`git show --name-only --format= HEAD` matches what you staged — a `prepare-commit-msg` hook or
+harness intercept can silently swap the message (observed: correct files, unrelated message).
+On a mismatch, bail loudly (print both, stop) rather than pushing a mislabeled commit.
+
 ---
 
 ## Step 4 — Push

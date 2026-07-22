@@ -112,11 +112,16 @@ mergeCommitAllowed:  true
 squashMergeAllowed:  false
 rebaseMergeAllowed:  false
 deleteBranchOnMerge: true
-allowAutoMerge:      true
 ```
 
 Squash and rebase are disabled at the repo level so the UI is physically unable to violate
 the bundle's merge-commit rule. `deleteBranchOnMerge` complements `/prune`.
+
+**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`autoMergeAllowed`) is
+a **per-repo choice, not part of the standard**: `repo-init` *reports* its current state so you
+know whether `/ship` and `/merge` can take the `--auto` preflight path, but it never enables it
+and never flags it as drift. `/ship` and `/merge` detect it live at preflight and fall back to
+watch-to-green when it is off.
 
 ### Group 3 — Security
 
@@ -166,6 +171,13 @@ independently of fact 1.
 1. Current `core.hooksPath` value, if set and the directory exists → that is the repo's dir.
 2. Otherwise the first existing of `.githooks/`, `scripts/git-hooks/`, `.git-hooks/`.
 3. Otherwise create `.githooks/`.
+
+**Pre-existing worktrees change the mechanism.** `core.hooksPath` is **not** honored uniformly
+across linked worktrees — a gate set only via `core.hooksPath` can silently skip on a secondary
+worktree or a branch that predates the config. When `git worktree list` shows secondary
+worktrees, prefer installing a `.git/hooks` shim (or a per-worktree hook link) that delegates to
+the versioned hooks directory, rather than relying on `core.hooksPath` alone. State the
+trade-off in the summary.
 
 Standard hook set — **overridable per repo** via `hooks.set` in the manifest:
 
@@ -438,6 +450,10 @@ Build the drift list group by group (Groups 1–9). Each item is one of:
 | **drift** | repo moved away from the standard | actionable |
 | **new-in-standard** | repo's `standardVersion` predates this rule | actionable, labelled `(new)` |
 | **blocked** | cannot be applied here (plan/permission) | reported with the reason, not offered |
+
+Auto-merge (`autoMergeAllowed`, probed in Step 2) is reported here as **informational status,
+never drift** — a per-repo choice (Group 2). Surface whether it is on or off so the operator
+knows the `--auto` path is available to `/ship` and `/merge`; never offer to change it.
 
 Fully conformant → print the conformance summary and **stop without asking anything**.
 
