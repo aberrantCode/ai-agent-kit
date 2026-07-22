@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-19",
+  "generated": "2026-07-21",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -133,6 +133,11 @@
         "content-aware-file-renaming": {
           "description": "Use when renaming files into a structured naming formula based on their contents \u2014 especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files (document.pdf, document (1).pdf, IMG_*.jpg, scan*.pdf, untitled.*), bulk extracts from broker/bank portals or email attachments, or zip archives that must be extracted before processing. Triggers when the existing filename does not carry the document's identity and the file's content must be inspected to determine who, what, where, and when. The canonical naming formula is `%who% - %what% - %where% - %when% - %extra%`. Always prompt the user via AskUserQuestion only \u2014 never as plain text.",
           "category": "Tooling & DevOps"
+        },
+        "continue-new-session-prompt": {
+          "description": "Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says \"continue in a new session\", \"spawn a new terminal and keep going\", \"hand this off\", \"open a new window and work through those items\", \"/continue-new-session-prompt\", or otherwise asks for the open items from your last response to be executed elsewhere \u2014 including when they just say \"go do all that in a new session\". The skill turns the decision list you most recently gave them into a self-contained handoff prompt (state already established, tasks in dependency order, hard constraints, cheap subagent delegation, /loop for anything that needs polling), writes it under docs/PROMPTS/, and launches it via a script so no prompt text ever passes through shell quoting.",
+          "category": "Foundations & Workflow",
+          "has_commands": true
         },
         "conversation-history-mining-for-domain-knowledge": {
           "description": "Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps \u2014 mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.",
