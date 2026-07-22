@@ -226,6 +226,25 @@ future reader from "cleaning up" entries whose purpose isn't obvious:
 .claude/worktrees/
 ```
 
+#### Generated-and-committed files — merge policy (opt-in, declared in the manifest)
+
+Some repos commit a file that is *also* regenerated from source — a `CATALOG.md`, a
+`docs/STATUS.md`, a date-keyed changelog. Two branches almost always collide on it, and a
+date-keyed one goes stale across a midnight boundary. Declare each such file under
+`generatedCommitted` in the manifest (`path` + the `regen` command that rebuilds it). For every
+declared path, `repo-init`:
+
+- registers a **local** merge driver — a `merge=union` (or a keep-ours-then-regen) entry in
+  `.gitattributes` plus the matching `git config merge.<driver>.*` **in this clone's local
+  config**. State plainly in the summary that **GitHub's server-side merge ignores
+  `.gitattributes`**, so this only smooths *local* merges and rebases; a PR merged in the UI is
+  unaffected by it.
+- installs or extends a `post-rewrite` **and** `post-merge` hook (Group 5) that re-runs each
+  `regen` command, so a rebase leaves the generated file correct rather than conflicted.
+
+Opt-in by construction: a repo that declares nothing under `generatedCommitted` gets no merge
+driver and no regen hook, and behaves exactly as before.
+
 ### Group 7 — Repo metadata
 
 `description` non-empty, `topics` non-empty, `homepageUrl` set if the project has a site.
@@ -314,6 +333,14 @@ hooks:
   set: [pre-commit, pre-push]  # overridable per repo
 
 artifacts: [gitignore, gitattributes, gitleaks, pr-template, issue-templates, security, contributing]
+
+# Files that are regenerated from source AND committed. Opt-in, declared per repo.
+# repo-init provisions a local merge driver + regen hook for each (see Group 6).
+generatedCommitted:
+  - path: docs/STATUS.md
+    regen: pwsh ./scripts/sync-status.ps1
+  - path: CATALOG.md
+    regen: pwsh ./scripts/generate-catalog.ps1 -Force
 
 claudeMd:
   managedBlock: true          # the repo-init:begin/end span is maintained here
