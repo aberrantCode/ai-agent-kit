@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-19, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-21, schemaVersion: 1)
 -->
 
 # Catalog
@@ -23,6 +23,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`base`](claude/skills/base/SKILL.md) | Universal coding patterns, constraints, TDD workflow, atomic todos | codex |
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
+| [`continue-new-session-prompt`](claude/skills/continue-new-session-prompt/SKILL.md) | Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says "continue in a new session", "spawn a new terminal and ke... | — |
 | [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/SKILL.md) | Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps — mine prior Claude conversation transcripts instead... | — |
 | [`existing-repo`](claude/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | codex |
 | [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
