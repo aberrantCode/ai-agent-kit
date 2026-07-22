@@ -1,7 +1,7 @@
 ---
 name: sops-secrets
 category: Security & Credentials
-description: Domain expertise for SOPS-encrypted secrets in this repo — reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. "what's the login for grafana"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally — always shell to ac-devops, which is the only host with the age key.
+description: Domain expertise for SOPS-encrypted secrets in this repo — reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. "what's the login for grafana"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally — always shell to ac-devops, which is the only host with the age key. For agents: the Secrets-Broker MCP server is the reference-only path for checking/provisioning/rotating secrets without plaintext; this skill handles human plaintext reads and raw SOPS access.
 ---
 
 # SOPS Secrets Skill
@@ -25,6 +25,29 @@ If the question is about how Ansible **consumes** secrets in playbooks (not the
 storage/rotation side), defer to the broader `ac-opbta-ops` skill — it owns
 ISSUE-004 (`vars_files` vs `community.sops.load_vars`) and the playbook-side
 contract.
+
+## Agent path: use the Secrets-Broker MCP for reference-only access
+
+When **agents** need to check, provision, rotate, or apply secrets, use the
+**Secrets-Broker MCP server** (Python FastMCP on the workstation). Its tools
+return **references + fingerprints only, never plaintext** — removing the
+handoff pause and closing the transcript side-channels. Setup:
+`bash scripts/mcp/setup-venv.sh`.
+
+Key tools:
+- **`secret_exists(file, key)`** — check existence; returns a `sha256:<8hex>` fingerprint.
+- **`secret_reference(file, key)`** — an opaque `sops://…` handle for templates/tools.
+- **`secret_provision(file, key, generator="hex")`** — mint a new secret (idempotent); returns ref + fingerprint, never the value.
+- **`secret_rotate(file, key, generator="hex")`** — rotate; returns old + new fingerprints.
+- **`secret_apply(target, mode="syntax")`** — resolve + apply server-side to a service (`target` is a static enum: tailscale/observability/cloudflare; `check`/`apply` modes are operator-gated).
+
+Full tool reference + security model:
+[`docs/runbooks/security--secrets-broker-mcp.md`](../../../docs/runbooks/security--secrets-broker-mcp.md).
+
+**When NOT to use the broker:** human plaintext reads (copying a password into a
+login form) stay on this skill's `/get-service-auth` / `/get-secret` + the
+KeePass mirror. Agents should never call `/get-secret` — plaintext must not
+enter the transcript.
 
 ## The one rule you must never break
 
@@ -70,6 +93,11 @@ All commands are thin wrappers that:
   remediation. See `.claude/commands/sops-status.md`.
 
 ### Mutating
+
+> **For agents:** provisioning and rotating secrets is now automated via the
+> Secrets-Broker MCP server (see "Agent path" above) — no pause, plaintext
+> never enters chat. The commands below are the operator's low-level SOPS
+> access for interactive credential management.
 
 - **`/update-auth <service> [--username <u>] [--password <p>]`** — Set the
   username and/or password for a service. SSHes to ac-devops, runs `sops --set`

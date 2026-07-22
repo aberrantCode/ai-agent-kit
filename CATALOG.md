@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-21, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-22, schemaVersion: 1)
 -->
 
 # Catalog
@@ -89,6 +89,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | Skill | Description | Also in |
 |---|---|---|
 | [`ac-logo`](claude/skills/ac-logo/SKILL.md) | Full lifecycle for AC "PCB phosphor console" brand logos in any repository — finding existing logo assets and judging them against the brand checklist, generating a new on-brand badge, reskinning an off-brand logo int... | — |
+| [`design-taste-frontend`](claude/skills/design-taste-frontend/SKILL.md) | Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering. | — |
 | [`doc-coauthoring`](claude/skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users... | codex |
 | [`explain-code`](claude/skills/explain-code/SKILL.md) | Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks "how does this work? | codex |
 | [`frontend-design`](claude/skills/frontend-design/SKILL.md) | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, land... | codex |
@@ -205,6 +206,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/SKILL.md) | Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts — check both the MCP-visible layer and the server-side queue table di... | — |
 | [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/SKILL.md) | Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space — covers layered diagnosis and safe recovery o... | — |
 | [`multi-perspective-dns-diagnostic-ladder`](claude/skills/multi-perspective-dns-diagnostic-ladder/SKILL.md) | Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any "mysterious" networked-service failure needs root-causing — apply a layered probing ladder (multiple resolver perspectives, or dependency-chai... | — |
+| [`opbta-service`](claude/skills/opbta-service/SKILL.md) | Use when deploying, updating, retiring, inspecting, managing, or listing an internal service on svc.opbta.com (OPBTA) from any repo, not only AC_OPBTA. Covers deploy a service, add a container, stand up X on svc.opbta... | — |
 | [`shell-helper-migration`](claude/skills/shell-helper-migration/SKILL.md) | Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) — extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and pre... | — |
 | [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/SKILL.md) | Use when deciding whether a shell script can safely be migrated to source a centralized helper library — classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categorie... | — |
 | [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/SKILL.md) | Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own val... | — |
