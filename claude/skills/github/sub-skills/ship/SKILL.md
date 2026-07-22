@@ -207,6 +207,12 @@ pending-checks path above.
 
 ## Step 7 — Merge and clean up
 
+If `$IN_WORKTREE`, first confirm the worktree is still registered
+(`git worktree list --porcelain | grep -q "$REPO_ROOT"`). A concurrent session may have pruned
+it mid-task; if it is gone, do **not** silently fall through onto the shared primary checkout
+(that briefly moves `main`/`dev` off-branch). Pause via `AskUserQuestion` (recreate the
+worktree and replay the commit / continue on the primary checkout deliberately / abort).
+
 From `$REPO_ROOT`, stash any post-hook working-tree changes so the post-merge checkout is not
 blocked. If `$IN_WORKTREE`, remove the worktree before merging:
 
