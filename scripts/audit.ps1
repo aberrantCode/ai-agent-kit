@@ -139,6 +139,30 @@ function Get-PythonExe {
     throw "No Python interpreter found on PATH (tried python3, python)."
 }
 
+# Normalized set of markdown heading texts (## and deeper) from a document. Used by
+# the Claude<->Codex body-parity check: harness wording lives in prose, so comparing
+# heading *structure* surfaces a missing Step/section without flagging every reworded
+# sentence. Normalization strips markdown, backticks, and punctuation so a hyphen vs
+# em-dash or a `$VERSION` backtick can never register as drift.
+function Get-HeadingSet {
+    param([string]$Text)
+    $set = [System.Collections.Generic.List[string]]::new()
+    if ([string]::IsNullOrEmpty($Text)) { return $set }
+    foreach ($m in [regex]::Matches($Text, '(?m)^#{2,}\s+(.+?)\s*$')) {
+        $h = $m.Groups[1].Value.ToLowerInvariant()
+        $h = ($h -replace '[^a-z0-9 ]', ' ') -replace '\s+', ' '
+        $h = $h.Trim()
+        if (-not $h) { continue }
+        # Strip harness-specific sections so only *substantive* (non-harness) divergence
+        # is compared: a Claude-only Diagram link or a "Claude instructions" block is not
+        # mirror drift (T8 asks for non-harness divergence).
+        if ($h -eq 'diagram') { continue }
+        if ($h -match '\b(claude|codex|gemini)\b') { continue }
+        $set.Add($h)
+    }
+    return $set
+}
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -546,6 +570,37 @@ for pat in pats:
                     Add-Finding error 'hook-eol' $rel `
                         'not pinned eol=lf in .gitattributes (CRLF-shebang hazard - F-KO-19)'
                 }
+            }
+        }
+    }
+
+    # --- CHECK 15: Claude<->Codex body parity [warn] (CU-13) ------------------
+    # Check 7 sees only whether a skill NAME is mirrored, not whether a mirrored
+    # skill's body drifted (e.g. a Codex sub-skill missing a whole Step the Claude
+    # copy has - F-DM-03). For every claude SKILL.md with a codex counterpart at the
+    # mirrored path, diff the heading structure and warn on any heading present on one
+    # side but not the other. Warn-only by design: mirror drift surfaces on every
+    # /audit-skills but never fails an archive PR (charter mirror-gap philosophy) - a
+    # real port is a separate change.
+    $claudeSkillsRoot = Join-Path $RepoRoot 'claude/skills'
+    if (Test-Path -LiteralPath $claudeSkillsRoot) {
+        foreach ($f in Get-ChildItem -LiteralPath $claudeSkillsRoot -Recurse -Filter 'SKILL.md' -File -ErrorAction SilentlyContinue) {
+            $claudePath = $f.FullName.Replace('\', '/')
+            $codexPath  = $claudePath -replace '/claude/skills/', '/codex/skills/'
+            if (-not (Test-Path -LiteralPath $codexPath)) { continue }  # not mirrored - Check 7 covers presence
+
+            $ch = @(Get-HeadingSet (Get-Content -LiteralPath $f.FullName -Raw))
+            $co = @(Get-HeadingSet (Get-Content -LiteralPath $codexPath -Raw))
+            if ($ch.Count -eq 0 -and $co.Count -eq 0) { continue }
+
+            $missingInCodex  = @($ch | Where-Object { $co -notcontains $_ })
+            $missingInClaude = @($co | Where-Object { $ch -notcontains $_ })
+            if ($missingInCodex.Count -gt 0 -or $missingInClaude.Count -gt 0) {
+                $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $codexPath).Replace('\', '/')
+                $parts = @()
+                if ($missingInCodex.Count -gt 0)  { $parts += 'codex missing section(s): ' + ($missingInCodex -join '; ') }
+                if ($missingInClaude.Count -gt 0) { $parts += 'claude missing section(s): ' + ($missingInClaude -join '; ') }
+                Add-Finding warn 'body-parity' $rel ($parts -join ' || ')
             }
         }
     }
