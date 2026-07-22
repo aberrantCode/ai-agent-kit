@@ -18,6 +18,14 @@
       * Claude<->Codex mirror gap ............................. [info]
       * Missing diagram.html ................................. [info]
       * Profile skill shadowing a bundle sub-skill ............ [warn]
+      * Output Contract inlined in every sub-skill (no dangling
+        pointer) .............................................. [error]
+      * Command "sub-skills/<x>" path resolution + github
+        op-dir shadow ......................................... [error]
+      * Template *.ps1 non-ASCII bytes ...................... [error]
+      * Template *.ps1 PSScriptAnalyzer (degrades if absent) . [warn|info]
+      * Command-file frontmatter YAML validity .............. [error]
+      * templates/hooks/** pinned eol=lf in .gitattributes .. [error]
 
     The profile-shadowing check is the one check that reads outside the archive. A
     loose top-level skill in `~/.claude/skills/<name>` whose name matches a sub-skill
@@ -352,6 +360,192 @@ try {
                     "'$owner' - /$($top.Name) resolves to the loose copy, not the bundle. " +
                     "Import anything unique to the archive, then delete " +
                     "$(Join-Path $ProfileRoot $top.Name)")
+            }
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Bundle-hardening lints (github-skill audit 2026-07-22, T12). These read
+    # skill/command/template files on disk directly rather than through the
+    # manifest; each Test-Path-guards its roots so it no-ops on partial trees.
+    # -----------------------------------------------------------------------
+    $platformSkillRoots = @(
+        (Join-Path $RepoRoot 'claude/skills')
+        (Join-Path $RepoRoot 'codex/skills')
+    ) | Where-Object { Test-Path -LiteralPath $_ }
+
+    # --- CHECK 9: pointer-only Output-Contract lint [error] (CU-11 / F-KO-04) --
+    # A sub-skill can load standalone, so a bare "obey the parent Output Contract"
+    # pointer resolves to nothing. Every sub-skill that references an Output
+    # Contract must inline its own "## Output Contract" section. Files that never
+    # mention the contract are not contract-bearing and are skipped; keying on the
+    # section heading (not a bundle-specific marker string) lets bundles use their
+    # own contract wording while still catching the dangling-pointer regression.
+    $subSkillFiles = [System.Collections.Generic.List[string]]::new()
+    foreach ($root in $platformSkillRoots) {
+        foreach ($f in Get-ChildItem -LiteralPath $root -Recurse -Filter 'SKILL.md' -File -ErrorAction SilentlyContinue) {
+            if ($f.FullName.Replace('\', '/') -match '/sub-skills/[^/]+/SKILL\.md$') {
+                $subSkillFiles.Add($f.FullName)
+            }
+        }
+    }
+    foreach ($file in $subSkillFiles) {
+        $text = Get-Content -LiteralPath $file -Raw
+        if ([string]::IsNullOrEmpty($text)) { continue }
+        if ($text -notmatch 'Output Contract') { continue }
+        if ($text -notmatch '(?m)^#{2,}\s+Output Contract') {
+            $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $file).Replace('\', '/')
+            Add-Finding error 'output-contract' $rel `
+                'references an Output Contract but inlines no "## Output Contract" section (dangling pointer - F-KO-04)'
+        }
+    }
+
+    # --- CHECK 10: sub-skill path resolution + github op-dir shadow [error] ----
+    # (CU-12) 10a: every "sub-skills/<x>" a command references must resolve to a
+    # real SKILL.md in that bundle - a renamed sub-skill otherwise 404s silently.
+    foreach ($root in $platformSkillRoots) {
+        foreach ($cmd in Get-ChildItem -LiteralPath $root -Recurse -Filter '*.md' -File -ErrorAction SilentlyContinue) {
+            $norm = $cmd.FullName.Replace('\', '/')
+            if ($norm -notmatch '/commands/[^/]+\.md$') { continue }
+            $bundleRoot = $norm -replace '/commands/[^/]+\.md$', ''
+            $body = Get-Content -LiteralPath $cmd.FullName -Raw
+            if ([string]::IsNullOrEmpty($body)) { continue }
+            $seenRef = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+            foreach ($m in [regex]::Matches($body, 'sub-skills/([a-z0-9][a-z0-9-]*)')) {
+                $sub = $m.Groups[1].Value
+                if (-not $seenRef.Add($sub)) { continue }
+                if (-not (Test-Path -LiteralPath (Join-Path $bundleRoot "sub-skills/$sub/SKILL.md"))) {
+                    $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $cmd.FullName).Replace('\', '/')
+                    Add-Finding error 'subskill-path' $rel `
+                        "references sub-skills/$sub but that sub-skill's SKILL.md does not exist in the bundle"
+                }
+            }
+        }
+    }
+    # 10b: no top-level skill may shadow a github bundle sub-skill (the F-KO-05
+    # class - how /merge silently resolved to a stale loose copy). Scoped to the
+    # github bundle on purpose: youtube-extraction and project-manager deliberately
+    # dual-publish some sub-skills as top-level skills, so an archive-wide rule
+    # would false-fail on accepted state.
+    foreach ($platform in 'claude', 'codex') {
+        $ghSub = Join-Path $RepoRoot "$platform/skills/github/sub-skills"
+        $skillsRoot = Join-Path $RepoRoot "$platform/skills"
+        if (-not (Test-Path -LiteralPath $ghSub)) { continue }
+        foreach ($sub in Get-ChildItem -LiteralPath $ghSub -Directory -ErrorAction SilentlyContinue) {
+            if (Test-Path -LiteralPath (Join-Path $skillsRoot $sub.Name)) {
+                Add-Finding error 'op-dir-shadow' "$platform/skills/$($sub.Name)" `
+                    "top-level skill shadows github sub-skill '$($sub.Name)' - /$($sub.Name) would resolve to the loose copy, not the bundle (F-KO-05)"
+            }
+        }
+    }
+
+    # --- CHECK 11+12: template .ps1 hygiene [error | warn] (CU-14a/b) ----------
+    $templatePs1 = [System.Collections.Generic.List[string]]::new()
+    foreach ($root in $platformSkillRoots) {
+        foreach ($f in Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' -File -ErrorAction SilentlyContinue) {
+            if ($f.FullName.Replace('\', '/') -match '/templates/') { $templatePs1.Add($f.FullName) }
+        }
+    }
+    # 11: non-ASCII bytes (the mojibake class, F-KO-10). Byte scan; first offender.
+    foreach ($file in $templatePs1) {
+        $bytes = [System.IO.File]::ReadAllBytes($file)
+        $line = 1
+        for ($i = 0; $i -lt $bytes.Length; $i++) {
+            if ($bytes[$i] -eq 10) { $line++ }
+            elseif ($bytes[$i] -gt 127) {
+                $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $file).Replace('\', '/')
+                Add-Finding error 'template-nonascii' "${rel}:${line}" `
+                    'non-ASCII byte in a template .ps1 (mojibake class - F-KO-10); use ASCII glyphs'
+                break
+            }
+        }
+    }
+    # 12: PSScriptAnalyzer (unapproved verbs, Write-Host; F-KO-11). Degrade to a
+    # skipped note when the module is absent (mirrors the gitleaks-absent pattern).
+    if ($templatePs1.Count -gt 0) {
+        if (Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue) {
+            foreach ($file in $templatePs1) {
+                $diags = Invoke-ScriptAnalyzer -Path $file -Severity Warning, Error -ErrorAction SilentlyContinue
+                foreach ($d in $diags) {
+                    $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $file).Replace('\', '/')
+                    Add-Finding warn 'template-lint' "${rel}:$($d.Line)" "$($d.RuleName): $($d.Message)"
+                }
+            }
+        }
+        else {
+            Add-Finding info 'template-lint' 'templates/**/*.ps1' `
+                'PSScriptAnalyzer not installed - template lint skipped (Install-Module PSScriptAnalyzer)'
+        }
+    }
+
+    # --- CHECK 13: command frontmatter YAML validity [error] (CU-14c / F-KO-16)
+    # audit already validates SKILL.md frontmatter via generate-manifest.py;
+    # command files are the uncovered gap. A present leading `---` block must parse
+    # as YAML (a colon-space once broke init-repo.md's frontmatter and the harness
+    # silently used the body as the description). Real YAML parse via PyYAML - never
+    # a hand-rolled split. Files with no `---` block carry no frontmatter and are
+    # skipped. Degrades to an info note when PyYAML is absent.
+    $cmdYamlPy = @'
+import sys, glob, os
+root = sys.argv[1]
+try:
+    import yaml
+except ImportError:
+    print("__NO_YAML__"); sys.exit(0)
+pats = ['claude/skills/**/commands/*.md', 'codex/skills/**/commands/*.md',
+        'claude/commands/*.md', 'codex/commands/*.md']
+seen = set()
+for pat in pats:
+    for p in glob.glob(os.path.join(root, pat), recursive=True):
+        rp = os.path.normpath(p)
+        if rp in seen:
+            continue
+        seen.add(rp)
+        try:
+            t = open(p, encoding='utf-8').read()
+        except Exception as e:
+            print(f"{p}\t{str(e).splitlines()[0]}"); continue
+        if not t.startswith('---'):
+            continue
+        end = t.find('\n---', 3)
+        if end == -1:
+            print(f"{p}\tunterminated frontmatter block (opening --- has no closing ---)"); continue
+        try:
+            yaml.safe_load(t[3:end])
+        except Exception as e:
+            print(f"{p}\t{str(e).splitlines()[0]}")
+'@
+    $yamlRaw = & $pythonExe @('-c', $cmdYamlPy, $RepoRoot)
+    if ($LASTEXITCODE -eq 0 -and $yamlRaw) {
+        foreach ($ln in $yamlRaw) {
+            if ([string]::IsNullOrWhiteSpace($ln)) { continue }
+            if ($ln.Trim() -eq '__NO_YAML__') {
+                Add-Finding info 'command-frontmatter' 'commands/*.md' `
+                    'PyYAML not installed - command frontmatter validation skipped'
+                continue
+            }
+            $parts = $ln -split "`t", 2
+            $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $parts[0]).Replace('\', '/')
+            $msg = if ($parts.Count -gt 1) { $parts[1] } else { 'invalid YAML frontmatter' }
+            Add-Finding error 'command-frontmatter' $rel "invalid YAML frontmatter: $msg"
+        }
+    }
+
+    # --- CHECK 14: hook-template LF coverage [error] (CU-14d / F-KO-19) --------
+    # Every templates/hooks/** file must be pinned eol=lf in .gitattributes - a
+    # CRLF shebang is a broken interpreter path on POSIX sh (incl. Git-for-Windows'
+    # bundled sh.exe). git check-attr is the authoritative evaluator, so no
+    # .gitattributes glob matching is re-implemented here.
+    if (Get-Command git -ErrorAction SilentlyContinue) {
+        foreach ($root in $platformSkillRoots) {
+            foreach ($f in Get-ChildItem -LiteralPath $root -Recurse -File -ErrorAction SilentlyContinue) {
+                if ($f.FullName.Replace('\', '/') -notmatch '/templates/hooks/[^/]+$') { continue }
+                $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $f.FullName).Replace('\', '/')
+                $attr = & git -C $RepoRoot check-attr eol -- $rel 2>$null
+                if (($attr -join "`n") -notmatch 'eol:\s*lf') {
+                    Add-Finding error 'hook-eol' $rel `
+                        'not pinned eol=lf in .gitattributes (CRLF-shebang hazard - F-KO-19)'
+                }
             }
         }
     }
