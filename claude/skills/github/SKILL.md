@@ -217,6 +217,15 @@ These hold for every operation, present or future:
   the source (`git remote set-head origin -a`) rather than working around it, and never
   guess-continue past a failed verification.
 - **All user prompts go through `AskUserQuestion`.** Never write "type yes/no".
+- **`gh api` leading-slash paths on Git-Bash need `MSYS_NO_PATHCONV=1`, and read back the
+  result.** MSYS rewrites a leading `/repos/...` into a Windows filesystem path before `gh`
+  sees it, so the call silently no-ops (branch protection *looked* applied but wasn't). Prefix
+  such calls `MSYS_NO_PATHCONV=1 gh api "/repos/…"` (or drop the leading slash:
+  `gh api "repos/…"`), and confirm the applied state by re-reading it — never trust exit 0.
+- **A git-bash `fork`/`add_item … failed` is a shell failure, not a git failure.** On Windows
+  Cygwin after heavy use, bash cannot fork; re-run the same `git`/`gh` step through `pwsh`.
+  Shell state does not persist but repo state does, so just repeat the last command. `ship`,
+  `merge`, and `release` carry this row in their Error-Recovery tables.
 - **Never force-push `dev` or `main` blind, never skip failing CI gates.** Surface the failure
   and stop.
 

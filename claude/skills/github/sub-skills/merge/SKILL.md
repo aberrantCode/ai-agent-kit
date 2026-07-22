@@ -206,3 +206,11 @@ Cleanup: remote + local branch deleted, worktree removed.
 For multiple targets, one line each. Prefix any target that failed its gate with its error.
 If a worktree dir was left on disk, add a single caveat line telling the user to delete it
 manually.
+
+---
+
+## Error Recovery
+
+| Situation | Recovery |
+|---|---|
+| git-bash `fork`/`add_item … failed` mid-run (Windows Cygwin) | Not a git failure — bash could not fork. Re-run the same `git`/`gh` step through `pwsh`; shell state doesn't persist but repo state does, so just repeat the last command |
