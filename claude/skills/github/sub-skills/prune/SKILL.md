@@ -100,8 +100,17 @@ or exclude some (follow up with a multi-select of items to **keep**). Confirm th
 ```bash
 git worktree remove <path>            # retry with --force if the branch is checked out there
 git branch -d <branch>                # safe delete only; never silently escalate to -D
-git push origin --delete <branch>     # strip the origin/ prefix
+
+# remote branch — skip cleanly if the server already deleted it (deleteBranchOnMerge).
+if git ls-remote --heads origin "<branch>" | grep -q .; then
+  git push origin --delete "<branch>"   # strip any origin/ prefix from <branch> first
+else
+  : # already gone server-side — record "remote already removed", not a failure
+fi
 ```
+
+A `push origin --delete` that still races the server-side deletion and returns `remote ref
+does not exist` is also success — record it and move on, never surface it.
 
 Track each result (success / failure with stderr). Apply the **Windows worktree-lock footgun**
 rule from the parent skill if a worktree dir resists removal.
