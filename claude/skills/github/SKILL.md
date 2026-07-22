@@ -174,6 +174,17 @@ These hold for every operation, present or future:
 - **Route repository actions through the named operation.** Opening/landing a PR, cutting a
   release, or pruning branches goes through `/ship` `/merge` `/release` `/prune` — not an
   ad-hoc `gh`/`git` sequence that skips their guarantees. See "Prefer the named operation".
+- **Never merge before a preflight passes.** Before any `gh pr merge`, read
+  `gh pr view <n> --json state,isDraft,mergeable,mergeStateStatus,reviewDecision` and
+  `gh pr checks <n>`. A `mergeable == "UNKNOWN"` right after a push is transient — poll, don't
+  fail. `isDraft` is its own gate (ask: mark-ready or skip). Required checks / `BLOCKED` mean
+  either `--auto` (only if the repo has auto-merge enabled) or watch-to-green — never bypass.
+  `merge` and `ship` carry the executable preflight; see their steps.
+- **Refresh remote refs before reasoning; treat an already-gone remote delete as success.**
+  Any op that decides "merged?" or "still needs deleting?" from local refs runs
+  `git fetch --prune origin` first — `deleteBranchOnMerge` (which `repo-init` enables) removes
+  branches server-side, so unpruned `origin/*` refs are phantoms. Before deleting a remote
+  branch, `git ls-remote --heads origin <b>`; absent → record "already removed", not a failure.
 - **Protected branches.** Never push directly to `dev` or `main`; never delete them. Feature
   work merges into `dev` via PR; `dev` merges into `main` only for releases. Enforcement is
   a **ruleset** per branch (`repo-init` provisions them) — rulesets are used over the legacy

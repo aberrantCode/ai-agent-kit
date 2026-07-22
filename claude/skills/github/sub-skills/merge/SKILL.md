@@ -78,24 +78,33 @@ whole run — record it and continue to the next target.
 
 ---
 
-## Step 2 — Pre-merge checks (per PR)
+## Step 2 — Preflight (per PR)
 
 ```bash
-gh pr view <n> --json state,mergeable,mergeStateStatus,headRefName,title
+git fetch --prune origin      # refresh remote-tracking refs before reasoning about state
+gh pr view <n> --json state,isDraft,mergeable,mergeStateStatus,reviewDecision,headRefName,title
 gh pr checks <n>
 ```
 
-Gate before merging:
+Gate, in order — each blocker stops *this target* only (record it, continue to the next):
 
-- `state` must be `OPEN`. Already `MERGED` → skip to cleanup (Step 4) and note it.
-- `mergeable` must be `MERGEABLE`. `CONFLICTING` → **stop this target**, surface the conflict,
-  do not attempt to resolve remotely.
-- `mergeStateStatus` of `BLOCKED` or `BEHIND`, or any failing/pending check in
-  `gh pr checks` → **stop this target** and print the failing check. Never bypass a required
-  gate. If checks are merely still running, say so and let the user re-run `/merge` later.
+1. `state == MERGED` → skip to cleanup (Step 4), note it. `state != OPEN` otherwise → stop.
+2. `isDraft == true` → `AskUserQuestion` (mark ready with `gh pr ready <n>` / skip this PR).
+   A draft passes every content gate and is then refused by GitHub, so gate it up front.
+3. `mergeable == "UNKNOWN"` → transient right after a push. Poll up to 5× at 15s intervals,
+   re-reading `gh pr view <n> --json mergeable`; only treat a *stable* non-`MERGEABLE` as real.
+4. `mergeable == "CONFLICTING"` → stop this target; surface the conflict; never resolve remotely.
+5. `mergeStateStatus == BEHIND` → the base moved; note it. `BLOCKED`, or any failing/pending
+   `gh pr checks` line → required checks are in play:
+   - Detect whether the repo even allows auto-merge:
+     `gh repo view --json autoMergeAllowed -q .autoMergeAllowed`.
+   - `true` and checks are merely *pending* → `gh pr merge <n> --merge --auto --delete-branch`
+     and record "queued on auto-merge" for the summary.
+   - `false`, or a check is *failing* → stop this target and print the failing check. Never
+     `--admin`/`--no-verify` past a required gate here (release is the only op that may admin-merge).
 
-If the user wants to eyeball the change before merging, point them at the companion
-`/diff-review <pr#>` command (a visual HTML diff) — do not run it as part of this operation.
+To eyeball the change before merging, point the user at the companion `/diff-review <pr#>`
+command (a visual HTML diff) — do not run it as part of this operation.
 
 ---
 

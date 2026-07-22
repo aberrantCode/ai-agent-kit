@@ -184,6 +184,27 @@ fi
 
 ---
 
+## Step 6.5 — Merge preflight
+
+`ship` opened the PR moments ago, so `mergeable` is almost always `UNKNOWN` on first read and
+CI has not started. Do not merge blind (the recurring "failed 2–3× then watched checks"):
+
+```bash
+gh pr view "$BRANCH" --json isDraft,mergeable,mergeStateStatus,reviewDecision
+```
+
+- Poll `mergeable == UNKNOWN` up to 5× / 15s before treating it as real.
+- `isDraft` (only if you opened it draft) → `gh pr ready`.
+- `mergeStateStatus == BLOCKED` + pending checks → if
+  `gh repo view --json autoMergeAllowed -q .autoMergeAllowed` is `true`, set `AUTO=--auto` for
+  Step 7's merge; else watch `gh pr checks "$BRANCH" --watch` to green (leave `AUTO` empty),
+  then merge. A *failing* check stops the ship — surface it (Error-Recovery already covers this).
+
+Leave `AUTO` empty in the common clean case; it is set only on the auto-merge-enabled +
+pending-checks path above.
+
+---
+
 ## Step 7 — Merge and clean up
 
 From `$REPO_ROOT`, stash any post-hook working-tree changes so the post-merge checkout is not
@@ -193,8 +214,8 @@ blocked. If `$IN_WORKTREE`, remove the worktree before merging:
 cd "$REPO_ROOT"
 ( ! git diff --quiet || ! git diff --cached --quiet ) && git stash --include-untracked && STASHED=true
 [ "$IN_WORKTREE" = true ] && { git worktree remove "$REPO_ROOT" --force 2>/dev/null || git worktree prune; }
-gh pr merge "$BRANCH" --merge --delete-branch --subject "$MSG"
-gh pr view "$BRANCH" --json state --jq '.state'   # expect "MERGED"
+gh pr merge "$BRANCH" --merge --delete-branch ${AUTO:-} --subject "$MSG"
+gh pr view "$BRANCH" --json state --jq '.state'   # expect "MERGED" (or "queued" on --auto)
 ```
 
 Conditional cleanup and sync:
