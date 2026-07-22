@@ -27,8 +27,10 @@
         profile default; when omitted the platform-appropriate default
         (~/.claude/skills) is resolved from a cross-platform home directory.
       - Safety: default behavior is preview-only; -Force is required to actually
-        write files. An existing destination bundle is backed up (renamed to
-        `<Name>.bak-<timestamp>`) before it is replaced - never a silent clobber.
+        write files. An existing destination bundle is backed up to a sibling
+        `<profileRoot>-backups/<Name>.bak-<timestamp>` (outside the scanned skills
+        root, so the backup is never loaded as a duplicate skill) before it is
+        replaced - never a silent clobber.
         Resolved source and destination paths are canonicalized and
         containment-checked before any write, and -Name is restricted to a bare
         directory name so it cannot traverse out of either root.
@@ -182,9 +184,17 @@ try {
             New-Item -ItemType Directory -Path $profileRoot -Force | Out-Null
         }
         # Back up an existing destination before replacing it - never clobber silently.
+        # The backup MUST live outside the profile skills root: a `<Name>.bak-<ts>` dir
+        # left beside the bundle is itself scanned as a skill and loads as a duplicate
+        # shadow of the one just deployed (same name/triggers). Use a sibling
+        # `<root>-backups/` directory instead.
         if (Test-Path -LiteralPath $destDir) {
-            $stamp  = (Get-Date).ToString('yyyyMMddHHmmss')
-            $backup = "$destDir.bak-$stamp"
+            $stamp = (Get-Date).ToString('yyyyMMddHHmmss')
+            $backupRoot = Join-Path (Split-Path -Parent $profileRoot) ((Split-Path -Leaf $profileRoot) + '-backups')
+            if (-not (Test-Path -LiteralPath $backupRoot)) {
+                New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
+            }
+            $backup = Join-Path $backupRoot "$Name.bak-$stamp"
             Move-Item -LiteralPath $destDir -Destination $backup
             $result.backedUpTo = $backup
         }
