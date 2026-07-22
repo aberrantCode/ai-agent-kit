@@ -5,16 +5,24 @@
 .DESCRIPTION
     The prompt file is the only durable record of what a spawned session was asked to do. Deleting
     it while the work is unverified destroys the ability to re-run, audit, or hand the task to
-    someone else — so this refuses to delete until four conditions hold:
+    someone else — so this refuses to delete until five conditions hold:
 
       1. The task branch is merged into the base branch on the remote.
       2. The local base branch matches origin exactly (no unpushed or unpulled commits).
       3. The repo's tests pass.
       4. A human has confirmed the work is what they wanted (-Confirmed).
+      5. The delegation ledger has a tally row correlated to this session (or -NoDelegation
+         explicitly declares nothing was delegated).
 
     The first three are mechanical and checked here. The fourth cannot be inferred from the repo:
     a merged branch with green tests can still be the wrong solution, which is precisely what a
     human review catches. An agent may only pass -Confirmed after the user has actually said so.
+
+    The fifth is what stops the denominator quietly going missing. The end-of-session tally is the
+    step a tired session skips, and once retirement has run there is nothing left to notice the
+    gap. Gating deletion on it means a session either logs its dispatch totals or says out loud
+    (via -NoDelegation) that it delegated nothing — the one thing it can no longer do is skip the
+    ledger in silence.
 
     Reports every check and exits non-zero if any fail, deleting nothing.
 
@@ -41,6 +49,16 @@
 .PARAMETER Confirmed
     The human sign-off gate. Without it nothing is deleted, regardless of the other checks.
 
+.PARAMETER LedgerPath
+    The delegation-outcomes ledger to check for this session's tally. Defaults to
+    ~/.claude/telemetry/delegation-outcomes.jsonl (the same default log-delegation-outcome.ps1
+    writes to).
+
+.PARAMETER NoDelegation
+    Record the delegation gate as satisfied because nothing was delegated this session. The
+    reason is printed so a genuinely-no-delegation run is distinguishable from a skipped tally —
+    never silent, mirroring -SkipTests.
+
 .PARAMETER KeepWorktree
     Verify and delete the prompt, but leave the worktree and branch in place.
 #>
@@ -53,6 +71,8 @@ param(
     [string]$TestCommand,
     [switch]$SkipTests,
     [switch]$Confirmed,
+    [string]$LedgerPath = (Join-Path $env:USERPROFILE '.claude\telemetry\delegation-outcomes.jsonl'),
+    [switch]$NoDelegation,
     [switch]$KeepWorktree
 )
 
@@ -130,6 +150,33 @@ else {
 
 # 4. Human sign-off.
 Add-Check 'user confirmed the work' ([bool]$Confirmed) $(if ($Confirmed) { 'confirmed by caller' } else { 'not confirmed — rerun with -Confirmed once the user has signed off' })
+
+# 5. Delegation tally recorded for this session.
+$promptLeaf = Split-Path -Leaf $PromptPath
+# The slug is the prompt basename minus a leading yyyy-mm-dd- date and the .md suffix, so a tally
+# tagged by -Task ("<slug>: ...") correlates even when -PromptPath/-Branch were left off the row.
+$slug = ($promptLeaf -replace '\.md$', '') -replace '^\d{4}-\d{2}-\d{2}-', ''
+if ($NoDelegation) {
+    Add-Check 'delegation tally logged' $true 'caller declared no delegation (-NoDelegation)'
+}
+elseif (-not (Test-Path -LiteralPath $LedgerPath)) {
+    Add-Check 'delegation tally logged' $false "no ledger at $LedgerPath — log totals with log-delegation-outcome.ps1 -PromptPath '$PromptPath' -Outcome ok -Dispatches N, or pass -NoDelegation"
+}
+else {
+    $tallyFound = $false
+    foreach ($line in (Get-Content -LiteralPath $LedgerPath)) {
+        if (-not $line.Trim()) { continue }
+        try { $row = $line | ConvertFrom-Json } catch { continue }
+        if ($row.outcome -ne 'ok') { continue }
+        $matched = ($row.prompt -and $promptLeaf -and $row.prompt -like "*$promptLeaf*") -or
+                   ($Branch -and $row.branch -eq $Branch) -or
+                   ($slug -and $row.task -and $row.task -like "*$slug*")
+        if ($matched) { $tallyFound = $true; break }
+    }
+    $tallyDetail = if ($tallyFound) { "found an 'ok' tally row correlated to this session" }
+                   else { "no tally references '$slug' / '$Branch' / '$promptLeaf' — log totals tagged with -PromptPath '$PromptPath', or pass -NoDelegation if nothing was delegated" }
+    Add-Check 'delegation tally logged' $tallyFound $tallyDetail
+}
 
 Write-Host ''
 foreach ($r in $results) {

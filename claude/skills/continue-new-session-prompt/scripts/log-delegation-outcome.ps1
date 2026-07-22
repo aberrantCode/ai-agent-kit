@@ -82,6 +82,9 @@ if ($Outcome -ne 'ok' -and -not $FailureMode) {
 if ($Outcome -ne 'ok' -and -not $Evidence) {
     Write-Warning 'No -Evidence given. Future-you will not be able to tell whether this was a real model limitation or a bad prompt.'
 }
+if ($Outcome -eq 'ok' -and -not ($PromptPath -or $Branch -or $Task)) {
+    Write-Warning 'This tally has no -PromptPath/-Branch/-Task tag, so complete-task-session.ps1 cannot correlate it to a session and the retirement gate will not credit it. Tag totals rows with -PromptPath (the handoff prompt).'
+}
 
 $dir = Split-Path -Parent $LedgerPath
 if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
