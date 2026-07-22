@@ -93,7 +93,12 @@ Discover skills across the workstation that are new or changed relative to the a
 2. For each discovered `SKILL.md`:
    - Read frontmatter — if `installed-from: ai-agent-kit` is present, **skip** (installed copy)
    - If `status: deprecated` is present, classify as **Deprecated** regardless of diff — do not treat as New or Changed
-   - Compare content against archive counterpart using diff (ignore trailing whitespace)
+   - Compare content against archive counterpart using diff, **normalizing both sides
+     first**: drop any `^category:\s` frontmatter line and truncate at the first
+     `## Diagram` heading, then ignore trailing whitespace and CRLF/LF differences.
+     `/sync-skill` appends a `category:` line and a `## Diagram` / `[View
+     diagram](diagram.html)` footer to every archive copy that the live source lacks —
+     an un-normalized diff reports every previously synced skill as Changed forever.
    - Classify: **New** | **Changed** | **Unchanged** | **Orphan** | **Deprecated**
    - If `version:` is present and archive has a different version, note the version delta in the report
 
