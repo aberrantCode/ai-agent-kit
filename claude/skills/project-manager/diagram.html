@@ -264,7 +264,7 @@
 %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#1e2128', 'primaryTextColor': '#e8eaf0', 'primaryBorderColor': '#e8a04a', 'lineColor': '#6e7280', 'fontFamily': 'Fragment Mono', 'edgeLabelBackground': '#0e0f11', 'clusterBkg': '#16181c', 'background': '#0e0f11', 'secondaryColor': '#1e2128', 'tertiaryColor': '#1e2128'}}}%%
 flowchart TD
     Start(["Start"]) --> Step1{"Step 1\ndocs/features/ empty?"}
-    Step1 -->|"Empty"| Interview["Feature Interview\nExtract areas from INITIAL_PROMPT.md\nInterview one area at a time\nWrite specs immediately"]
+    Step1 -->|"Empty"| Interview["Feature Interview\nExtract areas from REQUIREMENTS.md\nInterview one area at a time\nWrite specs immediately"]
     Step1 -->|"Has specs"| Step2["Step 2 — Plan Generation\nFor each spec without a plan:\nGenerate phased plan\nWrite to docs/plans/"]
     Interview --> Step2
     Step2 --> Step3{"Step 3\nFind next task\nwith status: todo"}
@@ -299,7 +299,7 @@ flowchart TD
     <div class="section-label">Directory Conventions</div>
     <div class="dir-tree">
       <div><span class="dir-folder">docs/</span></div>
-      <div>&nbsp;&nbsp;<span class="dir-folder">INITIAL_PROMPT.md</span>&nbsp;&nbsp;<span class="dir-comment">← source of truth (never modified)</span></div>
+      <div>&nbsp;&nbsp;<span class="dir-folder">REQUIREMENTS.md</span>&nbsp;&nbsp;<span class="dir-comment">← source of truth (never modified)</span></div>
       <div>&nbsp;&nbsp;<span class="dir-folder">features/</span>&nbsp;&nbsp;<span class="dir-comment">← feature specs (final authority on scope)</span></div>
       <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir-file">{feature-slug}.md</span></div>
       <div>&nbsp;&nbsp;<span class="dir-folder">plans/</span>&nbsp;&nbsp;<span class="dir-comment">← one plan per feature spec</span></div>

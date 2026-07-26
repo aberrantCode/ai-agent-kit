@@ -7,13 +7,28 @@ description: Create a new feature spec — interviews user, detects overlap with
 
 Creates a complete, approval-ready feature specification in `docs/features/`. Covers requirement gathering, overlap detection, template population, optional diagram generation, and feature-index updates.
 
-**Prerequisite:** The project must have been initialized with `/init-project` (or equivalent manual scaffolding). Specifically, this skill assumes the following exist:
+---
+
+## Phase 0 — Prerequisite Gate (fail-closed)
+
+**Run this before anything else. Do not skip it, and do not proceed past it on a partial or divergent scaffold.**
+
+This skill assumes the project was initialized by `/init-project`. Verify every required artifact exists (e.g. `test -f <path>`):
 
 - `docs/features/template.md` — canonical feature spec template
 - `docs/features/README.md` — feature index
-- `docs/workflow/SDLC.md` — contains the Feature Abbreviation Registry table used for CAP-ID prefixes
+- `docs/workflow/SDLC.md` — holds the **Feature Abbreviation Registry** used for CAP-ID prefixes
 
-If any are missing, stop and tell the user to run `/init-project` first.
+**If all three exist, continue to Phase 1.**
+
+**If any are missing, STOP.** Do not improvise against whatever convention the repo happens to use — a repo with hand-authored specs but no `SDLC.md` is an *un-initialized* repo, not an alternate standard. Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
+- (b) **Cancel** — stop; report exactly which artifacts were missing and that `/init-project` must be run first.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the three paths**, and only then continue. If any are still missing after init, stop and report — never proceed on an incomplete scaffold.
+
+> **Red flag — STOP.** The thought *"this repo has its own feature convention, so I'll follow that instead"* is the exact failure this gate prevents. A missing `SDLC.md` means the CAP-ID registry does not exist — you cannot reserve a `[XX-CAP-NN]` prefix against a table that isn't there. Halt and offer init; do not fabricate a substitute convention or write a spec that can't be registered.
 
 ---
 

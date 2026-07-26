@@ -24,8 +24,31 @@ Load these local artifacts before acting:
 - `docs/workflow/INDEX.md`
 - `docs/features/template.md`, `docs/plans/template.md`, `docs/tasks/template.md`
 
-If `docs/features/` has no real specs, run the Feature Interview from `project-manager:init-features`
-first. If scaffolding is missing, stop and tell the user to run `/init-project`.
+## Step 0 - Prerequisite Gate (fail-closed)
+
+**Run this before loading inputs or mutating anything. Do not proceed on a partial scaffold.**
+
+Verify the orchestration scaffold exists (e.g. `test -f <path>` / `test -d <path>`):
+
+- `docs/features/template.md`, `docs/plans/template.md`, `docs/tasks/template.md`
+- `docs/workflow/SDLC.md` — CAP-ID registry the plan generator reads (Step 3)
+- `docs/STATUS.md` and `docs/tasks/active/`
+
+**If the scaffold is complete but `docs/features/` has no real specs** (only `README.md`/`template.md`),
+run the Feature Interview from `project-manager:init-features` first, then continue.
+
+**If any scaffold artifact above is missing, STOP.** Do not synthesize plans or tasks against an
+improvised layout. Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
+- (b) **Cancel** — stop; report exactly which artifacts were missing.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the
+paths**, and only then continue. If any are still missing after init, stop and report.
+
+> **Red flag — STOP.** A repo with hand-authored specs but no `SDLC.md`/templates is un-initialized,
+> not an alternate standard. Do not generate plans against a convention you inferred from existing
+> files — halt and offer init.
 
 ## Step 1 - Classify Feature Specs
 

@@ -25,7 +25,7 @@ Bootstraps a repository so that every agent and operator who touches it is funne
 Before writing anything:
 
 1. **Detect existing state.** Glob each of these and record which exist:
-   - `docs/REQUIREMENTS.md`, `docs/INITIAL_PROMPT.md` (legacy)
+   - `docs/REQUIREMENTS.md`
    - `docs/features/template.md`, `docs/features/README.md`
    - `docs/plans/template.md`
    - `docs/tasks/template.md`
@@ -61,7 +61,6 @@ Before writing anything:
 For every directory and file from the discovery list that does **not** already exist, create it. For each path that **does** exist, follow these rules:
 
 - **`docs/REQUIREMENTS.md`** — If absent, copy from `references/init-project/REQUIREMENTS.md.template` (substitute `{{PROJECT_NAME}}`/`{{TODAY}}`); never overwrite — if it exists, leave it, and on a Phase 0(a) paste with the file present, offer (i) leave, (ii) write `docs/REQUIREMENTS.md.new` for manual merge.
-- **`docs/INITIAL_PROMPT.md`** (legacy) — If a legacy file exists, LEAVE IT untouched (never overwrite, never create a new one); the tooling still reads it as a fallback when REQUIREMENTS.md is absent.
 - **`docs/features/template.md`** — If absent, copy from `references/feature-spec-template.md` in the skill bundle. If present, diff: if different, ask via `AskUserQuestion` whether to overwrite, keep, or write `.new` alongside.
 - **`docs/plans/template.md`, `docs/tasks/template.md`** — Same diff-and-ask flow.
 - **`AGENTS.md`** — If absent, copy from `references/init-project/AGENTS.md.template` with `{{PROJECT_NAME}}` substituted. If present, check whether it already contains the marker `<!-- BEGIN project-manager fragment -->`. If yes, do nothing. If no, **append** the contents of `CLAUDE_FRAGMENT.md.template` (yes, named for CLAUDE but the same fragment is valid for AGENTS); never replace existing content.

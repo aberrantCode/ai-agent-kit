@@ -10,6 +10,33 @@ until the user has explicitly authorized each class of change.**
 
 ---
 
+## Phase 0 — Prerequisite Gate (fail-closed)
+
+**Run this before loading any artifacts. Do not audit against an assumed convention.**
+
+This audit compares specs against the canonical template and the CAP-ID standard. Verify every
+reference artifact exists (e.g. `test -f <path>`):
+
+- `docs/features/template.md` — the template every spec is checked against (Check 1)
+- `docs/workflow/SDLC.md` — holds the **Feature Abbreviation Registry** the CAP-ID checks rely on (Check 2)
+- `docs/REQUIREMENTS.md` — product intent used for logical-coherence checks (Check 2/4)
+
+**If all exist, continue to Phase 1.**
+
+**If any are missing, STOP.** You cannot audit CAP-IDs against a registry that doesn't exist, and a
+repo missing these was never initialized by `/init-project`. Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
+- (b) **Cancel** — stop; report exactly which artifacts were missing.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the
+paths**, and only then continue.
+
+> **Red flag — STOP.** Do not "audit against the repo's own convention" when `template.md` or
+> `SDLC.md` is absent — that produces findings measured against nothing. Halt and offer init.
+
+---
+
 ## Phase 1 — Load Reference Artifacts
 
 Before reading any specs, load the reference material you will audit against:
@@ -60,7 +87,7 @@ Read the `## Capabilities` section. For each capability item, verify:
 - **Single-sentence, testable**: not vague ("improve performance"), not compound
   (two capabilities in one bullet)
 - **Logical coherence**: capability makes sense in the context of the feature and the overall
-  product (read `docs/REQUIREMENTS.md` or legacy `docs/INITIAL_PROMPT.md` for product intent)
+  product (read `docs/REQUIREMENTS.md` for product intent)
 
 Flag each deficient capability with a specific, actionable improvement suggestion.
 Also flag if the capability set has **obvious gaps** — e.g., a data model feature with no
