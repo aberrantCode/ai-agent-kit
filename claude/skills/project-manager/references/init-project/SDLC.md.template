@@ -13,7 +13,7 @@ REQUIREMENTS.md   →   feature specs   →   plans   →   tasks (active)   →
 
 | Phase | Owner            | Trigger                          | Output                          |
 |-------|------------------|----------------------------------|---------------------------------|
-| Capture | User + `init-features`   | `REQUIREMENTS.md` (or legacy `INITIAL_PROMPT.md`) exists | `docs/features/*.md`           |
+| Capture | User + `init-features`   | `REQUIREMENTS.md` exists | `docs/features/*.md`           |
 | Approve | User             | Review                           | `status: approved` in spec      |
 | Plan    | `continue-tasks` | Approved spec without plan       | `docs/plans/<slug>-plan.md`    |
 | Execute | Agent (per task) | `Status: todo` in plan           | Claimed task lease + code change + final `## Completion` |
