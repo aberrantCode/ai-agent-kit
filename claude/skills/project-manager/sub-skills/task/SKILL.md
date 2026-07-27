@@ -9,12 +9,28 @@ Express lane for the "I just need to fix this now" case. Combines `/pm-capture` 
 
 **Chore lane only.** Anything scope-changing is redirected to `/pm-capture` + `/pm-groom → feature`.
 
-**Prerequisite:** The project must have been initialized with `/init-project`.
+---
 
-- `docs/backlog.md` — must exist
-- `docs/workflow/scope-manifest.md` — must exist (the chore express lane is inert without it; the guard will reject any chore without an authorization snapshot)
+## Phase 0 — Prerequisite Gate (fail-closed)
 
-If either is missing, stop and tell the user: "The chore express lane is inert until `docs/workflow/scope-manifest.md` exists. Run `/init-project` or `/reinit` to scaffold it, or run `/pm-capture` + `/pm-groom → feature` instead."
+**Run this before anything else. Do not proceed on a partial scaffold.**
+
+Verify (e.g. `test -f <path>`):
+
+- `docs/backlog.md` — must exist (the intake store)
+- `docs/workflow/scope-manifest.md` — must exist (the chore express lane is **inert** without it; the guard rejects any chore lacking an authorization snapshot, and Phase 5 hashes this file into `manifest_sha`)
+
+**If both exist, continue to Phase 1.**
+
+**If either is missing, STOP.** Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
+- (b) **Use the standard lane instead** — run `/pm-capture` + `/pm-groom → feature`, which do not require the scope-manifest.
+- (c) **Cancel** — stop; report exactly which artifacts were missing.
+
+If the user picks (a): invoke `project-manager:init-project` (or `/reinit`), wait for it to finish, **re-verify the paths**, and only then continue.
+
+> **Red flag — STOP.** Do not materialize a chore task with a fabricated or empty `manifest_sha` when `scope-manifest.md` is absent — that writes an unenforceable authorization snapshot. Halt and offer init or the standard lane.
 
 ---
 
