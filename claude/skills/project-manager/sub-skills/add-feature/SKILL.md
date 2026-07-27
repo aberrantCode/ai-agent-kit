@@ -17,18 +17,20 @@ This skill assumes the project was initialized by `/init-project`. Verify every 
 
 - `docs/features/template.md` — canonical feature spec template
 - `docs/features/README.md` — feature index
-- `docs/workflow/SDLC.md` — holds the **Feature Abbreviation Registry** used for CAP-ID prefixes
+- `docs/workflow/SDLC.md` — must exist **and** contain a `## Feature Abbreviation Registry` heading (the table you reserve CAP-ID prefixes in — Phase 3/6)
 
-**If all three exist, continue to Phase 1.**
+**Verify existence *and* the registry**, e.g. `test -f docs/workflow/SDLC.md && grep -q "Feature Abbreviation Registry" docs/workflow/SDLC.md`. A file that exists but lacks that heading is a hand-rolled/incomplete `SDLC.md` — **treat it as missing** for this gate; existence alone is not enough.
 
-**If any are missing, STOP.** Do not improvise against whatever convention the repo happens to use — a repo with hand-authored specs but no `SDLC.md` is an *un-initialized* repo, not an alternate standard. Use `AskUserQuestion` to offer:
+**If all three exist and `SDLC.md` has the registry, continue to Phase 1.**
+
+**If any are missing (or `SDLC.md` lacks the registry), STOP.** Do not improvise against whatever convention the repo happens to use — a repo with hand-authored specs but no registry is an *un-initialized* repo, not an alternate standard. Use `AskUserQuestion` to offer:
 
 - (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
 - (b) **Cancel** — stop; report exactly which artifacts were missing and that `/init-project` must be run first.
 
 If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the three paths**, and only then continue. If any are still missing after init, stop and report — never proceed on an incomplete scaffold.
 
-> **Red flag — STOP.** The thought *"this repo has its own feature convention, so I'll follow that instead"* is the exact failure this gate prevents. A missing `SDLC.md` means the CAP-ID registry does not exist — you cannot reserve a `[XX-CAP-NN]` prefix against a table that isn't there. Halt and offer init; do not fabricate a substitute convention or write a spec that can't be registered.
+> **Red flag — STOP.** The thought *"this repo has its own feature convention, so I'll follow that instead"* is the exact failure this gate prevents. A missing (or registry-less) `SDLC.md` means the CAP-ID registry does not exist — you cannot reserve a `[XX-CAP-NN]` prefix against a table that isn't there. A bare `test -f` that passes on a hand-rolled `SDLC.md` with no registry is a **false green** — always confirm the registry heading, not just the path. Halt and offer init; do not fabricate a substitute convention or write a spec that can't be registered.
 
 ---
 
