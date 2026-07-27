@@ -1,0 +1,8 @@
+# AC_DESIGN adoption marker — https://github.com/aberrantCode/AC_DESIGN · spec: docs/adoption-marker.md
+source: AC_DESIGN
+version: "0.9.0"
+appliedSurfaces:
+  - presentation
+presentationTheme: assets/ac-design/presentation-theme.css
+upstream: https://github.com/aberrantCode/AC_DESIGN
+appliedAt: "2026-07-26"

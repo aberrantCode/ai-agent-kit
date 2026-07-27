@@ -1,0 +1,890 @@
+/* ===========================================================================
+   AC shared theme — "PCB phosphor console"
+   ---------------------------------------------------------------------------
+   The house style for internal AC web apps (AC_OPBTA, AC_OSM, ...). The whole
+   interface reads as a powered circuit board: a near-black substrate, phosphor-
+   green copper traces carrying the live signal, and tin-silver solder accents.
+
+   Two themes, ONE identity. Hue is locked to ~152 (phosphor green) in BOTH
+   light and dark; only lightness (and a little chroma) shifts. Dark is the
+   default; light is the on-brand silkscreen alternate. Colours are authored in
+   OKLCH so the L axis is perceptually uniform and contrast stays predictable.
+
+   Adoption: copy the :root / [data-theme] blocks below verbatim into the target
+   app (the token NAMES are the contract), set <html data-theme="dark">, and wire
+   the tiny theme module from artifacts/snippets/app-shell.html. Build component
+   styles on these tokens; do not rename them unless the shared standard moves.
+   =========================================================================== */
+
+/* BEGIN GENERATED TOKENS */
+:root {
+  /* The single brand hue. Everything green derives from this. */
+  --brand-h: 152;
+  /* Subliminal PCB grid line — derived from the themed rule colour so it tracks
+     light/dark automatically. ~14% blend = felt, not seen. */
+  --grid-line: color-mix(in oklch, var(--rule) 14%, transparent);
+
+  --ac-font-sans: 'Segoe UI Variable Text', 'Segoe UI', ui-sans-serif, system-ui,
+                  -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --ac-font-mono: 'Cascadia Code', 'JetBrains Mono', ui-monospace, 'SF Mono',
+                  Menlo, Consolas, monospace;
+
+  --ac-radius-md: 0.5rem;
+  --ac-space-2: 0.5rem;
+  --ac-space-4: 1rem;
+  --ac-space-6: 1.5rem;
+  --ac-space-8: 2rem;
+}
+
+/* DARK — powered board (default). Near-black PCB substrate, phosphor ink.
+   Applies both when no data-theme is set and when it is explicitly "dark". */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:          oklch(0.135 0.012 152);  /* pcb substrate (near-black) */
+  --surface-1:   oklch(0.178 0.014 152);  /* row hover / inset panel    */
+  --surface-2:   oklch(0.220 0.016 152);  /* card / dropdown / palette  */
+  --ink:         oklch(0.945 0.022 152);  /* primary readout            */
+  --ink-soft:    oklch(0.800 0.032 152);  /* secondary                  */
+  --muted:       oklch(0.620 0.030 152);  /* metadata / tertiary        */
+  --faint:       oklch(0.460 0.022 152);  /* placeholder / disabled     */
+  --rule:        oklch(0.300 0.022 152);  /* standard separation        */
+  --rule-soft:   oklch(0.232 0.018 152);  /* quieter separation         */
+  --accent:      oklch(0.860 0.205 152);  /* live phosphor trace        */
+  --accent-dim:  oklch(0.560 0.130 152);  /* de-energised soldermask    */
+  --accent-glow: oklch(0.860 0.205 152 / 0.42);
+  --solder:      oklch(0.820 0.014 232);  /* tin/silver secondary accent — downstream-only; no shared component consumes it */
+  --focus-ring:  oklch(0.860 0.205 152 / 0.34);
+  --led-up:      oklch(0.840 0.200 150);  /* ok / healthy / approved    */
+  --led-down:    oklch(0.640 0.220 26);   /* bad / down / rejected      */
+  --led-warn:    oklch(0.820 0.160 88);   /* warn / degraded / pending  */
+  --panel-shadow: 0 0 0 1px oklch(0.30 0.02 152 / 0.7),
+                  0 24px 60px -16px oklch(0 0 0 / 0.88);
+}
+
+/* LIGHT — silkscreen board. A real soldermask reads as a calm muted green-grey,
+   not glaring white; ink is a dark green-black. Same identity, lifted lightness. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg:          oklch(0.918 0.018 152);  /* muted silkscreen board     */
+  --surface-1:   oklch(0.892 0.020 152);  /* row hover (inset, darker)  */
+  --surface-2:   oklch(0.955 0.012 152);  /* card / palette floats up   */
+  --ink:         oklch(0.250 0.046 152);  /* dark green-black ink       */
+  --ink-soft:    oklch(0.405 0.050 152);
+  --muted:       oklch(0.460 0.040 152);  /* AA: was 0.510 (~4.47:1), now ~5.5:1 on light --bg */
+  --faint:       oklch(0.640 0.030 152);
+  --rule:        oklch(0.798 0.024 152);
+  --rule-soft:   oklch(0.852 0.020 152);
+  --accent:      oklch(0.460 0.165 152);  /* deeper trace for contrast (AA: primary-button text now ~4.7:1) */
+  --accent-dim:  oklch(0.640 0.110 152);
+  /* glow/focus L intentionally left at 0.500 (brighter than the 0.460 trace — a
+     glow reads as emitted light); the 0.04 L delta is imperceptible at this alpha. */
+  --accent-glow: oklch(0.500 0.165 152 / 0.24);
+  --solder:      oklch(0.500 0.022 232);
+  --focus-ring:  oklch(0.500 0.165 152 / 0.30);
+  --led-up:      oklch(0.540 0.170 150);
+  --led-down:    oklch(0.540 0.200 26);
+  --led-warn:    oklch(0.620 0.150 80);
+  --panel-shadow: 0 1px 2px oklch(0.25 0.04 152 / 0.12),
+                  0 18px 40px -14px oklch(0.25 0.04 152 / 0.24);
+}
+/* END GENERATED TOKENS */
+
+/* ---- base ---------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--ac-font-sans);
+  font-feature-settings: 'ss01', 'cv11';
+  color-scheme: light dark;
+  /* Tint every native form control (checkbox, radio, range, progress) to the
+     phosphor accent. accent-color inherits, so one declaration covers them all,
+     and it re-resolves when [data-theme] flips --accent. */
+  accent-color: var(--accent);
+}
+
+body {
+  background-color: var(--bg);
+  /* Faint PCB trace-grid — whisper-quiet (passes the squint test); reads as
+     "circuit substrate" only when you look for it. */
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem, 2.25rem 2.25rem;
+  background-position: -1px -1px, -1px -1px;
+  background-attachment: fixed;
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  transition: background-color 200ms cubic-bezier(0.25, 1, 0.5, 1),
+              color            200ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+/* Reduced-motion: collapse every transition/transform the system animates — the
+   body theme fade, the interactive control transitions (buttons, tools, table
+   row hover), and the section-toggle chevron rotation. The .ac-rail glow is
+   additionally killed at its own rule below. */
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .ac-button,
+  .ac-tool,
+  .ac-navlink,
+  .ac-link,
+  .ac-table tbody tr,
+  .ac-section__toggle svg,
+  .ac-disclosure__summary::before {
+    transition: none;
+  }
+}
+
+/* One focus treatment for every interactive control: a phosphor ring keyed off
+   the theme. Never rely on colour alone — the ring is a shape cue too. The ring
+   is a spread box-shadow, so it follows each control's OWN border-radius — a
+   square .ac-tool keeps square corners, a rounded .ac-input stays rounded. Do
+   NOT set border-radius here (it would override the control's geometry). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* Lit / phosphor-edged controls: the translucent phosphor ring blends into an
+   already-phosphor border, so layer a 1px contrasting separator (--bg) between
+   the lit edge and the ring so focus stays perceptible (accent-on-accent fix).
+   box-shadow replaces — it does not stack — so re-assert the lit glow as a third
+   layer; the powered trace stays border+colour+GLOW even while focused. */
+.ac-button--primary:focus-visible,
+.ac-button[aria-pressed="true"]:focus-visible,
+.ac-button--active:focus-visible,
+.ac-tool[aria-pressed="true"]:focus-visible,
+.ac-tool--active:focus-visible {
+  box-shadow: 0 0 0 1px var(--bg), 0 0 0 4px var(--focus-ring),
+              0 0 12px -3px var(--accent-glow);
+}
+
+/* ---- app shell ---------------------------------------------------------- */
+
+.ac-app-shell { min-height: 100vh; }
+
+.ac-app-shell__header {
+  background: color-mix(in oklch, var(--bg) 88%, var(--surface-1));
+  border-bottom: 1px solid var(--rule);
+}
+
+.ac-app-shell__header-inner,
+.ac-app-shell__content {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: var(--ac-space-4) clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.ac-app-shell__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ac-space-4);
+}
+
+/* The brand mark sits on its own black PCB tile so the dark-backed logo reads
+   cleanly in BOTH themes (a dark mark on a pale board would vanish). */
+.ac-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem; height: 2.9rem;
+  flex-shrink: 0;
+  background: #050505;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.ac-brand-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Section/brand heading: uppercase, tracked, with a phosphor sub-label. */
+.ac-title {
+  font-size: clamp(1.02rem, 1.8vw, 1.28rem);
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.ac-title__sub {
+  font-size: 0.6em;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--accent);
+}
+
+/* ---- card --------------------------------------------------------------- */
+
+.ac-card {
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  box-shadow: var(--panel-shadow);
+  padding: var(--ac-space-6);
+}
+
+/* ---- buttons ------------------------------------------------------------ */
+
+.ac-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ac-space-2);
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  background: var(--surface-1);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+.ac-button:hover { border-color: var(--accent); color: var(--accent); }
+.ac-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Primary commit: a lit phosphor outline (the live trace), not a heavy fill —
+   the board metaphor favours energised edges over solid blocks. */
+.ac-button--primary {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+}
+.ac-button--primary:hover {
+  background: color-mix(in oklch, var(--accent) 18%, transparent);
+  box-shadow: 0 0 16px -4px var(--accent-glow);
+}
+.ac-button--secondary {
+  background: var(--surface-1);
+  border-color: var(--rule);
+  color: var(--ink);
+}
+
+/* Lit "active/pressed" button — the powered-trace selected state, mirroring the
+   .ac-tool lit state. Drive via aria-pressed (toggle) or .ac-button--active
+   (current). State = border + colour + glow; pair a colour-coded label (e.g.
+   "Using") with a checkmark icon (F13) so it is never colour-only. */
+.ac-button[aria-pressed="true"],
+.ac-button--active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+  box-shadow: 0 0 12px -3px var(--accent-glow);
+}
+
+/* Segmented control — a row of .ac-button rendered as ONE control (e.g.
+   "Already using / Dismiss"). Buttons butt together: inner borders collapse via
+   a -1px pull, outer corners are grouped. Wrap in role="group" + aria-label. */
+.ac-segmented { display: inline-flex; }
+.ac-segmented > .ac-button {
+  border-radius: 0;
+  margin-left: -1px;            /* collapse the shared 1px seam */
+}
+.ac-segmented > .ac-button:first-child {
+  margin-left: 0;
+  border-top-left-radius: var(--ac-radius-md);
+  border-bottom-left-radius: var(--ac-radius-md);
+}
+.ac-segmented > .ac-button:last-child {
+  border-top-right-radius: var(--ac-radius-md);
+  border-bottom-right-radius: var(--ac-radius-md);
+}
+/* The lit/hovered segment lifts above its neighbours so its full phosphor border
+   shows over the collapsed seam. */
+.ac-segmented > .ac-button[aria-pressed="true"],
+.ac-segmented > .ac-button--active,
+.ac-segmented > .ac-button:hover,
+.ac-segmented > .ac-button:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
+/* Square icon tool button (theme toggle, settings, etc.) — sharp corners,
+   hairline border that lights to phosphor on interaction. */
+.ac-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem; height: 2rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+.ac-tool:hover, .ac-tool:focus-visible { border-color: var(--accent); color: var(--accent); }
+/* Lit "selected" tool — a powered trace. Drive via aria-pressed (toggle buttons)
+   or the .ac-tool--active class (current view/tab). State is border+colour+glow,
+   never colour alone. */
+.ac-tool[aria-pressed="true"],
+.ac-tool--active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px -3px var(--accent-glow);
+}
+.ac-tool svg { width: 14px; height: 14px; }
+/* Sun/moon swap by theme — show the icon for the theme you'd switch TO. */
+[data-theme="dark"]  .ac-tool .i-dark  { display: none; }
+[data-theme="dark"]  .ac-tool .i-light { display: block; }
+[data-theme="light"] .ac-tool .i-dark  { display: block; }
+[data-theme="light"] .ac-tool .i-light { display: none; }
+
+/* Masthead text nav-link — uppercase tracked, --ink-soft by default, lights to
+   --accent on hover/focus. The current item ([aria-current] or .ac-navlink--active)
+   stays lit with a phosphor underline. A text-link alternative to .ac-tool icons
+   (the Optimizer's NEW / HISTORY). */
+.ac-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 0.25rem 0;
+  border-bottom: 1px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.ac-navlink:hover { color: var(--accent); }
+/* Current/active item — lit + phosphor underline. :not([aria-current="false"])
+   so an explicit false doesn't falsely light. */
+.ac-navlink[aria-current]:not([aria-current="false"]),
+.ac-navlink--active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---- forms -------------------------------------------------------------- */
+
+.ac-form-field { display: grid; gap: var(--ac-space-2); }
+
+.ac-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ac-input,
+.ac-select,
+.ac-textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  background: color-mix(in oklch, var(--bg) 60%, var(--surface-1));
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  color: var(--ink);
+  font: inherit;
+}
+/* Placeholder uses --muted, not --faint: --faint on the recessed well is only
+   ~2.6:1 (fails AA), --muted clears 4.5:1 in both themes. --faint stays defined
+   for downstream disabled/decorative use. */
+.ac-input::placeholder,
+.ac-textarea::placeholder { color: var(--muted); }
+/* The phosphor ring is supplied globally by the single :focus-visible rule above
+   (no duplicate box-shadow here). Use :focus-visible — not :focus — so the lit
+   well-edge appears on keyboard focus only, not on every mouse click. */
+.ac-input:focus-visible,
+.ac-select:focus-visible,
+.ac-textarea:focus-visible {
+  border-color: var(--accent);
+}
+
+/* Helper / validation text below a field — muted by default; the --error variant
+   uses the down-state hue. Reference it from the input via aria-describedby. */
+.ac-form-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.ac-form-hint--error { color: var(--led-down); }
+
+/* Invalid field — an energized RED edge (the error counterpart of the accent
+   focus). aria-invalid drives it; the focus ring also switches to the error hue.
+   Higher specificity than the plain :focus-visible rule so red wins on focus. */
+.ac-input[aria-invalid="true"],
+.ac-select[aria-invalid="true"],
+.ac-textarea[aria-invalid="true"] {
+  border-color: var(--led-down);
+}
+.ac-input[aria-invalid="true"]:focus-visible,
+.ac-select[aria-invalid="true"]:focus-visible,
+.ac-textarea[aria-invalid="true"]:focus-visible {
+  border-color: var(--led-down);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--led-down) 34%, transparent);
+}
+
+/* Native <select>: strip the OS chrome (appearance:none) and paint our own
+   chevron so the control reads on-brand. The chevron is tinted to --muted, baked
+   per theme because a data-URI background can't read a CSS custom property.
+   The recessed-well background-color is inherited from the shared rule above;
+   only background-image is set here.
+   MAINTENANCE: %23798c7d is the sRGB of dark --muted (oklch 0.620 0.030 152);
+   the light override below bakes light --muted. These two hexes are the ONLY
+   token values duplicated outside the :root/[data-theme] contract — re-bake both
+   if --muted is ever retuned. */
+.ac-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23798c7d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 0.7rem;
+}
+/* Light theme: re-bake the chevron with light --muted (sRGB of oklch 0.460 0.040 152). */
+[data-theme="light"] .ac-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475f4d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Checkbox / radio row — a <label> wrapping a NATIVE input (kept native for full
+   keyboard a11y and the inherited accent-color phosphor tint) plus its text. The
+   label is the click target and the implicit a11y label. */
+.ac-checkbox,
+.ac-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ac-space-2);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.ac-checkbox > input,
+.ac-radio > input {
+  width: 1rem; height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--accent); /* explicit, in case a host resets the inherited value */
+}
+/* Disabled: dim the whole row so the label tracks the control. */
+.ac-checkbox:has(> input:disabled),
+.ac-radio:has(> input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- utility ------------------------------------------------------------ */
+
+.ac-mono { font-family: var(--ac-font-mono); font-variant-numeric: tabular-nums; }
+.ac-text-muted { color: var(--muted); }
+.ac-text-accent { color: var(--accent); }
+
+/* Inline link / "more" affordance — accent text with a hover underline + a
+   subtle phosphor glow, and the shared focus ring (a/button are in the global
+   :focus-visible set). Distinct from .ac-text-accent, which is colour-only. */
+.ac-link {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 150ms ease, text-shadow 150ms ease;
+}
+.ac-link:hover {
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Status pill: colour PLUS a leading dot, so state never depends on colour
+   alone (accessibility baseline). Pair with --led-* tokens. */
+.ac-status { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
+.ac-status::before {
+  content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+}
+.ac-status--up   { color: var(--led-up); }
+.ac-status--down { color: var(--led-down); }
+.ac-status--warn { color: var(--led-warn); }
+
+/* ---- signature elements ------------------------------------------------- */
+/* These four are the most recognizable AC brand cues, transcribed from the two
+   canonical apps (the AC/OPBTA service catalog and the Prompt Optimizer). They
+   are token-driven, so they track light/dark automatically. */
+
+/* Energized rail — a powered bus line with lit terminal nodes at each end.
+   Sits directly under the masthead (and above the footer). The single most
+   recognizable AC cue: the board is "switched on". */
+.ac-rail {
+  position: relative;
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg,
+    var(--accent-dim), var(--accent) 12%, var(--accent) 88%, var(--accent-dim));
+  box-shadow: 0 0 10px -2px var(--accent-glow);
+}
+.ac-rail::before,
+.ac-rail::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 9px 1px var(--accent-glow);
+  transform: translateY(-50%);
+}
+.ac-rail::before { left: 0; }
+.ac-rail::after  { right: 0; }
+@media (prefers-reduced-motion: reduce) { .ac-rail { box-shadow: none; } }
+
+/* Standalone status LED — the glowing per-row dot in a data grid (distinct from
+   .ac-status, which pairs a dot WITH a text label). The glow auto-tints to the
+   LED's own colour so up/down/warn each read correctly. */
+.ac-led {
+  display: inline-block;
+  width: 0.55rem; height: 0.55rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px 0 color-mix(in oklch, currentColor 55%, transparent);
+  flex-shrink: 0;
+}
+.ac-led--up   { color: var(--led-up); }
+.ac-led--down { color: var(--led-down); }
+.ac-led--warn { color: var(--led-warn); }
+
+/* Footer status strip — uppercase mono telemetry, dot-separated. The live value
+   (model id, build, mode) lifts to ink-soft; everything else stays muted. */
+.ac-statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: var(--ac-space-4);
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ac-statusbar__sep   { color: var(--rule); user-select: none; }
+.ac-statusbar__value { color: var(--ink-soft); }
+
+/* Search field with a keyboard-shortcut hint badge (the "/" affordance). */
+.ac-search { position: relative; display: flex; align-items: center; }
+.ac-search .ac-input { padding-left: 2.25rem; padding-right: 2.5rem; }
+.ac-search__icon {
+  position: absolute; left: 0.75rem;
+  display: inline-flex; color: var(--muted); pointer-events: none;
+}
+.ac-search__icon svg { width: 14px; height: 14px; }
+/* Inline keyboard-shortcut pill — a STATIC badge reusable anywhere: a trailing
+   "⌘K" hint on a search button, an inline shortcut in body copy, a footer hint.
+   The positioning is split out into .ac-search__kbd so the pill itself carries
+   no layout assumptions. */
+.ac-kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ac-font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted);
+  background: color-mix(in oklch, var(--bg) 60%, var(--surface-1));
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0 0.4rem;
+}
+/* Positioning modifier: pin the pill inside a .ac-search well (the relative
+   parent). Vertically centred so it tracks the input height. */
+.ac-search__kbd {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Collapsible category section header — uppercase tracked label, a chevron
+   toggle, and a right-aligned count (e.g. "AI  05"). The active section's rule
+   lights to phosphor. */
+.ac-section__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ac-space-2);
+  justify-content: space-between;
+  padding: var(--ac-space-2) 0;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.ac-section--active > .ac-section__head { border-bottom-color: var(--accent); }
+/* The toggle is the interactive trigger and the ONLY valid host for
+   aria-expanded (it must sit on the control, never the <section>). It wraps the
+   chevron + label so the whole header reads as one accessible button; pair it
+   with aria-controls pointing at the matching .ac-section__body id. */
+.ac-section__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ac-space-2);
+  background: none; border: 0; padding: 0;
+  color: inherit; cursor: pointer;
+  font: inherit; line-height: 1;
+  text-transform: inherit; letter-spacing: inherit;
+}
+.ac-section__toggle svg {
+  width: 12px; height: 12px;
+  color: var(--muted); flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+/* Chevron points down when open, rotates closed; the label never rotates. */
+.ac-section__toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
+/* Collapse the body when its toggle is closed. :has() reaches from the section
+   down to the body sibling — the toggle is nested in the head, so an adjacent
+   selector can't. This actually HIDES the rows (the prior rule only spun the
+   chevron). The `:has(> .ac-section__head ...)` scope keeps the match to the
+   section's OWN toggle so a nested collapsed section can't hide its parent. */
+.ac-section:has(> .ac-section__head .ac-section__toggle[aria-expanded="false"]) > .ac-section__body {
+  display: none;
+}
+.ac-section__count {
+  margin-left: auto;
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* Data grid — hairline-separated rows, uppercase tracked column heads, mono
+   right-aligned numerics, phosphor-tinted row hover. */
+.ac-table { width: 100%; border-collapse: collapse; }
+.ac-table th {
+  text-align: left;
+  padding: var(--ac-space-2) 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.ac-table td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--ink);
+}
+.ac-table tbody tr { transition: background-color 120ms ease; }
+.ac-table tbody tr:hover { background: var(--surface-1); }
+.ac-table .ac-num {
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Bordered disclosure / accordion panel — a self-contained collapsible BOX
+   (distinct from .ac-section, which is a hairline data-grid header). Built on
+   native <details>/<summary> so collapse + ARIA (expanded/collapsed) come for
+   free, no JS. Use for "RUNTIME CONFIGURATION", nested "OPTIONS", "Filters". */
+.ac-disclosure {
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  background: var(--surface-2);
+  /* NO overflow:hidden — it would clip the summary's outset focus ring (an
+     a11y regression). Corner containment is handled by rounding the body below. */
+}
+.ac-disclosure__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ac-space-2);
+  padding: var(--ac-space-2) var(--ac-space-4);
+  cursor: pointer;
+  list-style: none;            /* strip the default ▶ marker (most engines) */
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  user-select: none;
+}
+.ac-disclosure__summary::-webkit-details-marker { display: none; }  /* Safari */
+/* Custom chevron: a border-corner that points right when collapsed and rotates
+   down when the panel is open. */
+.ac-disclosure__summary::before {
+  content: "";
+  width: 0.45rem; height: 0.45rem;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(-45deg);   /* ▶ collapsed */
+  transition: transform 150ms ease;
+  flex-shrink: 0;
+}
+.ac-disclosure[open] > .ac-disclosure__summary::before {
+  transform: rotate(45deg);    /* ▼ open */
+}
+/* Right-aligned count slot (e.g. active-filter count). */
+.ac-disclosure__count {
+  margin-left: auto;
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.ac-disclosure__body {
+  padding: var(--ac-space-4);
+  border-top: 1px solid var(--rule-soft);
+  /* Round the bottom corners so a body background stays inside the box now that
+     the parent no longer clips (the focus ring needs the parent to NOT clip). */
+  border-radius: 0 0 calc(var(--ac-radius-md) - 1px) calc(var(--ac-radius-md) - 1px);
+}
+
+/* Tag / keyword chip — a small static pill for tags, keywords, applied filters.
+   Recessed --surface-1 fill with a hairline border; sits in a wrapping row. */
+.ac-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.12rem 0.5rem;
+  background: var(--surface-1);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+/* Overflow counter ("+N") — the collapsed-extras marker; mono tabular, muted. */
+.ac-chip--more {
+  color: var(--muted);
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+/* Optional wrapping container for a chip row. */
+.ac-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+/* Reusable mono count — tabular numerics, muted. The generic form of
+   .ac-section__count, usable anywhere (e.g. "00 selected", "07"). */
+.ac-count {
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+/* Numeric badge — a small square-ish chip holding a score/count (e.g. RepoRadar's
+   "5"): mono tabular, energized hairline border, recessed fill. Reusable outside
+   the data grid. .ac-badge--accent lights the edge for emphasis. */
+.ac-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  background: var(--surface-1);
+  color: var(--ink-soft);
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.ac-badge--accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* VLAN-style dot-badge — a coloured dot + label pill whose dot hue carries
+   DOMAIN meaning (e.g. a VLAN id). The hue plugs in via the --dot custom property
+   so downstream per-domain palettes need NO new CSS; it falls back to --muted.
+   Keep domain hues low-chroma (per the domain-palette rule). Colour-only state:
+   always give the badge an aria-label or a visible text companion (F13). */
+.ac-dot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.12rem 0.5rem;
+  background: var(--surface-1);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+.ac-dot-badge::before {
+  content: "";
+  width: 0.5rem; height: 0.5rem;
+  border-radius: 50%;
+  background: var(--dot, var(--muted));
+  flex-shrink: 0;
+}
+
+/* Result-count header — "Showing 50 of 275". Muted prose; the numerics lift to
+   ink-soft mono tabular via .ac-result-count__n. */
+.ac-result-count {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.ac-result-count__n {
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+/* ---- responsive masthead & nav drawer ----------------------------------- */
+/* The masthead is a flex row (brand | tools). Below the 48rem breakpoint it
+   stacks to a single column: the hamburger (.ac-nav-toggle) appears and the
+   tool row collapses into a vertical .ac-nav-drawer revealed by aria-expanded. */
+.ac-app-shell__masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* No flex-wrap here: above the breakpoint the drawer stays inline and never
+     wraps to a stranded second row. Wrapping is enabled only in the media query
+     below, where the drawer is meant to drop to its own full-width column. */
+}
+.ac-nav-drawer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.ac-nav-drawer nav { display: flex; align-items: center; gap: 1rem; }
+.ac-nav-toggle { display: none; }   /* wide: no hamburger, tools are inline */
+
+@media (max-width: 48rem) {
+  .ac-app-shell__masthead { flex-wrap: wrap; }   /* let the drawer drop to row 2 */
+  .ac-nav-toggle { display: inline-flex; }        /* narrow: show the hamburger */
+  /* The drawer drops to its own full-width row and stacks vertically. */
+  .ac-nav-drawer {
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-top: var(--ac-space-4);
+  }
+  .ac-nav-drawer nav { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  /* Collapsed by default below the breakpoint; the hamburger reveals it. */
+  .ac-nav-toggle[aria-expanded="false"] + .ac-nav-drawer { display: none; }
+}
+
+/* Ghost / watermark — a faint oversized mark sitting BEHIND content (the catalog
+   logo behind the grid, the Optimizer icon in a textarea well). Absolute and
+   non-interactive; tinted via currentColor so an INLINE currentColor SVG (e.g.
+   artifacts/images/ac-design-mark.svg) recolours per theme.
+   Place inside a parent that is `position:relative; isolation:isolate` — the
+   isolate makes z-index:-1 sit behind in-flow content but in FRONT of the parent
+   background (without it, -1 would slip behind the surface). Override
+   color/opacity/size per context. NOTE: an <img src> does NOT inherit
+   currentColor (it renders black) — inline the SVG to recolour. */
+.ac-ghost {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  color: var(--accent);
+  opacity: 0.05;
+  z-index: -1;
+}
+.ac-ghost svg,
+.ac-ghost img { display: block; width: 100%; height: 100%; }
