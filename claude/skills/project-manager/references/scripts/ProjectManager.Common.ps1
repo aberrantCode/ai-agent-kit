@@ -17,6 +17,27 @@ function Get-PmRoot {
     return (Resolve-Path -LiteralPath $StartPath).Path
 }
 
+function Remove-PmYamlComment {
+    param([string]$Value)
+
+    # Strip a YAML inline comment: a '#' that is at the start of the value or
+    # preceded by whitespace, and not inside a quoted string. Leaves '#' that is
+    # part of an unquoted token (e.g. 'foo#bar') or inside quotes intact.
+    $inSingle = $false
+    $inDouble = $false
+    for ($i = 0; $i -lt $Value.Length; $i++) {
+        $ch = $Value[$i]
+        if ($ch -eq "'" -and -not $inDouble) { $inSingle = -not $inSingle }
+        elseif ($ch -eq '"' -and -not $inSingle) { $inDouble = -not $inDouble }
+        elseif ($ch -eq '#' -and -not $inSingle -and -not $inDouble) {
+            if ($i -eq 0 -or [char]::IsWhiteSpace($Value[$i - 1])) {
+                return $Value.Substring(0, $i)
+            }
+        }
+    }
+    return $Value
+}
+
 function ConvertFrom-PmFrontmatter {
     param([string]$Content)
 
@@ -26,7 +47,7 @@ function ConvertFrom-PmFrontmatter {
     foreach ($line in $lines) {
         if ($line -match '^\s*([A-Za-z0-9_-]+):\s*(.*)\s*$') {
             $key = $Matches[1]
-            $value = $Matches[2].Trim()
+            $value = (Remove-PmYamlComment $Matches[2]).Trim()
             if ($value -match '^\[(.*)\]$') {
                 $inner = $Matches[1].Trim()
                 if ($inner.Length -eq 0) { $result[$key] = @() }
@@ -61,7 +82,12 @@ function Get-PmSpec {
     $deps = @()
     if ($fm.depends_on -is [array]) { $deps = @($fm.depends_on) }
     elseif ($fm.depends_on) { $deps = @([string]$fm.depends_on) }
-    $caps = @([regex]::Matches($content, '\[[A-Z]{2}-CAP-\d{2,}\]') | ForEach-Object { $_.Value.Trim('[', ']') } | Sort-Object -Unique)
+    # Owned capabilities are those DECLARED as checklist bullets in the spec
+    # (`- [ ] `[XX-CAP-NN]` ...`), not every CAP-ID mentioned in prose. Foreign
+    # CAP-IDs cross-referenced in a description or a cross-feature boundary note
+    # (e.g. a spec noting dedup is owned by the catalog) must not be demanded of
+    # this spec's own plan.
+    $caps = @([regex]::Matches($content, '(?m)^\s*-\s*(?:\[[ xX]\]\s*)?`\[([A-Z]{2}-CAP-\d{2,})\]`') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
     [pscustomobject]@{
         Path = $File.FullName
         Name = $File.Name
