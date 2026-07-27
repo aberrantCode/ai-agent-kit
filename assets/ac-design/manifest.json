@@ -1,0 +1,8 @@
+{
+  "source": "AC_DESIGN",
+  "version": "0.9.0",
+  "upstream": "https://github.com/aberrantCode/AC_DESIGN",
+  "syncedAt": "2026-07-26",
+  "files": ["presentation-theme.css", "shared-theme.css"],
+  "note": "Synced from AC_DESIGN artifacts/styles/. presentation-theme.css @imports ./shared-theme.css."
+}
