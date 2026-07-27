@@ -80,6 +80,13 @@ will reorder it the moment something blocks.
 
 Give the new session somewhere to work before it starts, rather than making it decide:
 
+> **`<skill-dir>`** is this bundle's own directory — `~/.claude/skills/continue-new-session-prompt`
+> when installed to the global profile. Every `<skill-dir>/scripts/…` reference below — **including
+> the ones you copy into the generated handoff prompt** — must be written out as that resolved
+> absolute path. Never emit a bare `scripts/…` path: the receiving session resolves it against *its
+> own* repo root, where the script does not exist, and reads the miss as "the required script was
+> never scaffolded."
+
 ```powershell
 pwsh -File <skill-dir>/scripts/new-task-worktree.ps1 `
     -RepoPath 'C:\path\to\repo' -Slug 'reset-move-queue' -Type refactor -SyncDeps
@@ -144,7 +151,7 @@ decisions, sequencing, anything adversarial — so it does not fan out judgment 
 Remind it to dispatch independent lookups in parallel in one message.
 
 **Delegation logging.** The cheap-model default is a bet, and bets need a scoreboard. Instruct the
-session to record outcomes with `scripts/log-delegation-outcome.ps1`:
+session to record outcomes with `<skill-dir>/scripts/log-delegation-outcome.ps1`:
 
 - Whenever it escalates a subagent to a stronger model, redoes a subagent's work itself, or drops a
   task the subagent could not complete — log it with a `-Category`, a `-FailureMode` from the fixed
@@ -162,7 +169,7 @@ Be explicit that a failure is worth logging even when it was recovered in second
 invisible later; only the ledger remembers, and the whole point is to answer next month's question
 "which categories should stop going to haiku?" with data rather than impressions.
 
-Review the accumulated evidence with `scripts/delegation-report.ps1`, which reports failure share
+Review the accumulated evidence with `<skill-dir>/scripts/delegation-report.ps1`, which reports failure share
 per category and model and flags the pairs worth changing. It withholds recommendations below a
 minimum sample rather than drawing conclusions from three data points — and says so, because "not
 enough data yet" is itself worth knowing. When it does flag a category, fold that into the *next*
