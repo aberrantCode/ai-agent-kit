@@ -20,7 +20,12 @@ function Get-StagedFiles {
 
 function Test-IsDocsFile {
     param([string]$Path)
-    return $Path -match '^(docs/|scripts/|\.github/|\.claude/|AGENTS\.md$|CLAUDE\.md$|README\.md$|ROADMAP\.md$)'
+    # Repo-specific exemption: this is the ai-agent-kit skills archive, whose "product" is the
+    # skill/instruction/command markdown under claude/, codex/, gemini/. Those authoring dirs are
+    # treated as docs-like so ordinary skill maintenance rides /ship without a PM task file. (This
+    # customization is intentionally NOT in the installed template — bare claude/ would mis-exempt
+    # a real source dir in a general project.)
+    return $Path -match '^(docs/|scripts/|\.github/|\.claude/|claude/|codex/|gemini/|AGENTS\.md$|CLAUDE\.md$|README\.md$|ROADMAP\.md$)'
 }
 
 function Get-ActiveTaskScope {
