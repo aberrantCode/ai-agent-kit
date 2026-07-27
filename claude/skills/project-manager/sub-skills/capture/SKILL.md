@@ -7,12 +7,27 @@ description: Front-door intake for bugs, chores, tech-debt, and ideas — captur
 
 Single front door for intake. Every bug, chore, tech-debt item, and idea lands as a `BL-NNN` row in `docs/backlog.md`. Atomically allocates monotonic IDs (race-safe). Append-only; never commits.
 
-**Prerequisite:** The project must have been initialized with `/init-project` (or equivalent manual scaffolding). Specifically, this skill assumes:
+---
+
+## Phase 0 — Prerequisite Gate (fail-closed)
+
+**Run this before anything else. Do not proceed on a partial scaffold.**
+
+Verify the intake store exists (e.g. `test -f <path>`):
 
 - `docs/backlog.md` — live backlog table
-- `docs/backlog-archive.md` — completed items
+- `docs/backlog-archive.md` — completed items (scanned for ID allocation)
 
-If either is missing, stop and tell the user to run `/init-project` first (or that the repo hasn't adopted the intake lane).
+**If both exist, continue to Phase 1.**
+
+**If either is missing, STOP.** A repo without them has not adopted the intake lane. Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the backlog store, then re-run this gate and continue.
+- (b) **Cancel** — stop; report exactly which artifacts were missing.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the paths**, and only then continue.
+
+> **Red flag — STOP.** Do not hand-create `docs/backlog.md` and improvise ID allocation to route around the missing store — the monotonic `BL-*` invariant depends on both files existing together. Halt and offer init.
 
 ---
 

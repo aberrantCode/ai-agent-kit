@@ -7,10 +7,27 @@ description: Triage and promotion — the moment the feature-vs-chore lane is de
 
 Triage and promotion. Decides which lane (feature vs. chore) an item belongs to. Accepts both backlog items (`BL-NNN`) and homeless issues (`docs/issues/*.md`). For each, asks the pivotal question and offers four outcomes. Never commits.
 
-**Prerequisite:** The project must have been initialized with `/init-project`.
+---
 
-- `docs/backlog.md` — must exist
-- Optional: `docs/issues/` — directory of homeless issues
+## Phase 0 — Prerequisite Gate (fail-closed)
+
+**Run this before loading any item. Do not proceed on a partial scaffold.**
+
+Verify (e.g. `test -f <path>`):
+
+- `docs/backlog.md` — must exist (the intake store this skill triages)
+- `docs/issues/` — optional; a directory of homeless issues (not required)
+
+**If `docs/backlog.md` exists, continue to Phase 1.**
+
+**If it is missing, STOP.** Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the backlog store, then re-run this gate and continue.
+- (b) **Cancel** — stop; report that `docs/backlog.md` is missing.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the path**, and only then continue. Note: Option A (promote-to-feature) invokes `/add-feature`, which runs its own prerequisite gate for `docs/workflow/SDLC.md`.
+
+> **Red flag — STOP.** Do not triage against an improvised backlog when `docs/backlog.md` is absent. Halt and offer init.
 
 ---
 
