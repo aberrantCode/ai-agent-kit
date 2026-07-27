@@ -17,11 +17,13 @@ Verify every required artifact exists (e.g. `test -f <path>`):
 
 - `docs/REQUIREMENTS.md` — source material for the interview
 - `docs/features/template.md` — canonical spec template each area is written from (Step 2)
-- `docs/workflow/SDLC.md` — holds the **Feature Abbreviation Registry** you append a CAP-ID prefix row to per spec (Step 2)
+- `docs/workflow/SDLC.md` — must exist **and** contain a `## Feature Abbreviation Registry` heading, where you append a CAP-ID prefix row per spec (Step 2)
 
-**If all exist, continue to Step 1.**
+**Verify existence *and* the registry**, e.g. `test -f docs/workflow/SDLC.md && grep -q "Feature Abbreviation Registry" docs/workflow/SDLC.md`. A present-but-registry-less `SDLC.md` is incomplete — **treat it as missing**.
 
-**If any are missing, STOP.** A repo without these was not initialized by `/init-project`; do not improvise a substitute. Use `AskUserQuestion` to offer:
+**If all exist and `SDLC.md` has the registry, continue to Step 1.**
+
+**If any are missing (or `SDLC.md` lacks the registry), STOP.** A repo without these was not initialized by `/init-project`; do not improvise a substitute. Use `AskUserQuestion` to offer:
 
 - (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
 - (b) **Cancel** — stop; report exactly which artifacts were missing.

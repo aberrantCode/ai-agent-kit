@@ -18,13 +18,16 @@ This audit compares specs against the canonical template and the CAP-ID standard
 reference artifact exists (e.g. `test -f <path>`):
 
 - `docs/features/template.md` — the template every spec is checked against (Check 1)
-- `docs/workflow/SDLC.md` — holds the **Feature Abbreviation Registry** the CAP-ID checks rely on (Check 2)
+- `docs/workflow/SDLC.md` — must exist **and** contain a `## Feature Abbreviation Registry` heading, the table the CAP-ID checks audit against (Check 2)
 - `docs/REQUIREMENTS.md` — product intent used for logical-coherence checks (Check 2/4)
 
-**If all exist, continue to Phase 1.**
+**Verify existence *and* the registry**, e.g. `test -f docs/workflow/SDLC.md && grep -q "Feature Abbreviation Registry" docs/workflow/SDLC.md`. A present-but-registry-less `SDLC.md` is incomplete — **treat it as missing**.
 
-**If any are missing, STOP.** You cannot audit CAP-IDs against a registry that doesn't exist, and a
-repo missing these was never initialized by `/init-project`. Use `AskUserQuestion` to offer:
+**If all exist and `SDLC.md` has the registry, continue to Phase 1.**
+
+**If any are missing (or `SDLC.md` lacks the registry), STOP.** You cannot audit CAP-IDs against a
+registry that doesn't exist, and a repo missing these was never initialized by `/init-project`. Use
+`AskUserQuestion` to offer:
 
 - (a) **Run `/init-project` now** (Recommended) — scaffold the missing artifacts, then re-run this gate and continue.
 - (b) **Cancel** — stop; report exactly which artifacts were missing.
