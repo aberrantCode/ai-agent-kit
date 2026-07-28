@@ -443,5 +443,23 @@ then escalate to erik.
   shared conventions).
 - OQ3 fleet-wide stale-count sweep (reorg iteration 10 vehicle).
 - OQ4 instructions mirror-policy ruling.
-- Implement `install-to-project.ps1` / `push-to-profile.ps1` / `sync-installed.ps1`
-  bodies (stubs → real) once skills-manager command flows are ready to delegate to them.
+- Implement `install-to-project.ps1` / `sync-installed.ps1` bodies (stubs → real) once
+  skills-manager command flows are ready to delegate to them. **`push-to-profile.ps1`:
+  done (2026-07-27)** — implements the corrected nested `/push-skill` layout
+  (nested sub-skills, `installed-from` stamped on every SKILL.md, commands relocated,
+  strays + drafts skipped, preview default / `-Force` with backup-before-overwrite,
+  containment-checked). Still-open follow-up: wire the skills-manager `/push-skill`
+  operation (all four SKILL.md copies) to *delegate* to this script instead of
+  re-describing the write steps inline.
+- **`/install-skill` sub-skill flatten bug (parallel to the `/push-skill` fix).**
+  `skills-manager` `/install-skill` step 7 writes each sub-skill to a loose top-level
+  `<target>/.claude/skills/<sub>/SKILL.md`. That is the same defect just corrected in
+  `/push-skill`: it shadows the bundle's own sub-skill (`audit.ps1` Check 8,
+  `profile-shadowing`) and breaks the parent skill's relative `sub-skills/<sub>`
+  delegation (e.g. `commands/merge.md` → "execute `sub-skills/merge`"). Fix: install
+  sub-skills **nested** under `<target>/.claude/skills/<name>/sub-skills/<sub>/` in all
+  four skills-manager copies (claude/codex/gemini/.claude), matching the corrected
+  `/push-skill` layout. When implemented, sweep existing installed project bundles for
+  loose top-level shadow dirs left by the old behavior. Deferred here rather than fixed
+  in-line because it changes deployed-project layout (broader blast radius than the
+  profile-only `/push-skill` change).

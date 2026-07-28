@@ -372,12 +372,12 @@ Push a skill bundle from the archive to the global user profile (`~/.gemini/`) s
      - Question: "~/.gemini/skills/<name> exists and differs. Overwrite with archive version?"
      - Options: "Yes, overwrite" | "Skip this skill"
 
-3. On confirm:
-   - Write `SKILL.md` to `~/.gemini/skills/<name>/SKILL.md` (do NOT add `installed-from` marker — the global profile is a source, not a deployment target)
-   - Write each sub-skill from `sub-skills/` to `~/.gemini/skills/<sub>/SKILL.md`
-   - Write each companion command from `commands/` to `~/.gemini/commands/<cmd>.md`
-   - Write each `references/**` file to `~/.gemini/skills/<name>/references/**`
-   - Write each `rules/**` file to `~/.gemini/skills/<name>/rules/**`
+3. On confirm — deploy the bundle **nested**, mirroring the archive layout. The parent skill plus its companion commands are the only top-level entry points; each sub-skill stays *inside* the bundle and is reached through the parent's relative `sub-skills/<sub>` path. **Never write a sub-skill to a loose top-level `~/.gemini/skills/<sub>/` directory** — that shadows the bundle's own sub-skill (`audit.ps1` Check 8, `profile-shadowing`) and breaks the parent's delegation. Writes:
+   - `SKILL.md` → `~/.gemini/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (after existing fields). A pushed bundle is a downstream **copy** of the archive — a deployment target, exactly like `/install-skill` writing into a project, NOT an authoritative source. The marker makes `/find-skills` and `/sync-skill` skip it, so a pushed copy can never masquerade as a profile-authored source and clobber the archive it came from (the profile is priority #1 in conflict resolution). Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.
+   - Each sub-skill → `~/.gemini/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
+   - Each companion command → `~/.gemini/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
+   - Each `references/**` file → `~/.gemini/skills/<name>/references/**` (no marker).
+   - Each `rules/**` file → `~/.gemini/skills/<name>/rules/**` (no marker).
 
 4. Report all files written
 
