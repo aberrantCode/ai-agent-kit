@@ -228,6 +228,21 @@ for the current set and the reasoning per variable. Add or change variables with
 -SetEnv "ANTHROPIC_LOG=debug","FORCE_COLOR="
 ```
 
+**Tab color.** The launcher colors the new tab with one stable color per repo, so several sessions
+spawned for the same checkout are visually grouped. It resolves the color from a global registry
+(`~/.claude/repo-colors.json`) keyed by the repo's normalized `origin` remote — which means every
+worktree of a repo resolves to the same color. On a repo's first launch the color is seeded once:
+from a `tabColor:` key in the repo's `pm-profile.yml` if present, otherwise the next unused color
+from the AC brand palette; after that the registry is authoritative. Pass `-TabColor '#RRGGBB'` to
+override for one launch, or `-ColorScheme '<name>'` (a scheme defined in your Windows Terminal
+settings, e.g. `AC Phosphor`) to also recolor the palette Claude's TUI renders against. Resolution
+never blocks a launch — on failure the tab is simply uncolored. See `resolve-repo-color.ps1`.
+
+Manage assignments with `manage-repo-colors.ps1` (`-Action list | set | remove | reset-top`) or the
+`/repo-color` command: `reset-top` clears the registry and re-seeds the N most active repos (ranked
+by transcript volume in `~/.claude/projects`) from the AC palette, and `demo-repo-tabs.ps1` opens a
+window of colored tabs to preview the set.
+
 **Choosing the model is part of writing the prompt, not a launcher setting.** You are the one who
 just decided what the tasks are, so you are the one who knows whether they need frontier reasoning
 or are mostly mechanical. Weigh the *hardest* task in the list, not the average — a run that is
