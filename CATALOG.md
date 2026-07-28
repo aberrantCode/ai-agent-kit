@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-22, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-28, schemaVersion: 1)
 -->
 
 # Catalog
@@ -21,6 +21,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`additive-merge-conflict-resolution`](claude/skills/additive-merge-conflict-resolution/SKILL.md) | Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the... | — |
 | [`analyze-conversations`](claude/skills/analyze-conversations/SKILL.md) | Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting — "what keeps going wrong", "find issues we've hit more than once", "aud... | — |
 | [`base`](claude/skills/base/SKILL.md) | Universal coding patterns, constraints, TDD workflow, atomic todos | codex |
+| [`claim-discipline`](claude/skills/claim-discipline/SKILL.md) | Use when about to state a checkable claim as fact — a file path, a line number, a count ("appears N times", "2 stale branches"), a quote ("the rule says X"), or "file Y contains / lacks Z". Verify it with a tool call ... | — |
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
 | [`continue-new-session-prompt`](claude/skills/continue-new-session-prompt/SKILL.md) | Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says "continue in a new session", "spawn a new terminal and ke... | — |

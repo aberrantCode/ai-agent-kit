@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-22",
+  "generated": "2026-07-28",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -101,6 +101,10 @@
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
           "category": "Frontend"
+        },
+        "claim-discipline": {
+          "description": "Use when about to state a checkable claim as fact \u2014 a file path, a line number, a count (\"appears N times\", \"2 stale branches\"), a quote (\"the rule says X\"), or \"file Y contains / lacks Z\". Verify it with a tool call in the same turn, or hedge it (\"I believe\", \"likely\") or omit it \u2014 never assert it flat. Separates verifiable facts from judgment calls so assertions about a user's own config, code, or repo state are not fabricated. Triggers whenever a response cites a location, count, or quote the user could check.",
+          "category": "Foundations & Workflow"
         },
         "cloudflare-d1": {
           "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
