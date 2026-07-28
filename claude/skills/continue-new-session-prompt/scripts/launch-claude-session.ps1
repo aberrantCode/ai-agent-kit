@@ -38,9 +38,19 @@
     a hashtable literal fails type conversion at the parameter binder. Strings work under both
     -File and -Command.
 
+.PARAMETER TabColor
+    Windows Terminal tab color as #RGB or #RRGGBB. Omit it to auto-resolve a stable per-repo color
+    via resolve-repo-color.ps1 (registry at ~/.claude/repo-colors.json), so every session for the
+    same repo shares one color. Pass a value to override for a single launch. Resolution failure is
+    non-fatal — the session still launches, uncolored.
+
+.PARAMETER ColorScheme
+    Windows Terminal color scheme name for the tab (must already be defined in your WT settings),
+    e.g. 'AC Phosphor'. This recolors the palette Claude's TUI renders against. Optional.
+
 .PARAMETER DryRun
-    Write the runner script and print it without launching anything. Useful for inspecting what
-    the new session will actually execute.
+    Write the runner script and print it (plus the resolved tab color / scheme) without launching
+    anything. Useful for inspecting what the new session will actually execute.
 
 .EXAMPLE
     pwsh -File launch-claude-session.ps1 -PromptPath C:\repo\docs\PROMPTS\task.md `
@@ -57,6 +67,8 @@ param(
     [string]$Title = 'claude-session',
     [switch]$NoSkipPermissions,
     [string[]]$SetEnv = @(),
+    [string]$TabColor,
+    [string]$ColorScheme,
     [switch]$DryRun
 )
 
@@ -107,6 +119,24 @@ $PromptPath = (Resolve-Path -LiteralPath $PromptPath).Path
 $WorkingDirectory = (Resolve-Path -LiteralPath $WorkingDirectory).Path
 $Title = $Title -replace '\s+', '-'
 
+# Tab color: one stable color per repo so concurrent sessions for the same checkout are grouped.
+# An explicit -TabColor always wins; otherwise resolve (and persist) from the repo registry. A
+# resolution failure is never fatal — the session still launches, just without a colored tab.
+if (-not $TabColor) {
+    $resolver = Join-Path $PSScriptRoot 'resolve-repo-color.ps1'
+    if (Test-Path -LiteralPath $resolver) {
+        try { $TabColor = (& $resolver -WorkingDirectory $WorkingDirectory 2>$null | Select-Object -Last 1) }
+        catch { Write-Warning "Tab-color resolution failed ($($_.Exception.Message)); launching without one." }
+    }
+}
+if ($TabColor -and $TabColor.Trim() -notmatch '^#?[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$') {
+    Write-Warning "Ignoring invalid -TabColor '$TabColor' (expected #RGB or #RRGGBB)."
+    $TabColor = $null
+}
+elseif ($TabColor) {
+    $TabColor = '#' + $TabColor.Trim().TrimStart('#').ToUpper()
+}
+
 # `pwsh -File` hands every argument through as a literal string, so `-SetEnv A=1,B=2` arrives as
 # one element with the commas and any quote characters intact rather than as an array. Split on
 # commas that introduce a new KEY= pair, which leaves commas inside a value alone.
@@ -143,6 +173,9 @@ claude $flags `$prompt
 "@ | Set-Content -LiteralPath $runner -Encoding UTF8
 
 if ($DryRun) {
+    $tab = if ($TabColor) { $TabColor } else { '(none)' }
+    $scheme = if ($ColorScheme) { $ColorScheme } else { '(none)' }
+    Write-Host "Tab color: $tab   Color scheme: $scheme"
     Write-Host "Runner script (not launched): $runner`n"
     Get-Content -LiteralPath $runner | ForEach-Object { Write-Host "  $_" }
     return
@@ -150,8 +183,13 @@ if ($DryRun) {
 
 $before = @(Get-Process -Name claude -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
 
-$launchArgs = @(
-    'new-tab', '--title', $Title, '-d', $WorkingDirectory,
+# wt reads options up to the command token, so tab styling goes before the `pwsh` invocation.
+$tabStyle = @()
+if ($TabColor) { $tabStyle += @('--tabColor', $TabColor) }
+if ($ColorScheme) { $tabStyle += @('--colorScheme', $ColorScheme) }
+
+$launchArgs = @('new-tab', '--title', $Title) + $tabStyle + @(
+    '-d', $WorkingDirectory,
     'pwsh', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', $runner
 )
 
