@@ -96,7 +96,7 @@ ai-agent-kit/
 │   ├── generate-catalog.ps1    # stub → implemented (D2/D8)
 │   ├── audit.ps1               # IMPLEMENTED (D3)
 │   ├── install-to-project.ps1  # stub
-│   ├── push-to-profile.ps1     # stub
+│   ├── push-to-profile.ps1     # stub → implemented
 │   ├── sync-installed.ps1      # stub
 │   ├── backfill-categories.ps1 # stub → one-time sweep (D8)
 │   ├── validate.ps1            # local validation gate (P2) — T8
@@ -138,7 +138,7 @@ so accidental execution fails loudly (exit ≠ 0).
 |---|---|---|
 | `audit.ps1` | **implemented** | Read-only archive health check. Checks (severity in brackets): `SKILL.md` present with valid frontmatter, `name` matching directory [error]; missing `category:` [warn while the generator reports `categorySource: legacy-dict`, error once it reports `frontmatter` — an explicit marker, never a coverage heuristic]; `installed-from:` present inside the archive [error]; secret-shaped content (API keys, tokens, connection strings) anywhere under `shared/` [error]; manifest freshness via `generate-manifest.py --output <temp>` + diff **excluding the volatile `generated` timestamp field** (raw diff would false-positive on day rollover) [error]; CATALOG parity both directions, if `CATALOG.md` exists [error]; Claude↔Codex mirror gap [info — charter §5]; missing `diagram.html` [info]. Frontmatter parsing is delegated to `generate-manifest.py --validate --json` — one parser, two consumers. Console table + `-Json` output. |
 | `install-to-project.ps1` | stub | Copy a named skill bundle (SKILL.md + sub-skills/ + commands/ + references/ + rules/) into a target project's `.claude/`, stamping `installed-from: ai-agent-kit`. Honors shared safety conventions. |
-| `push-to-profile.ps1` | stub | Deploy a bundle to `~/.claude/skills/` (or vendor equivalent), stamping provenance. Honors shared safety conventions. |
+| `push-to-profile.ps1` | **implemented** | Deploy a bundle to `~/.claude/skills/` (or vendor equivalent), stamping provenance. **Nested** layout (sub-skills stay under the bundle — never loose top-level, `audit.ps1` Check 8; fixes F-KO-05); parent + each sub-skill `SKILL.md` stamped `installed-from: ai-agent-kit`; companion commands relocated to the profile's top-level `commands/`; `status: draft` skipped. Honors shared safety conventions (preview default, `-Force` writes with backup-to-sibling-`-backups`, containment-checked paths). |
 | `sync-installed.ps1` | stub | Scan a project (or fleet root) for stamped installed copies; diff against archive; **report-only by default**, `-Apply` writes with backup-before-overwrite. |
 | `generate-catalog.ps1` | stub → implemented in plan | Render `CATALOG.md` from `manifest.json`. Byte-stable output (ordinal sort, `utf8NoBOM`, LF via `.gitattributes`) so CI can diff. |
 | `backfill-categories.ps1` | stub → run once in plan | Inject `category:` frontmatter into each Claude `SKILL.md`; **skips any file with a non-empty `category:` already set** (protects hand assignments); `-WhatIf` preview by default, explicit apply; reports unresolvable skills for human assignment. |
