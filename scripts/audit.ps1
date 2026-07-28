@@ -385,6 +385,25 @@ try {
                     "Import anything unique to the archive, then delete " +
                     "$(Join-Path $ProfileRoot $top.Name)")
             }
+
+            # Profile-parity for bundled scripts: if the archive ships scripts/ for
+            # a skill and that skill is installed in the profile, every archive
+            # script must also be present in the profile copy. This is the check
+            # that would have flagged continue-new-session-prompt before a session
+            # hit the missing-script wall. warn-only + profile-guarded like the
+            # shadowing check above - an archive PR must not fail on local state.
+            foreach ($top in $installed) {
+                $archiveScripts = Join-Path $RepoRoot "claude/skills/$($top.Name)/scripts"
+                if (-not (Test-Path -LiteralPath $archiveScripts)) { continue }
+                $profileScripts = Join-Path $top.FullName 'scripts'
+                foreach ($src in @(Get-ChildItem -LiteralPath $archiveScripts -File -ErrorAction SilentlyContinue)) {
+                    if (-not (Test-Path -LiteralPath (Join-Path $profileScripts $src.Name))) {
+                        Add-Finding warn 'profile-script-gap' $top.Name (
+                            "archive ships scripts/$($src.Name) but the installed profile copy lacks it - " +
+                            "the skill's SKILL.md will point at a script that is not there. Re-run /push-skill $($top.Name)")
+                    }
+                }
+            }
         }
     }
 
@@ -459,6 +478,38 @@ try {
             if (Test-Path -LiteralPath (Join-Path $skillsRoot $sub.Name)) {
                 Add-Finding error 'op-dir-shadow' "$platform/skills/$($sub.Name)" `
                     "top-level skill shadows github sub-skill '$($sub.Name)' - /$($sub.Name) would resolve to the loose copy, not the bundle (F-KO-05)"
+            }
+        }
+    }
+
+    # --- CHECK 10c: bundled-script references resolve [error] ------------------
+    # A SKILL.md that invokes a helper via the `<skill-dir>/scripts/<file>`
+    # convention is broken unless that file ships in the bundle's own scripts/
+    # dir - the exact class that left continue-new-session-prompt's helpers
+    # undeployed (they were never in the copy list, so /push-skill dropped them).
+    #
+    # Keyed strictly on the `<skill-dir>/scripts/` placeholder (an absolute path
+    # into the skill's *own* directory), NOT on a bare `scripts/foo.sh`: many
+    # SKILL.md files reference project-relative scripts as examples or as
+    # scaffold targets the skill tells you to create, which are not bundle
+    # helpers and must not be flagged. The placeholder is the unambiguous signal
+    # of a self-referential helper. Extension set matches shipped script kinds.
+    foreach ($root in $platformSkillRoots) {
+        foreach ($f in Get-ChildItem -LiteralPath $root -Recurse -Filter 'SKILL.md' -File -ErrorAction SilentlyContinue) {
+            $norm = $f.FullName.Replace('\', '/')
+            if ($norm -match '/sub-skills/') { continue }   # sub-skills resolve relative to their own dir
+            $bundleRoot = $norm -replace '/SKILL\.md$', ''
+            $body = Get-Content -LiteralPath $f.FullName -Raw
+            if ([string]::IsNullOrEmpty($body)) { continue }
+            $seenScript = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+            foreach ($m in [regex]::Matches($body, '<skill-?dir>/scripts/([A-Za-z0-9._-]+\.(?:ps1|mjs|sh|js|py))')) {
+                $scriptFile = $m.Groups[1].Value
+                if (-not $seenScript.Add($scriptFile)) { continue }
+                if (-not (Test-Path -LiteralPath (Join-Path $bundleRoot "scripts/$scriptFile"))) {
+                    $rel = [System.IO.Path]::GetRelativePath($RepoRoot, $f.FullName).Replace('\', '/')
+                    Add-Finding error 'bundle-scripts' $rel `
+                        "references <skill-dir>/scripts/$scriptFile but that file is not present in the bundle's scripts/ dir - a deploy would drop it"
+                }
             }
         }
     }
