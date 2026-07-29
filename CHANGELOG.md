@@ -13,6 +13,58 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.11.0] - 2026-07-29
+
+### Added
+
+- per-repo Windows Terminal tab colors for spawned sessions (`e3d9e92`)
+- add claim-discipline skill (`28caa5c`)
+- gate on SDLC registry content, not just file existence (`0f9d70c`)
+- recognize docs/REQUIREMENTS.md in what-next detection (`de0ca0c`)
+- fail-closed prerequisite gates for PM intake sub-skills (`c3b9a4c`)
+- fail-closed init-artifact gates for PM entry skills (`bfc9dfe`)
+- add -IncludeSmoke opt-in to validate.ps1 (`6ef7e3f`)
+- provision changelog-staleness gate as third release-init artifact (`41bef7b`)
+- add Claude<->Codex body-parity check to audit.ps1 (warn) (`d3b4a72`)
+- implement push-to-profile.ps1 (was a throw stub) (`e95586c`)
+- generated-and-committed doc merge policy (`98e385d`)
+- shared merge/ship merge-preflight and ref-hygiene principles (`9a409dc`)
+- add scope-mode entry point to continue-new-session-prompt (`b2791eb`)
+- sync stale skills, add design-taste-frontend and opbta-service (`d687ff9`)
+- add continue-new-session-prompt (`bfb4fa4`)
+
+### Fixed
+
+- nest sub-skills + stamp provenance on /push-skill (`bc5c1ec`)
+- bundle scripts/ in skills-manager deploy operations (`b7ca837`)
+- qualify continue-new-session-prompt bundle script paths (`2da07c9`)
+- strip YAML inline comments and scope spec capabilities to declared bullets (`aa5d6d3`)
+- back up outside the profile skills root in push-to-profile.ps1 (`3bb25ac`)
+- verify HEAD after commit; repo-init hooksPath shim + auto-merge read-only (`823edcc`)
+- port Step 4b, 6b, and 4 error-recovery rows into Codex release mirror (`9806e23`)
+- guard Windows/Git-Bash hazards in git+gh operations (`4336577`)
+- harden worktree lifecycle — add-verify, live-lock recovery, orphan cleanup, concurrent-prune guard (`1b3e3bd`)
+- guard prune remote-delete against already-gone refs (`8b60acf`)
+
+### Documentation
+
+- add anti-bypass guidance and triggers to github SKILL.md (`093cfc7`)
+- normalize diff before classifying skills in /find-skills (`03e455f`)
+- teach release sub-skill the tag-keyed version-gate path (`e001d3c`)
+
+### Tests
+
+- add github-template deploy-and-run smoke test (`9be39d3`)
+
+### Internal
+
+- exempt archive authoring dirs (claude/codex/gemini) from PM guard (`6537988`)
+- scaffold project-manager workflow (`2e1deff`)
+- adopt AC_DESIGN presentation design system (`558d892`)
+- add github-bundle hardening lints to audit.ps1 (`31808a4`)
+- gate session retirement on a delegation tally (`76c1044`)
+- regenerate CHANGELOG for v0.10.0 (`c1d1e07`)
+
 ## [0.10.0] - 2026-07-21
 
 ### Added
