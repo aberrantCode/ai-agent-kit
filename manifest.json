@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-28",
+  "generated": "2026-07-29",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -581,11 +581,6 @@
         "web-payments": {
           "description": "Stripe Checkout, subscriptions, webhooks, customer portal",
           "category": "Commerce & Payments"
-        },
-        "what-next": {
-          "description": "Decide what the agent should do next in the current repository. Use this skill whenever the user asks \"what next?\", \"what should I work on?\", \"where did we leave off?\", \"what's on the backlog?\", \"help me pick the next task\", or invokes /what-next or /what-next-update. Also trigger proactively when the user returns to a project after a break and wants direction. The skill inspects repo structure, detects the project-management framework in use, reads or builds a backlog, prioritises pending work using a weighted heuristic, and \u2014 after the user picks from the top three \u2014 hands the chosen task off to the right specialist agent. All user interaction goes through AskUserQuestion; results are cached to docs/what-next.md so subsequent runs skip re-analysis.",
-          "category": "Foundations & Workflow",
-          "has_commands": true
         },
         "woocommerce": {
           "description": "WooCommerce REST API - products, orders, customers, webhooks",
