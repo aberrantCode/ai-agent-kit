@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-19",
+  "generated": "2026-07-28",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -35,7 +35,7 @@
           "has_commands": true
         },
         "ac-opbta-ops": {
-          "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
+          "description": "Repository-specific operator knowledge for AC_OPBTA (Ansible, Semaphore, SOPS, Proxmox, Docker, SSH, Tailscale, OpenVPN, WireGuard, Unbound, Pi-hole, Wazuh, OPNsense, Traefik, Prometheus/Grafana/Loki, ntopng, ntfy, Uptime Kuma, Cloudflare, XPipe). Use whenever the user asks about this home-network repo's tooling, wants to deploy a new service, change firewall rules, read a SOPS-encrypted secret, diagnose a VLAN or Pi-hole issue, manage XPipe connections / identities on the workstation, or troubleshoot any playbook/role in here \u2014 even if the tool isn't named explicitly (e.g. \"add a rule so the IoT VLAN can reach Wyzebridge\", \"spin up a container for X\", \"what's the admin password for Y\").",
           "category": "Tooling & DevOps"
         },
         "accumulated-feature-branch-workflow": {
@@ -102,6 +102,10 @@
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
           "category": "Frontend"
         },
+        "claim-discipline": {
+          "description": "Use when about to state a checkable claim as fact \u2014 a file path, a line number, a count (\"appears N times\", \"2 stale branches\"), a quote (\"the rule says X\"), or \"file Y contains / lacks Z\". Verify it with a tool call in the same turn, or hedge it (\"I believe\", \"likely\") or omit it \u2014 never assert it flat. Separates verifiable facts from judgment calls so assertions about a user's own config, code, or repo state are not fabricated. Triggers whenever a response cites a location, count, or quote the user could check.",
+          "category": "Foundations & Workflow"
+        },
         "cloudflare-d1": {
           "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
           "category": "Databases & Storage"
@@ -133,6 +137,11 @@
         "content-aware-file-renaming": {
           "description": "Use when renaming files into a structured naming formula based on their contents \u2014 especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files (document.pdf, document (1).pdf, IMG_*.jpg, scan*.pdf, untitled.*), bulk extracts from broker/bank portals or email attachments, or zip archives that must be extracted before processing. Triggers when the existing filename does not carry the document's identity and the file's content must be inspected to determine who, what, where, and when. The canonical naming formula is `%who% - %what% - %where% - %when% - %extra%`. Always prompt the user via AskUserQuestion only \u2014 never as plain text.",
           "category": "Tooling & DevOps"
+        },
+        "continue-new-session-prompt": {
+          "description": "Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says \"continue in a new session\", \"spawn a new terminal and keep going\", \"hand this off\", \"open a new window and work through those items\", \"/continue-new-session-prompt\", or otherwise asks for the open items from your last response to be executed elsewhere \u2014 including when they just say \"go do all that in a new session\". The skill turns the decision list you most recently gave them into a self-contained handoff prompt (state already established, tasks in dependency order, hard constraints, cheap subagent delegation, /loop for anything that needs polling), writes it under docs/PROMPTS/, and launches it via a script so no prompt text ever passes through shell quoting.",
+          "category": "Foundations & Workflow",
+          "has_commands": true
         },
         "conversation-history-mining-for-domain-knowledge": {
           "description": "Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps \u2014 mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.",
@@ -169,6 +178,10 @@
         "design-critique-to-safe-refactor": {
           "description": "Use when converting a design critique, redesign request, or UX audit finding into actual code changes on a tool or feature that's already working. Ensures the refactor can't silently break existing behavior by treating tests and client-side DOM hooks as the interface contract to preserve, and by gating auth/security-sensitive changes with explicit review before merge.",
           "category": "Code Quality"
+        },
+        "design-taste-frontend": {
+          "description": "Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.",
+          "category": "UI & Design"
         },
         "diagnostics-probe-design": {
           "description": "Use when investigating a service or infrastructure failure and before proposing any fix \u2014 verify the premise, then write a read-only, multi-hypothesis probe that combines recorded metrics with live state to pinpoint the broken component and avoid redoing already-completed or destructive work.",
@@ -241,7 +254,7 @@
           "category": "Code Quality"
         },
         "github": {
-          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; pruning stale branches and worktrees; bringing a repo's configuration up to standard (branch protection, merge policy, security settings, local hook gate); or creating, working in, and tearing down an isolated per-task worktree. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", \"init the repo\", \"initialize this repo\", \"harden this repo\", \"set up branch protection\", \"why can I push straight to dev\", \"apply the repo standard\", \"create a worktree\", \"set up an isolated workspace\", \"remove the worktree\", and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
+          "description": "Use when the user wants to perform a git or GitHub repository operation from the terminal \u2014 merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev\u2192main release; provisioning or repairing a repo's release automation (changelog generator + tag-triggered workflow); committing and pushing; pruning stale branches and worktrees; bringing a repo's configuration up to standard (branch protection, merge policy, security settings, local hook gate); or creating, working in, and tearing down an isolated per-task worktree. Triggers on \"merge 1209\", \"merge this branch\", \"merge the current worktree\", \"ship it\", \"release\", \"set up releases\", \"release init\", \"provision release workflow\", \"fix changelog automation\", \"commit\", \"clean up branches\", \"init the repo\", \"initialize this repo\", \"harden this repo\", \"set up branch protection\", \"why can I push straight to dev\", \"apply the repo standard\", \"create a worktree\", \"set up an isolated workspace\", \"remove the worktree\", \"merge PR 76\", \"merge these PRs\", \"land this branch\", \"open a PR for this\", \"cut a release\", \"clean these branches\" \u2014 route these through the named operation rather than a raw gh/git sequence \u2014 and similar phrasings \u2014 even when the word \"git\" is absent. This is a thin-command bundle: each command names one operation and this skill runs it against the current repo with minimal terminal output.",
           "category": "Foundations & Workflow",
           "has_commands": true,
           "has_sub_skills": true
@@ -318,6 +331,10 @@
           "description": "Node.js backend patterns with Express/Fastify, repositories",
           "category": "Languages & Runtimes"
         },
+        "opbta-service": {
+          "description": "Use when deploying, updating, retiring, inspecting, managing, or listing an internal service on svc.opbta.com (OPBTA) from any repo, not only AC_OPBTA. Covers deploy a service, add a container, stand up X on svc.opbta.com, day-2 ops, rotate a secret, re-expose a service, rename/move/resize a service, service catalog / list services, cross-repo OPBTA service lifecycle.",
+          "category": "Infrastructure & Ops"
+        },
         "parallel-subagent-fanout": {
           "description": "Use when a task splits into independent lenses or disjoint-file subtasks \u2014 multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature branch \u2014 to dispatch multiple subagents concurrently and reconcile their results into one verdict.",
           "category": "Foundations & Workflow"
@@ -336,7 +353,7 @@
           "has_commands": true
         },
         "project-manager": {
-          "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks, /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md (or legacy docs/INITIAL_PROMPT.md) exists and the user says anything like \"move forward\", \"keep building\", \"what's next\", \"continue the implementation\", or \"start working on the project\", AND when the user says \"set up project management\", \"bootstrap a new project\", \"initialize the project workflow\", or \"make sure agents follow the project plan\". This skill manages the full lifecycle: scaffolding a new project with enforcement artifacts, extracting feature specs via interview, generating phased implementation plans, spawning typed agents to execute tasks, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as the shared state between orchestrator and worker agents.",
+          "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks, /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md exists and the user says anything like \"move forward\", \"keep building\", \"what's next\", \"continue the implementation\", or \"start working on the project\", AND when the user says \"set up project management\", \"bootstrap a new project\", \"initialize the project workflow\", or \"make sure agents follow the project plan\". This skill manages the full lifecycle: scaffolding a new project with enforcement artifacts, extracting feature specs via interview, generating phased implementation plans, spawning typed agents to execute tasks, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as the shared state between orchestrator and worker agents.",
           "category": "AI & LLM",
           "has_commands": true,
           "has_sub_skills": true
@@ -452,7 +469,7 @@
           "has_commands": true
         },
         "sops-secrets": {
-          "description": "Domain expertise for SOPS-encrypted secrets in this repo \u2014 reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. \"what's the login for grafana\"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally \u2014 always shell to ac-devops, which is the only host with the age key.",
+          "description": "Domain expertise for SOPS-encrypted secrets in this repo \u2014 reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. \"what's the login for grafana\"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally \u2014 always shell to ac-devops, which is the only host with the age key. For agents: the Secrets-Broker MCP server is the reference-only path for checking/provisioning/rotating secrets without plaintext; this skill handles human plaintext reads and raw SOPS access.",
           "category": "Security & Credentials"
         },
         "spec-align": {

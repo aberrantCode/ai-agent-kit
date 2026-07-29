@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-19, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-28, schemaVersion: 1)
 -->
 
 # Catalog
@@ -21,8 +21,10 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`additive-merge-conflict-resolution`](claude/skills/additive-merge-conflict-resolution/SKILL.md) | Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the... | — |
 | [`analyze-conversations`](claude/skills/analyze-conversations/SKILL.md) | Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting — "what keeps going wrong", "find issues we've hit more than once", "aud... | — |
 | [`base`](claude/skills/base/SKILL.md) | Universal coding patterns, constraints, TDD workflow, atomic todos | codex |
+| [`claim-discipline`](claude/skills/claim-discipline/SKILL.md) | Use when about to state a checkable claim as fact — a file path, a line number, a count ("appears N times", "2 stale branches"), a quote ("the rule says X"), or "file Y contains / lacks Z". Verify it with a tool call ... | — |
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
+| [`continue-new-session-prompt`](claude/skills/continue-new-session-prompt/SKILL.md) | Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says "continue in a new session", "spawn a new terminal and ke... | — |
 | [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/SKILL.md) | Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps — mine prior Claude conversation transcripts instead... | — |
 | [`existing-repo`](claude/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | codex |
 | [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
@@ -88,6 +90,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | Skill | Description | Also in |
 |---|---|---|
 | [`ac-logo`](claude/skills/ac-logo/SKILL.md) | Full lifecycle for AC "PCB phosphor console" brand logos in any repository — finding existing logo assets and judging them against the brand checklist, generating a new on-brand badge, reskinning an off-brand logo int... | — |
+| [`design-taste-frontend`](claude/skills/design-taste-frontend/SKILL.md) | Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering. | — |
 | [`doc-coauthoring`](claude/skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users... | codex |
 | [`explain-code`](claude/skills/explain-code/SKILL.md) | Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks "how does this work? | codex |
 | [`frontend-design`](claude/skills/frontend-design/SKILL.md) | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, land... | codex |
@@ -204,6 +207,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`honcho-deriver-queue-health-diagnostics`](claude/skills/honcho-deriver-queue-health-diagnostics/SKILL.md) | Use when a Honcho memory backend (or any background derivation/processing queue) seems stuck, slow, or is reporting suspicious pending/error counts — check both the MCP-visible layer and the server-side queue table di... | — |
 | [`lvm-thin-pool-diagnostics-recovery`](claude/skills/lvm-thin-pool-diagnostics-recovery/SKILL.md) | Use when a host or guest (VM/container) using LVM thin-provisioned storage shows ENOSPC, read-only remounts, or stalled writes despite the filesystem reporting free space — covers layered diagnosis and safe recovery o... | — |
 | [`multi-perspective-dns-diagnostic-ladder`](claude/skills/multi-perspective-dns-diagnostic-ladder/SKILL.md) | Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any "mysterious" networked-service failure needs root-causing — apply a layered probing ladder (multiple resolver perspectives, or dependency-chai... | — |
+| [`opbta-service`](claude/skills/opbta-service/SKILL.md) | Use when deploying, updating, retiring, inspecting, managing, or listing an internal service on svc.opbta.com (OPBTA) from any repo, not only AC_OPBTA. Covers deploy a service, add a container, stand up X on svc.opbta... | — |
 | [`shell-helper-migration`](claude/skills/shell-helper-migration/SKILL.md) | Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) — extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and pre... | — |
 | [`shell-migration-skip-taxonomy`](claude/skills/shell-migration-skip-taxonomy/SKILL.md) | Use when deciding whether a shell script can safely be migrated to source a centralized helper library — classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categorie... | — |
 | [`side-effect-free-helper-library`](claude/skills/side-effect-free-helper-library/SKILL.md) | Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own val... | — |

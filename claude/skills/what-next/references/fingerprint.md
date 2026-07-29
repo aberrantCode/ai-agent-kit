@@ -13,7 +13,7 @@ Include these files (only if they exist):
 | `backlog-archive.md`                      | Closure state of completed tasks                 |
 | `docs/features/*.md`                      | Feature specs (project-manager framework)        |
 | `docs/plans/*.md`                         | Plan files (project-manager framework)           |
-| `docs/INITIAL_PROMPT.md`                  | Source of truth for product intent               |
+| `docs/REQUIREMENTS.md` or `docs/INITIAL_PROMPT.md` | Source of truth for product intent               |
 | `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`, `composer.json` | Stack signals; a change means new deps or renames |
 | `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, `lerna.json` | Monorepo structure                            |
 | `.github/ISSUE_TEMPLATE/*`                | Team PM convention changes                       |

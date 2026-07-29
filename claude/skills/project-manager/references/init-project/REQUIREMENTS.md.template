@@ -3,9 +3,6 @@
 > **Source of truth for product intent (the PRD).** User-owned — agents never modify this file.
 > `/init-features` reads it to seed feature specs. If product direction changes, deprecate features
 > (`status: deprecated`) and add new ones rather than rewriting history here.
->
-> _Migrating from a legacy `docs/INITIAL_PROMPT.md`? Rename it to `docs/REQUIREMENTS.md`, or leave
-> it — the tooling still reads `INITIAL_PROMPT.md` as a fallback when `REQUIREMENTS.md` is absent._
 
 ---
 

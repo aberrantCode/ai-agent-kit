@@ -5,7 +5,7 @@ description: >
   Automated project implementation orchestrator that drives feature-driven development from a single
   initial prompt through to completed code. Use this skill when the user invokes /init-project,
   /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks,
-  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md (or legacy docs/INITIAL_PROMPT.md) exists and the user says
+  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md exists and the user says
   anything like "move forward", "keep building", "what's next", "continue the implementation",
   or "start working on the project", AND when the user says "set up project management",
   "bootstrap a new project", "initialize the project workflow", or "make sure agents follow the
@@ -28,7 +28,6 @@ worker agents.
 ```
 docs/
   REQUIREMENTS.md            # Product requirements — source of truth for intent (never modified)
-  INITIAL_PROMPT.md          # Legacy intake — still read as a fallback
   backlog.md                 # Canonical intake store (feature requests, bugs, chores, tech-debt)
   backlog-archive.md         # Completed backlog items
   features/                  # Feature specs — final authority on scope
@@ -139,7 +138,7 @@ Run **before** `/init-features`. After `/init-project` completes, the user fills
 
 ### `/init-features` — Feature Interview
 
-Use when `docs/REQUIREMENTS.md` (or legacy `docs/INITIAL_PROMPT.md`) exists but `docs/features/` is empty or incomplete. Extracts 3-6
+Use when `docs/REQUIREMENTS.md` exists but `docs/features/` is empty or incomplete. Extracts 3-6
 functional areas from the prompt, interviews the user one area at a time via `AskUserQuestion`, and
 writes one feature spec per area to `docs/features/`. Detailed flow lives in
 `sub-skills/init-features/SKILL.md`.
@@ -473,7 +472,7 @@ Run `/continue-tasks` from Step 1 (bootstrap check).
 Run this when `docs/features/` is empty or when new features need to be captured.
 
 ### Step 1 — Extract feature areas from the prompt
-Read `docs/REQUIREMENTS.md` (fall back to `docs/INITIAL_PROMPT.md` if REQUIREMENTS.md is absent). Group the implied features into 3–6 functional areas (e.g., "Data
+Read `docs/REQUIREMENTS.md`. Group the implied features into 3–6 functional areas (e.g., "Data
 Models & Engine", "Onboarding & Profiles", "Dashboard & Logging", "Planner & Visualization",
 "Recovery & Reminders"). List the areas to the user and ask if the grouping makes sense before
 proceeding.

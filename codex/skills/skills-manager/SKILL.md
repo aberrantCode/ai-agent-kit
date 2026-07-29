@@ -38,6 +38,7 @@ Deploying a bundle to a repo copies:
 - Each `commands/<cmd>.md` → `<target>/.claude/commands/<cmd>.md`
 - Each `references/**` file → `<target>/.claude/skills/<name>/references/**`
 - Each `rules/**` file → `<target>/.claude/skills/<name>/rules/**`
+- Each `scripts/**` file → `<target>/.claude/skills/<name>/scripts/**`
 
 ### Installed Copy
 A skill file is an installed copy when its YAML frontmatter carries an `installed-from:` marker pointing at this archive. New installs stamp `installed-from: ai-agent-kit`; copies installed before the repository was renamed carry the legacy value `installed-from: llm_skills`. **Treat either value as an installed copy** — throughout this document, `installed-from: ai-agent-kit` is shorthand for *either the current or the legacy marker*. The sync and find operations skip these — they are not project-developed skills.
@@ -125,6 +126,7 @@ Archive a specific skill (or all discovered skills) including its full bundle.
    - `SKILL.md` → `claude/skills/<name>/SKILL.md`
    - Companion commands → `claude/skills/<name>/commands/<cmd>.md`
    - Sub-skills → `claude/skills/<name>/sub-skills/<sub>/SKILL.md`
+   - Any `scripts/**` helper files → `claude/skills/<name>/scripts/**` (a bundle whose SKILL.md invokes `<skill-dir>/scripts/…` is broken without them)
 6. Generate a visual diagram for the skill:
    - Invoke the `visual-explainer:generate-web-diagram` skill
    - Instruct it to diagram: the skill's purpose (from `description` frontmatter), its key operations or phases (from section headings), significant inputs/outputs, and any decision points or branching paths
@@ -180,6 +182,7 @@ Deploy a skill bundle from the archive into a project.
    - Commands from `commands/` (N files)
    - References from `references/` (N files)
    - Rules from `rules/` (N files)
+   - Scripts from `scripts/` (N files)
 
 6. If `name` was given, prompt the user to confirm:
    - Question: "Install `<name>` (+ N dependencies) into `<target>`? This will write N files."
@@ -191,6 +194,7 @@ Deploy a skill bundle from the archive into a project.
    - Write each command to `<target>/.claude/commands/<cmd>.md` (no marker — commands are not skills)
    - Copy each `references/**` file to `<target>/.claude/skills/<name>/references/**` (no marker)
    - Copy each `rules/**` file to `<target>/.claude/skills/<name>/rules/**` (no marker)
+   - Copy each `scripts/**` file to `<target>/.claude/skills/<name>/scripts/**` (no marker)
 
 8. Report all files written
 
@@ -219,7 +223,7 @@ Update installed skills in the current project when the archive has newer versio
    - Overwrite each `SKILL.md`, preserving the `installed-from: ai-agent-kit` marker in frontmatter
    - Also check `commands/` in the archive bundle — write any new or changed commands to `<project>/.claude/commands/`
    - Also check `sub-skills/` — update any installed sub-skills that are outdated
-   - Also check `references/` and `rules/` in the archive bundle — write any new or changed files to `<project>/.claude/skills/<name>/references/**` and `<project>/.claude/skills/<name>/rules/**`
+   - Also check `references/`, `rules/`, and `scripts/` in the archive bundle — write any new or changed files to `<project>/.claude/skills/<name>/references/**`, `<project>/.claude/skills/<name>/rules/**`, and `<project>/.claude/skills/<name>/scripts/**`
    - Regenerate the diagram: invoke `visual-explainer:generate-web-diagram` for each updated skill and overwrite `claude/skills/<name>/diagram.html`; update the `## Diagram` section in SKILL.md if the path changed
 
 6. Report updated files
@@ -256,6 +260,7 @@ Import project-level changes to a skill back into the archive and the global use
    - **Archive**: overwrite `claude/skills/<name>/SKILL.md`
    - **User profile**: overwrite `~/.claude/skills/<name>/SKILL.md` (create dir if needed)
    - **Companion commands**: scan project `.claude/commands/` for new companion commands not yet in the archive bundle; for each new one, ask the user: "Bundle `/<cmd>` with `<name>`?" → "Yes" | "Skip"
+   - **Helper scripts**: copy any new or changed `scripts/**` files from the project bundle to both `claude/skills/<name>/scripts/**` and `~/.claude/skills/<name>/scripts/**`
    - **README**: update Description cell if frontmatter `description` changed
 
 7. Report what was imported
@@ -401,12 +406,13 @@ Push a skill bundle from the archive to the global user profile (`~/.claude/`) s
      - Question: "~/.claude/skills/<name> exists and differs. Overwrite with archive version?"
      - Options: "Yes, overwrite" | "Skip this skill"
 
-3. On confirm:
-   - Write `SKILL.md` to `~/.claude/skills/<name>/SKILL.md` (do NOT add `installed-from` marker — the global profile is a source, not a deployment target)
-   - Write each sub-skill from `sub-skills/` to `~/.claude/skills/<sub>/SKILL.md`
-   - Write each companion command from `commands/` to `~/.claude/commands/<cmd>.md`
-   - Write each `references/**` file to `~/.claude/skills/<name>/references/**`
-   - Write each `rules/**` file to `~/.claude/skills/<name>/rules/**`
+3. On confirm — deploy the bundle **nested**, mirroring the archive. The parent skill plus its companion commands are the only top-level entry points; each sub-skill stays *inside* the bundle and is reached through the parent's relative `sub-skills/<sub>` path. **Never write a sub-skill to a loose top-level `~/.claude/skills/<sub>/` directory** — that shadows the bundle's own sub-skill (`audit.ps1` Check 8, `profile-shadowing`) and breaks the parent's delegation. This is exactly what `scripts/push-to-profile.ps1` does — prefer running it (`-Name <name> -Force`) over hand-copying. Writes:
+   - `SKILL.md` → `~/.claude/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (after existing fields). A pushed bundle is a downstream **copy** of the archive — a deployment target, exactly like `/install-skill` writing into a project, NOT an authoritative source. The marker makes `/find-skills` and `/sync-skill` skip it, so a pushed copy can never masquerade as a profile-authored source and clobber the archive it came from (the profile is priority #1 in conflict resolution). Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.
+   - Each sub-skill → `~/.claude/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
+   - Each companion command → `~/.claude/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
+   - Each `references/**` file → `~/.claude/skills/<name>/references/**` (no marker).
+   - Each `rules/**` file → `~/.claude/skills/<name>/rules/**` (no marker).
+   - Each `scripts/**` file → `~/.claude/skills/<name>/scripts/**` (no marker).
 
 4. Report all files written
 

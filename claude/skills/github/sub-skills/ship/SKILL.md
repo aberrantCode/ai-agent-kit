@@ -165,6 +165,21 @@ silently when not requested.
 ```bash
 git checkout -b "$BRANCH"   # skip if already on the pre-committed branch
 git commit -m "$MSG"        # skip if pre-committed
+```
+
+After committing, verify the commit is the one you intended — a `prepare-commit-msg` hook or a
+harness intercept can hijack `-m` (observed: correct 9 files, unrelated message). Do not rely
+on vigilance:
+
+```bash
+HEAD_MSG=$(git log -1 --format=%s)
+HEAD_FILES=$(git show --name-only --format= HEAD | sort)
+```
+
+If `$HEAD_MSG` does not match `$MSG`, or the file list differs from what was staged, **bail
+loudly** (print both, stop) rather than pushing a mislabeled commit. Only then push:
+
+```bash
 git push -u origin "$BRANCH"
 ```
 
@@ -184,7 +199,34 @@ fi
 
 ---
 
+## Step 6.5 — Merge preflight
+
+`ship` opened the PR moments ago, so `mergeable` is almost always `UNKNOWN` on first read and
+CI has not started. Do not merge blind (the recurring "failed 2–3× then watched checks"):
+
+```bash
+gh pr view "$BRANCH" --json isDraft,mergeable,mergeStateStatus,reviewDecision
+```
+
+- Poll `mergeable == UNKNOWN` up to 5× / 15s before treating it as real.
+- `isDraft` (only if you opened it draft) → `gh pr ready`.
+- `mergeStateStatus == BLOCKED` + pending checks → if
+  `gh repo view --json autoMergeAllowed -q .autoMergeAllowed` is `true`, set `AUTO=--auto` for
+  Step 7's merge; else watch `gh pr checks "$BRANCH" --watch` to green (leave `AUTO` empty),
+  then merge. A *failing* check stops the ship — surface it (Error-Recovery already covers this).
+
+Leave `AUTO` empty in the common clean case; it is set only on the auto-merge-enabled +
+pending-checks path above.
+
+---
+
 ## Step 7 — Merge and clean up
+
+If `$IN_WORKTREE`, first confirm the worktree is still registered
+(`git worktree list --porcelain | grep -q "$REPO_ROOT"`). A concurrent session may have pruned
+it mid-task; if it is gone, do **not** silently fall through onto the shared primary checkout
+(that briefly moves `main`/`dev` off-branch). Pause via `AskUserQuestion` (recreate the
+worktree and replay the commit / continue on the primary checkout deliberately / abort).
 
 From `$REPO_ROOT`, stash any post-hook working-tree changes so the post-merge checkout is not
 blocked. If `$IN_WORKTREE`, remove the worktree before merging:
@@ -193,8 +235,8 @@ blocked. If `$IN_WORKTREE`, remove the worktree before merging:
 cd "$REPO_ROOT"
 ( ! git diff --quiet || ! git diff --cached --quiet ) && git stash --include-untracked && STASHED=true
 [ "$IN_WORKTREE" = true ] && { git worktree remove "$REPO_ROOT" --force 2>/dev/null || git worktree prune; }
-gh pr merge "$BRANCH" --merge --delete-branch --subject "$MSG"
-gh pr view "$BRANCH" --json state --jq '.state'   # expect "MERGED"
+gh pr merge "$BRANCH" --merge --delete-branch ${AUTO:-} --subject "$MSG"
+gh pr view "$BRANCH" --json state --jq '.state'   # expect "MERGED" (or "queued" on --auto)
 ```
 
 Conditional cleanup and sync:
@@ -230,3 +272,4 @@ Shipped feat/foo → dev — PR #123, merge commit abc1234. Branch + worktree cl
 | PR checks failing | `gh pr checks $BRANCH` — do not force merge |
 | `dev` used by worktree on merge | `cd $REPO_ROOT`; remove the worktree before `gh pr merge` |
 | Local changes block post-merge checkout | Stash before merge (Step 7 does this); PR may already be merged — check `gh pr view` |
+| git-bash `fork`/`add_item … failed` mid-run (Windows Cygwin) | Not a git failure — bash could not fork. Re-run the same `git`/`gh` step through `pwsh`; shell state doesn't persist but repo state does, so just repeat the last command |

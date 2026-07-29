@@ -1,0 +1,566 @@
+/* ===========================================================================
+   AC presentation theme — "PCB phosphor console", projected
+   ---------------------------------------------------------------------------
+   The slide layer of the AC house style. A deck is the same powered circuit
+   board as an AC app — near-black substrate, phosphor-green traces, tin-silver
+   solder accents — scaled up to viewing distance. It does not restate the
+   identity; it INHERITS it. Every colour, font, space and radius here resolves
+   to a token defined in shared-theme.css.
+
+   This file is a first-class SIBLING of shared-theme.css, not a fork of it. It
+   `@import`s the core so a deck links ONE stylesheet, then adds only what a
+   slide genuinely needs that an app screen does not:
+     1. a projection type scale (the UI ramp tops out at ~1.28rem);
+     2. a slide stage — canvas, aspect ratio, safe-area, and a 12-col grid;
+     3. NAMED motion tokens (the core inlines its durations/easings as literals);
+     4. a categorical data-viz palette.
+   Everything new is prefixed `--ac-slide-*` / `--ac-ease-*` / `--ac-dur-*`, is
+   derived from an existing primitive wherever one exists, and is ADDITIVE — no
+   core token or class is renamed. The core token NAMES remain the contract.
+
+   Adoption: `<html data-theme="dark">`, link this file (it pulls in the core),
+   wire the tiny deck module from artifacts/snippets/presentation-deck.html, and
+   build slides from the `.ac-slide--*` templates. Dark is the default deck; the
+   light silkscreen deck is the same markup under `data-theme="light"`.
+   =========================================================================== */
+
+@import "./shared-theme.css";
+
+/* ---- presentation tokens ------------------------------------------------- */
+/* All new; all derived. The type scale is expressed in `cqi` (1cqi = 1% of the
+   slide's width) so it is PROJECTION-RESOLUTION-INVARIANT — a title is 7.5% of
+   the slide whether it renders at 1280px or 3840px. Reference numbers below are
+   for a 1280px-wide slide (1cqi = 12.8px). */
+:root {
+  /* Canvas. Two tokens carry the same ratio because `aspect-ratio` wants the
+     `16 / 9` form while the fit-to-viewport calc() needs the evaluated number.
+     This is the same kind of necessary duplication the core documents for the
+     baked <select> chevron — retune both together if the ratio ever changes. */
+  --ac-slide-aspect: 16 / 9;          /* primary — widescreen projection      */
+  --ac-slide-ar:     calc(16 / 9);    /* same ratio, numeric, for the fit calc */
+  --ac-deck-pad:     2.5rem;          /* gutter between the stage and the viewport edge */
+
+  /* Safe area & grid. Nothing critical (text, logo, faces) crosses the margin;
+     the slide grid is 12 columns like the app column, scaled to the stage. */
+  --ac-slide-margin: 5.5cqi;          /* ~70px @1280 — the projection safe-area */
+  --ac-slide-gutter: 2.4cqi;          /* ~31px @1280 — inter-column / list gap  */
+  --ac-slide-cols:   12;
+
+  /* Projection type scale — a ~1.25 (major-second-ish) ramp anchored on a body
+     size legible from the back of a room. Roles mirror the deck's information
+     hierarchy: kicker → title → section → heading → subhead → lead → body →
+     caption/data. `.ac-title__sub` (the green kicker) carries straight over. */
+  --ac-slide-title:   7.5cqi;         /* ~96px — one big idea per slide         */
+  --ac-slide-section: 6cqi;           /* ~77px — section-divider number/word    */
+  --ac-slide-bignum:  16cqi;          /* ~205px — the single big-number stat    */
+  --ac-slide-heading: 4cqi;           /* ~51px — content-slide headline         */
+  --ac-slide-subhead: 3cqi;           /* ~38px — supporting line under a heading */
+  --ac-slide-lead:    3.2cqi;         /* ~41px — quote / pull-quote body        */
+  --ac-slide-body:    2.6cqi;         /* ~33px — standard body / bullet         */
+  --ac-slide-caption: 1.8cqi;         /* ~23px — caption, data label, footnote  */
+  --ac-slide-kicker:  1.5cqi;         /* ~19px — uppercase tracked kicker/eyebrow */
+
+  /* Motion — NAMED here for the first time. The values codify what the core
+     already animates inline, so a future shared release can hoist these
+     upward without a visual change:
+       --ac-ease-standard  = the core body theme-fade curve (an ease-out quart)
+       --ac-dur-1/-2/-3    = the core's 120 / 150 / 200ms literals
+     The slide-scale additions (build/transition/stagger) extend that base. */
+  --ac-ease-standard: cubic-bezier(0.25, 1, 0.5, 1);   /* default in/out         */
+  --ac-ease-emphasis: cubic-bezier(0.22, 1, 0.36, 1);  /* stronger settle, NO overshoot */
+  --ac-ease-exit:     cubic-bezier(0.4, 0, 1, 1);      /* leaving — quick to start */
+
+  --ac-dur-1: 120ms;                  /* micro (hover)     — from the core       */
+  --ac-dur-2: 150ms;                  /* control transition — from the core      */
+  --ac-dur-3: 200ms;                  /* theme fade         — from the core      */
+  --ac-dur-build:  260ms;             /* one fragment reveal                     */
+  --ac-dur-slide:  400ms;             /* slide → slide crossfade                 */
+  --ac-dur-slide-lg: 500ms;           /* slide → slide horizontal push           */
+  --ac-stagger:    50ms;              /* delay between staggered builds          */
+
+  /* Data-viz categorical palette — the phosphor accent LEADS; the rest are the
+     brand's own hues (solder blue, LED amber/red) plus two low-chroma fills, so
+     a chart still reads as AC and never out-shouts the accent. Ordered so the
+     first two (green, blue) are a colour-blind-safe pair; greens+reds only ever
+     co-occur with a direct label or pattern (see the a11y note in the spec). */
+  --ac-slide-series-1: var(--accent);          /* phosphor green (from the core) */
+  --ac-slide-series-2: oklch(0.72 0.090 232);  /* solder blue (on the --solder hue) */
+  --ac-slide-series-3: oklch(0.80 0.120 88);   /* amber (on the --led-warn hue)  */
+  --ac-slide-series-4: oklch(0.70 0.120 300);  /* violet                         */
+  --ac-slide-series-5: oklch(0.78 0.090 196);  /* cyan                           */
+  --ac-slide-series-6: oklch(0.66 0.140 26);   /* coral/red (on the --led-down hue) */
+}
+
+/* Light silkscreen deck: deepen the data-viz series for AA on the pale board
+   (same move the core makes for --accent / --muted in light). Hues are locked;
+   only L (and a touch of C) shifts, exactly like the core token ladder. */
+[data-theme="light"] {
+  --ac-slide-series-2: oklch(0.52 0.110 232);
+  --ac-slide-series-3: oklch(0.58 0.130 80);
+  --ac-slide-series-4: oklch(0.50 0.140 300);
+  --ac-slide-series-5: oklch(0.54 0.100 196);
+  --ac-slide-series-6: oklch(0.54 0.170 26);
+}
+
+/* ---- deck & slide stage -------------------------------------------------- */
+
+/* The deck is the viewport-filling stage that centres one slide. In "live"
+   presentation mode (.ac-deck--live, toggled by the deck module) only the
+   [data-active] slide shows; without it, every slide stacks vertically so the
+   same markup doubles as a scrollable handout / print view. */
+.ac-deck {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ac-deck-pad);
+  padding: var(--ac-deck-pad);
+}
+
+/* One slide = one 16:9 stage. `container-type: size` turns the slide into the
+   query container its children measure `cqi` against, so the whole type scale
+   tracks the slide's rendered size. The inline-size min() fits the stage to
+   BOTH viewport axes (width, or the width a 16:9 box would need to fill the
+   available height) so a slide is never cropped. */
+.ac-slide {
+  container-type: size;
+  container-name: slide;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: none;
+  inline-size: min(100%, calc((100dvh - 2 * var(--ac-deck-pad)) * var(--ac-slide-ar)));
+  aspect-ratio: var(--ac-slide-aspect);
+  padding: var(--ac-slide-margin);
+  background-color: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  box-shadow: var(--panel-shadow);
+  /* The signature PCB substrate — the same whisper-quiet trace-grid the core
+     paints on <body>, carried onto the slide so a deck reads as the board too.
+     Cell scales with the slide via cqmin so it stays felt-not-seen at any size. */
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 6cqmin 6cqmin, 6cqmin 6cqmin;
+  background-position: -1px -1px;
+}
+
+/* Aspect alternates — 4:3 legacy projectors, 16:10 laptop panels. Same stage,
+   different ratio pair; set on the deck so every slide inherits it. */
+.ac-deck--4-3  { --ac-slide-aspect: 4 / 3;   --ac-slide-ar: calc(4 / 3); }
+.ac-deck--16-10 { --ac-slide-aspect: 16 / 10; --ac-slide-ar: calc(16 / 10); }
+
+/* Live mode — one slide at a time. Slides fade on advance (opacity only; a
+   crossfade is the restrained default, see the spec's transition table). The
+   deck is the positioning context the absolute slides anchor to. */
+.ac-deck--live { position: relative; justify-content: center; gap: 0; padding: 0; }
+.ac-deck--live .ac-slide {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--ac-dur-slide) var(--ac-ease-standard),
+              visibility 0s linear var(--ac-dur-slide);
+}
+.ac-deck--live .ac-slide[data-active] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--ac-dur-slide) var(--ac-ease-standard);
+}
+
+/* ---- slide grid ---------------------------------------------------------- */
+/* Opt-in 12-col grid inside the safe area. Column-span helpers cover the common
+   splits; anything finer sets grid-column inline. Rows default to content. */
+.ac-slide__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ac-slide-cols), 1fr);
+  gap: var(--ac-slide-gutter);
+  block-size: 100%;
+  align-content: center;
+}
+.ac-col-4  { grid-column: span 4; }
+.ac-col-6  { grid-column: span 6; }
+.ac-col-7  { grid-column: span 7; }
+.ac-col-5  { grid-column: span 5; }
+.ac-col-8  { grid-column: span 8; }
+.ac-col-12 { grid-column: 1 / -1; }
+
+/* A plain vertically-centred content stack (the common non-grid case). */
+.ac-slide__stack {
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--ac-slide-gutter);
+}
+
+/* ---- projection type roles ----------------------------------------------- */
+/* Each maps a semantic slide role to a scale token + the core's type
+   conventions (uppercase-tracked labels, the phosphor kicker, mono numerics).
+   Line-height tightens as size grows — display type needs less leading. */
+
+.ac-slide__kicker {
+  font-size: var(--ac-slide-kicker);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);            /* the signature green eyebrow */
+  line-height: 1.2;
+}
+.ac-slide__title {
+  font-size: var(--ac-slide-title);
+  font-weight: 680;
+  letter-spacing: 0.005em;
+  line-height: 1.04;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ac-slide__section {
+  font-size: var(--ac-slide-section);
+  font-weight: 680;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.06;
+  color: var(--ink);
+}
+.ac-slide__heading {
+  font-size: var(--ac-slide-heading);
+  font-weight: 660;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ac-slide__subhead {
+  font-size: var(--ac-slide-subhead);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink-soft);
+  text-wrap: balance;
+}
+.ac-slide__lead {
+  font-size: var(--ac-slide-lead);
+  font-weight: 400;
+  line-height: 1.32;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.ac-slide__body {
+  font-size: var(--ac-slide-body);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.ac-slide__caption {
+  font-size: var(--ac-slide-caption);
+  line-height: 1.4;
+  color: var(--muted);
+}
+/* Big-number statistic + its label (the KPI slide). Value is mono tabular — a
+   readout, per the core's "mono for numerics" rule; label is an uppercase kicker. */
+.ac-slide__bignum {
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ac-slide-bignum);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  text-shadow: 0 0 0.5cqi var(--accent-glow);   /* faint phosphor emission */
+}
+.ac-slide__data-label {
+  font-size: var(--ac-slide-caption);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Bullet list tuned for projection: generous leading, a phosphor marker, and a
+   hard limit signalled by the spec (≤5 items, ≤~9 words). */
+.ac-slide__list { list-style: none; display: grid; gap: calc(var(--ac-slide-gutter) * 0.75); }
+.ac-slide__list > li {
+  position: relative;
+  padding-left: 3.4cqi;
+  font-size: var(--ac-slide-body);
+  line-height: 1.35;
+  color: var(--ink);
+}
+.ac-slide__list > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 1.1cqi; height: 1.1cqi;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 1.2cqi -0.2cqi var(--accent-glow);   /* a lit trace node */
+}
+
+/* ---- slide templates (archetypes) ---------------------------------------- */
+/* Each `.ac-slide--*` sets only the layout intent — placement and alignment.
+   Type roles and the grid do the rest, so templates stay thin and composable.
+   Purpose + do/don'ts for each live in the spec. */
+
+/* Title — the opener. Content bottom-left, brand mark clear-spaced. */
+.ac-slide--title { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--ac-slide-gutter); }
+
+/* Section divider — a numbered chapter break. Centred, quieter substrate. */
+.ac-slide--section {
+  display: flex; flex-direction: column; justify-content: center; gap: calc(var(--ac-slide-gutter) * 0.6);
+  background-color: color-mix(in oklch, var(--bg) 80%, #000);   /* dip to signal a gear-change */
+}
+[data-theme="light"] .ac-slide--section { background-color: color-mix(in oklch, var(--bg) 84%, var(--ink)); }
+
+/* Agenda / TOC — a numbered list, each row a hairline-ruled entry. */
+.ac-slide--agenda { display: flex; flex-direction: column; justify-content: center; gap: var(--ac-slide-gutter); }
+.ac-slide__agenda-item {
+  display: flex; align-items: baseline; gap: var(--ac-slide-gutter);
+  padding: calc(var(--ac-slide-gutter) * 0.5) 0;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: var(--ac-slide-subhead);
+  color: var(--ink);
+}
+.ac-slide__agenda-item[aria-current="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.ac-slide__agenda-num {
+  font-family: var(--ac-font-mono); font-variant-numeric: tabular-nums;
+  color: var(--muted); font-size: var(--ac-slide-body);
+}
+
+/* Single-column content — a heading over a stack. The default workhorse. */
+.ac-slide--content { display: flex; flex-direction: column; justify-content: center; gap: var(--ac-slide-gutter); }
+
+/* Statement — one line, big, centred. Silence around it is the message. */
+.ac-slide--statement { display: grid; place-items: center; text-align: center; }
+.ac-slide--statement .ac-slide__title { max-inline-size: 82%; }
+
+/* Big number — the KPI/impact slide. Stat centred, label above/below. */
+.ac-slide--bignum { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: calc(var(--ac-slide-gutter) * 0.5); }
+
+/* Quote / pull-quote — leading phosphor rule, attribution muted. */
+.ac-slide--quote { display: flex; flex-direction: column; justify-content: center; gap: var(--ac-slide-gutter); }
+.ac-slide__quote {
+  border-left: 0.4cqi solid var(--accent);
+  padding-left: var(--ac-slide-gutter);
+  font-size: var(--ac-slide-lead);
+  line-height: 1.28;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.ac-slide__cite { font-size: var(--ac-slide-caption); color: var(--muted); font-style: normal; }
+.ac-slide__cite::before { content: "— "; }
+
+/* ---- image templates ----------------------------------------------------- */
+
+/* Full-bleed image — media fills the stage edge-to-edge, under the safe-area
+   content. Pair with a scrim when text sits over it. */
+.ac-slide--full-bleed { padding: var(--ac-slide-margin); }
+
+/* Image + caption — media in a framed well, caption beneath. */
+.ac-slide--image-caption { display: flex; flex-direction: column; gap: var(--ac-slide-gutter); }
+
+/* Split — media one half, content the other. Reverse for right-side media. */
+.ac-slide--split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ac-slide-gutter); align-items: center; }
+.ac-slide--split.ac-slide--media-right { direction: rtl; }
+.ac-slide--split.ac-slide--media-right > * { direction: ltr; }
+
+/* Comparison — two mirrored columns with a centre rule. */
+.ac-slide--comparison { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ac-slide-gutter); align-items: stretch; }
+.ac-slide--comparison > * + * { border-left: 1px solid var(--rule); padding-left: var(--ac-slide-gutter); }
+
+/* Two / three column content. */
+.ac-slide--two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ac-slide-gutter); align-content: center; }
+.ac-slide--three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ac-slide-gutter); align-content: center; }
+
+/* Timeline / process — a horizontal energized rail with lit nodes per step,
+   reusing the .ac-rail signature as the spine. */
+.ac-slide--timeline { display: flex; flex-direction: column; justify-content: center; gap: calc(var(--ac-slide-gutter) * 1.5); }
+.ac-slide__track { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--ac-slide-gutter); position: relative; }
+.ac-slide__track::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 1.1cqi; height: 1px;
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent) 12%, var(--accent) 88%, var(--accent-dim));
+  box-shadow: 0 0 1cqi -0.2cqi var(--accent-glow);
+}
+.ac-slide__step { position: relative; display: flex; flex-direction: column; gap: 1cqi; padding-top: 2.6cqi; }
+.ac-slide__step::before {
+  content: ""; position: absolute; top: 0.55cqi; left: 0;
+  width: 1.1cqi; height: 1.1cqi; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 1.2cqi -0.1cqi var(--accent-glow);
+}
+
+/* Team / bio grid — cards with a portrait, name, role. */
+.ac-slide--team { display: grid; grid-template-columns: repeat(auto-fit, minmax(18cqi, 1fr)); gap: var(--ac-slide-gutter); align-content: center; }
+.ac-slide__bio { display: flex; flex-direction: column; gap: 1cqi; }
+.ac-slide__bio-name { font-size: var(--ac-slide-subhead); font-weight: 640; color: var(--ink); }
+.ac-slide__bio-role { font-size: var(--ac-slide-caption); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* Chart slide — heading over a chart well that fills the remaining height. */
+.ac-slide--chart { display: flex; flex-direction: column; gap: var(--ac-slide-gutter); }
+.ac-slide__chart { flex: 1; min-height: 0; display: grid; }
+
+/* Closing / CTA — mirror of the title, content anchored, brand + contact. */
+.ac-slide--closing { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--ac-slide-gutter); }
+
+/* ---- media, scrims & treatments ------------------------------------------ */
+
+/* The image element itself. Cover crops to fill (default for full-bleed/split);
+   contain fits without cropping (diagrams, screenshots, logos). Focal point is
+   controlled via object-position on the element (inline or a --focal var). */
+.ac-slide__media {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: var(--focal, 50% 50%);
+}
+.ac-slide__media--contain { object-fit: contain; }
+
+/* Full-bleed media layer — sits BEHIND the safe-area content (z-index:-1 under
+   the isolated slide), edge-to-edge past the padding via negative inset. */
+.ac-slide__bleed {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+.ac-slide__bleed .ac-slide__media { border-radius: 0; }
+
+/* Contained media well — framed, rounded, hairline border (matches .ac-card). */
+.ac-slide__frame {
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--ac-radius-md);
+  background: var(--surface-1);
+}
+
+/* Legibility scrim — a gradient from the substrate colour so text over imagery
+   always clears contrast. Direction picks the text edge. MANDATORY under any
+   text-on-image (see the a11y baseline). */
+.ac-slide__scrim { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.ac-slide__scrim--bottom { background: linear-gradient(0deg, var(--bg) 4%, color-mix(in oklch, var(--bg) 55%, transparent) 34%, transparent 62%); }
+.ac-slide__scrim--left   { background: linear-gradient(90deg, var(--bg) 2%, color-mix(in oklch, var(--bg) 55%, transparent) 36%, transparent 64%); }
+.ac-slide__scrim--full   { background: color-mix(in oklch, var(--bg) 52%, transparent); }
+
+/* Brand-tied treatments. Duotone drains the photo to greyscale then floods the
+   phosphor accent through a colour blend — the image joins the board. Tint is a
+   lighter accent wash. Both are treatments, not defaults: reach for them when a
+   photo needs to belong, and keep them consistent across a deck. */
+.ac-slide__media--duotone { filter: grayscale(1) contrast(1.05); }
+.ac-slide__media--duotone::after,           /* when applied to a wrapper */
+.ac-slide__tint::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: var(--accent); mix-blend-mode: color; opacity: 0.42;
+}
+.ac-slide__tint { position: relative; }
+
+/* ---- logo placement on slides -------------------------------------------- */
+/* The brand tile, clear-spaced in a corner. Clear space = the tile's own size
+   on every side (nothing intrudes). Sized in cq units so it scales with the
+   stage. Reuse .ac-brand-logo for the tiled mark, or .ac-ghost for a watermark. */
+.ac-slide__brand {
+  position: absolute;
+  top: var(--ac-slide-margin);
+  right: var(--ac-slide-margin);
+  z-index: 2;
+  inline-size: 6cqi;
+  aspect-ratio: 1;
+}
+.ac-slide__brand--bottom-left { top: auto; right: auto; bottom: var(--ac-slide-margin); left: var(--ac-slide-margin); }
+.ac-slide__brand .ac-brand-logo { inline-size: 100%; block-size: 100%; }
+/* A giant faint watermark mark, bled off a corner (reuses .ac-ghost tinting). */
+.ac-slide__watermark { inset: auto -6cqi -8cqi auto; inline-size: 44cqi; block-size: 44cqi; opacity: 0.05; }
+
+/* ---- slide chrome: footer, page number, progress ------------------------- */
+/* Reuse the app footer language — an uppercase mono telemetry strip — as a
+   persistent slide footer (deck name · section · page). */
+.ac-slide__footer {
+  position: absolute;
+  left: var(--ac-slide-margin);
+  right: var(--ac-slide-margin);
+  bottom: calc(var(--ac-slide-margin) * 0.55);
+  display: flex;
+  align-items: center;
+  gap: 1cqi;
+  font-family: var(--ac-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ac-slide-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ac-slide__footer .ac-slide__page { margin-left: auto; color: var(--ink-soft); }
+.ac-slide__footer-sep { color: var(--rule); user-select: none; }
+
+/* Deck progress rail — a thin energized bar across the deck foot whose filled
+   portion tracks position. Reuses the rail's phosphor language. Set --progress
+   (0–1) from the deck module. */
+.ac-deck__progress {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--rule-soft); z-index: 10;
+}
+.ac-deck__progress::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  inline-size: calc(var(--progress, 0) * 100%);
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+  box-shadow: 0 0 8px -1px var(--accent-glow);
+  transition: inline-size var(--ac-dur-3) var(--ac-ease-standard);
+}
+
+/* ---- builds / fragments -------------------------------------------------- */
+/* A fragment is hidden until revealed (data-revealed set by the deck module).
+   Default reveal: fade + a short rise, on the standard curve. Stagger a group
+   by setting --i (0,1,2…) inline; delay = --i * --ac-stagger. Restraint is the
+   rule: reveal to control PACING, not to decorate. */
+.ac-fragment {
+  opacity: 0;
+  transform: translateY(1.4cqi);
+  transition: opacity var(--ac-dur-build) var(--ac-ease-standard),
+              transform var(--ac-dur-build) var(--ac-ease-standard);
+  transition-delay: calc(var(--i, 0) * var(--ac-stagger));
+}
+.ac-fragment[data-revealed] { opacity: 1; transform: none; }
+/* Emphasis variant — a revealed item that also lights up (for a punchline). */
+.ac-fragment--emphasis[data-revealed] { color: var(--accent); }
+
+/* ---- reduced motion ------------------------------------------------------ */
+/* Match the core's contract: honour prefers-reduced-motion by collapsing every
+   transition/transform this layer adds. Slides still CHANGE (opacity snaps),
+   fragments still REVEAL (they just appear) — motion is removed, not function.
+   The core already kills the body fade, control transitions and the rail glow;
+   this block covers the slide/build/progress additions. */
+@media (prefers-reduced-motion: reduce) {
+  .ac-deck--live .ac-slide,
+  .ac-deck--live .ac-slide[data-active],
+  .ac-fragment,
+  .ac-deck__progress::before {
+    transition: none;
+  }
+  .ac-fragment { transform: none; }
+  .ac-slide__bignum { text-shadow: none; }
+  .ac-slide__track::before,
+  .ac-slide__step::before,
+  .ac-slide__list > li::before { box-shadow: none; }
+}
+
+/* ---- print / PDF export -------------------------------------------------- */
+/* One slide per printed page at the deck's aspect. Chrome that only makes sense
+   on screen (the fixed progress rail) is dropped; every slide shows regardless
+   of live-mode active state, so a print is the full handout. */
+@media print {
+  @page { size: landscape; margin: 0; }
+  .ac-deck, .ac-deck--live { display: block; padding: 0; }
+  .ac-deck--live .ac-slide,
+  .ac-slide {
+    position: relative; inset: auto; opacity: 1; visibility: visible;
+    inline-size: 100%; break-after: page; border: 0; border-radius: 0; box-shadow: none;
+  }
+  .ac-deck__progress { display: none; }
+  .ac-fragment { opacity: 1; transform: none; }
+}

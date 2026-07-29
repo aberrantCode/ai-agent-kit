@@ -112,11 +112,16 @@ mergeCommitAllowed:  true
 squashMergeAllowed:  false
 rebaseMergeAllowed:  false
 deleteBranchOnMerge: true
-allowAutoMerge:      true
 ```
 
 Squash and rebase are disabled at the repo level so the UI is physically unable to violate
 the bundle's merge-commit rule. `deleteBranchOnMerge` complements `/prune`.
+
+**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`autoMergeAllowed`) is
+a **per-repo choice, not part of the standard**: `repo-init` *reports* its current state so you
+know whether `/ship` and `/merge` can take the `--auto` preflight path, but it never enables it
+and never flags it as drift. `/ship` and `/merge` detect it live at preflight and fall back to
+watch-to-green when it is off.
 
 ### Group 3 — Security
 
@@ -166,6 +171,13 @@ independently of fact 1.
 1. Current `core.hooksPath` value, if set and the directory exists → that is the repo's dir.
 2. Otherwise the first existing of `.githooks/`, `scripts/git-hooks/`, `.git-hooks/`.
 3. Otherwise create `.githooks/`.
+
+**Pre-existing worktrees change the mechanism.** `core.hooksPath` is **not** honored uniformly
+across linked worktrees — a gate set only via `core.hooksPath` can silently skip on a secondary
+worktree or a branch that predates the config. When `git worktree list` shows secondary
+worktrees, prefer installing a `.git/hooks` shim (or a per-worktree hook link) that delegates to
+the versioned hooks directory, rather than relying on `core.hooksPath` alone. State the
+trade-off in the summary.
 
 Standard hook set — **overridable per repo** via `hooks.set` in the manifest:
 
@@ -225,6 +237,25 @@ future reader from "cleaning up" entries whose purpose isn't obvious:
 .worktrees/
 .claude/worktrees/
 ```
+
+#### Generated-and-committed files — merge policy (opt-in, declared in the manifest)
+
+Some repos commit a file that is *also* regenerated from source — a `CATALOG.md`, a
+`docs/STATUS.md`, a date-keyed changelog. Two branches almost always collide on it, and a
+date-keyed one goes stale across a midnight boundary. Declare each such file under
+`generatedCommitted` in the manifest (`path` + the `regen` command that rebuilds it). For every
+declared path, `repo-init`:
+
+- registers a **local** merge driver — a `merge=union` (or a keep-ours-then-regen) entry in
+  `.gitattributes` plus the matching `git config merge.<driver>.*` **in this clone's local
+  config**. State plainly in the summary that **GitHub's server-side merge ignores
+  `.gitattributes`**, so this only smooths *local* merges and rebases; a PR merged in the UI is
+  unaffected by it.
+- installs or extends a `post-rewrite` **and** `post-merge` hook (Group 5) that re-runs each
+  `regen` command, so a rebase leaves the generated file correct rather than conflicted.
+
+Opt-in by construction: a repo that declares nothing under `generatedCommitted` gets no merge
+driver and no regen hook, and behaves exactly as before.
 
 ### Group 7 — Repo metadata
 
@@ -315,6 +346,14 @@ hooks:
 
 artifacts: [gitignore, gitattributes, gitleaks, pr-template, issue-templates, security, contributing]
 
+# Files that are regenerated from source AND committed. Opt-in, declared per repo.
+# repo-init provisions a local merge driver + regen hook for each (see Group 6).
+generatedCommitted:
+  - path: docs/STATUS.md
+    regen: pwsh ./scripts/sync-status.ps1
+  - path: CATALOG.md
+    regen: pwsh ./scripts/generate-catalog.ps1 -Force
+
 claudeMd:
   managedBlock: true          # the repo-init:begin/end span is maintained here
   blockVersion: 1.0.0
@@ -391,6 +430,10 @@ ls .github/workflows/ 2>/dev/null
 cat .github/repo-standard.yml 2>/dev/null                   # prior manifest, if any
 ```
 
+On Git-Bash, prefix every leading-slash `gh api "/repos/…"` above with `MSYS_NO_PATHCONV=1`
+(or drop the leading slash) — MSYS otherwise rewrites `/repos/...` into a filesystem path and
+the read silently returns nothing, making a configured repo look unconfigured.
+
 Read the manifest **first** if it exists — its `waivers` suppress drift and its `hooks.set`
 and `hooks.path` override the defaults for this repo.
 
@@ -407,6 +450,10 @@ Build the drift list group by group (Groups 1–9). Each item is one of:
 | **drift** | repo moved away from the standard | actionable |
 | **new-in-standard** | repo's `standardVersion` predates this rule | actionable, labelled `(new)` |
 | **blocked** | cannot be applied here (plan/permission) | reported with the reason, not offered |
+
+Auto-merge (`autoMergeAllowed`, probed in Step 2) is reported here as **informational status,
+never drift** — a per-repo choice (Group 2). Surface whether it is on or off so the operator
+knows the `--auto` path is available to `/ship` and `/merge`; never offer to change it.
 
 Fully conformant → print the conformance summary and **stop without asking anything**.
 
@@ -455,6 +502,11 @@ Order matters — cheapest and most reversible first, so a mid-run failure leave
 Rulesets are applied by name: `PUT` when a ruleset with that name exists (preserving its id),
 `POST` when it does not. Never blind-`POST` — that creates a duplicate ruleset with the same
 name, and the two then AND together into rules nobody wrote.
+
+On Git-Bash, run the ruleset `PUT`/`POST` as `MSYS_NO_PATHCONV=1 gh api "/repos/$REPO/rulesets…"`
+and **re-read `gh api "/repos/$REPO/rulesets"` afterward to confirm it actually applied** — a
+leading-slash path gets mangled by MSYS and the call exits 0 while doing nothing, so protection
+can look applied when it was silently dropped.
 
 **Self-lockout guard.** Before applying a branch ruleset, confirm the authenticated user has
 admin on the repo (`gh api "/repos/$REPO" --jq '.permissions.admin'`). Without admin, a

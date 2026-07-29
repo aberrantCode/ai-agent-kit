@@ -121,6 +121,87 @@ Show a one-block summary (from → into, last → new version, commit count) and
 
 ---
 
+## Step 4b — Stamp `$VERSION` onto `dev` before tagging
+
+Repos advertise their own version in files that are **not** derived from the tag: a README
+shields.io badge, a token/package manifest, a `VERSION` file. Tagging without updating them
+ships a release whose own artifacts claim the *previous* version — and if the repo has a
+docs-truth gate, that gate will block the tag push mid-release, leaving a half-finished
+release to unwind. Stamp first, tag second.
+
+> **EXCEPTION — a gate that keys version refs to the CURRENT tag inverts this order.** Some
+> repos enforce that the version refs must *equal the latest existing tag*, resolving "latest
+> version" from **local git tags** (e.g. AC_DESIGN's `scripts/check_docs.py` via
+> `git tag --sort=-v:refname`, run by the pre-push `validate.ps1`). On such a repo you CANNOT
+> stamp `$VERSION` before the tag exists — the gate rejects the bump ("badge cites v0.9.0,
+> latest tag is v0.8.0") and blocks *every* push carrying it, including the prepare branch.
+> **Detect it cheaply:** stamp into a throwaway edit and run the repo gate; if it fails
+> *because the new version ≠ the current tag*, take the **deferred path** —
+>   - the prepare PR below rolls the **changelog ONLY** (no version-ref edits), and
+>   - the version-ref stamp + rebuild moves to **[Step 6b](#step-6b--deferred-version-stamp-tag-keyed-gate)**, AFTER the tag is created.
+>
+> The `check_docs`/`validate` idiom is common in the AC repos — when releasing one, assume the
+> deferred path unless a quick check proves otherwise.
+
+**This step is conditional. Detect, and skip silently when nothing matches — never create an
+empty PR.** In the deferred path this step's *only* content is the changelog roll.
+
+### Detect
+
+```bash
+V=${VERSION#v}            # 1.2.3
+STAMPED=()
+
+# 1. shields.io version badges in real docs (NOT templates/examples)
+grep -rlE 'badge/version-v[0-9]+\.[0-9]+\.[0-9]+' --include=*.md . 2>/dev/null \
+  | grep -vE '(^|/)(docs/templates|artifacts/markdown|artifacts/github|\.github/ISSUE_TEMPLATE)/'
+
+# 2. common manifests
+[ -f tokens/tokens.json ] && grep -q '"version"' tokens/tokens.json && echo tokens/tokens.json
+[ -f package.json ]       && echo package.json
+[ -f pyproject.toml ]     && echo pyproject.toml
+[ -f VERSION ]            && echo VERSION
+```
+
+### Rules
+
+- **Only stamp files that assert *this repo's current* version.** A badge inside a template or
+  a worked example is teaching syntax, not a claim. If you find a stale version in an example,
+  do **not** bump it on every release — replace the digits with a placeholder (`vX.Y.Z`) once,
+  so it can never go stale again. Bumping an example is a bug you will repeat forever.
+- **Never touch a generated file.** If the repo generates artifacts from a manifest, edit the
+  manifest and re-run its build (e.g. `python scripts/build_tokens.py`), then verify with the
+  repo's own drift check rather than hand-editing outputs.
+- `package.json` → `npm version "$V" --no-git-tag-version` (it also updates the lockfile).
+  Otherwise edit the single version field in place; do not reformat the file.
+- Roll the changelog in this same commit when the repo keeps a Keep-a-Changelog `[Unreleased]`
+  section: rename it to `## [$VERSION] — YYYY-MM-DD`, open a fresh empty `[Unreleased]`, add
+  the `[$VERSION]` compare-link definition, and repoint `[Unreleased]` at `$VERSION...HEAD`.
+  One "prepare" commit, not two.
+
+### Land it on `dev`
+
+`dev` is usually PR-only (same detection as Step 5), so do not assume a direct push:
+
+```bash
+git checkout -b "chore/prepare-$VERSION" origin/dev
+# ...stamp the files, roll the changelog...
+git commit -am "chore: prepare $VERSION"
+git push -u origin "chore/prepare-$VERSION"
+gh pr create --base dev --head "chore/prepare-$VERSION" --title "chore: prepare $VERSION" \
+  --body $'## Summary\n- Stamp '"$VERSION"' onto the repo\'s own version references and roll the changelog.\n\n## Test Plan\n- [ ] repo gates green'
+gh pr merge <PR#> --merge --delete-branch --subject "chore: prepare $VERSION"
+git checkout dev && git pull origin dev
+```
+
+### Verify before proceeding
+
+Run the repo's own gate (`scripts/validate.ps1`, `make check`, `npm test` — whatever Step 4's
+payload implies). **If the repo has a docs/version-truth check, it must pass here**, because it
+is what would otherwise block the tag push in Step 6. Only then continue to Step 5.
+
+---
+
 ## Step 5 — Detect the release route
 
 **Before merging, decide whether `main` accepts a direct push or is PR-only.** Many repos
@@ -248,6 +329,36 @@ Release.
 
 ---
 
+## Step 6b — Deferred version stamp (tag-keyed gate)
+
+**Only when Step 4b detected a current-tag-keyed version gate** (skip entirely otherwise — the
+normal path already stamped `dev` in Step 4b and the bump rode the release merge onto `main`).
+The tag now exists, so the version refs can finally equal it. Do it once, then carry it to
+**both** branches so neither lags a release behind:
+
+```bash
+# 1. Create the tag LOCALLY first (Step 6 already did this) so the gate's
+#    `git tag --sort=-v:refname` sees $VERSION as latest while you stamp.
+git worktree add "<repo>-wt/.worktrees/chore-stamp-$VERSION" -b "chore/stamp-$VERSION" origin/dev
+#    ...in that worktree: bump README badge + manifest version to $VERSION, then rebuild
+#    (python scripts/build_tokens.py, etc.). Gate now passes: refs == latest local tag.
+#    Push the TAG and the branch FROM that worktree (its working tree matches the tag):
+git push origin "$VERSION"                       # validate runs on the worktree tree -> passes
+git push -u origin "chore/stamp-$VERSION"
+```
+
+Then open a `chore:` PR to `dev` and merge it; **then open a `dev`→`main` PR and merge** so
+`main`'s own artifacts match the tag (in the deferred path the bump did NOT ride the release
+merge, so `main` would otherwise sit one version behind). After this, `dev == main` and Step 7
+is a no-op.
+
+**Worktree cleanup footgun:** if you used a helper worktree here, `gh pr merge --delete-branch`
+from the primary checkout will fail to delete the LOCAL branch while the worktree still holds
+it (`error: cannot delete branch '…' used by worktree`). Remove the worktree **before** the
+`--delete-branch` merge (per the parent cleanup order: worktree → local branch → remote).
+
+---
+
 ## Release-Automation Standard (verify and warn — never fix here)
 
 Release notes must be derived from git **at tag time**; a committed `CHANGELOG.md` is a cache,
@@ -315,5 +426,9 @@ Released v0.2.0 — dev → main (merge commit def5678), tagged + GitHub Release
 | Push to main rejected as non-fast-forward | `git pull --rebase origin main` then retry — never force-push main |
 | PR merge `BLOCKED` / `REVIEW_REQUIRED`, no reviewer | Check `enforce_admins`: if `false`, `AskUserQuestion` then `gh pr merge --admin`; if `true`, STOP — a reviewer is required |
 | Tag push rejected by a changelog-staleness gate | Not a gate bug — regenerate `CHANGELOG.md` (the local tag already exists), land it on `dev` via a `chore:` PR, then push the tag. Never `--no-verify` |
+| Version-ref stamp (Step 4b) rejected on the PREPARE push ("badge cites v0.9.0, latest tag is v0.8.0") | The gate keys refs to the **current** tag — you cannot stamp before tagging. This is the Step 4b **EXCEPTION**: revert the version-ref edits (keep the changelog roll), release + tag first, then stamp in **Step 6b** |
+| Tag push rejected by a version/docs-truth gate, `dev` already stamped | Step 4b's normal path was right but a file was missed. The tag exists, so refs really are stale: stamp the flagged file on `dev` via a `chore:` PR, re-push the tag, and add it to Step 4b's detection list |
 | Tag already exists | AskUserQuestion: new version or abort |
 | `$REPO` empty | STOP — `gh auth status` / `git remote -v` before any gh command |
+| git-bash throws `fatal error - add_item (…) failed` / `fork` mid-run (Windows Cygwin) | Not a git failure — the bundled bash could not fork. Re-run the same git/gh command through **PowerShell** (`pwsh`); shell state does not persist but the repo state does, so just repeat the last step |
+| A helper worktree blocks `--delete-branch` ("branch used by worktree") | Remove the worktree first, then delete the branch (cleanup order: worktree → local → remote). The remote branch was already deleted by `--delete-branch`; only the local delete failed — finish with `git worktree remove <path>` then `git branch -D <branch>` |

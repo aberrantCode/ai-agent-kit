@@ -113,7 +113,7 @@ Scan file-based markers in this order. The **first** match wins unless otherwise
 |----------|-----------------------------------------------------------|----------------------|-----------------------------------------|
 | 1        | `docs/features/` has `.md` files AND `docs/plans/` exists | `project-manager`    | **Delegate to /continue-tasks** (below) |
 | 2        | `docs/features/` exists but plans are missing             | `project-manager-partial` | Suggest `/reinit` or `/continue-tasks` |
-| 3        | `docs/INITIAL_PROMPT.md` exists                           | `project-manager-seed`    | Suggest `/continue-tasks`              |
+| 3        | `docs/REQUIREMENTS.md` or `docs/INITIAL_PROMPT.md` exists | `project-manager-seed`    | Suggest `/continue-tasks`              |
 | 4        | `backlog.md` or `BACKLOG.md` at repo root                 | `backlog-md`         | Read as primary task store              |
 | 5        | `tasks.md` or `TASKS.md`                                  | `tasks-md`           | Read as primary task store              |
 | 6        | `plan.md` or `PLAN.md`                                    | `plan-md`            | Read; backlog items may be implicit     |

@@ -1,0 +1,25 @@
+---
+last_updated: "2026-07-27"
+discovered_by: "init-project"
+schema_version: 1
+---
+
+# Test Runners — AI Agent Kit
+
+> **Source of truth for the Verification Gate.** This file lists every test runner the orchestrator should consult when verifying that a code-changing task's claim of `Tests: passing: true` is real. Confirmed rows (`Confirmed: yes`) are authoritative; unconfirmed rows are discovery candidates pending user review.
+>
+> Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc by running `references/scripts/pm-test-runners.ps1 -DiscoverOnly` and rewriting this table.
+
+## Confirmed runners
+
+| Subtree | Runner | Command | Confirmed |
+|---------|--------|---------|-----------|
+| .       | validate.ps1 (local gate) | `pwsh -File scripts/validate.ps1` | yes       |
+
+> Add one row per subtree that owns a runner. Use `.` for the repo root. The `Command` column must contain a single shell command that runs the full test suite for that subtree (e.g. ```pytest```, ```npm test```, ```cd backend; uv run pytest```). The orchestrator quotes this value verbatim when surfacing it to verification agents.
+
+## Notes
+
+- A monorepo with `backend/pyproject.toml` and `frontend/package.json` should have two rows: one with `Subtree: backend`, one with `Subtree: frontend`.
+- Only the `Confirmed: yes` rows feed the Verification Gate. Leave a row with `Confirmed: no` to remember a candidate that was deliberately not adopted.
+- If no runner exists yet (greenfield project), leave the placeholder row and the gate will treat `Tests: passing: true` reports as advisory until a real runner is registered.

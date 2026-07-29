@@ -7,11 +7,26 @@ description: Systematic close-out learning harvest — collects archived task No
 
 Systematic close-out learning harvest. Collects Notes and Handoff fields from archived task files and resolution summaries from resolved issues, then appends them to the workflow learning ledger with a dedup contract ensuring idempotency.
 
-**Prerequisite:** The project must have been initialized with `/init-project` (or equivalent manual scaffolding). Specifically, this skill assumes:
+---
+
+## Phase 0 — Prerequisite Gate (fail-closed)
+
+**Run this before harvesting. Do not proceed on a partial scaffold.**
+
+Verify the learning ledger exists (e.g. `test -f <path>`):
 
 - `docs/workflow/INDEX.md` — durable learning ledger (created by `/init-project`)
 
-If missing, stop and tell the user to run `/init-project` first.
+**If it exists, continue.**
+
+**If missing, STOP.** Use `AskUserQuestion` to offer:
+
+- (a) **Run `/init-project` now** (Recommended) — scaffold the ledger, then re-run this gate and continue.
+- (b) **Cancel** — stop; report that `docs/workflow/INDEX.md` is missing.
+
+If the user picks (a): invoke `project-manager:init-project`, wait for it to finish, **re-verify the path**, and only then continue.
+
+> **Red flag — STOP.** Do not append harvested learnings to an improvised file when `INDEX.md` is absent — the dedup contract keys off the existing ledger. Halt and offer init.
 
 ---
 

@@ -79,11 +79,15 @@ history), surface the error and stop — never force-push or reset.
 Draft a conventional-commit message from the staged diff (`type: subject`, subject < 72 chars,
 optional 2–4 bullet body). Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`.
 
+**On Git-Bash, do not use the `git commit -m "$(cat <<'EOF' … EOF)"` heredoc form** — it hangs
+and reverts staged changes here. Use a single `-m` for a one-line message, or a temp file for a
+body:
+
 ```bash
-git commit -m "$(cat <<'EOF'
-<message>
-EOF
-)"
+# one line:
+git commit -m "fix: …"
+# with a body:
+printf '%s\n\n%s\n' "fix: subject" "- bullet one" > "$TMP" && git commit -F "$TMP"; rm -f "$TMP"
 ```
 
 ---
