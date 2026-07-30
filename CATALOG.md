@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-29, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-07-30, schemaVersion: 1)
 -->
 
 # Catalog
@@ -48,6 +48,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/SKILL.md) | Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them — a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one s... | — |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | codex |
 | [`team-coordination`](claude/skills/team-coordination/SKILL.md) | Multi-person projects - shared state, todo claiming, handoffs | codex |
+| [`work-resume`](claude/skills/work-resume/SKILL.md) | Use when the operator wants to pick up where they left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish that", "what's next here", "I forgot where I left off". Scans... | — |
 
 ### Languages & Runtimes
 

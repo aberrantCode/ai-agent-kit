@@ -87,6 +87,7 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | `/recreate-files` | youtube-extraction | youtube-extraction | unchanged |
 | `/add-remote-installer` | add-remote-installer (skill) | utilities-manager | skill demoted to bundle command (iter 25) |
 | `/continue-new-session-prompt` `/dispatch-session-prompt` | continue-new-session-prompt | continue-new-session-prompt | **new** (2026-07-22) — `/dispatch-session-prompt` is verb-first per the Generic-Verb Rule (skills-backlog-dispatch handoff, pre-cleared); scope-mode sibling of the existing continue-mode `/continue-new-session-prompt`, both dispatching into the same skill's "Entry modes" |
+| `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | work-resume | work-resume | **new** (2026-07-30) — conversation-resumption bundle; scans a repo's recent sessions across all worktree conventions, reconstructs what each expected next, reconciles against git, and proposes the next action. Object-first names each carry a specific verb (resume/report/scan) per the Generic-Verb Rule. Distinct from project-manager's plan-oriented `/what-next` and the cut `/search-sessions` (this is resume-scoped, not a generic history search). |
 
 Repo-local `.claude/commands/` copies of the skills-manager commands are installed
 duplicates, not separate names.

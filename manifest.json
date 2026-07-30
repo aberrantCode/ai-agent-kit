@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-29",
+  "generated": "2026-07-30",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -585,6 +585,12 @@
         "woocommerce": {
           "description": "WooCommerce REST API - products, orders, customers, webhooks",
           "category": "Commerce & Payments"
+        },
+        "work-resume": {
+          "description": "Use when the operator wants to pick up where they left off \u2014 \"what was I working on\", \"continue my last session\", \"resume work in this repo\", \"did I finish that\", \"what's next here\", \"I forgot where I left off\". Scans this repo's recent Claude Code sessions (including its git worktrees) newest-first, reads the last turn of each to reconstruct what was expected next, reconciles that against local/remote git state and approved plans, and proposes the single best thing to pick up \u2014 either stopping for approval or auto-resuming. Trigger this whenever the operator returns to a repo and asks where things stand or what to do next, even if they don't say the word \"resume\".",
+          "category": "Foundations & Workflow",
+          "has_commands": true,
+          "has_sub_skills": true
         },
         "workspace": {
           "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
