@@ -120,7 +120,7 @@ from project state:
 
 1. Read `docs/STATUS.md` §1 (Next action & run state) and use its NEXT ACTION if present
    (`docs/workflow/FOCUS.md` is a retired stub pointing there).
-2. Otherwise, if `references/scripts/pm-next.ps1` exists, run it and use its top recommendation.
+2. Otherwise, if the skill-relative `references/scripts/pm-next.ps1` exists, run it and use its top recommendation.
 3. Otherwise, scan `docs/plans/*.md` for the first `todo` task in the lowest phase of the
    highest-priority approved feature with no dependency blockers.
 4. If none of the above yields a candidate, print: "No recap recommendation found and no eligible

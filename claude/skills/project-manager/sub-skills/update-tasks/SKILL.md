@@ -10,9 +10,9 @@ spawns agents.
 
 ## Scan Rules
 
-Run `references/scripts/pm-validate.ps1` first when present. If validation fails, reconcile only the
-specific active completion files that are valid enough to parse; avoid broad plan edits until the
-reported schema problems are fixed.
+Run the skill-relative `references/scripts/pm-validate.ps1` first when present. If validation fails,
+reconcile only the specific active completion files that are valid enough to parse; avoid broad plan
+edits until the reported schema problems are fixed.
 
 For each `docs/tasks/active/*.md`:
 
@@ -117,10 +117,11 @@ This ensures that task completions and their associated merged PRs stay in sync.
 
 ## Refresh the tracker
 
-After reconciliation, regenerate `docs/STATUS.md` via the `sync-status` skill so its §2/§3
-(generated progress + outstanding-work) reflect the updated plan rows. Rewrite only the
-`pm:generated:*` fences; never touch the `pm:curated:*` fences (§1 runtime, §4 backlog). This keeps
-the single outstanding-work tracker in sync without a separate manual step.
+After reconciliation, regenerate `docs/STATUS.md` via the `sync-status` skill so its generated
+sections reflect the updated plan rows. Rewrite only `pm:generated:*` fences. Preserve
+`pm:curated:*` fences, including §4 only when `docs/backlog.md` is absent and §4 is in curated
+fallback mode. This keeps the single outstanding-work tracker in sync without a separate manual
+step.
 
 ## Output
 

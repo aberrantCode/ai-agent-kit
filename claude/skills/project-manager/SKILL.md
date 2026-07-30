@@ -53,20 +53,22 @@ docs/
 ```
 
 `docs/STATUS.md` is the one file that answers "what is outstanding, and what should happen next?".
-Its `pm:generated:*` sections (progress + outstanding) are rewritten by the `sync-status` skill from
-the canonical specs/plans/tasks/issues and `docs/backlog.md`; its `pm:curated:*` sections (§1
-runtime/next-action) are hand-maintained and preserved across regeneration. Section §4 (unowned
-backlog) is GENERATED from `docs/backlog.md` rows that are not yet promoted to features + homeless
-open issues. `/continue-tasks` and `/update-tasks` regenerate it automatically.
+Its generated sections (§2 progress, §3 outstanding, and §4 backlog when `docs/backlog.md` exists)
+are rewritten by the `sync-status` skill from the canonical specs/plans/tasks/issues and
+`docs/backlog.md`. Its curated sections (§1 runtime/next-action, plus §4 backlog only in the
+backward-compatible fallback mode when `docs/backlog.md` is absent) are preserved across
+regeneration. `/continue-tasks` and `/update-tasks` regenerate it automatically.
 
 Read `references/feature-spec-template.md`, `references/plan-template.md`, and
 `references/task-file-template.md` for the exact file formats to use. These templates ship with
 the skill and are also copied into target projects by `/init-project` (as `docs/features/template.md`,
 `docs/plans/template.md`, and `docs/tasks/template.md`).
 
-When present, read-only helpers under `references/scripts/` provide deterministic status,
-next-task, blocked, stale, and validation reports. Prefer those helpers for mechanical scans and
-fall back to markdown scanning when they are unavailable.
+All `references/...` paths in this skill are **relative to the project-manager skill directory**.
+When running from a target project root, resolve helper scripts to the installed skill path first
+(for this repository, `claude/skills/project-manager/references/scripts/...`). When present, these
+read-only helpers provide deterministic status, next-task, blocked, stale, and validation reports.
+Prefer them for mechanical scans and fall back to markdown scanning when they are unavailable.
 
 ---
 
@@ -166,8 +168,9 @@ Check whether `docs/features/` contains any `.md` files.
 - If **complete**: skip to Step 2.
 
 **Step 2 — Plan generation**
-Run `references/scripts/pm-validate.ps1` first when present. If validation reports errors, stop and
-surface them before mutating plans. If helpers are missing, perform the markdown checks manually.
+Run the skill-relative `references/scripts/pm-validate.ps1` first when present. If validation
+reports errors, stop and surface them before mutating plans. If helpers are missing, perform the
+markdown checks manually.
 
 Classify specs by frontmatter status before planning. Only specs with `status: approved` are
 eligible. Report `draft`, `deprecated`, `implemented`, malformed, and dependency-blocked specs
@@ -183,8 +186,9 @@ For each eligible approved feature spec that does not yet have a matching plan i
 - Plans should include explicit review/test tasks where implementation-heavy phases are known.
 
 **Step 3 — Find next task**
-Run `references/scripts/pm-next.ps1` when present and use its output as the deterministic first pass;
-then verify any selected task against the current plan before writing files.
+Run the skill-relative `references/scripts/pm-next.ps1` when present and use its output as the
+deterministic first pass; then verify any selected task against the current plan before writing
+files.
 
 Scan eligible approved plans for the first task with status `todo`. Pick the highest-priority
 incomplete task by dependency order, priority, phase, then feature slug. Skip tasks whose feature
@@ -277,8 +281,8 @@ this matters in monorepos where pytest, npm test, cargo test, etc. are nested un
 `frontend/`, `packages/*`, `apps/*`, or `services/*` rather than at the repo root. When inserting a
 verification task, the orchestrator quotes the relevant runner command(s) from `runners.md` into the
 task body so the verifier doesn't re-guess. If `runners.md` is missing or empty, the gate runs
-`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warns the user that the
-runner list should be confirmed via `/reinit` for deterministic future runs.
+the skill-relative `references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warns
+the user that the runner list should be confirmed via `/reinit` for deterministic future runs.
 
 ---
 
@@ -334,9 +338,9 @@ Detailed flow lives in `sub-skills/iterate-tasks/SKILL.md`.
 
 Produce a read-only status report. Do not modify any files.
 
-If `references/scripts/pm-status.ps1`, `pm-blocked.ps1`, `pm-stale.ps1`, and `pm-validate.ps1` are
-present, run them first and summarize their output. If they are unavailable, perform the markdown
-scan below.
+If the skill-relative `references/scripts/pm-status.ps1`, `pm-blocked.ps1`, `pm-stale.ps1`, and
+`pm-validate.ps1` are present, run them first and summarize their output. If they are unavailable,
+perform the markdown scan below.
 
 1. Count feature specs in `docs/features/`
 2. Count plans in `docs/plans/` and identify specs missing a plan
@@ -363,8 +367,9 @@ refresh `ROADMAP.md`; update the roadmap manually from the report if desired.
 
 Use this when you suspect task agents have completed work but the plan hasn't been updated yet.
 
-Run `references/scripts/pm-validate.ps1` before mutating plans when present. If validation reports
-errors unrelated to the active completion being reconciled, surface them and avoid broad plan edits.
+Run the skill-relative `references/scripts/pm-validate.ps1` before mutating plans when present. If
+validation reports errors unrelated to the active completion being reconciled, surface them and
+avoid broad plan edits.
 
 1. Read every file in `docs/tasks/active/`
 2. For each file, check for a final `## Completion` sentinel with parseable `Status:`
@@ -385,12 +390,12 @@ This command is idempotent — safe to run multiple times. After reconciliation 
 
 ### `/sync-status` — Regenerate the Outstanding-Work Tracker
 
-Rewrite the `pm:generated:*` sections of `docs/STATUS.md` (progress table + outstanding-work list)
-from the canonical specs/plans/tasks/issues, preserving the `pm:curated:*` sections (§1 runtime,
-§4 unowned backlog). Write scope is `docs/STATUS.md` only — never mutate specs/plans/tasks. This is
-the persist-to-file counterpart of the read-only `/review-tasks`, and it runs automatically at the
-end of every `/continue-tasks` and `/update-tasks` cycle. Detailed flow lives in
-`sub-skills/sync-status/SKILL.md`.
+Rewrite the generated sections of `docs/STATUS.md` from the canonical specs/plans/tasks/issues.
+§4 is generated from `docs/backlog.md` when that file exists; if `docs/backlog.md` is absent, §4 is
+a curated fallback and must be preserved verbatim. Write scope is `docs/STATUS.md` only — never
+mutate specs/plans/tasks. This is the persist-to-file counterpart of the read-only `/review-tasks`,
+and it runs automatically at the end of every `/continue-tasks` and `/update-tasks` cycle. Detailed
+flow lives in `sub-skills/sync-status/SKILL.md`.
 
 ---
 
@@ -429,31 +434,24 @@ Move every file currently in `docs/tasks/active/` to `docs/tasks/archive/`. Move
 task files sitting directly in `docs/tasks/` (not in a subdirectory) to `docs/tasks/archive/`
 as well. Do not delete any files.
 
-**Step 3 — Normalize feature specs**
+**Step 3 — Audit feature specs (report by default)**
 For each `.md` file in `docs/features/` that is not `README.md` and not `template.md`:
 
 1. Read the file in full.
 2. Check whether it has the required YAML frontmatter block with all fields:
-   `feature`, `slug`, `status`, `priority`, `area`, `depends_on`, `last_updated`.
+   `feature`, `slug`, `status`, `priority`, `area`, `depends_on`, `owner`, `version`,
+   `last_updated`, `related`.
 3. Check whether it has all required sections:
-   `## Overview`, `## Capabilities`, `## Requirements`, `## Acceptance Criteria`, `## Out of Scope`.
-4. If **fully conforming**: mark as `ok`, skip.
-5. If **non-conforming**: rewrite the file using the template structure. Rules:
-   - **Never discard content.** Every sentence, table, list, code block, and edge-case note from
-     the original must appear somewhere in the rewritten file.
-   - Map existing content to the nearest matching section. If it doesn't fit cleanly into any
-     required section, place it in a `## Notes` section at the bottom.
-   - Infer missing frontmatter fields from the file's content and filename:
-     - `slug` → derive from filename (strip `.md`)
-     - `status` → look for a `Status` field in a `## Metadata` table or similar; default `draft`
-     - `priority` → look for explicit priority signal; default `p2`
-     - `area` → infer from the feature name or existing metadata
-     - `depends_on` → look for dependency references in the text; default `[]`
-     - `last_updated` → today's date
-   - Keep the `## Capabilities` section as a checklist (`- [ ] ...`), promoting bullet lists
-     from the original where needed.
-   - Keep `## Acceptance Criteria` as Given/When/Then bullets where possible.
-6. After rewriting, report the file as `normalized`.
+   `## Metadata`, `## Executive Overview`, `## Problem Statement`, `## Use Cases`,
+   `## Capabilities`, `## Acceptance Criteria`, `## Out of Scope`, `## Edge Cases`,
+   `## Known Issues & Limitations`, `## Open Questions`, `## Change History`.
+4. Classify the file as `ok` (fully conforming) or `non-conforming`; record missing frontmatter
+   fields and sections in the report.
+
+Do not rewrite specs during this audit. If any spec is non-conforming, ask the user whether to
+continue report-only, rewrite selected files, or rewrite all non-conforming files. Only files
+explicitly selected by the user may be normalized, and normalization must preserve every sentence,
+table, list, code block, and edge-case note from the original.
 
 Report a summary table when done:
 
@@ -491,10 +489,10 @@ writes — specs are useful immediately and the user may stop at any time.
 Read `references/feature-spec-template.md` for the exact format. Key fields:
 - `status`: `draft` | `approved` | `implemented`
 - `priority`: `p1` | `p2` | `p3`
-- Capabilities list (what the feature can do)
-- Requirements (must/should/may)
+- Metadata, executive overview, problem statement, and use cases
+- Capabilities list with CAP-IDs (what the feature can do)
 - Acceptance criteria (testable, binary pass/fail)
-- Out-of-scope (explicit exclusions to prevent scope creep)
+- Out-of-scope, edge cases, known issues, open questions, and change history
 
 ### Spec Authority Rule
 Feature specs are the final authority on scope. They may only be changed by:
@@ -550,7 +548,7 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /iterate-tasks       →  one self-perpetuating iteration: merge pending PR, dispatch next action as fresh subagent, emit next-next prompt
 /update-tasks        →  reconcile active task files with plan statuses (regenerates docs/STATUS.md)
 /review-tasks        →  read-only progress snapshot (persisted form is docs/STATUS.md)
-/sync-status         →  regenerate docs/STATUS.md generated sections (including §4 from backlog.md); preserve curated sections
+/sync-status         →  regenerate docs/STATUS.md generated sections (§4 from backlog.md when present); preserve curated fallback fences
 /pm-retro            →  close-out learnings to docs/workflow/INDEX.md
 /sync-tracker        →  optional GitHub issue mirror; markdown stays authoritative
 /analyze-parallelism →  read-only opt-in future parallel batch analysis
