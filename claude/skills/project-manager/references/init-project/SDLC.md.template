@@ -77,7 +77,8 @@ not mark the implementation complete.
 test runner the gate consults — one row per `(Subtree, Runner, Command)`. Monorepos with nested
 runners (e.g. `backend/pyproject.toml`, `frontend/package.json`) register one row per subtree so the
 gate sees them. The file is populated by `/init-project` (Phase 3.5 Runner Discovery) and refreshed
-by `/reinit`. Refresh ad-hoc with `references/scripts/pm-test-runners.ps1 -DiscoverOnly`.
+by `/reinit`. Refresh ad-hoc with the project-manager skill's
+`references/scripts/pm-test-runners.ps1 -DiscoverOnly` helper.
 
 ## Claims, Leases, and Handoff
 

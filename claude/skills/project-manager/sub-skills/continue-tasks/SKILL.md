@@ -52,9 +52,9 @@ paths**, and only then continue. If any are still missing after init, stop and r
 
 ## Step 1 - Classify Feature Specs
 
-If `references/scripts/pm-validate.ps1` exists, run it before plan or task mutation. Treat errors as
-blockers unless they are the exact active completion state being reconciled in Step 4. If the helper
-is not available, perform the validation checks manually.
+If the skill-relative `references/scripts/pm-validate.ps1` exists, run it before plan or task
+mutation. Treat errors as blockers unless they are the exact active completion state being
+reconciled in Step 4. If the helper is not available, perform the validation checks manually.
 
 For each feature spec, parse YAML frontmatter. Required fields for orchestration are `slug`,
 `status`, `priority`, and `depends_on`.
@@ -139,8 +139,9 @@ every confirmed row whose `Subtree` overlaps any path in the implementation task
 list, include the row's `Command` verbatim in the verification task body under a `### Required test
 commands` heading. This is how the gate works in monorepos: a row with `Subtree: backend` and
 `Command: cd backend; uv run pytest` is the only thing that surfaces a nested `backend/pyproject.toml`
-runner to the verifier. If `runners.md` is missing, run `references/scripts/pm-test-runners.ps1
--DiscoverOnly` as a fallback, include all discovered commands, and warn the user in the
+runner to the verifier. If `runners.md` is missing, run the skill-relative
+`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback, include all discovered
+commands, and warn the user in the
 orchestrator output that they should run `/reinit` to confirm and persist the list.
 
 ### `Status: failure`
@@ -172,8 +173,9 @@ artifacts touched, and recommended next actions.
 
 ## Step 6 - Select the Next Task
 
-If `references/scripts/pm-next.ps1` exists, run it and use its output as the deterministic first
-pass. Still verify the selected task against the current approved spec and plan before writing files.
+If the skill-relative `references/scripts/pm-next.ps1` exists, run it and use its output as the
+deterministic first pass. Still verify the selected task against the current approved spec and plan
+before writing files.
 
 Scan eligible plans in dependency order. Pick the first task with `Status` `todo` whose earlier
 phase tasks and feature dependencies are complete.

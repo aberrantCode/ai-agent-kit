@@ -37,7 +37,7 @@ None. The command derives everything from session state and the repo:
 
 - Previous assistant turn (read from your own conversation history)
 - `docs/STATUS.md` §1 and `docs/workflow/INDEX.md` (fallback signals)
-- `references/scripts/pm-next.ps1` (deterministic next-task helper if present)
+- Skill-relative `references/scripts/pm-next.ps1` (deterministic next-task helper if present)
 - `gh pr list` (only when a pending PR is suspected)
 
 ## Step 1 — Read the recap for the recommended next action
@@ -120,7 +120,7 @@ subagent that has zero conversation history. The brief MUST include:
   > NEXT action that comes after this one — same shape as the prompt you received:
   > Goal / Pointers / Constraints / Workflow / PR handling / RECURSION CLAUSE
   > (including this clause itself, so the chain continues). Pick the next action from
-  > `docs/tasks/backlog.md`, `docs/STATUS.md` §1, or `pm-next.ps1` output —
+  > `docs/backlog.md`, `docs/STATUS.md` §1, or `pm-next.ps1` output —
   > whichever the project uses. If multiple plausible candidates exist, list them in
   > the prompt and instruct the next session to use `AskUserQuestion` to pick.
 
@@ -233,8 +233,8 @@ this matters in monorepos where pytest, npm test, cargo test, etc. are nested un
 `frontend/`, `packages/*`, `apps/*`, or `services/*` rather than at the repo root. When inserting a
 verification task, quote the relevant runner command(s) from `runners.md` into the task body so the
 verifier doesn't re-guess. If `runners.md` is missing or empty, run
-`references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warn the user that the
-runner list should be confirmed via `/reinit` for deterministic future runs.
+the skill-relative `references/scripts/pm-test-runners.ps1 -DiscoverOnly` as a fallback and warn
+the user that the runner list should be confirmed via `/reinit` for deterministic future runs.
 
 **Spec authority (inlined for the same reason).** Anything changing product scope or behavior
 goes through the FEATURE lane (spec → plan → task); bugs, chores, and tech-debt go through the

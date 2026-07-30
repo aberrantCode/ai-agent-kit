@@ -131,7 +131,7 @@ The Verification Gate (see `project-manager:continue-tasks` and `SKILL.md`) chec
    - `CLAUDE.md` and `AGENTS.md` — stack tables, working-directory notes.
    - Top-level workspace files: `pnpm-workspace.yaml`, `turbo.json`, `lerna.json`, `nx.json`, `Cargo.toml` (workspace members), `go.work`.
 
-2. **Run automated discovery.** Execute `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo. The script walks up to 4 levels deep, skipping `node_modules`, `.venv`, `target`, `dist`, `.git`, etc., and emits a markdown table of candidate runners with evidence.
+2. **Run automated discovery.** Execute the skill-relative `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo. The script walks up to 4 levels deep, skipping `node_modules`, `.venv`, `target`, `dist`, `.git`, etc., and emits a markdown table of candidate runners with evidence.
 
 3. **Merge signals into a candidate list.** For each `(Subtree, Runner)` pair found by either the README hints OR the discovery walk, build a row with a proposed test command (e.g., `cd backend; uv run pytest`, `cd frontend; npm test`, `pytest`, `make test`).
 

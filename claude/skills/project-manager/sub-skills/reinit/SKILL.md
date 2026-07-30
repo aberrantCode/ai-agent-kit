@@ -106,7 +106,7 @@ can be approved.
 The Verification Gate consults `docs/workflow/runners.md` to confirm a code-changing task's `Tests: passing: true` claim. Repository layout drifts (a new `backend/` subtree, a renamed `services/api/`, etc.), so reinit must reconfirm:
 
 1. Read repo signals (`README.md`, `CLAUDE.md`, `AGENTS.md`, workspace files like `pnpm-workspace.yaml` / `turbo.json` / `go.work`).
-2. Run `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo root.
+2. Run the skill-relative `references/scripts/pm-test-runners.ps1 -DiscoverOnly` against the repo root.
 3. Diff the discovered candidates against the existing rows in `docs/workflow/runners.md`. Categorize each candidate as:
    - **Already confirmed** — present in the file with `Confirmed: yes`, evidence still on disk. Leave alone.
    - **New candidate** — discovered but not in the file. Surface via `AskUserQuestion`.

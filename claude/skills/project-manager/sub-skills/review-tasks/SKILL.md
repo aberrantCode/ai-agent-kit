@@ -14,10 +14,10 @@ Produce a read-only status report. Do not modify any files, including `ROADMAP.m
 
 Prefer deterministic helpers when they are installed:
 
-1. Run `references/scripts/pm-status.ps1`.
-2. Run `references/scripts/pm-blocked.ps1`.
-3. Run `references/scripts/pm-stale.ps1`.
-4. Run `references/scripts/pm-validate.ps1`.
+1. Run the skill-relative `references/scripts/pm-status.ps1`.
+2. Run the skill-relative `references/scripts/pm-blocked.ps1`.
+3. Run the skill-relative `references/scripts/pm-stale.ps1`.
+4. Run the skill-relative `references/scripts/pm-validate.ps1`.
 5. Summarize their output in the final report.
 
 If any helper is missing, fall back to the markdown scan below for that category.

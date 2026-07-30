@@ -24,7 +24,7 @@ Tasks missing file scope metadata are serial-only.
 
 ## Analysis Rules
 
-1. Run `references/scripts/pm-validate.ps1` if present.
+1. Run the skill-relative `references/scripts/pm-validate.ps1` if present.
 2. Read approved plans and active tasks.
 3. Exclude blocked, stale, malformed, in-progress, or verification-pending work.
 4. Exclude tasks whose feature dependencies are incomplete.

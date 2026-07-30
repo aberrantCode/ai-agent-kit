@@ -3,7 +3,7 @@ feature: "{{feature-slug}}"
 status: in-progress      # not-started | in-progress | done | blocked
 failures: 0              # used by the Error Recovery Loop; do not edit by hand
 last_updated: "{{TODAY}}"
-external_issue: ""
+external_issue: ""       # GitHub issue number, not GraphQL node/database ID
 external_url: ""
 ---
 
@@ -76,7 +76,7 @@ are needed:
 
 | Field | Meaning |
 |-------|---------|
-| `external_issue` / `external_url` | Optional GitHub issue mirror maintained by `/sync-tracker`; local markdown remains authoritative |
+| `external_issue` / `external_url` | Optional GitHub issue mirror maintained by `/sync-tracker`; `external_issue` is the repository-scoped issue number, not a GraphQL node/database ID; local markdown remains authoritative |
 | `claimed_by`, `claimed_at`, `lease_expires_at` | Coordination lease for active work |
 | `parallel` | Defaults to `false`; only `true` after explicit parallelism analysis |
 | `depends_on_tasks` | Local task ids that must be complete first |
