@@ -76,9 +76,9 @@ Point-in-time artifacts — consensus documents, audit snapshots, dated reports 
 requirements/plans but are not themselves binding once superseded. Filenames are
 date-prefixed (`YYYY-MM-DD-<topic>.md` or `.json`).
 
-[`rationalization.md`](rationalization.md) is a historical report (2026-04-09 skills-archive
-rationalization) that predates this `reports/` convention and is now stale — it belongs with
-`reports/` and should be moved/renamed there rather than treated as a live doc.
+[`reports/2026-04-09-skills-rationalization.md`](reports/2026-04-09-skills-rationalization.md) is
+a historical report (2026-04-09 skills-archive rationalization) that predates this `reports/`
+convention but now lives here under a date-prefixed name, per the convention above.
 
 ## `backlog.md`
 

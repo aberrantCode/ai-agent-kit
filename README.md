@@ -131,3 +131,5 @@ requires: [base]                    # dependency list              (optional)
   task list and acceptance criteria.
 - [`scripts/README.md`](scripts/README.md) — every script, its status, and the full installer
   trust model.
+- [`CHANGELOG.md`](CHANGELOG.md) — dated record of merged changes.
+- [`ROADMAP.md`](ROADMAP.md) — planned and in-progress work.
