@@ -2,12 +2,16 @@
 
 Vendor-neutral assets — reusable across Claude Code, OpenAI Codex CLI, Google Gemini
 CLI, and any future vendor, framework, or product. This tree exists alongside the
-vendor-first trees (`claude/`, `codex/`, `gemini/`); it never replaces them (D1).
+vendor-first trees (`claude/`, `codex/`, `gemini/`); it never replaces them, per the
+[hybrid vendor-layout decision](../docs/requirements/canonical-repo.md).
+
+> **▣ Diagram —** the vendor-neutral test: needs vendor frontmatter/tool-syntax/install-path?
+> yes → claude|codex|gemini/skills/; no → shared/<class>/ *(type: decision)*
 
 ## The vendor-neutral test
 
-An asset belongs in `shared/` only if it passes this test verbatim from
-`docs/requirements/canonical-repo.md` §4 (D1):
+An asset belongs in `shared/` only if it passes this test verbatim from the [canonical-repo
+requirements](../docs/requirements/canonical-repo.md):
 
 > an asset qualifies for `shared/` only if it contains no vendor-specific frontmatter
 > contract, tool syntax, or install-path convention — plain markdown/config any
@@ -22,19 +26,20 @@ install-path convention to function, it belongs under that vendor's tree
 
 | Class | Contents |
 |---|---|
-| `prompts/` | Reusable, standalone prompts — one prompt per file, plain text or markdown. |
-| `workflows/` | Vendor-neutral orchestration *documents* a human or agent follows manually. |
-| `configs/` | Reusable configuration fragments. No secrets — pointers only. |
-| `plugins/` | A pure reference list of external plugins/addons, with provenance and vetting status per entry. |
+| [`prompts/`](prompts/README.md) | Reusable, standalone prompts — one prompt per file, plain text or markdown. |
+| [`workflows/`](workflows/README.md) | Vendor-neutral orchestration *documents* a human or agent follows manually. |
+| [`configs/`](configs/README.md) | Reusable configuration fragments. No secrets — pointers only. |
+| [`plugins/`](plugins/README.md) | A pure reference list of external plugins/addons, with provenance and vetting status per entry. |
 
-Each class has its own README documenting its specific conventions — see the README in
-each subdirectory.
+Each class has its own README documenting its specific conventions — see the README linked
+in each row above.
 
 ## Adding a new asset class
 
 New classes are **README-first**: before any asset lands in a new `shared/<class>/`
 directory, that directory is created containing only a `README.md` describing its
 purpose, conventions, and the vendor-neutral test as applied to that class (mirroring
-how `workflows/`, `configs/`, and `plugins/` were reserved in this effort per D7). Only
-after the README exists do actual assets get added. This keeps the namespace legible
-and the mission discoverable in the tree even before a class has content.
+how `workflows/`, `configs/`, and `plugins/` were reserved in this effort, per the
+[future-asset-classes-get-directories-now decision](../docs/requirements/canonical-repo.md)).
+Only after the README exists do actual assets get added. This keeps the namespace
+legible and the mission discoverable in the tree even before a class has content.

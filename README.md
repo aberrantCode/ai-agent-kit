@@ -29,6 +29,8 @@ loads to work well in a given domain, and the automation that moves them around.
 
 ## Repository map
 
+> **▣ Diagram —** the directory tree and the archive→consumer flow *(type: tree + flow)*
+
 ```
 ai-agent-kit/
 ├── README.md            # you are here — mission + orientation
@@ -49,6 +51,9 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 
 ## Quick start
 
+> **▣ Diagram —** the three install paths (profile install / project install / clone-and-copy)
+> as a decision flow *(type: flow)*
+
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can
 use the asset. A **project install** copies one bundle into one repository, so it travels with
 that repo.
@@ -62,15 +67,9 @@ irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-sk
 The installer is interactive: pick platform, asset type, deploy paths, then browse and select.
 Requires PowerShell 5.1+ on Windows, or `pwsh` on macOS and Linux.
 
-**Know what that one-liner does.** It downloads whatever is sitting on this repo's `main`
-branch at this moment and executes it as you, unreviewed. There is no version pin and no
-integrity check in it. You are trusting this repo's `main`, GitHub's content CDN, and the
-timing of your own request.
-
-**To extend less trust than that:** clone the repo, read `install-skills.ps1`, and run it
-locally — or pin the raw URL to a commit SHA instead of `main`, so the content cannot change
-underneath you. [`scripts/README.md`](scripts/README.md) spells out both, plus the checksum
-check to run against tagged releases once releases publish a SHA256.
+**Know what that one-liner does.** It executes unreviewed code from this repo's `main` branch
+as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
+for the full trust model and lower-trust alternatives.
 
 ### Into a single project
 
@@ -98,8 +97,9 @@ number that drifts.
 
 ## Conventions
 
-Skill bundles live at `{vendor}/skills/{name}/SKILL.md` and may ship `sub-skills/`,
-`commands/`, `references/`, and `rules/` beside it. Frontmatter:
+Skill bundles live at `{vendor}/skills/{name}/SKILL.md`. For the full bundle anatomy —
+`sub-skills/`, `commands/`, `references/`, `rules/`, `diagram.html`, `evals/` — see
+[`claude/README.md`](claude/README.md). Frontmatter:
 
 ```yaml
 ---

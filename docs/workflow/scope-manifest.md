@@ -5,10 +5,13 @@ chore_safe: ["docs/**", "scripts/**", ".github/**", "*.md", "*.config.*"]
 
 # Scope Manifest
 
+> **▣ Diagram —** commit-scope decision: product_scope hit → FAIL; chore_safe hit → allow;
+> unclassified → allow only if scope_confirmed *(type: decision)*
+
 This file is the machine-enforced boundary between the **chore lane** and the **feature lane**
-(see `docs/reports/2026-07-16-pm-lifecycle-redesign.review.md` §2.5). `scripts/guard-pm-flow.ps1`
-reads it — via `docs/workflow/scope-manifest.md`, its fixed path — every time a staged commit's
-active task has `feature: chore-*`.
+(see [`../reports/2026-07-16-pm-lifecycle-redesign.review.md`](../reports/2026-07-16-pm-lifecycle-redesign.review.md)
+§2.5). `scripts/guard-pm-flow.ps1` reads it — via `docs/workflow/scope-manifest.md`, its fixed
+path — every time a staged commit's active task has `feature: chore-*`.
 
 ## How the guard uses this file
 
@@ -30,10 +33,11 @@ until a manifest exists.
 
 ## Frozen at promotion — this file's own edits are a normal reviewed diff
 
-Every chore task freezes an `authz_snapshot.manifest_sha` (the sha256 of this file) at the moment
-it is promoted from the backlog. The guard re-hashes this file on every chore commit; if the live
-hash no longer matches the frozen `manifest_sha`, the task is **stale** and fails closed until it
-is re-groomed (re-frozen against the current manifest).
+Every chore task freezes an `authz_snapshot.manifest_sha` at promotion — see
+[`../reports/2026-07-16-pm-lifecycle-redesign.review.md`](../reports/2026-07-16-pm-lifecycle-redesign.review.md)
+§2.5 for the canonical description of that mechanism; it is not restated here. The guard re-hashes
+this file on every chore commit; if the live hash no longer matches the frozen `manifest_sha`, the
+task is **stale** and fails closed until it is re-groomed (re-frozen against the current manifest).
 
 Because of that snapshot, **editing this file must never ride in the same commit as a chore task
 that depends on it** — the guard's same-commit self-authorization block rejects any commit that
