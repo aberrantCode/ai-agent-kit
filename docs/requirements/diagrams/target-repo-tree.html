@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Kit — Target Repository Structure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section { animation:fadeUp 0.35s ease-out both; animation-delay:0s; }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--teal { border-color:var(--teal-dim); }
+  .section--teal .section-label { color:var(--teal); }
+  .section--teal .dot { background:var(--teal); }
+
+  .tree-container { font-family:var(--font-mono); font-size:13px; line-height:1.8; color:var(--text); background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px 20px; overflow-x:auto; }
+  .tree-line { display:flex; align-items:baseline; white-space:pre-wrap; word-break:break-all; }
+  .tree-indent { display:inline-block; min-width:2em; }
+  .tree-node { display:inline; }
+  .tree-label { display:inline; color:var(--text-dim); font-size:11px; margin-left:4px; }
+  .tree-marker { color:var(--emerald); font-weight:600; }
+  .tree-file { color:var(--text); }
+  .tree-dir { color:var(--teal); font-weight:600; }
+  .tag-readme { display:inline-block; background:var(--emerald-dim); color:var(--emerald); padding:2px 6px; border-radius:3px; font-size:10px; font-weight:600; margin-left:6px; }
+  .tag-note { display:inline-block; background:var(--amber-dim); color:var(--amber); padding:2px 6px; border-radius:3px; font-size:10px; font-weight:600; margin-left:6px; }
+  .tag-status { display:inline-block; background:var(--violet-dim); color:var(--violet); padding:2px 6px; border-radius:3px; font-size:10px; font-weight:600; margin-left:6px; }
+  .tag-generated { display:inline-block; background:var(--teal-dim); color:var(--teal); padding:2px 6px; border-radius:3px; font-size:10px; font-weight:600; margin-left:6px; }
+  .tree-comment { display:inline; color:var(--text-dim); font-size:11px; margin-left:4px; }
+
+  .legend { display:flex; flex-wrap:wrap; gap:16px; margin-top:20px; font-size:11px; }
+  .legend-item { display:flex; align-items:center; gap:6px; }
+  .legend-swatch { width:12px; height:12px; border-radius:2px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .tree-container{font-size:12px;} }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Kit</h1>
+<p class="subtitle">target repository structure · canonical authoring surface + mirrors + shared assets</p>
+
+<div class="diagram">
+
+  <!-- Tree visualization -->
+  <div class="section section--teal section--hero">
+    <div class="section-label"><span class="dot"></span> Directory Structure · finished state</div>
+    <div class="tree-container">
+<div class="tree-line"><span class="tree-node"><span class="tree-file">ai-agent-kit/</span></span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">README.md</span><span class="tree-comment"># mission + orientation (short; no counts, no tables)</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">CATALOG.md</span><span class="tag-generated">GENERATED</span><span class="tree-comment"># full asset tables, from manifest.json</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">CHANGELOG.md</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">CONTRIBUTING.md</span><span class="tag-status">P4</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">manifest.json</span><span class="tag-generated">GENERATED</span><span class="tree-comment"># machine-readable source of truth</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-file">install-skills.ps1</span><span class="tag-note">D5</span><span class="tree-comment"># root placement = published-URL contract</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">claude/</span><span class="tag-readme">README</span><span class="tree-comment"># canonical authoring surface</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">skills/</span><span class="tree-comment"># skill bundles (reorg-governed — see CATALOG.md)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">instructions/</span><span class="tree-comment"># agent instructions</span></div>
+<div class="tree-line"><span class="tree-indent">│   └──</span> <span class="tree-dir">commands/</span><span class="tree-comment"># global slash commands</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">codex/</span><span class="tag-readme">README</span><span class="tag-note">D5</span><span class="tree-comment"># on-demand mirror (charter §5)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">skills/</span></div>
+<div class="tree-line"><span class="tree-indent">│   └──</span> <span class="tree-dir">instructions/</span><span class="tag-status">OQ4</span><span class="tree-comment"># mirror policy TBD</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">gemini/</span><span class="tag-readme">README</span><span class="tag-note">D5</span><span class="tree-comment"># frozen mirror (charter §5)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">skills/</span></div>
+<div class="tree-line"><span class="tree-indent">│   └──</span> <span class="tree-dir">instructions/</span><span class="tag-status">OQ4</span><span class="tree-comment"># mirror policy TBD</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">shared/</span><span class="tag-readme">README</span><span class="tag-note">D1</span><span class="tree-comment"># vendor-neutral assets (test)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">prompts/</span><span class="tag-readme">README</span><span class="tree-comment"># reusable prompts (from claude/prompts/)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">workflows/</span><span class="tag-readme">README</span><span class="tree-comment"># vendor-neutral orchestration documents</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-dir">configs/</span><span class="tag-readme">README</span><span class="tree-comment"># reusable config fragments — no secrets</span></div>
+<div class="tree-line"><span class="tree-indent">│   └──</span> <span class="tree-dir">plugins/</span><span class="tag-readme">README</span><span class="tree-comment"># plugin/addon reference list + provenance</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">scripts/</span><span class="tag-readme">README</span><span class="tree-comment"># all lifecycle automation</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">generate-manifest.py</span><span class="tree-comment"># existing (gains --output, --validate, category support)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">generate-catalog.ps1</span><span class="tag-note">D2/D8</span><span class="tree-comment"># stub → implemented</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">audit.ps1</span><span class="tag-note">D3</span><span class="tree-comment"># IMPLEMENTED</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">install-to-project.ps1</span><span class="tree-comment"># stub</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">push-to-profile.ps1</span><span class="tree-comment"># stub → implemented</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">sync-installed.ps1</span><span class="tree-comment"># stub</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">backfill-categories.ps1</span><span class="tree-comment"># stub → one-time sweep (D8)</span></div>
+<div class="tree-line"><span class="tree-indent">│   ├──</span> <span class="tree-file">validate.ps1</span><span class="tag-note">P2</span><span class="tag-note">T8</span><span class="tree-comment"># local validation gate</span></div>
+<div class="tree-line"><span class="tree-indent">│   └──</span> <span class="tree-file">install-hooks.ps1</span><span class="tag-note">P2</span><span class="tag-note">T8</span><span class="tree-comment"># opt-in pre-push hook installer</span></div>
+<div class="tree-line"><span class="tree-indent">├──</span> <span class="tree-dir">docs/</span><span class="tag-readme">README</span><span class="tree-comment"># requirements, plans, reorg governance, reports</span></div>
+<div class="tree-line"><span class="tree-indent">└──</span> <span class="tree-dir">logs/</span><span class="tree-comment"># UNTRACKED local telemetry (P5) — gitignored, no README</span></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:var(--emerald);"></div>
+        <span>README — directory has its own README.md</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:var(--amber);"></div>
+        <span>Priority/Status tag — D1–D8, P2–P5, OQ4, T8</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:var(--teal);"></div>
+        <span>GENERATED — produced by automation, not hand-edited</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 ## Phases
 
-> **▣ Diagram —** SDLC state flow: Capture→Approve→Plan→Execute→Verify→Merge, with the [Verification Gate](#verification-gate) and [Failure Budget](#failure-budget) as decision nodes *(type: state)*
+> **▣ Diagram —** SDLC state flow: Capture→Approve→Plan→Execute→Verify→Merge, with the [Verification Gate](#verification-gate) and [Failure Budget](#failure-budget) as decision nodes *(type: state)* — [view](diagrams/sdlc-state-flow.html)
 
 ```
 REQUIREMENTS.md   →   feature specs   →   plans   →   tasks (active)   →   tasks (archive)

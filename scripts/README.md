@@ -156,7 +156,7 @@ Category resolution: see the [repo standard's category-frontmatter rule](../docs
 
 > **▣ Diagram —** The regeneration pipeline: frontmatter → `generate-manifest.py` →
 > `manifest.json` → `generate-catalog.ps1` → `CATALOG.md`, with `audit.ps1` /
-> `validate.ps1` verifying each arrow *(type: flow)*
+> `validate.ps1` verifying each arrow *(type: flow)* — [view](diagrams/regeneration-pipeline.html)
 
 `manifest.json` and `CATALOG.md` are **generated, never hand-edited** — a core rule of
 the [repo standard](../docs/requirements/canonical-repo.md), reinforced by the
@@ -209,7 +209,7 @@ Two pieces:
   installed the git hook.
 
 > **▣ Diagram —** The Zed PreToolUse hook (client-side) vs the `pre-push` git hook
-> (git-side) firing in sequence on a push *(type: sequence)*
+> (git-side) firing in sequence on a push *(type: sequence)* — [view](diagrams/hook-sequence.html)
 
 **Interaction with the global "git-push-opens-Zed" hook** (every hook-interaction
 case in this repo gets documented, not assumed — a precedent set in the

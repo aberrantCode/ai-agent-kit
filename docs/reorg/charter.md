@@ -62,7 +62,7 @@ durable per-item state exists.
 *Pairs with [§3 Boundary Sentences](#3-boundary-sentences-verbatim) above — both encode the
 same ownership map, stated here as a lookup table rather than paired sentences.*
 
-> **▣ Diagram —** Bundle nodes with owned-concern edges *(type: graph)*
+> **▣ Diagram —** Bundle nodes with owned-concern edges *(type: graph)* — [view](diagrams/bundle-ownership-graph.html)
 
 | Concern | Sole owner |
 |---|---|
@@ -136,7 +136,7 @@ never automation.
 ## 9. Phases and Gate
 
 > **▣ Diagram —** Phase timeline (3 phases × iteration ranges × soft gate at iteration 10)
-> *(type: timeline)*
+> *(type: timeline)* — [view](diagrams/phase-timeline.html)
 
 - **Phase 1 (P0):** github, project-manager, skills-manager — iterations 1–9, fleet sweep
   at iteration 10 with the soft gate above.

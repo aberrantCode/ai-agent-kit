@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master-Skills Reorganization — Phase Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.timeline-phase,.timeline-gate { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.08s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1400px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+
+  .timeline-container { position:relative; padding:40px 0; overflow-x:auto; }
+  .timeline-track {
+    position:relative;
+    height:120px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:30px;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+  }
+  .timeline-background {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    border-radius:8px;
+  }
+  .timeline-phase {
+    position:absolute;
+    top:12px;
+    height:96px;
+    border-radius:6px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    font-family:var(--font-mono);
+    overflow:hidden;
+    z-index:2;
+  }
+  .timeline-phase.phase-0 {
+    background:linear-gradient(135deg, var(--emerald), rgba(4,120,87,0.7));
+    border:1px solid var(--emerald);
+    box-shadow:0 2px 8px rgba(4,120,87,0.2);
+  }
+  .timeline-phase.phase-1 {
+    background:linear-gradient(135deg, var(--teal), rgba(15,118,110,0.7));
+    border:1px solid var(--teal);
+    box-shadow:0 2px 8px rgba(15,118,110,0.2);
+  }
+  .timeline-phase.phase-2 {
+    background:linear-gradient(135deg, var(--violet), rgba(91,33,182,0.7));
+    border:1px solid var(--violet);
+    box-shadow:0 2px 8px rgba(91,33,182,0.2);
+  }
+
+  .phase-content {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    text-align:center;
+    position:relative;
+    z-index:3;
+  }
+  .phase-label { font-size:12px; font-weight:700; opacity:0.95; }
+  .phase-range { font-size:10px; opacity:0.85; font-weight:500; }
+  .phase-bundles { font-size:9px; opacity:0.8; max-width:90px; }
+
+  .timeline-gate {
+    position:absolute;
+    top:-28px;
+    width:60px;
+    height:60px;
+    background:var(--amber-dim);
+    border:2px solid var(--amber);
+    border-radius:6px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:4;
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:700;
+    color:var(--amber);
+    text-align:center;
+    gap:2px;
+  }
+  .gate-icon { font-size:16px; }
+
+  .timeline-label {
+    position:absolute;
+    top:-32px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-dim);
+    font-weight:600;
+  }
+
+  .iteration-ticks {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    z-index:1;
+  }
+  .tick {
+    flex:1;
+    border-right:1px solid rgba(0,0,0,0.05);
+    position:relative;
+    font-size:9px;
+    color:var(--text-dim);
+    padding-top:4px;
+    text-align:center;
+    font-family:var(--font-mono);
+  }
+  .tick:last-child { border-right:none; }
+  @media (prefers-color-scheme: dark) { .tick { border-right-color:rgba(255,255,255,0.05); } }
+
+  .callout {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    border-radius:0 8px 8px 0;
+    padding:12px 16px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--text-dim);
+    margin-top:8px;
+  }
+  .callout strong { color:var(--text); }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-top:8px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:1000px) {
+    body { padding:24px 16px; }
+    .timeline-phase { font-size:12px; }
+    .phase-label { font-size:10px; }
+    .phase-range { font-size:9px; }
+    .phase-bundles { font-size:8px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Master-Skills Reorganization</h1>
+<p class="subtitle">11-bundle reorg · 26-iteration roadmap · phase timeline with soft gate</p>
+
+<div class="diagram">
+
+  <!-- Overview -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Three-phase implementation roadmap</div>
+    <p style="font-size:13px; line-height:1.7; margin-bottom:12px;">
+      Master-skills reorganization rolls out across 26 iterations in 3 phases. <strong>Phase 1 (P0)</strong> establishes foundations with core tooling. At iteration 10, a <strong>soft gate</strong> reviews sub-skill firing evidence and proceeds without stopping. <strong>Phase 2 (P1)</strong> scales manager suites. <strong>Phase 3 (P2)</strong> completes the rollout with utilities, extensions, and closeout.
+    </p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="section section--teal" style="--i:1">
+    <div class="section-label"><span class="dot"></span> Timeline · iterations 1–26</div>
+
+    <div class="timeline-container">
+      <div class="timeline-track">
+        <div class="iteration-ticks">
+          <div class="tick">1</div><div class="tick">2</div><div class="tick">3</div><div class="tick">4</div><div class="tick">5</div>
+          <div class="tick">6</div><div class="tick">7</div><div class="tick">8</div><div class="tick">9</div><div class="tick">10</div>
+          <div class="tick">11</div><div class="tick">12</div><div class="tick">13</div><div class="tick">14</div><div class="tick">15</div>
+          <div class="tick">16</div><div class="tick">17</div><div class="tick">18</div><div class="tick">19</div><div class="tick">20</div>
+          <div class="tick">21</div><div class="tick">22</div><div class="tick">23</div><div class="tick">24</div><div class="tick">25</div><div class="tick">26</div>
+        </div>
+
+        <!-- Phase 1 bar -->
+        <div class="timeline-phase phase-0" style="left:2%; width:32%; --i:2">
+          <div class="phase-content">
+            <div class="phase-label">Phase 1 (P0)</div>
+            <div class="phase-range">iterations 1–9</div>
+            <div class="phase-bundles">github · project-manager · skills-manager</div>
+          </div>
+        </div>
+
+        <!-- Soft gate at iteration 10 -->
+        <div class="timeline-gate" style="left:34.5%; --i:3">
+          <div class="gate-icon">✓</div>
+          <div style="font-size:9px;">SOFT</div>
+          <div style="font-size:9px;">GATE</div>
+        </div>
+
+        <!-- Phase 2 bar -->
+        <div class="timeline-phase phase-1" style="left:38%; width:48%; --i:4">
+          <div class="phase-content">
+            <div class="phase-label">Phase 2 (P1)</div>
+            <div class="phase-range">iterations 11–22</div>
+            <div class="phase-bundles">agent-manager · quality-manager · developer-manager · design-manager · ops-manager</div>
+          </div>
+        </div>
+
+        <!-- Phase 3 bar -->
+        <div class="timeline-phase phase-2" style="left:88%; width:10%; --i:5">
+          <div class="phase-content">
+            <div class="phase-label">Phase 3 (P2)</div>
+            <div class="phase-range">23–25</div>
+            <div class="phase-bundles">utilities · youtube-ext · gated-batch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Soft gate note -->
+    <div class="callout">
+      <strong>Iteration 10 — Soft Gate (not a hard stop):</strong> Loop reviews Phase-1 sub-skill firing evidence in the iteration summary, then proceeds to iteration 11 WITHOUT blocking. This overrides the original hard-gate default. Gate is informational; progress continues automatically.
+    </div>
+  </div>
+
+  <!-- Phase details -->
+  <div class="section section--emerald" style="--i:6">
+    <div class="section-label"><span class="dot"></span> Phase 1 (P0) — Foundation · iterations 1–9</div>
+    <div class="ve-card">
+      <div class="title">Objective</div>
+      <div class="desc">Establish core command infrastructure, project management, and skill deployment tooling.</div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Bundles</div>
+      <div class="desc"><code>github</code> (git/GitHub thin-command suite) · <code>project-manager</code> (feature specs, plans, tasks) · <code>skills-manager</code> (archive management and install/sync)</div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Iteration 10 checkpoint</div>
+      <div class="desc">Fleet sweep and sub-skill firing evidence review. Gate is soft — loop reports findings and continues to Phase 2 without user intervention.</div>
+    </div>
+  </div>
+
+  <div class="section section--teal" style="--i:7">
+    <div class="section-label"><span class="dot"></span> Phase 2 (P1) — Scale · iterations 11–22</div>
+    <div class="ve-card">
+      <div class="title">Objective</div>
+      <div class="desc">Deploy domain-specific manager suites: agents, quality gates, developer workflows, design operations, infrastructure/ops.</div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Bundles</div>
+      <div class="desc"><code>agent-manager</code> · <code>quality-manager</code> · <code>developer-manager</code> · <code>design-manager</code> · <code>ops-manager</code></div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Duration</div>
+      <div class="desc">12 iterations of concurrent bundle development, integration testing, and hardening.</div>
+    </div>
+  </div>
+
+  <div class="section section--violet" style="--i:8">
+    <div class="section-label"><span class="dot"></span> Phase 3 (P2) — Close · iterations 23–25 + closeout at 26</div>
+    <div class="ve-card">
+      <div class="title">Objective</div>
+      <div class="desc">Deploy utility suites, ship YouTube extraction extension, activate gated-batch. Closeout verification at iteration 26.</div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Bundles</div>
+      <div class="desc"><code>utilities-manager</code> · <code>youtube-extraction</code> extension · <code>gated-batch</code></div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Closeout (iteration 26)</div>
+      <div class="desc">Final verification, cross-bundle integration check, post-launch monitoring setup.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

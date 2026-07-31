@@ -29,7 +29,7 @@ loads to work well in a given domain, and the automation that moves them around.
 
 ## Repository map
 
-> **▣ Diagram —** the directory tree and the archive→consumer flow *(type: tree + flow)*
+> **▣ Diagram —** the directory tree and the archive→consumer flow *(type: tree + flow)* — [view](diagrams/repo-map.html)
 
 ```
 ai-agent-kit/
@@ -52,7 +52,7 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 ## Quick start
 
 > **▣ Diagram —** the three install paths (profile install / project install / clone-and-copy)
-> as a decision flow *(type: flow)*
+> as a decision flow *(type: flow)* — [view](diagrams/install-paths.html)
 
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can
 use the asset. A **project install** copies one bundle into one repository, so it travels with

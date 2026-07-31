@@ -91,7 +91,7 @@ Decided in erik's interview, 2026-07-13 — binding for this effort.
 Counts are deliberately absent — they live in `CATALOG.md`/`manifest.json`
 ([G5](#goals), [N1](#non-goals)).
 
-> **▣ Diagram —** target repo file-tree with per-directory annotations *(type: tree)*
+> **▣ Diagram —** target repo file-tree with per-directory annotations *(type: tree)* — [view](diagrams/target-repo-tree.html)
 
 ```
 ai-agent-kit/

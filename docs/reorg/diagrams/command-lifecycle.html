@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Lifecycle — Slash Command Assignment State Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.08s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+
+  /* State diagram */
+  .state-machine { display:flex; flex-direction:column; gap:32px; align-items:center; margin-top:20px; }
+  .state-row { display:flex; gap:20px; align-items:center; width:100%; justify-content:center; flex-wrap:wrap; }
+  .state-node { padding:16px 28px; border-radius:8px; border:2px solid; font-family:var(--font-mono); font-weight:700; text-align:center; font-size:13px; min-width:140px; }
+  .state-node--start { border-color:var(--emerald); background:var(--emerald-dim); color:var(--emerald); }
+  .state-node--global { border-color:var(--teal); background:var(--teal-dim); color:var(--teal); }
+  .state-node--bundle { border-color:var(--violet); background:var(--violet-dim); color:var(--violet); }
+  .state-node--cut { border-color:var(--red); background:var(--red-dim); color:var(--red); }
+
+  .transition-group { display:flex; flex-direction:column; gap:8px; }
+  .transition { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-dim); }
+  .arrow { font-family:var(--font-mono); color:var(--text-dim); }
+  .arrow svg { width:24px; height:24px; }
+  .transition-label { font-family:var(--font-mono); font-size:11px; }
+
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); margin-top:16px; }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .notes-list { list-style:none; display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .notes-list li { font-size:12px; color:var(--text-dim); line-height:1.5; padding-left:16px; position:relative; }
+  .notes-list li::before { content:"→"; position:absolute; left:0; color:var(--emerald); font-family:var(--font-mono); }
+  .notes-list code { font-family:var(--font-mono); font-size:10px; background:var(--amber-dim); color:var(--amber); padding:1px 5px; border-radius:3px; }
+
+  .examples-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:16px; }
+  .example-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .example-card .title { font-weight:600; font-size:11px; color:var(--text); margin-bottom:4px; font-family:var(--font-mono); }
+  .example-card .desc { font-size:10px; color:var(--text-dim); line-height:1.5; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .state-row{flex-direction:column;} }
+</style>
+</head>
+<body>
+
+<h1>Command Lifecycle</h1>
+<p class="subtitle">slash command state machine · unassigned → global / bundle-owned / cut</p>
+
+<div class="diagram">
+
+  <!-- State Machine Diagram -->
+  <div class="section section--emerald" style="--i:0">
+    <div class="section-label"><span class="dot"></span> State Transitions</div>
+    <div class="state-machine">
+      <div class="state-row">
+        <div class="state-node state-node--start">unassigned</div>
+      </div>
+      <div class="state-row">
+        <div class="transition-group" style="width:100%">
+          <div class="transition">
+            <span class="arrow">↓</span>
+            <span class="transition-label">passes Generic-Verb Rule</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-row" style="gap:40px">
+        <div class="state-node state-node--global">global</div>
+        <div class="state-node state-node--bundle">bundle-owned</div>
+        <div class="state-node state-node--cut">cut</div>
+      </div>
+    </div>
+    <div class="callout">
+      A new slash command name starts in <strong>unassigned</strong>. Before assignment, it must pass the <strong>Generic-Verb Rule</strong>: bare generic verbs/nouns (like <code>/apply</code>, <code>/probe</code>, <code>/dashboard</code>) are renamed to specific verb–object pairs (<code>/apply-script</code>, <code>/probe-incident</code>, <code>/add-dashboard</code>). After passing, it transitions to exactly one of three terminal states: <strong>global</strong>, <strong>bundle-owned</strong>, or <strong>cut</strong>.
+    </div>
+  </div>
+
+  <!-- Destinations -->
+  <div class="section section--teal" style="--i:1">
+    <div class="section-label"><span class="dot"></span> Terminal States</div>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="title">Global</div>
+        <div class="desc">Lives in <code>claude/commands/</code>. No single bundle owns it. Used across multiple domains.</div>
+      </div>
+      <div class="example-card">
+        <div class="title">Bundle-Owned</div>
+        <div class="desc">Moves into a specific bundle's <code>commands/</code> directory. Owned and versioned by that bundle.</div>
+      </div>
+      <div class="example-card">
+        <div class="title">Cut</div>
+        <div class="desc">Rejected or retired. Does not ship. Removed from the command namespace registry.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Examples & Rules -->
+  <div class="section section--violet" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Examples & Rules</div>
+    <ul class="notes-list">
+      <li><strong>Global example:</strong> <code>/diff-review</code>, <code>/plan</code>, commands marked "review at closeout" in the registry.</li>
+      <li><strong>Bundle-owned example:</strong> <code>/code-review</code> → quality-manager bundle, <code>/ship</code> stays github-owned.</li>
+      <li><strong>Cut examples:</strong> <code>/verify</code> (built-in verify skill + superpowers owned it), <code>/guide</code>, <code>/profile-perf</code>, <code>/check-mirrors</code>.</li>
+      <li><strong>Collision rule:</strong> Built-ins and plugins win naming silently. <code>/verify</code> was cut; <code>/init</code> was renamed to <code>/init-repo</code> to avoid collision with Claude Code's built-in.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

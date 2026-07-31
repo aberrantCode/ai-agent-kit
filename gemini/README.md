@@ -6,7 +6,8 @@ charter's [cross-CLI mirror policy](../docs/reorg/charter.md). Gemini is
 here, and growing this set is a deliberate, manual decision, not a default.
 
 > **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)*
+> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> [view](diagrams/vendor-mirror-flow.html)
 
 ## `skills/<name>/SKILL.md`
 

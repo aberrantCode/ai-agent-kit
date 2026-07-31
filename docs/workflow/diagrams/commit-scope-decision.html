@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commit Scope Decision — Chore-Lane Classification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f8faf7; --surface: #ffffff; --surface2: #f0f4f1; --surface-elevated: #fafbf9;
+    --border: rgba(20,70,40,0.08); --border-bright: rgba(20,70,40,0.16);
+    --text: #0d1b12; --text-dim: #4a6055;
+    --red: #d93026; --red-dim: rgba(217,48,38,0.09);
+    --green: #0a7c3c; --green-dim: rgba(10,124,60,0.09);
+    --amber: #a45a0a; --amber-dim: rgba(164,90,10,0.09);
+    --slate: #3f4f4a; --slate-dim: rgba(63,79,74,0.08);
+    --blue: #0969da; --blue-dim: rgba(9,105,218,0.09);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1410; --surface: #151d19; --surface2: #1a2420; --surface-elevated: #202c24;
+      --border: rgba(100,200,130,0.08); --border-bright: rgba(100,200,130,0.16);
+      --text: #d6ede2; --text-dim: #6b9580;
+      --red: #f97062; --red-dim: rgba(249,112,98,0.12);
+      --green: #56d364; --green-dim: rgba(86,211,100,0.12);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.12);
+      --slate: #8b9d95; --slate-dim: rgba(139,157,149,0.08);
+      --blue: #79c0ff; --blue-dim: rgba(121,192,255,0.12);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 15% 10%, var(--green-dim) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 85%, var(--blue-dim) 0%, transparent 55%);
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 48px 40px;
+    min-height: 100vh;
+  }
+  @keyframes fadeUp { from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
+  .section, .tree-branch { animation: fadeUp 0.35s ease-out both; animation-delay: calc(var(--i,0)*0.07s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .subtitle { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-bottom: 44px; }
+  .section-label { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+  .diagram { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 980px; margin: 0 auto; }
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; }
+  .section--hero { background: var(--surface-elevated); border-color: var(--border-bright); box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 32px 36px; }
+  .section--recessed { background: var(--surface2); }
+
+  .section--blue .section-label { color: var(--blue); } .section--blue .dot { background: var(--blue); } .section--blue { border-color: var(--blue-dim); }
+  .section--slate .section-label { color: var(--slate); } .section--slate .dot { background: var(--slate); } .section--slate { border-color: var(--slate-dim); }
+
+  /* Decision tree structure */
+  .tree-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .tree-node { display: grid; gap: 16px; }
+  .tree-level { display: flex; align-items: flex-start; gap: 12px; justify-content: flex-start; flex-wrap: wrap; }
+
+  /* Start node */
+  .node-start {
+    background: var(--surface2);
+    border: 2px solid var(--blue);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  /* Branch connector */
+  .branch-arrows {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 16px;
+    margin: 16px 0 20px 0;
+    position: relative;
+  }
+  .arrow-line {
+    flex: 1;
+    height: 40px;
+    border-left: 2px solid var(--border-bright);
+    border-bottom: 2px solid var(--border-bright);
+    border-radius: 0 0 0 8px;
+  }
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 0px solid transparent;
+    border-top: 8px solid var(--border-bright);
+  }
+
+  /* Outcome nodes */
+  .outcomes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .outcome-node {
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid;
+    background: var(--surface);
+  }
+  .outcome-node.fail {
+    border-color: var(--red);
+    background: var(--red-dim);
+  }
+  .outcome-node.allow {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+  .outcome-node.conditional {
+    border-color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  .outcome-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .outcome-node.fail .outcome-title { color: var(--red); }
+  .outcome-node.allow .outcome-title { color: var(--green); }
+  .outcome-node.conditional .outcome-title { color: var(--amber); }
+
+  .outcome-condition {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .outcome-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .outcome-desc code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--text);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* Legend and callout */
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+  .legend-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-item.fail .legend-box { background: var(--red); }
+  .legend-item.allow .legend-box { background: var(--green); }
+  .legend-item.conditional .legend-box { background: var(--amber); }
+
+  .callout {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--slate);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin-top: 16px;
+  }
+  .callout code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--slate-dim);
+    color: var(--slate);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .callout strong { color: var(--text); }
+
+  /* Manifest rules tables */
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .rule-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .rule-card .title {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+  .rule-card .desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .rule-card code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: rgba(0,0,0,0.1);
+    color: var(--text);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  @media (max-width: 860px) {
+    body { padding: 24px 16px; }
+    .outcomes-grid { grid-template-columns: 1fr; }
+    .legend { grid-template-columns: 1fr; }
+    .rules-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Commit Scope Decision</h1>
+<p class="subtitle">classify staged files in a chore-lane commit</p>
+
+<div class="diagram">
+
+  <!-- Hero section: decision statement -->
+  <div class="section section--hero section--blue" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Decision Authority</div>
+    <p style="font-size: 13px; line-height: 1.6; color: var(--text);">
+      For a chore-lane commit, classify each staged source file against two glob lists: <code style="font-family: var(--font-mono); background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">product_scope</code> and <code style="font-family: var(--font-mono); background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">chore_safe</code>. Behaviour-bearing code cannot ride the lightweight chore lane. Route unconfirmed files through <code style="font-family: var(--font-mono); background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">/groom → /add-feature</code> instead.
+    </p>
+  </div>
+
+  <!-- Manifest rules -->
+  <div class="section section--slate" style="--i:1">
+    <div class="section-label"><span class="dot"></span> Manifest Definitions</div>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="title">product_scope</div>
+        <div class="desc">Behaviour-bearing source code that defines feature implementation. Examples: <code>src/**</code>, <code>api/**</code>, <code>components/**</code>, <code>app/**</code>, <code>packages/*/src/**</code></div>
+      </div>
+      <div class="rule-card">
+        <div class="title">chore_safe</div>
+        <div class="desc">Safe-by-definition files: documentation, scripts, CI config, generic config. Examples: <code>docs/**</code>, <code>scripts/**</code>, <code>.github/**</code>, <code>*.md</code>, <code>*.config.*</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decision tree -->
+  <div class="section" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Classification Flow</div>
+
+    <div class="tree-node">
+      <div class="node-start">
+        📋 For each staged file, check: Does it match product_scope OR chore_safe OR neither?
+      </div>
+
+      <div class="branch-arrows">
+        <div class="arrow-line" style="margin-left: 20px;"></div>
+        <div class="arrow-line" style="margin-left: auto; margin-right: auto;"></div>
+        <div class="arrow-line" style="margin-right: 20px;"></div>
+      </div>
+
+      <div class="outcomes-grid">
+        <!-- FAIL outcome -->
+        <div class="outcome-node fail tree-branch" style="--i:3">
+          <div class="outcome-title">🚫 HARD FAIL</div>
+          <div class="outcome-condition">Matches: <code>product_scope</code></div>
+          <div class="outcome-desc">
+            Behaviour-bearing code cannot ride the chore lane, <strong>regardless of <code>scope_confirmed</code> flag.</strong> Route through <code>/groom → /add-feature</code> to create a proper spec + plan instead.
+          </div>
+        </div>
+
+        <!-- ALLOW outcome -->
+        <div class="outcome-node allow tree-branch" style="--i:4">
+          <div class="outcome-title">✓ ALLOWED</div>
+          <div class="outcome-condition">Matches: <code>chore_safe</code></div>
+          <div class="outcome-desc">
+            Docs, scripts, CI config, and generic config files are safe by definition. Proceed with commit.
+          </div>
+        </div>
+
+        <!-- CONDITIONAL outcome -->
+        <div class="outcome-node conditional tree-branch" style="--i:5">
+          <div class="outcome-title">⚠️ CONDITIONAL</div>
+          <div class="outcome-condition">Matches: Neither list</div>
+          <div class="outcome-desc">
+            Allowed <strong>only if</strong> the authorizing chore task has <code>scope_confirmed: true</code>. Operator explicitly acknowledged the file is out-of-manifest but safe.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend" style="margin-top: 28px;">
+      <div class="legend-item fail"><div class="legend-box"></div> Reject · no override possible</div>
+      <div class="legend-item allow"><div class="legend-box"></div> Accept · always safe</div>
+      <div class="legend-item conditional"><div class="legend-box"></div> Accept · requires confirmation</div>
+    </div>
+  </div>
+
+  <!-- Fallback and rules -->
+  <div class="section section--recessed" style="--i:6">
+    <div class="section-label"><span class="dot"></span> Rules & Fallback</div>
+    <div class="callout" style="margin-top: 0;">
+      <strong>Manifest missing?</strong> If the <code>product_scope</code> or <code>chore_safe</code> file is missing, the chore lane is inert — the guard fails closed for <strong>every</strong> chore task until the manifest exists. This ensures no accidental product code lands in the chore lane due to misconfiguration.
+    </div>
+    <div style="margin-top: 16px; font-size: 12px; line-height: 1.6; color: var(--text-dim);">
+      <strong style="color: var(--text);">Key Point:</strong> <code style="font-family: var(--font-mono); background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">scope_confirmed</code> can unblock an unclassified file; it can <strong>NEVER</strong> override a <code style="font-family: var(--font-mono); background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">product_scope</code> hit.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
