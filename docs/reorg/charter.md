@@ -12,7 +12,7 @@ map: docs/reports/2026-07-10-master-skills-consensus-plan.md
 This charter is the Phase-0 governance document for the 27-iteration master-skills
 reorganization. Every skill PR in the series must conform to it. Where this charter and an
 individual bundle draft disagree, this charter wins; where erik's 2026-07-10 human
-resolutions (§8) and anything else disagree, the resolutions win.
+resolutions (§8, Human Resolutions) and anything else disagree, the resolutions win.
 
 ## 1. Routing and Triggering Model
 
@@ -36,9 +36,13 @@ directly on `pr-splitter` without the `github` master firing first.
 2. **Every absorption that deletes a referenced name** ships its fleet `/update-skill`
    sweep + CLAUDE.md reference-rewrite sweep in the same PR series as the deletion.
 3. **Git history is the archive of record.** Deleted skill content is never tombstoned with
-   `status: deprecated` long-term; verify absorption per the consensus JSON, then delete.
+   `status: deprecated` long-term; verify absorption per the
+   [consensus JSON](../reports/2026-07-10-master-skills-consensus.json), then delete.
 
 ## 3. Boundary Sentences (verbatim)
+
+*Pairs with [§4 Single Owners](#4-single-owners) below — both encode the same ownership map,
+stated here as verbatim paired sentences rather than a lookup table.*
 
 Each sentence below must appear **verbatim in both SKILL.md files** of its pair:
 
@@ -50,10 +54,15 @@ Each sentence below must appear **verbatim in both SKILL.md files** of its pair:
    > launch; ops-manager owns post-deploy verification.
 4. > design-manager owns "is it good"; quality-manager owns "does it work".
 
-Routing corollary for #2: "resume the batch" routes on whether durable per-item state
-exists.
+Routing corollary for boundary sentence #2 (above): "resume the batch" routes on whether
+durable per-item state exists.
 
 ## 4. Single Owners
+
+*Pairs with [§3 Boundary Sentences](#3-boundary-sentences-verbatim) above — both encode the
+same ownership map, stated here as a lookup table rather than paired sentences.*
+
+> **▣ Diagram —** Bundle nodes with owned-concern edges *(type: graph)*
 
 | Concern | Sole owner |
 |---|---|
@@ -86,9 +95,10 @@ The cross-CLI transpiler is **cut**. Instead:
 
 Every PR that deletes or renames a skill must, in the same PR:
 
-1. Remove/update the README row (README parity: every archived skill has a row; every row
-   points to a real file).
-2. Regenerate `manifest.json` (`scripts/generate-manifest.py`).
+1. Remove/update the [README](../../README.md) row (README parity: every archived skill has
+   a row; every row points to a real file).
+2. Regenerate [`manifest.json`](../../manifest.json) (via
+   [`scripts/generate-manifest.py`](../../scripts/generate-manifest.py)).
 3. Add/update/remove `diagram.html` as applicable.
 4. Run the installed-copy sweep for affected fleet repos (or schedule it explicitly in the
    same PR series and say so in the PR body).
@@ -125,6 +135,9 @@ never automation.
 
 ## 9. Phases and Gate
 
+> **▣ Diagram —** Phase timeline (3 phases × iteration ranges × soft gate at iteration 10)
+> *(type: timeline)*
+
 - **Phase 1 (P0):** github, project-manager, skills-manager — iterations 1–9, fleet sweep
   at iteration 10 with the soft gate above.
 - **Phase 2 (P1):** agent-manager, quality-manager, developer-manager, design-manager,
@@ -136,13 +149,17 @@ never automation.
 
 142 Claude skill directories / 84 Codex / 5 Gemini; 25 global slash commands; 15 agent
 instructions. The charter PR (iteration 0) deletes `what-next-workspace` (eval artifacts,
-not a skill), leaving **141 Claude skill directories**. Count corrections in README/CLAUDE.md
-ship in the owning PRs; stale figures are never left standing once an owning PR touches the
-surface.
+not a skill), leaving **141 Claude skill directories**. Count corrections in
+[README](../../README.md)/[CLAUDE.md](../../CLAUDE.md) ship in the owning PRs; stale figures
+are never left standing once an owning PR touches the surface.
+
+*These counts were frozen at the 2026-07-10 audit and are not updated in place; the live
+source of truth is [`CATALOG.md`](../../CATALOG.md).*
 
 ## 11. Companion Documents
 
-- **Disposition ledger** — `docs/reorg/disposition-ledger.md`: one binding row per skill
-  directory (142 at audit time), flipped to `done` by the owning PR.
-- **Command-namespace registry** — `docs/reorg/command-namespace-registry.md`: every
-  current/planned/cut command, its owner, and the generic-verb rule.
+- **Disposition ledger** — [`disposition-ledger.md`](disposition-ledger.md): one binding row
+  per skill directory (142 at audit time), flipped to `done` by the owning PR.
+- **Command-namespace registry** —
+  [`command-namespace-registry.md`](command-namespace-registry.md): every current/planned/cut
+  command, its owner, and the generic-verb rule.

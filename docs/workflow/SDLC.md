@@ -1,10 +1,12 @@
 # Software Development Lifecycle — AI Agent Kit
 
-> Defines how work moves from idea to merged code in this repository. Owned by the project-manager skill; do not edit by hand unless updating the Feature Abbreviation Registry (see below).
+> Defines how work moves from idea to merged code in this repository. Owned by the project-manager skill; do not edit by hand unless updating the [Feature Abbreviation Registry](#feature-abbreviation-registry) (see below).
 
 ---
 
 ## Phases
+
+> **▣ Diagram —** SDLC state flow: Capture→Approve→Plan→Execute→Verify→Merge, with the [Verification Gate](#verification-gate) and [Failure Budget](#failure-budget) as decision nodes *(type: state)*
 
 ```
 REQUIREMENTS.md   →   feature specs   →   plans   →   tasks (active)   →   tasks (archive)
@@ -13,12 +15,20 @@ REQUIREMENTS.md   →   feature specs   →   plans   →   tasks (active)   →
 
 | Phase | Owner            | Trigger                          | Output                          |
 |-------|------------------|----------------------------------|---------------------------------|
-| Capture | User + `init-features`   | `REQUIREMENTS.md` exists | `docs/features/*.md`           |
+| Capture | User + `init-features`   | [`REQUIREMENTS.md`](../REQUIREMENTS.md) exists | [`docs/features/*.md`](../features/) |
 | Approve | User             | Review                           | `status: approved` in spec      |
-| Plan    | `continue-tasks` | Approved spec without plan       | `docs/plans/<slug>-plan.md`    |
+| Plan    | `continue-tasks` | Approved spec without plan       | [`docs/plans/<slug>-plan.md`](../plans/) |
 | Execute | Agent (per task) | `Status: todo` in plan           | Claimed task lease + code change + final `## Completion` |
 | Verify  | `code-reviewer` / verifier task | Code-changing task reports success | Review/test result, then plan task → `done` |
 | Merge   | User             | All P0 tasks done                | PR merged to `dev`              |
+
+- **Requirements-doc shortcut (recognized alternate entry):** the standard flow above enters
+  Capture through an idea → [`../features/`](../features/) spec → [`../plans/`](../plans/). The
+  canonical-repo effort instead entered Capture directly through a requirements doc —
+  [`../requirements/canonical-repo.md`](../requirements/canonical-repo.md) →
+  [`../plans/canonical-repo-plan.md`](../plans/canonical-repo-plan.md) — bypassing
+  [`../features/`](../features/). This is a recognized alternate entry point, not a deviation; the
+  standard flow remains the default for new work.
 
 ---
 
@@ -33,6 +43,9 @@ Two-letter prefixes used in CAP-IDs (`[XX-CAP-NN]`). Each row must be unique. Ad
 ---
 
 ## Status Vocabulary
+
+> This table is authoritative. [`../plans/template.md`](../plans/template.md) copies it rather than
+> maintaining its own separate copy.
 
 | Status        | Used by         | Meaning                                                  |
 |---------------|-----------------|----------------------------------------------------------|
@@ -60,7 +73,7 @@ Two-letter prefixes used in CAP-IDs (`[XX-CAP-NN]`). Each row must be unique. Ad
 
 ## Failure Budget
 
-The Error Recovery Loop (in `project-manager:continue-tasks`) tolerates up to **5 failures per plan** before escalating to the user. Each failure adds 1-3 corrective tasks rather than retrying the failed task blindly. After 5 failures, the plan is paused and a detailed issue is written to `docs/issues/`.
+The Error Recovery Loop (in `project-manager:continue-tasks`) tolerates up to **5 failures per plan** before escalating to the user. Each failure adds 1-3 corrective tasks rather than retrying the failed task blindly. After 5 failures, the plan is paused and a detailed issue is written to [`docs/issues/`](../issues/).
 
 ## Verification Gate
 
@@ -73,7 +86,7 @@ reported in the implementation task's completion block.
 If `Tests: passing: false` is reported, the orchestrator creates corrective build/test work and does
 not mark the implementation complete.
 
-**Test runners live in `docs/workflow/runners.md`.** That file is the authoritative list of every
+**Test runners live in [`docs/workflow/runners.md`](runners.md).** That file is the authoritative list of every
 test runner the gate consults — one row per `(Subtree, Runner, Command)`. Monorepos with nested
 runners (e.g. `backend/pyproject.toml`, `frontend/package.json`) register one row per subtree so the
 gate sees them. The file is populated by `/init-project` (Phase 3.5 Runner Discovery) and refreshed
@@ -82,7 +95,7 @@ by `/reinit`. Refresh ad-hoc with `references/scripts/pm-test-runners.ps1 -Disco
 ## Claims, Leases, and Handoff
 
 Active task files include `claimed_by`, `claimed_at`, and `lease_expires_at`. The orchestrator also
-creates a matching lock record under `docs/tasks/locks/` when claiming work.
+creates a matching lock record under [`docs/tasks/locks/`](../tasks/locks/) when claiming work.
 
 - **Claim**: create or update the task file metadata, create a lock file, and write an initial task
   log entry.
@@ -95,9 +108,9 @@ creates a matching lock record under `docs/tasks/locks/` when claiming work.
 - **Manual cancellation**: set the lock `status: cancelled`, record the reason, leave the task file
   active unless the user explicitly chooses to archive it.
 
-Use `docs/workflow/FOCUS.md` for current resumability state and `docs/workflow/INDEX.md` for durable
-decisions, discoveries, and cross-feature notes. Use `docs/tasks/logs/{task-id}.md` for task-local
-timeline and handoff notes.
+Use [`docs/workflow/FOCUS.md`](FOCUS.md) for current resumability state and
+[`docs/workflow/INDEX.md`](INDEX.md) for durable decisions, discoveries, and cross-feature notes. Use
+`docs/tasks/logs/{task-id}.md` for task-local timeline and handoff notes.
 
 ## Optional Tracker Sync
 

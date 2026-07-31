@@ -12,7 +12,7 @@ All slash commands share **one global namespace**: global commands (`claude/comm
 bundle commands (`claude/skills/<bundle>/commands/`), repo-local commands
 (`.claude/commands/`), plugin commands, and CLI built-ins. Before adding any command, check
 this registry; a new name must not collide with anything here. Built-ins and plugins win
-collisions — that is why no `/verify` ships (charter §4).
+collisions — that is why no `/verify` ships ([charter §4](charter.md#4-single-owners)).
 
 ## The Generic-Verb Rule
 
@@ -29,7 +29,7 @@ not trigger `/apply`). Renames already applied by the board under this rule:
 | `/backlog-burndown` | `/burndown` | verb-first shortening (still specific) |
 | `/capture` | `/pm-capture` | bare verb; namespaced to the project-manager bundle (PM lifecycle redesign) |
 | `/groom` | `/pm-groom` | bare verb; namespaced to the project-manager bundle (PM lifecycle redesign) |
-| `/task` | `/pm-task` | bare noun; namespaced (spec §2.4 uses `/pm-task` as the example) |
+| `/task` | `/pm-task` | bare noun; namespaced (the [PM Lifecycle Redesign spec](../reports/2026-07-16-pm-lifecycle-redesign.review.md), [§2.4](../reports/2026-07-16-pm-lifecycle-redesign.review.md#24-new--changed-commands), uses `/pm-task` as the example) |
 | `/retro` | `/pm-retro` | bare noun; namespaced to the project-manager bundle (PM lifecycle redesign) |
 | `/verify` | *(none)* | built-in verify skill + superpowers own the trigger |
 | `/init` | `/init-repo` | collides with the Claude Code **built-in** `/init` (scaffolds CLAUDE.md); built-ins win collisions silently, so `/init` would never reach the github bundle. Natural-language triggers ("init the repo", "initialize this repo") are registered on the sub-skill instead, so the spoken form still works. |
@@ -37,18 +37,20 @@ not trigger `/apply`). Renames already applied by the board under this rule:
 Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-script`,
 `/probe-incident`, `/add-dashboard`, `/search-sessions`.
 
+> **▣ Diagram —** per-command lifecycle: unassigned → global → bundle-owned, or → cut *(type: state)*
+
 ## Current Global Commands (25, `claude/commands/`)
 
 | Command | Final owner | Change |
 |---|---|---|
-| `/code-review` | quality-manager | moves into bundle, name unchanged, fleet sweep (iter 14; resolution #3) |
+| `/code-review` | quality-manager | moves into bundle, name unchanged, fleet sweep (iter 14; [resolution #3](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)) |
 | `/tdd` | quality-manager | moves, name unchanged, fleet sweep (iter 14) |
 | `/test-coverage` | quality-manager | moves, name unchanged, fleet sweep (iter 14) |
 | `/e2e` | quality-manager | moves, name unchanged, fleet sweep (iter 14) |
 | `/start-app` | developer-manager | rewired to local-dev-harness; gains generation mode (iter 19) |
 | `/skills-manager` | skills-manager | already bundle-owned; global copy reconciled (iter 4–5) |
 | `/analyze-repo` | *(unassigned — global)* | review at closeout (iter 26) |
-| `/analyze-workspace` | *(unassigned — global)* | review at closeout; workspace skill is deleted (resolution #1) |
+| `/analyze-workspace` | *(unassigned — global)* | review at closeout; workspace skill is deleted ([resolution #1](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)) |
 | `/build-fix` | *(unassigned — global)* | review at closeout |
 | `/check-contributors` | *(unassigned — global)* | review at closeout |
 | `/diagnose` | *(unassigned — global)* | review at closeout; note quality-manager's `/diagnose-runbook` GENERATES repo-local `/diagnose` commands |
@@ -66,6 +68,8 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | `/update-code-index` | *(unassigned — global)* | review at closeout |
 | `/update-codemaps` | *(unassigned — global)* | review at closeout |
 | `/update-docs` | *(unassigned — global)* | review at closeout |
+
+*The 11 rows above marked "review at closeout" with no settled owner are backlog, not current-state fact — see [`docs/backlog.md`](../backlog.md) for the live intake queue; they stay listed here for reorg completeness and are not deleted.*
 
 ## Current Bundle Commands
 
@@ -119,13 +123,13 @@ duplicates, not separate names.
 
 ## Project-Manager Lifecycle Redesign — new commands (2026-07-16)
 
-Source: `docs/reports/2026-07-16-pm-lifecycle-redesign.review.md` (§2.4, §3). All four are
+Source: the [PM Lifecycle Redesign spec](../reports/2026-07-16-pm-lifecycle-redesign.review.md) ([§2.4](../reports/2026-07-16-pm-lifecycle-redesign.review.md#24-new--changed-commands), [§3](../reports/2026-07-16-pm-lifecycle-redesign.review.md#3-new--changed-artifacts-at-a-glance)). All four are
 `pm-`-prefixed to satisfy the Generic-Verb Rule above (the bare forms are banned generic
 verbs/nouns); the spec's §3 "open naming question" is resolved here in favor of the prefix.
 Owner: **project-manager** bundle. Sub-skill names are unprefixed (`capture`, `groom`, `task`,
 `retro`); the command wrappers carry the prefix.
 
-| Command | Sub-skill | Build step | Status |
+| Command | Sub-skill | [Build step](../reports/2026-07-16-pm-lifecycle-redesign.review.md#6-suggested-build-order-once-approved) | Status |
 |---|---|---|---|
 | `/pm-capture` | `capture` | 3 | shipped |
 | `/pm-groom` | `groom` | 3 | shipped |
@@ -144,6 +148,6 @@ into `/screenshot-review` batch mode), `/gen-start-app` (mode of `/start-app`),
 `/search-sessions`, duplicate `/get-secret`, `/rotate-secret` (a `--rotate` flag of
 `/get-secret`).
 
-Note (resolution #2): the *sub-skills* behind `/init-product` and `/propose-enhancements`
+Note ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)): the *sub-skills* behind `/init-product` and `/propose-enhancements`
 are staged as `status: draft` stubs in project-manager, but the commands stay cut until
 promotion.

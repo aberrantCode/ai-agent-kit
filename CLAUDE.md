@@ -93,6 +93,7 @@ This project uses the `project-manager` skill from the LLM Skills archive. All f
 ```
 docs/
   REQUIREMENTS.md         Product requirements — source of truth (never modified)
+  requirements/*.md       Approved requirements docs — binding scope for a body of work
   features/*.md           Feature specs — scope authority
   features/template.md    Canonical spec template
   plans/*.md              One plan per feature spec

@@ -2,7 +2,8 @@
 
 > Current handoff snapshot for resuming work without rereading the whole project. Update this before
 > long pauses, after `/continue-tasks` creates or reconciles active work, and after manual operator
-> decisions.
+> decisions. For the long-term durable decisions, discoveries, and cross-feature notes log, see
+> [`INDEX.md`](INDEX.md) instead — this file is the short-term resumable snapshot.
 
 **Last updated:** 2026-07-27
 **Current mode:** planning | executing | verifying | blocked | idle
