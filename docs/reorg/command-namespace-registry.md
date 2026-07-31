@@ -37,7 +37,7 @@ not trigger `/apply`). Renames already applied by the board under this rule:
 Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-script`,
 `/probe-incident`, `/add-dashboard`, `/search-sessions`.
 
-> **▣ Diagram —** per-command lifecycle: unassigned → global → bundle-owned, or → cut *(type: state)*
+> **▣ Diagram —** per-command lifecycle: unassigned → global → bundle-owned, or → cut *(type: state)* — [view](diagrams/command-lifecycle.html)
 
 ## Current Global Commands (25, `claude/commands/`)
 

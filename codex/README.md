@@ -4,7 +4,8 @@ On-demand mirror of [`claude/`](../claude/README.md) for OpenAI Codex CLI, per t
 charter's [cross-CLI mirror policy](../docs/reorg/charter.md).
 
 > **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)*
+> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> [view](diagrams/vendor-mirror-flow.html)
 
 The cross-CLI transpiler is cut — mirrors are created manually, only when a skill is
 actually used from Codex, not generated automatically from every Claude skill.

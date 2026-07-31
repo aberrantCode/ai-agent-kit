@@ -4,7 +4,8 @@ Canonical authoring surface for Claude Code assets — this tree is the single s
 truth, per the [canonical-repo requirements](../docs/requirements/canonical-repo.md).
 
 > **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)*
+> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> [view](diagrams/vendor-mirror-flow.html)
 
 Everything here is authored first; `codex/` and `gemini/` are stamped mirrors, never the
 other way around, per the [reorg charter's cross-CLI mirror

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDLC State Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1400px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .state-flow { display:flex; gap:0; align-items:flex-start; overflow-x:auto; padding:20px 0; position:relative; }
+  .state-flow::before { content:''; position:absolute; left:0; right:0; top:50%; height:3px; background:linear-gradient(90deg, var(--border-bright) 0%, var(--border-bright) 48%, transparent 48%, transparent 52%, var(--border-bright) 52%, var(--border-bright) 100%); pointer-events:none; }
+
+  .state-node { flex:0 0 auto; position:relative; z-index:2; }
+  .state-node:not(:last-child) { margin-right:0; }
+
+  .state-box { background:var(--surface2); border:2px solid var(--border-bright); border-radius:8px; padding:16px 20px; min-width:140px; text-align:center; position:relative; }
+  .state-box.emerald { border-color:var(--emerald); background:var(--emerald-dim); }
+  .state-box.teal    { border-color:var(--teal);    background:var(--teal-dim); }
+  .state-box.violet  { border-color:var(--violet);  background:var(--violet-dim); }
+  .state-box.amber   { border-color:var(--amber);   background:var(--amber-dim); }
+  .state-box.red     { border-color:var(--red);     background:var(--red-dim); }
+
+  .state-title { font-weight:700; font-size:13px; margin-bottom:6px; }
+  .state-owner { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); margin-bottom:8px; }
+  .state-trigger { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); line-height:1.4; padding-top:8px; border-top:1px solid var(--border); margin-top:6px; }
+  .state-output { font-family:var(--font-mono); font-size:9px; color:var(--text); margin-top:8px; line-height:1.3; }
+
+  .decision-node { flex:0 0 auto; margin-right:0; position:relative; z-index:3; }
+  .decision-diamond { width:120px; height:120px; position:relative; }
+  .decision-diamond svg { width:100%; height:100%; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.1)); }
+
+  .flow-arrow-h { display:inline-block; width:24px; height:2px; background:var(--border-bright); position:relative; align-self:center; margin:0 4px; flex-shrink:0; }
+  .flow-arrow-h::after { content:''; position:absolute; right:-6px; top:-4px; width:0; height:0; border-left:6px solid var(--border-bright); border-top:4px solid transparent; border-bottom:4px solid transparent; }
+
+  .branching-section { margin-top:20px; padding-top:20px; border-top:1px solid var(--border); }
+  .branch-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:14px; }
+  .branch-box { background:var(--surface2); border-left:3px solid var(--amber); border-radius:6px; padding:16px; }
+  .branch-box.red { border-left-color:var(--red); }
+  .branch-title { font-weight:600; font-size:12px; margin-bottom:6px; }
+  .branch-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .branch-desc code { font-family:var(--font-mono); background:var(--amber-dim); color:var(--amber); padding:1px 4px; border-radius:2px; }
+  .branch-box.red .branch-desc code { background:var(--red-dim); color:var(--red); }
+
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--teal); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+
+  .legend { display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); font-size:11px; }
+  .legend-item { display:flex; align-items:center; gap:6px; }
+  .legend-dot { width:6px; height:6px; border-radius:50%; }
+
+  @media (max-width:1200px) { .state-flow { gap:8px; } .state-box { min-width:120px; padding:12px 14px; font-size:12px; } .state-title { font-size:12px; } }
+  @media (max-width:900px) { body { padding:24px 16px; } .branch-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<h1>SDLC State Flow</h1>
+<p class="subtitle">Feature spec → implementation → verification → release · six sequential phases + two decision gates</p>
+
+<div class="diagram">
+
+  <!-- Main State Flow -->
+  <div class="section section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> State Flow · left-to-right sequence</div>
+
+    <div class="state-flow">
+      <!-- Phase 1: Capture -->
+      <div class="state-node">
+        <div class="state-box emerald">
+          <div class="state-title">Capture</div>
+          <div class="state-owner">User + init-features</div>
+          <div class="state-trigger">REQUIREMENTS.md exists</div>
+          <div class="state-output">docs/features/*.md</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-h"></div>
+
+      <!-- Phase 2: Approve -->
+      <div class="state-node">
+        <div class="state-box teal">
+          <div class="state-title">Approve</div>
+          <div class="state-owner">User</div>
+          <div class="state-trigger">Review spec</div>
+          <div class="state-output">status: approved</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-h"></div>
+
+      <!-- Phase 3: Plan -->
+      <div class="state-node">
+        <div class="state-box violet">
+          <div class="state-title">Plan</div>
+          <div class="state-owner">continue-tasks</div>
+          <div class="state-trigger">Approved without plan</div>
+          <div class="state-output">docs/plans/<br/>*-plan.md</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-h"></div>
+
+      <!-- Phase 4: Execute -->
+      <div class="state-node">
+        <div class="state-box amber">
+          <div class="state-title">Execute</div>
+          <div class="state-owner">Agent (per task)</div>
+          <div class="state-trigger">Status: todo</div>
+          <div class="state-output">Task lease +<br/>code change</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-h"></div>
+
+      <!-- Phase 5: Verify -->
+      <div class="state-node">
+        <div class="state-box red">
+          <div class="state-title">Verify</div>
+          <div class="state-owner">code-reviewer</div>
+          <div class="state-trigger">Task reports done</div>
+          <div class="state-output">Review + test<br/>results</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-h"></div>
+
+      <!-- Phase 6: Merge -->
+      <div class="state-node">
+        <div class="state-box emerald">
+          <div class="state-title">Merge</div>
+          <div class="state-owner">User</div>
+          <div class="state-trigger">All P0 done</div>
+          <div class="state-output">PR → dev</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decision Gates -->
+    <div class="branching-section">
+      <div class="section-label"><span class="dot"></span> Decision Gates · two critical branches</div>
+      <div class="branch-grid">
+        <div class="branch-box">
+          <div class="branch-title">Gate 1: Verification Gate</div>
+          <div class="branch-desc">Attached to <strong>Verify phase</strong>. Implementation, API, build, security, UI, and code-changing tasks are not final until they have an explicit verification result. Branch condition: if <code>Tests: passing: false</code> is reported, orchestrator creates corrective build/test work and does NOT mark implementation complete. Loop: Execute ← Verify.</div>
+        </div>
+        <div class="branch-box red">
+          <div class="branch-title">Gate 2: Failure Budget</div>
+          <div class="branch-desc">Attached to <strong>Execute/Verify boundary</strong>. Tolerates up to 5 failures per plan before escalating to user. Each failure adds 1-3 corrective tasks rather than retrying blindly. After 5 failures, plan is paused and detailed issue written to <code>docs/issues/</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alternate Entry Point -->
+    <div class="branching-section">
+      <div class="section-label"><span class="dot"></span> Alternate Entry Point · recognized variant</div>
+      <div class="callout">
+        The canonical-repo effort entered Capture directly through <code>docs/requirements/canonical-repo.md</code>, bypassing <code>docs/features/</code> entirely. This is a recognized alternate entry point, not a deviation. The feature spec phase (Capture → Approve) can be skipped when a requirements document is the source of truth.
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--emerald)"></span> User-owned phase</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span> Governance</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--violet)"></span> Orchestrator</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span> Agent worker</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span> Verification</div>
+    </div>
+  </div>
+
+  <!-- Phase Details Table -->
+  <div class="section section--teal" style="--i:1">
+    <div class="section-label"><span class="dot"></span> Phase Details · ownership, triggers, outputs</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border-bright);">
+            <th style="text-align:left; padding:8px 12px; font-weight:700; color:var(--emerald);">Phase</th>
+            <th style="text-align:left; padding:8px 12px; font-weight:700; color:var(--teal);">Owner</th>
+            <th style="text-align:left; padding:8px 12px; font-weight:700; color:var(--violet);">Trigger</th>
+            <th style="text-align:left; padding:8px 12px; font-weight:700; color:var(--slate);">Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Capture</td>
+            <td style="padding:10px 12px;">User + init-features</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">REQUIREMENTS.md exists</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">docs/features/*.md</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Approve</td>
+            <td style="padding:10px 12px;">User</td>
+            <td style="padding:10px 12px;">Review spec</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">status: approved in spec</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Plan</td>
+            <td style="padding:10px 12px;">continue-tasks</td>
+            <td style="padding:10px 12px;">Approved spec without plan</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">docs/plans/&lt;slug&gt;-plan.md</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Execute</td>
+            <td style="padding:10px 12px;">Agent (per task)</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">Status: todo in plan</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">Task lease + code + ## Completion</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Verify</td>
+            <td style="padding:10px 12px;">code-reviewer / verifier task</td>
+            <td style="padding:10px 12px;">Code-changing task reports success</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">Review/test result, plan task → done</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px; font-family:var(--font-mono);">Merge</td>
+            <td style="padding:10px 12px;">User</td>
+            <td style="padding:10px 12px;">All P0 tasks done</td>
+            <td style="padding:10px 12px; font-family:var(--font-mono); font-size:11px;">PR merged to dev</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Decision Gate Details -->
+  <div class="section section--amber" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Verification Gate · Verify phase branch</div>
+    <div class="branch-box" style="border-left-color:var(--red); background:var(--red-dim);">
+      <div class="branch-title" style="color:var(--red);">If Tests: passing: false</div>
+      <div class="branch-desc">Orchestrator creates corrective build/test work. Implementation task is NOT marked complete. Loop back to Execute phase with new corrective tasks. If a plan already contains a review/quality/test/security/e2e task covering the same CAP-ID, that task satisfies the gate when it succeeds.</div>
+    </div>
+  </div>
+
+  <div class="section section--red" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Failure Budget · Execute/Verify boundary branch</div>
+    <div class="branch-box red">
+      <div class="branch-title">Up to 5 Failures Allowed</div>
+      <div class="branch-desc">The Error Recovery Loop tolerates up to 5 failures per plan before escalating to user. Each failure adds 1-3 corrective tasks rather than retrying blindly. Tracks cumulative failures per plan.</div>
+    </div>
+    <div class="branch-box red" style="margin-top:12px;">
+      <div class="branch-title">Escalation at 5+ Failures</div>
+      <div class="branch-desc">After 5 failures, plan is paused and detailed issue is written to <code>docs/issues/</code>. User is notified. Work pauses until user resolves the underlying issue or adjusts scope.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

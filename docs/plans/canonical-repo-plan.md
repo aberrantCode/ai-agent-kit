@@ -57,7 +57,7 @@ orchestrator verifies each task's acceptance criteria before checking it off.
 | PR 7 | T7 | root `README.md` rewrite + project `CLAUDE.md` pointer fix | ~600 (mostly deletion of old tables) — flag overage, deletion-heavy |
 | PR 8 | T8, T9 | local validation gate (validate.ps1 + hook installer + CLAUDE.md rule) + CONTRIBUTING.md | ~350 |
 
-> **▣ Diagram —** PR dependency DAG *(type: graph)*
+> **▣ Diagram —** PR dependency DAG *(type: graph)* — [view](diagrams/pr-dependency-dag.html)
 
 Sequencing constraints (the real dependencies, not folder aesthetics):
 

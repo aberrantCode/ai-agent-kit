@@ -35,7 +35,7 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 
 *Phase tags in the Target column (`P0`, `P2`) are reorg phases defined in [charter.md §9](charter.md#9-phases-and-gate) — distinct from the P1–P5 proposal codes used elsewhere in requirements docs.*
 
-> **▣ Diagram —** disposition Sankey: old skill → disposition type → target bundle *(type: sankey)*
+> **▣ Diagram —** disposition Sankey: old skill → disposition type → target bundle *(type: sankey)* — [view](diagrams/disposition-sankey.html)
 
 ## Ledger
 

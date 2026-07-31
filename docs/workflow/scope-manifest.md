@@ -6,7 +6,7 @@ chore_safe: ["docs/**", "scripts/**", ".github/**", "*.md", "*.config.*"]
 # Scope Manifest
 
 > **▣ Diagram —** commit-scope decision: product_scope hit → FAIL; chore_safe hit → allow;
-> unclassified → allow only if scope_confirmed *(type: decision)*
+> unclassified → allow only if scope_confirmed *(type: decision)* — [view](diagrams/commit-scope-decision.html)
 
 This file is the machine-enforced boundary between the **chore lane** and the **feature lane**
 (see [`../reports/2026-07-16-pm-lifecycle-redesign.review.md`](../reports/2026-07-16-pm-lifecycle-redesign.review.md)

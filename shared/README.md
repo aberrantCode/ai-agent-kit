@@ -6,7 +6,8 @@ vendor-first trees (`claude/`, `codex/`, `gemini/`); it never replaces them, per
 [hybrid vendor-layout decision](../docs/requirements/canonical-repo.md).
 
 > **▣ Diagram —** the vendor-neutral test: needs vendor frontmatter/tool-syntax/install-path?
-> yes → claude|codex|gemini/skills/; no → shared/<class>/ *(type: decision)*
+> yes → claude|codex|gemini/skills/; no → shared/<class>/ *(type: decision)* —
+> [view](diagrams/vendor-neutral-test.html)
 
 ## The vendor-neutral test
 
