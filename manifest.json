@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-30",
+  "generated": "2026-08-01",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -330,6 +330,10 @@
         "nodejs-backend": {
           "description": "Node.js backend patterns with Express/Fastify, repositories",
           "category": "Languages & Runtimes"
+        },
+        "one-job-test": {
+          "description": "Test an installed agent skill against one real job to decide whether to keep it, fork it, or delete it. Use this whenever the user mentions installing, evaluating, auditing, trusting, pruning, or being disappointed by a skill \u2014 including phrasings like \"is this skill actually helping\", \"my output still looks the same\", \"should I keep this skill\", \"I have too many skills\", or when they share a skill folder or marketplace link and ask what you think. Also use before recommending that the user install any third-party skill.",
+          "category": "Foundations & Workflow"
         },
         "opbta-service": {
           "description": "Use when deploying, updating, retiring, inspecting, managing, or listing an internal service on svc.opbta.com (OPBTA) from any repo, not only AC_OPBTA. Covers deploy a service, add a container, stand up X on svc.opbta.com, day-2 ops, rotate a secret, re-expose a service, rename/move/resize a service, service catalog / list services, cross-repo OPBTA service lifecycle.",
