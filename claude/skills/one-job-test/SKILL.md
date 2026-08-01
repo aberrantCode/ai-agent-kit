@@ -124,3 +124,7 @@ So a **delete** verdict is a real result, not a failure of the test. If the user
 | `assets/library-inventory.csv` | Library audit — one row per installed skill |
 | `references/test-record-template.md` | Line-by-line notes and a worked example |
 | `references/library-audit.md` | Triage method and overlap resolution |
+
+## Diagram
+
+[View diagram](diagram.html)
