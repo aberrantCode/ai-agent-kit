@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-30, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-08-01, schemaVersion: 1)
 -->
 
 # Catalog
@@ -34,6 +34,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`guide-assistant`](claude/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | codex |
 | [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/SKILL.md) | Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification... | — |
 | [`iterative-development`](claude/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | codex |
+| [`one-job-test`](claude/skills/one-job-test/SKILL.md) | Test an installed agent skill against one real job to decide whether to keep it, fork it, or delete it. Use this whenever the user mentions installing, evaluating, auditing, trusting, pruning, or being disappointed by... | — |
 | [`parallel-subagent-fanout`](claude/skills/parallel-subagent-fanout/SKILL.md) | Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature b... | — |
 | [`pre-pr`](claude/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | codex |
 | [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/SKILL.md) | Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, a... | — |
