@@ -66,7 +66,13 @@ echo "long prompt from a file" | python scripts/fleet_llm.py chat -   # read std
 python scripts/fleet_llm.py chat "..." --json    # full JSON (usage, finish_reason, ...)
 ```
 Prints the assistant text. If the model returns **empty** content it warns and
-exits non-zero (see the `qwen3.5:latest` caveat below).
+exits non-zero (see the thinking-model caveat below).
+
+> **Raw passthrough note for git-bash:** only the `raw` subcommand takes a path
+> argument, and git-bash (MSYS) rewrites a leading-slash arg like `/ollama/api/tags`
+> into a Windows path. The CLI auto-recovers paths under `/openai`, `/ollama`, and
+> `/api`; for any other endpoint prefix with `MSYS_NO_PATHCONV=1`. `models`, `chat`,
+> and `embed` are unaffected (their paths are internal).
 
 ### Embeddings
 ```bash
@@ -104,9 +110,14 @@ python scripts/fleet_llm.py raw POST /openai/v1/embeddings --data '{"model":"nom
 
 - **Always go through Open WebUI on `:3000`.** ollama's native `:11434` is
   compose-net-only and unreachable from the LAN.
-- **`qwen3.5:latest` returns EMPTY content** — it is a "thinking" variant. Use an
-  explicit tag like **`qwen3.5:9b`** (the default). `chat` warns + exits non-zero
-  on empty content.
+- **`qwen3.5` tags are "thinking" models** — they emit a hidden `reasoning` pass
+  before the answer (the response carries both a `reasoning` and a `content` field;
+  the CLI prints only `content`). A **low `--max-tokens` can be fully consumed by the
+  reasoning pass, leaving `content` empty** — `chat` then warns and exits non-zero.
+  Fix: drop `--max-tokens` or raise it. (Verified 2026-08-02: both `qwen3.5:9b` and
+  `qwen3.5:latest` return proper content uncapped; `qwen3.5:9b` needed ~1900 tokens
+  for a one-sentence answer because of the reasoning pass. The default stays the
+  explicit tag `qwen3.5:9b`.)
 - The host is **LAN-only (VLAN30, `192.168.30.53`)**. Off-network, every call
   fails with a clear "Cannot reach fleet" message — get on the LAN.
 

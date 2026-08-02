@@ -218,10 +218,19 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 
 def fetch_token_from_sops() -> str:
-    """Operator-only convenience: decrypt the fleet token from AC_OPBTA SOPS on ac-devops."""
+    """Operator-only convenience: decrypt the fleet token from AC_OPBTA SOPS on ac-devops.
+
+    ac-devops authenticates only the dedicated ansible key, so use ~/.ssh/opbta-ansible
+    when it exists (the known access path) and otherwise fall back to the default agent.
+    """
+    ssh_cmd = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10"]
+    identity = Path.home() / ".ssh" / "opbta-ansible"
+    if identity.is_file():
+        ssh_cmd += ["-i", str(identity)]
+    ssh_cmd += [SOPS_SSH_HOST, SOPS_REMOTE_CMD]
     try:
         out = subprocess.run(
-            ["ssh", SOPS_SSH_HOST, SOPS_REMOTE_CMD],
+            ssh_cmd,
             capture_output=True, text=True, timeout=60,
         )
     except FileNotFoundError as exc:
@@ -289,7 +298,9 @@ def cmd_chat(args: argparse.Namespace) -> int:
     if not content.strip():
         eprint(
             f"WARNING: model '{model}' returned empty content. "
-            f"Some 'thinking' variants (e.g. qwen3.5:latest) do this — try an explicit tag like {DEFAULT_MODEL}."
+            f"qwen3.5 tags are 'thinking' models — they spend tokens on a hidden reasoning "
+            f"pass first, so a low --max-tokens can be consumed before any answer is emitted. "
+            f"Retry without --max-tokens or with a larger budget."
         )
         return 1
     print(content)
@@ -366,9 +377,31 @@ def cmd_rm(args: argparse.Namespace) -> int:
     return 0
 
 
+# Fleet endpoints all live under one of these roots. Used to recover a path that
+# git-bash (MSYS) rewrote from e.g. /ollama/api/tags into a Windows filesystem path
+# like "C:/Program Files/Git/ollama/api/tags" before Python ever saw the argument.
+KNOWN_API_ROOTS = ("/openai/", "/ollama/", "/api/")
+
+
+def demangle_path(path: str) -> str:
+    """Undo MSYS path conversion of a raw endpoint path, when detectable.
+
+    A clean POSIX path (starts with '/', no drive-letter colon) is returned as-is.
+    A mangled one is recovered from the first known API root segment; if no known
+    root is present we leave it alone (caller can set MSYS_NO_PATHCONV=1)."""
+    if path.startswith("/") and ":" not in path:
+        return path
+    for root in KNOWN_API_ROOTS:
+        idx = path.find(root)
+        if idx != -1:
+            return path[idx:]
+    return path
+
+
 def cmd_raw(args: argparse.Namespace) -> int:
     base_url, api_key, _ = require_config()
-    path = args.path if args.path.startswith("/") else "/" + args.path
+    recovered = demangle_path(args.path)
+    path = recovered if recovered.startswith("/") else "/" + recovered
     body = None
     if args.data is not None:
         payload = _read_prompt(args.data)

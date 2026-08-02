@@ -9,7 +9,8 @@ Map the request to a subcommand:
 
 - **list models / what's on the fleet** → `models`
 - **ask the fleet / run a prompt / chat with the local LLM** → `chat "<prompt>"`
-  (default model `qwen3.5:9b`; never `qwen3.5:latest` — it returns empty)
+  (default `qwen3.5:9b`; qwen3.5 tags are "thinking" models — avoid a tight
+  `--max-tokens`, which the hidden reasoning pass can consume, leaving output empty)
 - **embed** → `embed "<text>"` (default `nomic-embed-text`)
 - **pull a model** → `pull <tag>` (multi-GB download — confirm intent first)
 - **remove a model** → `rm <tag>` (only remove one that was pulled deliberately)
