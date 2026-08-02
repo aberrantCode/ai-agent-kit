@@ -233,6 +233,10 @@
           "description": "Use when shell scripts (bash/PowerShell) print non-ASCII glyphs like checkmarks, X marks, or box-drawing rules that render as mojibake under Git Bash / Windows cp1252 terminals \u2014 replace runtime output with ASCII equivalents while leaving comments and remote heredocs untouched.",
           "category": "Infrastructure & Ops"
         },
+        "fleet-llm": {
+          "description": "Talk to the operator's self-hosted Open WebUI / ollama fleet from the terminal \u2014 list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull or remove models, or hit any fleet endpoint raw. Triggers on \"ask the fleet\", \"ask my local LLM\", \"run this on ollama / open webui\", \"run a prompt on my GPU box\", \"list local models\", \"pull a model\", \"embed with nomic\", \"which models are on the fleet\", and similar.",
+          "category": "AI & LLM"
+        },
         "flutter": {
           "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
           "category": "Frontend"

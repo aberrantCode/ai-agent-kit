@@ -146,6 +146,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`agentic-development`](claude/skills/agentic-development/SKILL.md) | Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js) | codex |
 | [`ai-models`](claude/skills/ai-models/SKILL.md) | Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate | codex |
 | [`csv-driven-llm-pipeline`](claude/skills/csv-driven-llm-pipeline/SKILL.md) | Build a stateful, resumable batch pipeline driven by CSV files with per-row pipeline-state columns. Use whenever the user wants to iterate over a corpus and do per-row work that may take time, hit external APIs, call ... | — |
+| [`fleet-llm`](claude/skills/fleet-llm/SKILL.md) | Talk to the operator's self-hosted Open WebUI / ollama fleet from the terminal — list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull or remove models, or hit any fleet endpoint ... | — |
 | [`honcho`](claude/skills/honcho/SKILL.md) | Work with Honcho — the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, in... | — |
 | [`llm-patterns`](claude/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | codex |
 | [`project-manager`](claude/skills/project-manager/SKILL.md) | Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-fea... | codex, gemini |
@@ -470,6 +471,7 @@ than duplicated here.
 | [/diff-review](claude/commands/diff-review.md) | Generate a visual HTML diff review — before/after architecture comparison with code review analysis |
 | [/e2e](claude/commands/e2e.md) | Generate and run end-to-end tests with Playwright. Creates test journeys, runs tests, captures screenshots/videos/traces, and uploads artifacts. |
 | [/fact-check](claude/commands/fact-check.md) | Verify the factual accuracy of a document against the actual codebase, correct inaccuracies in place |
+| [/fleet-llm](claude/commands/fleet-llm.md) | Talk to the self-hosted Open WebUI / ollama fleet — list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull/remove models, or hit any fleet endpoint raw. Thin wrapper over the fleet... |
 | [/generate-slides](claude/commands/generate-slides.md) | Generate a stunning magazine-quality slide deck as a self-contained HTML page |
 | [/generate-web-diagram](claude/commands/generate-web-diagram.md) | Generate a beautiful standalone HTML diagram and open it in the browser |
 | [/initialize-project](claude/commands/initialize-project.md) | Full project setup with Claude coding guardrails. Works for both new and existing projects. |
