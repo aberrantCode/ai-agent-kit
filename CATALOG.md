@@ -474,6 +474,7 @@ than duplicated here.
 | [/generate-web-diagram](claude/commands/generate-web-diagram.md) | Generate a beautiful standalone HTML diagram and open it in the browser |
 | [/initialize-project](claude/commands/initialize-project.md) | Full project setup with Claude coding guardrails. Works for both new and existing projects. |
 | [/new-action](claude/commands/new-action.md) | You are creating a new action JSON file for the OSM profile configurator. The file will be placed in `assets/actions/all/`. |
+| [/opbta-update](claude/commands/opbta-update.md) | Alias of /update-service — update an existing OPBTA service on svc.opbta.com (bump/reconcile image, config, ports, env, or exposure). Matches the opbta-service skill's /opbta-* command family. |
 | [/plan](claude/commands/plan.md) | Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code. |
 | [/plan-review](claude/commands/plan-review.md) | Generate a visual HTML plan review — current codebase state vs. proposed implementation plan |
 | [/project-recap](claude/commands/project-recap.md) | Generate a visual HTML project recap — rebuild mental model of a project's current state, recent decisions, and cognitive debt hotspots |
@@ -486,6 +487,7 @@ than duplicated here.
 | [/update-code-index](claude/commands/update-code-index.md) | Regenerates `CODE_INDEX.md` by scanning the codebase for all functions, classes, hooks, and components. Organizes by capability to prevent semantic duplication. |
 | [/update-codemaps](claude/commands/update-codemaps.md) | Analyze the codebase structure and update architecture documentation: |
 | [/update-docs](claude/commands/update-docs.md) | Sync documentation from source-of-truth: |
+| [/update-service](claude/commands/update-service.md) | Update an existing OPBTA service on svc.opbta.com — bump/reconcile image, config, ports, env, or exposure. Resolves the target from the current repo's .opbta-service breadcrumb (else a service picker), plans once for ... |
 
 ## Shared Assets
 
