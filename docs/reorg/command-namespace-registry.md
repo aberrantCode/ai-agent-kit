@@ -77,6 +77,7 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 |---|---|---|---|
 | `/commit` `/ship` `/merge` `/release` `/release-init` `/prune` `/publish` | github | github | extended in place (iters 1–3), names unchanged |
 | `/init-repo` | github | github | **new** — repo-configuration provisioning pass (Repo-Configuration Standard). Verb-first per the Generic-Verb Rule; `/init` rejected as a built-in collision (see above) |
+| `/repo-status` | github | github | **new** (2026-08-02) — read-only repo-state inspection: working tree, branch tracking, worktrees, open PRs, and merged-stale branches, ending with a recommendation for which of ship/merge/release/prune applies next. Never mutates state; object-first name per the Generic-Verb Rule, sibling of `/repo-color` and `/init-repo`. |
 | `/add-feature` `/analyze-features` `/analyze-parallelism` `/continue-tasks` `/init-features` `/init-project` `/iterate-tasks` `/reinit` `/review-tasks` `/sync-status` `/sync-tracker` `/update-tasks` | project-manager | project-manager | unchanged (standalone add-feature skill merges into the bundle sub-skill, iter 9) |
 | `/continue-new-session` | project-manager | project-manager | kept as back-compat **alias** of new `/handoff` (iter 6) |
 | `/audit-skills` `/find-skills` `/import-skill` `/install-skill` `/push-skill` `/search-skill` `/sync-skill` `/update-skill` | skills-manager | skills-manager | extended in place (iters 4–5), names unchanged |
