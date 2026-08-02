@@ -7,15 +7,18 @@ description: >
   feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
   automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
   stale branches and worktrees; bringing a repo's configuration up to standard (branch
-  protection, merge policy, security settings, local hook gate); or creating, working in, and
-  tearing down an isolated per-task worktree. Triggers on "merge 1209", "merge this branch",
+  protection, merge policy, security settings, local hook gate); creating, working in, and
+  tearing down an isolated per-task worktree; or getting a read-only report of what's in flight
+  in a repo. Triggers on "merge 1209", "merge this branch",
   "merge the current worktree", "ship it", "release", "set up releases", "release init",
   "provision release workflow", "fix changelog automation", "commit", "clean up branches",
   "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
   "why can I push straight to dev", "apply the repo standard", "create a
   worktree", "set up an isolated workspace", "remove the worktree",
   "merge PR 76", "merge these PRs", "land this branch", "open a PR for this",
-  "cut a release", "clean these branches" — route these through the named
+  "cut a release", "clean these branches", "what's the status of this repo",
+  "repo status", "what's in flight", "what needs to be shipped or merged",
+  "which branches are stale" — route these through the named
   operation rather than a raw gh/git sequence — and similar
   phrasings — even
   when the word "git" is absent. This is a thin-command bundle: each command names one
@@ -107,6 +110,7 @@ question.
 | `/release` | release | `sub-skills/release` |
 | `/release-init` | release-init | `sub-skills/release-init` |
 | `/prune` | prune | `sub-skills/prune` |
+| `/repo-status` | inspect | `sub-skills/inspect` |
 
 One sub-skill has **no command of its own** and triggers directly on worktree phrasings:
 
@@ -119,6 +123,8 @@ recovery, and credential rules. `merge` and `prune` delegate their worktree hand
 so do multi-agent harnesses (agent-manager) that run one worktree per agent.
 
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
+`inspect` (`/repo-status`) sits beside that lifecycle rather than in it — a read-only report of
+what's in flight that recommends which of the others to run next; it never runs them itself.
 
 Two `*-init` operations sit beside that lifecycle. Both are idempotent provisioning passes
 that own one standard each, are safe to re-run forever, and never commit — they leave files
