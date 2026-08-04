@@ -6,7 +6,7 @@ description: >
   rule. Use this skill when the ask is about "session-handoff" without a clear sub-operation, or
   when unsure which of the two applies. Otherwise prefer invoking the specific sub-skill directly:
   `session-handoff:handoff` for continuing/dispatching work in a new terminal session ("continue in
-  a new session", "hand this off", "spawn a new terminal and keep going", "/continue-new-session-prompt",
+  a new session", "hand this off", "spawn a new terminal and keep going", "/handoff",
   "/dispatch-session-prompt"), or `session-handoff:audit` for checking whether a stated policy was
   actually followed in past session transcripts ("did I actually follow rule X", "audit my last N
   hours for compliance", "/hand-off-audit"). Do not confuse the two: handoff moves work forward into
@@ -26,7 +26,7 @@ you should almost always be able to route to one of them directly instead of sto
 - **Moving work forward** — you have open decisions, unfinished tasks, or a scope that needs to run
   unattended in a fresh session with no conversation history. See
   [`sub-skills/handoff/SKILL.md`](sub-skills/handoff/SKILL.md) (skill: `session-handoff:handoff`).
-  Commands: `/continue-new-session-prompt`, `/dispatch-session-prompt`, `/repo-color`.
+  Commands: `/handoff`, `/dispatch-session-prompt`, `/repo-color`.
 
 - **Looking backward** — you want to know whether a stated rule was actually followed by past agent
   behavior (this session or an earlier one), not whether code currently complies with a rule right
