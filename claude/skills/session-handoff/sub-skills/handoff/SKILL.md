@@ -1,10 +1,10 @@
 ---
-name: continue-new-session-prompt
+name: handoff
 description: >
   Hand off the current session's unresolved decisions to a fresh Claude Code session running in a
   new Windows Terminal tab. Use this skill whenever the user says "continue in a new session",
   "spawn a new terminal and keep going", "hand this off", "open a new window and work through
-  those items", "/continue-new-session-prompt", or otherwise asks for the open items from your
+  those items", "/handoff", or otherwise asks for the open items from your
   last response to be executed elsewhere — including when they just say "go do all that in a new
   session". The skill turns the decision list you most recently gave them into a self-contained
   handoff prompt (state already established, tasks in dependency order, hard constraints, cheap
@@ -31,7 +31,7 @@ capturing state, not in describing tasks.
 There are two ways into this skill, distinguished by where the task scope comes from. Everything
 from Step 2 onward is identical regardless of entry mode — only how Step 1 is satisfied differs.
 
-- **Continue mode** (`/continue-new-session-prompt`, no arguments) — the scope is *recovered*
+- **Continue mode** (`/handoff`, no arguments) — the scope is *recovered*
   from this conversation: the numbered decision list in your most recent response. This is the
   original, still-default entry point. Use Step 1 below as written.
 - **Scope mode** (`/dispatch-session-prompt <task description>`) — the scope *arrives with the
