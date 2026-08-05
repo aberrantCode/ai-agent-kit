@@ -26,7 +26,8 @@ you should almost always be able to route to one of them directly instead of sto
 - **Moving work forward** — you have open decisions, unfinished tasks, or a scope that needs to run
   unattended in a fresh session with no conversation history. See
   [`sub-skills/handoff/SKILL.md`](sub-skills/handoff/SKILL.md) (skill: `session-handoff:handoff`).
-  Commands: `/handoff`, `/dispatch-session-prompt`, `/repo-color`.
+  Commands: `/handoff`, `/dispatch-session-prompt` (the launcher delegates tab spawning to the
+  `spawn-terminal` skill, which now owns `/repo-color`).
 
 - **Looking backward** — you want to know whether a stated rule was actually followed by past agent
   behavior (this session or an earlier one), not whether code currently complies with a rule right

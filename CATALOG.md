@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-08-04, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-08-05, schemaVersion: 1)
 -->
 
 # Catalog
@@ -43,6 +43,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/SKILL.md) | Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, com... | — |
 | [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Umbrella for two related but distinct session-lifecycle operations: handing off open work to a fresh Claude Code session, and auditing whether past session behavior actually followed a stated rule. Use this skill when... | — |
 | [`session-management`](claude/skills/session-management/SKILL.md) | Context preservation, tiered summarization, resumability | codex |
+| [`spawn-terminal`](claude/skills/spawn-terminal/SKILL.md) | Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script — independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to "o... | — |
 | [`spec-align`](claude/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | codex |
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/SKILL.md) | Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scop... | — |
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/SKILL.md) | Use when a script, agent, or session is about to act on a remembered reference — a git default branch, a cached IP/credential, an "SSH is broken" note in memory — before any destructive or high-stakes operation. Verif... | — |

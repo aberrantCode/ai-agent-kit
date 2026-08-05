@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-08-04",
+  "generated": "2026-08-05",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -480,6 +480,11 @@
         "sops-secrets": {
           "description": "Domain expertise for SOPS-encrypted secrets in this repo \u2014 reading service logins, rotating credentials, syncing the KeePass mirror, and diagnosing SOPS itself. Use whenever the user asks for an admin username/password (e.g. \"what's the login for grafana\"), wants to rotate a credential, edit a secret, or troubleshoot anything under secrets/. Hard rule: never run sops locally \u2014 always shell to ac-devops, which is the only host with the age key. For agents: the Secrets-Broker MCP server is the reference-only path for checking/provisioning/rotating secrets without plaintext; this skill handles human plaintext reads and raw SOPS access.",
           "category": "Security & Credentials"
+        },
+        "spawn-terminal": {
+          "description": "Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script \u2014 independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to \"open a new terminal running X\", \"spawn a terminal\", \"launch a script in a new window\", \"kick off <command> in its own tab\", \"open a wt tab in this worktree\", \"run this in a separate terminal\", \"/spawn-terminal\", or otherwise asks for a command or script to start in a fresh terminal rather than the current one. The new tab starts in a folder you choose (a main checkout, a worktree, or an unrelated folder), is colored to match the repo of the invoking session, and can open full-screen or maximized. This is the generic terminal-launch core; `session-handoff:handoff` builds its Claude-session launch on top of it.",
+          "category": "Foundations & Workflow",
+          "has_commands": true
         },
         "spec-align": {
           "description": "Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec \u2014 from gap analysis through implementation, tests, and merge to dev",
