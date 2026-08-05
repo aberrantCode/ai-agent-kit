@@ -238,12 +238,14 @@ from a `tabColor:` key in the repo's `pm-profile.yml` if present, otherwise the 
 from the AC brand palette; after that the registry is authoritative. Pass `-TabColor '#RRGGBB'` to
 override for one launch, or `-ColorScheme '<name>'` (a scheme defined in your Windows Terminal
 settings, e.g. `AC Phosphor`) to also recolor the palette Claude's TUI renders against. Resolution
-never blocks a launch — on failure the tab is simply uncolored. See `resolve-repo-color.ps1`.
+never blocks a launch — on failure the tab is simply uncolored. The color registry and its scripts
+live in the **`spawn-terminal`** skill (this launcher delegates the whole tab spawn to it); see
+`spawn-terminal`'s `resolve-repo-color.ps1`.
 
-Manage assignments with `manage-repo-colors.ps1` (`-Action list | set | remove | reset-top`) or the
-`/repo-color` command: `reset-top` clears the registry and re-seeds the N most active repos (ranked
-by transcript volume in `~/.claude/projects`) from the AC palette, and `demo-repo-tabs.ps1` opens a
-window of colored tabs to preview the set.
+Manage assignments with the `/repo-color` command (owned by `spawn-terminal`), which wraps
+`manage-repo-colors.ps1` (`-Action list | set | remove | reset-top`): `reset-top` clears the
+registry and re-seeds the N most active repos (ranked by transcript volume in `~/.claude/projects`)
+from the AC palette, and `preview` opens a window of colored tabs to preview the set.
 
 **Choosing the model is part of writing the prompt, not a launcher setting.** You are the one who
 just decided what the tasks are, so you are the one who knows whether they need frontier reasoning
