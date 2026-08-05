@@ -110,3 +110,7 @@ The per-repo tab-color registry this skill uses is inspected and edited with `/r
 palette, and `preview` opens a window with a colored tab per registered repo. Always go through that
 command rather than editing `~/.claude/repo-colors.json` by hand, so the mutex and key normalization
 are honored.
+
+## Diagram
+
+[View diagram](diagram.html)
