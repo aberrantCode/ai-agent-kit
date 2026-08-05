@@ -3,13 +3,19 @@
     Launch a fresh Claude Code session in a new Windows Terminal tab with a prompt file injected.
 
 .DESCRIPTION
-    The prompt is read from disk inside this script rather than passed inline, because inline text
-    has to survive both the `wt` argument parser and the `pwsh -Command` parser. A single space in
-    a title is enough to make `wt` treat the rest of the line as a command and fail with
-    "the system cannot find the file specified". Reading from a file removes that whole class of
-    failure.
+    A thin Claude-specific specialization over the generic spawn-terminal.ps1 launcher (in the
+    `spawn-terminal` bundle). This script owns everything that is specific to spawning *Claude*:
 
-    Falls back to a plain pwsh console window when Windows Terminal is unavailable.
+      - the default environment a headless Claude session needs ($script:DefaultEnvironment),
+      - the --dangerously-skip-permissions default and the -NoSkipPermissions opt-out,
+      - reading the prompt from a file rather than passing it inline (a single space in a title is
+        enough to make `wt` treat the rest of the line as a command; reading from a file removes
+        that whole class of failure),
+      - verifying that a `claude` process actually came up.
+
+    Everything generic — the Windows Terminal invocation, per-repo tab color, the pwsh-console
+    fallback, and launch verification — is delegated to spawn-terminal.ps1. This script's public
+    parameters are unchanged from when it did that work itself.
 
 .PARAMETER PromptPath
     Path to the markdown prompt file. Its full contents become the new session's first message.
@@ -30,27 +36,23 @@
 
 .PARAMETER SetEnv
     Environment variables for the new session, as KEY=VALUE strings. Merged over the defaults in
-    $script:DefaultEnvironment: a key overrides that default, and a bare KEY= drops it. Windows
-    Terminal has no mechanism for this — the variables are set inside the runner script, and
-    claude inherits them as a child process.
+    $script:DefaultEnvironment: a key overrides that default, and a bare KEY= drops it. The merged
+    set is handed to spawn-terminal.ps1, which sets it inside the runner script so claude inherits
+    it as a child process.
 
-    KEY=VALUE rather than a hashtable because `pwsh -File` passes every argument as a string, so
-    a hashtable literal fails type conversion at the parameter binder. Strings work under both
-    -File and -Command.
+    KEY=VALUE rather than a hashtable because `pwsh -File` passes every argument as a string, so a
+    hashtable literal fails type conversion at the parameter binder.
 
 .PARAMETER TabColor
-    Windows Terminal tab color as #RGB or #RRGGBB. Omit it to auto-resolve a stable per-repo color
-    via resolve-repo-color.ps1 (registry at ~/.claude/repo-colors.json), so every session for the
-    same repo shares one color. Pass a value to override for a single launch. Resolution failure is
-    non-fatal — the session still launches, uncolored.
+    Windows Terminal tab color as #RGB or #RRGGBB. Omit it to let spawn-terminal.ps1 auto-resolve a
+    stable per-repo color. Pass a value to override for a single launch.
 
 .PARAMETER ColorScheme
     Windows Terminal color scheme name for the tab (must already be defined in your WT settings),
-    e.g. 'AC Phosphor'. This recolors the palette Claude's TUI renders against. Optional.
+    e.g. 'AC Phosphor'. Optional.
 
 .PARAMETER DryRun
-    Write the runner script and print it (plus the resolved tab color / scheme) without launching
-    anything. Useful for inspecting what the new session will actually execute.
+    Print the claude runner and the delegated launch plan without launching anything.
 
 .EXAMPLE
     pwsh -File launch-claude-session.ps1 -PromptPath C:\repo\docs\PROMPTS\task.md `
@@ -119,32 +121,21 @@ $PromptPath = (Resolve-Path -LiteralPath $PromptPath).Path
 $WorkingDirectory = (Resolve-Path -LiteralPath $WorkingDirectory).Path
 $Title = $Title -replace '\s+', '-'
 
-# Tab color: one stable color per repo so concurrent sessions for the same checkout are grouped.
-# An explicit -TabColor always wins; otherwise resolve (and persist) from the repo registry. A
-# resolution failure is never fatal — the session still launches, just without a colored tab.
-if (-not $TabColor) {
-    $resolver = Join-Path $PSScriptRoot 'resolve-repo-color.ps1'
-    if (Test-Path -LiteralPath $resolver) {
-        try { $TabColor = (& $resolver -WorkingDirectory $WorkingDirectory 2>$null | Select-Object -Last 1) }
-        catch { Write-Warning "Tab-color resolution failed ($($_.Exception.Message)); launching without one." }
-    }
+# Locate the generic launcher. The installed global profile mirrors the archive's directory layout
+# — spawn-terminal and session-handoff are siblings under skills/ in both — so one $PSScriptRoot-
+# relative path resolves in dev and in production alike.
+$spawnTerminal = Join-Path $PSScriptRoot '..\..\..\..\spawn-terminal\scripts\spawn-terminal.ps1'
+if (-not (Test-Path -LiteralPath $spawnTerminal)) {
+    throw "spawn-terminal.ps1 not found at '$spawnTerminal'. The 'spawn-terminal' skill must be " +
+    "installed alongside this bundle (globally: ~/.claude/skills/spawn-terminal/)."
 }
-if ($TabColor -and $TabColor.Trim() -notmatch '^#?[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$') {
-    Write-Warning "Ignoring invalid -TabColor '$TabColor' (expected #RGB or #RRGGBB)."
-    $TabColor = $null
-}
-elseif ($TabColor) {
-    $TabColor = '#' + $TabColor.Trim().TrimStart('#').ToUpper()
-}
+$spawnTerminal = (Resolve-Path -LiteralPath $spawnTerminal).Path
 
-# `pwsh -File` hands every argument through as a literal string, so `-SetEnv A=1,B=2` arrives as
-# one element with the commas and any quote characters intact rather than as an array. Split on
-# commas that introduce a new KEY= pair, which leaves commas inside a value alone.
+# Caller -SetEnv wins over defaults; a bare KEY= drops a default entirely. `pwsh -File` delivers
+# `-SetEnv A=1,B=2` as one string with commas intact, so split on commas that introduce a new KEY=.
 $pairs = foreach ($raw in $SetEnv) {
     ($raw -replace '"', '') -split ',(?=[^=,]+=)' | Where-Object { $_.Trim() }
 }
-
-# Caller values win over defaults; a bare KEY= drops a default entirely.
 $environment = $script:DefaultEnvironment.Clone()
 foreach ($pair in $pairs) {
     if ($pair -notmatch '^([^=]+)=(.*)$') {
@@ -154,82 +145,41 @@ foreach ($pair in $pairs) {
     if ([string]::IsNullOrEmpty($value)) { $environment.Remove($key) }
     else { $environment[$key] = $value }
 }
+# Serialize the merged, unset-applied set back to KEY=VALUE for spawn-terminal. Every value here is
+# non-empty (unsets already removed), so passing them as a native array keeps commas-in-values safe.
+$mergedSetEnv = $environment.Keys | Sort-Object | ForEach-Object { "$_=$($environment[$_])" }
 
-# Single-quoted PowerShell strings only need doubled single quotes to be literal, which keeps
-# values with spaces, backticks, or $ signs from being re-interpreted in the runner.
-$envLines = $environment.Keys | Sort-Object | ForEach-Object {
-    "`$env:$_ = '" + ($environment[$_] -replace "'", "''") + "'"
-}
-
-# The inner script is what the new tab actually runs. Writing it to a temp file keeps the
-# outer command line free of anything a parser could split.
+# The claude runner is what the new tab ultimately executes. spawn-terminal.ps1 sets the working
+# directory and environment around it, then dot-invokes it in-process, so it only has to read the
+# prompt from disk and hand it to claude — no inline prompt text ever crosses a shell parser.
 $flags = if ($NoSkipPermissions) { '' } else { '--dangerously-skip-permissions' }
-$runner = Join-Path ([System.IO.Path]::GetTempPath()) "claude-session-$Title-$PID.ps1"
+$claudeRunner = Join-Path ([System.IO.Path]::GetTempPath()) "claude-session-$Title-$PID.ps1"
 @"
-Set-Location -LiteralPath '$WorkingDirectory'
-$($envLines -join "`n")
-`$prompt = Get-Content -Raw -LiteralPath '$PromptPath'
+`$prompt = Get-Content -Raw -LiteralPath '$($PromptPath -replace "'", "''")'
 claude $flags `$prompt
-"@ | Set-Content -LiteralPath $runner -Encoding UTF8
+"@ | Set-Content -LiteralPath $claudeRunner -Encoding UTF8
+
+# Build the delegated call. Only pass color flags the caller actually supplied, so an omitted
+# -TabColor still lets spawn-terminal auto-resolve the per-repo color.
+$spawnParams = @{
+    ScriptPath       = $claudeRunner
+    WorkingDirectory = $WorkingDirectory
+    Title            = $Title
+    SetEnv           = $mergedSetEnv
+    VerifyProcess    = 'claude'
+}
+if ($TabColor) { $spawnParams.TabColor = $TabColor }
+if ($ColorScheme) { $spawnParams.ColorScheme = $ColorScheme }
+if ($DryRun) { $spawnParams.DryRun = $true }
 
 if ($DryRun) {
-    $tab = if ($TabColor) { $TabColor } else { '(none)' }
-    $scheme = if ($ColorScheme) { $ColorScheme } else { '(none)' }
-    Write-Host "Tab color: $tab   Color scheme: $scheme"
-    Write-Host "Runner script (not launched): $runner`n"
-    Get-Content -LiteralPath $runner | ForEach-Object { Write-Host "  $_" }
-    return
+    Write-Host "Claude runner (not launched): $claudeRunner"
+    Get-Content -LiteralPath $claudeRunner | ForEach-Object { Write-Host "  $_" }
+    Write-Host ''
 }
 
-$before = @(Get-Process -Name claude -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
+& $spawnTerminal @spawnParams
 
-# wt reads options up to the command token, so tab styling goes before the `pwsh` invocation.
-$tabStyle = @()
-if ($TabColor) { $tabStyle += @('--tabColor', $TabColor) }
-if ($ColorScheme) { $tabStyle += @('--colorScheme', $ColorScheme) }
-
-$launchArgs = @('new-tab', '--title', $Title) + $tabStyle + @(
-    '-d', $WorkingDirectory,
-    'pwsh', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', $runner
-)
-
-$usedFallback = $false
-if (Get-Command wt.exe -ErrorAction SilentlyContinue) {
-    try {
-        Start-Process wt.exe -ArgumentList $launchArgs
-    }
-    catch {
-        Write-Warning "Windows Terminal launch failed ($($_.Exception.Message)); falling back to a console window."
-        $usedFallback = $true
-    }
-}
-else {
-    Write-Warning 'Windows Terminal (wt.exe) not found; falling back to a console window.'
-    $usedFallback = $true
-}
-
-if ($usedFallback) {
-    Start-Process pwsh -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-File', $runner) `
-        -WorkingDirectory $WorkingDirectory
-}
-
-# Confirm the session actually came up. A tab that opens and dies immediately is
-# indistinguishable from success at the Start-Process call site, so poll for the process.
-$deadline = (Get-Date).AddSeconds(20)
-$launched = $null
-while ((Get-Date) -lt $deadline -and -not $launched) {
-    Start-Sleep -Milliseconds 750
-    $launched = Get-Process -Name claude -ErrorAction SilentlyContinue |
-        Where-Object { $_.Id -notin $before } |
-        Select-Object -First 1
-}
-
-if ($launched) {
-    Write-Host "Claude session started: PID $($launched.Id)  title '$Title'  cwd $WorkingDirectory"
+if (-not $DryRun) {
     Write-Host "Prompt: $PromptPath"
-}
-else {
-    Write-Host "No new claude process detected within 20s. Check the terminal tab for errors." -ForegroundColor Yellow
-    Write-Host "Run it manually with:  pwsh -File `"$runner`""
-    exit 1
 }

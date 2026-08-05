@@ -2,11 +2,11 @@
 description: Show or change the current repo's Windows Terminal tab color in the per-repo color registry
 ---
 
-The `session-handoff:handoff` skill assigns every repo one Windows Terminal tab color so spawned
-sessions for the same checkout are visually grouped. This command inspects and edits that registry
+The `spawn-terminal` skill assigns every repo one Windows Terminal tab color so tabs spawned for the
+same checkout are visually grouped. This command inspects and edits that registry
 (`~/.claude/repo-colors.json`) for the **current repo**.
 
-Let `S` = `<skill-dir>/scripts` (the `session-handoff:handoff` skill's `scripts/` directory).
+Let `S` = `<skill-dir>/scripts` (the `spawn-terminal` skill's `scripts/` directory).
 Interpret the command arguments as follows and run the matching script, then report the result
 tersely:
 
