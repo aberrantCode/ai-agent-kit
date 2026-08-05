@@ -2,7 +2,7 @@
 description: Merge one or more open pull requests into dev with a merge commit, then clean up the worktree, local branch, and remote branch. Accepts an optional message naming a PR number, branch, worktree, a set of them, or nothing (uses the current context). Responds with minimal output — a concise summary at the end, errors as they occur.
 ---
 
-Apply the `github` skill and execute its `merge` operation (`sub-skills/merge`).
+Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/merge/SKILL.md` to run its `merge` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:merge)`.
 
 Parse the invocation message per the parent skill's **Parameter Contract**. It is optional and
 may name:
