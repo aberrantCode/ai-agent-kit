@@ -4,10 +4,11 @@ description: >
   Umbrella for two related but distinct session-lifecycle operations: handing off open work to a
   fresh Claude Code session, and auditing whether past session behavior actually followed a stated
   rule. Use this skill when the ask is about "session-handoff" without a clear sub-operation, or
-  when unsure which of the two applies. Otherwise prefer invoking the specific sub-skill directly:
-  `session-handoff:handoff` for continuing/dispatching work in a new terminal session ("continue in
-  a new session", "hand this off", "spawn a new terminal and keep going", "/handoff",
-  "/dispatch-session-prompt"), or `session-handoff:audit` for checking whether a stated policy was
+  when unsure which of the two applies. Otherwise route directly to the specific sub-skill by
+  loading this bundle (`Skill(session-handoff)`) and reading its file: `sub-skills/handoff/SKILL.md`
+  for continuing/dispatching work in a new terminal session ("continue in a new session", "hand this
+  off", "spawn a new terminal and keep going", "/handoff", "/dispatch-session-prompt"), or
+  `sub-skills/audit/SKILL.md` for checking whether a stated policy was
   actually followed in past session transcripts ("did I actually follow rule X", "audit my last N
   hours for compliance", "/hand-off-audit"). Do not confuse the two: handoff moves work forward into
   a new session; audit looks backward at what already happened.
@@ -25,13 +26,15 @@ you should almost always be able to route to one of them directly instead of sto
 
 - **Moving work forward** — you have open decisions, unfinished tasks, or a scope that needs to run
   unattended in a fresh session with no conversation history. See
-  [`sub-skills/handoff/SKILL.md`](sub-skills/handoff/SKILL.md) (skill: `session-handoff:handoff`).
+  [`sub-skills/handoff/SKILL.md`](sub-skills/handoff/SKILL.md) (read this file directly — there is
+  no dispatchable `session-handoff:handoff` skill).
   Commands: `/handoff`, `/dispatch-session-prompt` (the launcher delegates tab spawning to the
   `spawn-terminal` skill, which now owns `/repo-color`).
 
 - **Looking backward** — you want to know whether a stated rule was actually followed by past agent
   behavior (this session or an earlier one), not whether code currently complies with a rule right
-  now. See [`sub-skills/audit/SKILL.md`](sub-skills/audit/SKILL.md) (skill: `session-handoff:audit`).
+  now. See [`sub-skills/audit/SKILL.md`](sub-skills/audit/SKILL.md) (read this file directly — there
+  is no dispatchable `session-handoff:audit` skill).
   Command: `/hand-off-audit`.
 
 If the request is genuinely ambiguous between the two, ask — don't guess. "Hand off this audit to a
