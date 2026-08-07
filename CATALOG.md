@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-08-05, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-08-07, schemaVersion: 1)
 -->
 
 # Catalog
@@ -191,6 +191,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`remote-installer`](claude/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | codex |
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
 | [`start-app`](claude/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | codex |
+| [`startup-context-audit`](claude/skills/startup-context-audit/SKILL.md) | Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big — "why does a new session start with tokens", "what's in my context window at launch", "... | — |
 | [`usage-limit-reducer`](claude/skills/usage-limit-reducer/SKILL.md) | Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like "hit my limit", "running out of tok... | — |
 | [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
