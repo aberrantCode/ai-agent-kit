@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-08-05",
+  "generated": "2026-08-07",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -501,6 +501,11 @@
         },
         "start-app": {
           "description": "Start any type of modern application \u2014 web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says \"start the app\", \"run it\", \"boot it up\", \"kick it off\", \"get it running\", \"spin it up\", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. \"start the Next.js app\", \"run the FastAPI server\", \"launch the Docker stack\").",
+          "category": "Tooling & DevOps",
+          "has_commands": true
+        },
+        "startup-context-audit": {
+          "description": "Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big \u2014 \"why does a new session start with tokens\", \"what's in my context window at launch\", \"startup context cost\", \"per-repo baseline token audit\", \"why is this repo's fresh session so heavy\", \"what am I paying before I type anything\". Measures the first-turn (pre-work) context each repo loads and decomposes it into readable on-disk instructions versus the non-visible harness. Complements usage-limit-reducer, which reports historical burn over time rather than the per-session baseline.",
           "category": "Tooling & DevOps",
           "has_commands": true
         },

@@ -183,3 +183,13 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | `worldview-shader-preset` | merge | worldview-scaffolds (new standalone) | 26 | pending | Two halves of one pattern; merged into a single standalone worldview-scaffolds skill at closeout reconciliation. |
 | `youtube-extraction` | extend-in-place | youtube-extraction ([P2](charter.md#9-phases-and-gate)) | 23 | pending | Slug retained; media-manager cancelled. Gains youtube-channel-tracker, conference-talk-extraction, prd-forensics; TTS/manual-generation staged as `status: draft` stubs ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |
 | `youtube-prd-forensics` | absorb-delete | youtube-extraction / prd-forensics | 23 | pending | Output scoped as video-derived forensic PRDs under docs/, NOT docs/features/ specs. |
+
+## Post-audit additions
+
+Skills created after the 2026-07-10 audit. They are not part of the frozen 142-row table
+or its summary counts above; the live inventory is [`CATALOG.md`](../../CATALOG.md). Listed
+here so each new directory still carries an explicit disposition.
+
+| Directory | Disposition | Target | Iter | Status | Notes |
+|---|---|---|---|---|---|
+| `startup-context-audit` | standalone | - (no relocation) | - | done | New standalone skill (2026-08-07). The startup/per-session-baseline complement to `usage-limit-reducer` (which owns *historical* burn): distinct trigger set ("why does a new session start with tokens", "startup context cost"), so kept separate rather than folded into that bundle. Cross-references it. Ships `scripts/startup-context.py`, `/startup-cost` command, and `diagram.html`. |
