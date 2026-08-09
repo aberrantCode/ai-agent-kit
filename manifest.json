@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-08-07",
+  "generated": "2026-08-09",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -273,6 +273,11 @@
         "graphify": {
           "description": "any input (code, docs, papers, images) \u2192 knowledge graph \u2192 clustered communities \u2192 HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships \u2014 especially if graphify-out/ exists. Provides persistent graph with god nodes, community detection, and BFS/DFS query tools.",
           "category": "Tooling & DevOps"
+        },
+        "guardrails-manager": {
+          "description": "Lifecycle management of vendor-neutral agent guardrails \u2014 the reusable CLAUDE.md / AGENTS.md / GEMINI.md rules, snippets, and whole-file captures archived under shared/guardrails/. Use when the user invokes /archive-guardrail or /install-guardrail, or says \"archive this CLAUDE.md rule\", \"capture this guardrail\", \"save this to the archive as a rule\", \"install that rule into this repo's CLAUDE.md\", or \"mine my CLAUDE.md rules into the archive\". All user interaction MUST go through the AskUserQuestion tool \u2014 never free-form text, never inline markdown questions.",
+          "category": "Tooling & DevOps",
+          "has_commands": true
         },
         "guide-assistant": {
           "description": "Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like \"walk me through\", \"run me through\", \"guide me through\", \"step me through\", or references a .md file, manual, runbook, or guide they want help executing. Also invoke when the user provides a file path to a markdown document and asks for help following it. ALWAYS use AskUserQuestion for every prompt to the user \u2014 never just print a question as plain text.",

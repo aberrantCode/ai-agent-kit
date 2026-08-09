@@ -25,6 +25,10 @@ codex/
 gemini/
   instructions/                     — agent instructions for Gemini CLI
   skills/<name>/SKILL.md
+shared/                       — vendor-neutral assets (any CLI can consume)
+  prompts/  workflows/  configs/  plugins/
+  guardrails/<name>.md        — reusable CLAUDE.md/AGENTS.md/GEMINI.md rules & snippets
+                                (managed by the guardrails-manager skill)
 .claude/commands/             — repo-local slash commands (skills-manager)
 logs/timing.jsonl             — `/ship` timing log
 ```
@@ -69,6 +73,8 @@ logs/timing.jsonl             — `/ship` timing log
 | `/push-skill <name>` | Push skill bundle to global `~/.claude/skills/` |
 | `/search-skill <query>` | Keyword search across archive |
 | `/backfill-diagrams` | Generate missing `diagram.html` files |
+| `/archive-guardrail` | Capture a `CLAUDE.md`/`AGENTS.md` file, section, or snippet into `shared/guardrails/` |
+| `/install-guardrail <name> [dir]` | Deploy a guardrail into a project's `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` |
 
 ---
 

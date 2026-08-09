@@ -41,7 +41,7 @@ ai-agent-kit/
 ├── claude/              # canonical authoring surface: skills, instructions, commands
 ├── codex/               # on-demand mirror of the Claude surface
 ├── gemini/              # frozen mirror
-├── shared/              # vendor-neutral: prompts, workflows, configs, plugins
+├── shared/              # vendor-neutral: prompts, workflows, configs, plugins, guardrails
 ├── scripts/             # lifecycle automation — audit, generate, install, sync
 └── docs/                # requirements, plans, and binding reorg governance
 ```
