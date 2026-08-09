@@ -78,6 +78,13 @@ in the directory. Then add `shared/<class>` to the class table in
 [`shared/README.md`](shared/README.md). Only after both READMEs exist do actual assets get
 added.
 
+**Guardrails** ([`shared/guardrails/`](shared/guardrails/README.md)) are the newest such
+class: reusable `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` rules, snippets, and whole-file captures.
+Unlike the passive shared classes, guardrails have a lifecycle skill —
+`guardrails-manager` — so archive and install go through `/archive-guardrail` and
+`/install-guardrail` rather than hand-copying. See that class README for the frontmatter
+contract.
+
 ## Governance
 
 **Reorg-charter precedence.** [`docs/reorg/charter.md`](docs/reorg/charter.md) is binding for

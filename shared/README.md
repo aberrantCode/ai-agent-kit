@@ -23,7 +23,7 @@ install-path convention to function, it belongs under that vendor's tree
 (`claude/skills/`, `codex/skills/`, `gemini/skills/`, or the vendor's
 `instructions/`/`commands/`), not here.
 
-## The four classes
+## The five classes
 
 | Class | Contents |
 |---|---|
@@ -31,6 +31,7 @@ install-path convention to function, it belongs under that vendor's tree
 | [`workflows/`](workflows/README.md) | Vendor-neutral orchestration *documents* a human or agent follows manually. |
 | [`configs/`](configs/README.md) | Reusable configuration fragments. No secrets — pointers only. |
 | [`plugins/`](plugins/README.md) | A pure reference list of external plugins/addons, with provenance and vetting status per entry. |
+| [`guardrails/`](guardrails/README.md) | Agent guardrail content — reusable `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` rules, snippets, and whole-file captures. Managed by the `guardrails-manager` skill. |
 
 Each class has its own README documenting its specific conventions — see the README linked
 in each row above.

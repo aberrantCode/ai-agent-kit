@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-08-07, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-08-09, schemaVersion: 1)
 -->
 
 # Catalog
@@ -187,6 +187,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`add-remote-installer`](claude/skills/add-remote-installer/SKILL.md) | Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install dir... | codex |
 | [`content-aware-file-renaming`](claude/skills/content-aware-file-renaming/SKILL.md) | Use when renaming files into a structured naming formula based on their contents — especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files ... | — |
 | [`graphify`](claude/skills/graphify/SKILL.md) | any input (code, docs, papers, images) → knowledge graph → clustered communities → HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships — e... | — |
+| [`guardrails-manager`](claude/skills/guardrails-manager/SKILL.md) | Lifecycle management of vendor-neutral agent guardrails — the reusable CLAUDE.md / AGENTS.md / GEMINI.md rules, snippets, and whole-file captures archived under shared/guardrails/. Use when the user invokes /archive-g... | — |
 | [`project-tooling`](claude/skills/project-tooling/SKILL.md) | gh, vercel, supabase, render CLI and deployment platform setup | codex |
 | [`remote-installer`](claude/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | codex |
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
