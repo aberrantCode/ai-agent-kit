@@ -8,8 +8,9 @@ description: >
   automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
   stale branches and worktrees; bringing a repo's configuration up to standard (branch
   protection, merge policy, security settings, local hook gate); creating, working in, and
-  tearing down an isolated per-task worktree; or getting a read-only report of what's in flight
-  in a repo. Triggers on "merge 1209", "merge this branch",
+  tearing down an isolated per-task worktree; fast-forwarding the local checkout to match its
+  upstream (dev ↔ origin/dev) without disturbing uncommitted work; or getting a read-only
+  report of what's in flight in a repo. Triggers on "merge 1209", "merge this branch",
   "merge the current worktree", "ship it", "release", "set up releases", "release init",
   "provision release workflow", "fix changelog automation", "commit", "clean up branches",
   "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
@@ -18,7 +19,8 @@ description: >
   "merge PR 76", "merge these PRs", "land this branch", "open a PR for this",
   "cut a release", "clean these branches", "what's the status of this repo",
   "repo status", "what's in flight", "what needs to be shipped or merged",
-  "which branches are stale" — route these through the named
+  "which branches are stale", "sync dev with origin", "fast-forward my checkout",
+  "catch my local dev up to remote", "my dev is behind origin" — route these through the named
   operation rather than a raw gh/git sequence — and similar
   phrasings — even
   when the word "git" is absent. This is a thin-command bundle: each command names one
@@ -105,6 +107,7 @@ question.
 | `/publish` | publish | `sub-skills/publish` |
 | `/init-repo` | repo-init | `sub-skills/repo-init` |
 | `/commit` | commit | `sub-skills/commit` |
+| `/sync-dev` | sync-dev | `sub-skills/sync-dev` |
 | `/ship` | ship | `sub-skills/ship` |
 | `/merge [targets]` | merge | `sub-skills/merge` |
 | `/release` | release | `sub-skills/release` |
@@ -125,6 +128,11 @@ so do multi-agent harnesses (agent-manager) that run one worktree per agent.
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
 `inspect` (`/repo-status`) sits beside that lifecycle rather than in it — a read-only report of
 what's in flight that recommends which of the others to run next; it never runs them itself.
+`sync-dev` (`/sync-dev`) also sits beside the lifecycle — a **local-only** helper that
+fast-forwards the current checkout to its upstream (typically `dev` ↔ `origin/dev`). It pulls
+in remote commits but never pushes, rebases, merges divergent history, or discards local work;
+on any non-fast-forward it stops and defers to `/ship` or a manual decision. `inspect` commonly
+recommends it when the working checkout is behind `origin/dev`.
 
 Two `*-init` operations sit beside that lifecycle. Both are idempotent provisioning passes
 that own one standard each, are safe to re-run forever, and never commit — they leave files
