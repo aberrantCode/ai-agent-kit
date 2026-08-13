@@ -140,7 +140,7 @@
 
   <div class="flow-arrow" style="--i:1">
     <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
-    seven thin commands + one direct-trigger sub-skill, one lifecycle
+    ten thin commands + one direct-trigger sub-skill, one lifecycle
   </div>
 
   <!-- Operations -->
@@ -158,6 +158,10 @@
       <li class="step-item">
         <div class="op-cmd op-cmd--emerald">/commit</div>
         <div><div class="step-title">Stage · pull · commit · push</div><div class="step-desc">Conventional-commit message from the staged diff. Warns on sensitive files; never force-pushes.</div></div>
+      </li>
+      <li class="step-item">
+        <div class="op-cmd op-cmd--teal">/sync-dev</div>
+        <div><div class="step-title">Fast-forward local checkout to upstream</div><div class="step-desc">Local-only: <code>git fetch</code> · verify behind-only · clear byte-identical untracked collisions · <code>git merge --ff-only</code>. Never pushes, rebases, merges divergent history, or discards work; stops and defers to <code>/ship</code> on any non-fast-forward. Sits <em>beside</em> the lifecycle.</div></div>
       </li>
       <li class="step-item">
         <div class="op-cmd op-cmd--teal">/ship</div>
@@ -180,6 +184,10 @@
         <div><div class="step-title">Prune stale worktrees + branches</div><div class="step-desc">Merged-into-dev detection (squash or standard), protects dirty worktrees, deletes local + origin.</div></div>
       </li>
       <li class="step-item">
+        <div class="op-cmd op-cmd--slate">/repo-status</div>
+        <div><div class="step-title">Read-only in-flight report · beside the lifecycle</div><div class="step-desc">Inspects working tree, branch tracking, worktrees, open PRs, and merged-stale branches, then recommends which of <code>ship</code>/<code>merge</code>/<code>release</code>/<code>prune</code>/<code>sync-dev</code> applies next. Never mutates state.</div></div>
+      </li>
+      <li class="step-item">
         <div class="op-cmd op-cmd--slate">no&nbsp;cmd</div>
         <div><div class="step-title">worktree-task-lifecycle · triggers directly</div><div class="step-desc">Single lifecycle authority: create under <code>&lt;repo&gt;-wt/.worktrees/</code>, clean-baseline setup, credentials stay in the primary checkout, merge from primary (never inside the worktree), post-merge idempotent removal with Windows lock recovery. <code>merge</code>/<code>prune</code> and agent harnesses delegate here.</div></div>
       </li>
@@ -192,6 +200,9 @@
       <span class="lc-node">merge</span><span class="lc-sep">→</span>
       <span class="lc-node">release</span><span class="lc-sep">→</span>
       <span class="lc-node">prune</span>
+      <span class="lc-sep" style="margin-left:10px">·&nbsp;beside:</span>
+      <span class="lc-node" style="background:var(--slate-dim);color:var(--slate);border-color:var(--slate)">repo-status</span>
+      <span class="lc-node">sync-dev</span>
     </div>
   </div>
 
