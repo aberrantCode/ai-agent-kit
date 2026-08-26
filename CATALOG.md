@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-08-13, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-08-26, schemaVersion: 1)
 -->
 
 # Catalog
@@ -193,6 +193,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
 | [`start-app`](claude/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | codex |
 | [`startup-context-audit`](claude/skills/startup-context-audit/SKILL.md) | Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big — "why does a new session start with tokens", "what's in my context window at launch", "... | — |
+| [`statusline`](claude/skills/statusline/SKILL.md) | Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line — the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on... | — |
 | [`usage-limit-reducer`](claude/skills/usage-limit-reducer/SKILL.md) | Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like "hit my limit", "running out of tok... | — |
 | [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
@@ -427,18 +428,18 @@ count (G5, `docs/requirements/canonical-repo.md`).
 |---|---|---|
 | [architect](claude/instructions/architect.md) | Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions. | opus |
 | [backend-api-developer](claude/instructions/backend-api-developer.md) | Use this agent when working on backend API development tasks in the monorepo, including implementing FastAPI routes, creating or modifying SQLModel/Pydantic models, running database migrations with Alembic, writing or... | sonnet |
-| [build-error-resolver](claude/instructions/build-error-resolver.md) | Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quic... | opus |
-| [code-reviewer](claude/instructions/code-reviewer.md) | Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes. | opus |
-| [doc-updater](claude/instructions/doc-updater.md) | Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides. | opus |
+| [build-error-resolver](claude/instructions/build-error-resolver.md) | Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quic... | sonnet |
+| [code-reviewer](claude/instructions/code-reviewer.md) | Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes. | sonnet |
+| [doc-updater](claude/instructions/doc-updater.md) | Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides. | haiku |
 | [docs-test-engineer](claude/instructions/docs-test-engineer.md) | Use this agent when you need to create or update documentation, write unit or integration tests, design test plans, or establish QA guidance for the monorepo. This includes writing README files, API documentation, tes... | sonnet |
-| [e2e-runner](claude/instructions/e2e-runner.md) | End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ... | opus |
+| [e2e-runner](claude/instructions/e2e-runner.md) | End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ... | sonnet |
 | [non-blocking-loading](claude/instructions/non-blocking-loading.md) |  | — |
 | [planner](claude/instructions/planner.md) | Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks. | opus |
-| [refactor-cleaner](claude/instructions/refactor-cleaner.md) | Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it. | opus |
+| [refactor-cleaner](claude/instructions/refactor-cleaner.md) | Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it. | sonnet |
 | [security-reviewer](claude/instructions/security-reviewer.md) | Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto,... | opus |
 | [ship-to-prod](claude/instructions/ship-to-prod.md) |  | — |
 | [ship-to-uat](claude/instructions/ship-to-uat.md) |  | — |
-| [tdd-guide](claude/instructions/tdd-guide.md) | Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage. | opus |
+| [tdd-guide](claude/instructions/tdd-guide.md) | Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage. | sonnet |
 | [webui-developer](claude/instructions/webui-developer.md) | Use this agent when working on the React/TypeScript WebUI application located in apps/webui. This includes component development, Storybook stories, linting, testing, build issues, and local development environment se... | sonnet |
 
 ## Codex Instructions

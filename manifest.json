@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-08-13",
+  "generated": "2026-08-26",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -518,6 +518,12 @@
           "description": "Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them \u2014 a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one step, records evidence, and ends with a copy-ready resume prompt.",
           "category": "Foundations & Workflow"
         },
+        "statusline": {
+          "description": "Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line \u2014 the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on \"fix my status line\", \"my status line doesn't show tokens\", \"no token count in spawned/worktree tabs\", \"status line shows the wrong token number\", \"add context percentage to my status line\", \"install a status line\", \"remove my status line\", \"why is my status line blank\", \"audit my status line\", \"status line shows 100k on a fresh session\", \"statusline.sh\", and any mention of the `statusLine` block in settings.json or the built-in `/statusline` command. This skill owns the canonical, worktree- and /handoff-safe status-line script and the install/remove/inspect/modify/audit operations around it. Prefer it over hand-editing settings.json or the script directly, because those ad-hoc edits are exactly what caused this to regress three times.",
+          "category": "Tooling & DevOps",
+          "has_commands": true,
+          "has_sub_skills": true
+        },
         "subagent-driven-development": {
           "description": "Use when executing implementation plans with independent tasks in the current session",
           "category": "Foundations & Workflow"
@@ -650,15 +656,15 @@
         },
         "build-error-resolver": {
           "description": "Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quickly.",
-          "model": "opus"
+          "model": "sonnet"
         },
         "code-reviewer": {
           "description": "Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.",
-          "model": "opus"
+          "model": "sonnet"
         },
         "doc-updater": {
           "description": "Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides.",
-          "model": "opus"
+          "model": "haiku"
         },
         "docs-test-engineer": {
           "description": "Use this agent when you need to create or update documentation, write unit or integration tests, design test plans, or establish QA guidance for the monorepo. This includes writing README files, API documentation, test suites for Python/FastAPI backend or React/TypeScript WebUI code, and creating comprehensive test strategies. Examples of when to invoke this agent:\\n\\n<example>\\nContext: User has just implemented a new API endpoint and needs tests.\\nuser: \"I just added a new /companies endpoint to the API, can you write tests for it?\"\\nassistant: \"I'll use the docs-test-engineer agent to create comprehensive unit and integration tests for the new /companies endpoint.\"\\n<commentary>\\nSince the user needs tests written for new backend code, use the Task tool to launch the docs-test-engineer agent to create pytest-based tests following the project's testing patterns.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants documentation for a new feature.\\nuser: \"Please document the workflow engine's new scheduling feature\"\\nassistant: \"I'll use the docs-test-engineer agent to create clear documentation for the scheduling feature.\"\\n<commentary>\\nSince the user is requesting documentation, use the docs-test-engineer agent to write technical documentation following the project's documentation standards and place it appropriately in the docs structure.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User has completed a WebUI component and needs tests.\\nuser: \"Write Vitest tests for the CompanyCard component I just created\"\\nassistant: \"I'll launch the docs-test-engineer agent to write comprehensive Vitest tests for the CompanyCard component.\"\\n<commentary>\\nSince the user needs WebUI component tests, use the docs-test-engineer agent to create TypeScript/Vitest tests following the WebUI testing patterns.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants a test plan for a new feature.\\nuser: \"Create a QA test plan for the new user authentication flow\"\\nassistant: \"I'll use the docs-test-engineer agent to design a comprehensive QA test plan covering the authentication flow.\"\\n<commentary>\\nSince the user needs a test strategy/plan, use the docs-test-engineer agent to create a structured QA document with test cases, scenarios, and acceptance criteria.\\n</commentary>\\n</example>",
@@ -666,7 +672,7 @@
         },
         "e2e-runner": {
           "description": "End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ensures critical user flows work.",
-          "model": "opus"
+          "model": "sonnet"
         },
         "non-blocking-loading": {
           "description": ""
@@ -677,7 +683,7 @@
         },
         "refactor-cleaner": {
           "description": "Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it.",
-          "model": "opus"
+          "model": "sonnet"
         },
         "security-reviewer": {
           "description": "Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities.",
@@ -691,7 +697,7 @@
         },
         "tdd-guide": {
           "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
-          "model": "opus"
+          "model": "sonnet"
         },
         "webui-developer": {
           "description": "Use this agent when working on the React/TypeScript WebUI application located in apps/webui. This includes component development, Storybook stories, linting, testing, build issues, and local development environment setup. Also use this agent for creating cross-platform helper scripts for Windows PowerShell and Unix shells, troubleshooting npm/node_modules issues, and ensuring CI/CD parity with local development commands.\\n\\nExamples:\\n\\n<example>\\nContext: User wants to add a new component to the webui\\nuser: \"I need to create a new DataTable component for displaying company information\"\\nassistant: \"I'll use the webui-developer agent to help create this component with proper TypeScript types, tests, and Storybook stories.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User is experiencing npm install failures\\nuser: \"npm install keeps failing in the webui project\"\\nassistant: \"Let me use the webui-developer agent to diagnose and fix this npm installation issue.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User wants to run tests before committing\\nuser: \"How do I run the webui tests?\"\\nassistant: \"I'll launch the webui-developer agent to provide the correct testing commands and ensure they match CI expectations.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: User needs a development script for Windows\\nuser: \"Can you create a PowerShell script to start the dev server?\"\\nassistant: \"I'll use the webui-developer agent to create a cross-platform helper script in scripts/dev.ps1.\"\\n<Task tool call to webui-developer agent>\\n</example>\\n\\n<example>\\nContext: Storybook won't start\\nuser: \"Storybook is failing to start with a port error\"\\nassistant: \"Let me engage the webui-developer agent to troubleshoot the Storybook configuration and port issues.\"\\n<Task tool call to webui-developer agent>\\n</example>",
