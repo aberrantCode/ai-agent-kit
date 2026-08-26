@@ -31,3 +31,9 @@ scripts/git-hooks/* text eol=lf
 # deploys them into. Pin them at the source.
 claude/skills/github/sub-skills/repo-init/templates/hooks/* text eol=lf
 codex/skills/github/sub-skills/repo-init/templates/hooks/*  text eol=lf
+
+# Status-line script shipped inside the statusline skill bundle. It is deployed verbatim
+# to ~/.claude/statusline.sh; a CRLF here rides along and (a) breaks the shebang on POSIX
+# sh and (b) leaves a stray \r on the last number parsed from a CRLF stream, silently
+# failing the humanize/threshold arithmetic. Pin it at the source.
+claude/skills/statusline/assets/*.sh text eol=lf
