@@ -8,9 +8,11 @@
 
       - the default environment a headless Claude session needs ($script:DefaultEnvironment),
       - the --dangerously-skip-permissions default and the -NoSkipPermissions opt-out,
-      - reading the prompt from a file rather than passing it inline (a single space in a title is
-        enough to make `wt` treat the rest of the line as a command; reading from a file removes
-        that whole class of failure),
+      - pointing the new session at the prompt file rather than inlining its contents (inlining a
+        large, command-heavy prompt as a CLI argument trips Windows Defender's command-line/AMSI
+        heuristic -> `claude.exe ... Access is denied`, and a single space in a title likewise makes
+        `wt` swallow the rest of the line; passing a short file pointer removes both classes of
+        failure),
       - verifying that a `claude` process actually came up.
 
     Everything generic — the Windows Terminal invocation, per-repo tab color, the pwsh-console
@@ -18,7 +20,9 @@
     parameters are unchanged from when it did that work itself.
 
 .PARAMETER PromptPath
-    Path to the markdown prompt file. Its full contents become the new session's first message.
+    Path to the markdown prompt file. The new session is told, via a short pointer argument, to read
+    and follow this file as its first action — the contents are NOT inlined onto claude's command
+    line (see the runner note in the body for why: Defender's command-line heuristic).
 
 .PARAMETER WorkingDirectory
     Directory the new session starts in. Defaults to the current location.
@@ -138,7 +142,14 @@ $pairs = foreach ($raw in $SetEnv) {
 }
 $environment = $script:DefaultEnvironment.Clone()
 foreach ($pair in $pairs) {
-    if ($pair -notmatch '^([^=]+)=(.*)$') {
+    # See spawn-terminal.ps1: a quoted-array `-SetEnv 'K=V','K2=V2'` can arrive with surrounding
+    # single quotes still attached to each pair. Strip one matched surrounding pair so the key is
+    # not corrupted (which would later serialize into an invalid `$env:'KEY = ...` line).
+    $p = $pair.Trim()
+    if ($p.Length -ge 2 -and $p[0] -eq "'" -and $p[-1] -eq "'") {
+        $p = $p.Substring(1, $p.Length - 2)
+    }
+    if ($p -notmatch '^([^=]+)=(.*)$') {
         throw "Invalid -SetEnv entry '$pair'. Expected KEY=VALUE (or KEY= to unset)."
     }
     $key, $value = $Matches[1].Trim(), $Matches[2]
@@ -150,13 +161,20 @@ foreach ($pair in $pairs) {
 $mergedSetEnv = $environment.Keys | Sort-Object | ForEach-Object { "$_=$($environment[$_])" }
 
 # The claude runner is what the new tab ultimately executes. spawn-terminal.ps1 sets the working
-# directory and environment around it, then dot-invokes it in-process, so it only has to read the
-# prompt from disk and hand it to claude — no inline prompt text ever crosses a shell parser.
+# directory and environment around it, then dot-invokes it in-process. It passes claude a SHORT
+# pointer to the prompt file (see below) — never the prompt's contents — so no large, command-heavy
+# argument crosses either a shell parser or Defender's command-line heuristic.
 $flags = if ($NoSkipPermissions) { '' } else { '--dangerously-skip-permissions' }
 $claudeRunner = Join-Path ([System.IO.Path]::GetTempPath()) "claude-session-$Title-$PID.ps1"
+# Pass a short pointer to the prompt file rather than inlining its contents. Windows Defender's
+# AMSI/command-line heuristic blocks CreateProcess when a process is spawned with a large argument
+# full of shell-command text (icacls/git/Start-Process/[Environment]::…), surfacing as
+# "claude.exe … Access is denied" — a command-heavy handoff prompt reliably trips it. Passing the
+# path keeps the command line short; the session reads the file itself as its first action, which is
+# exactly what a docs/PROMPTS handoff prompt is for.
+$promptRef = $PromptPath -replace "'", "''"
 @"
-`$prompt = Get-Content -Raw -LiteralPath '$($PromptPath -replace "'", "''")'
-claude $flags `$prompt
+claude $flags 'Read and follow the instructions in the file at $promptRef exactly. Its full contents are your task; treat them as your first message.'
 "@ | Set-Content -LiteralPath $claudeRunner -Encoding UTF8
 
 # Build the delegated call. Only pass color flags the caller actually supplied, so an omitted
