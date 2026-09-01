@@ -146,6 +146,14 @@ role hint and the existing project-manager role mapping:
 Most `/iterate-tasks` invocations span multiple roles (implement + commit + push + PR)
 and should default to `general-purpose`.
 
+**Model tier.** After choosing `subagent_type`, set `model:` on the `Agent` call to the
+cheapest capable tier — from the task's `Model` column when dispatching a plan task
+(`haiku` mechanical / `sonnet` implementation+review+e2e / `opus` architecture+security),
+else infer it (a multi-role implement+commit+PR run is `sonnet`; a pure docs/bookkeeping
+run is `haiku`; architecture/security is `opus`). Never leave `model:` unset — an unset
+model silently inherits the orchestrator's model and defeats the cost tiering
+(`~/.claude/rules/subagent-model-selection.md`).
+
 Do NOT set `isolation: "worktree"` on the `Agent` call. Let the subagent set up its own
 worktree per the project's `agent-concurrency.md` script — that's the project's
 convention, not this skill's to override.

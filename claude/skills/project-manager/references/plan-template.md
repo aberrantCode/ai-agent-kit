@@ -21,10 +21,10 @@ external_url: ""
 
 **Exit criteria.** Bullet list of observable outcomes (tests passing, file present, endpoint reachable, etc.).
 
-| # | Task | Covers | Role | Status | Notes |
-|---|------|--------|------|--------|-------|
-| 1 | Describe the task imperatively | `XX-CAP-01` | `tdd-guide` | todo | |
-| 2 | Another task | `XX-CAP-01` | `code-reviewer` | todo | |
+| # | Task | Covers | Role | Model | Status | Notes |
+|---|------|--------|------|-------|--------|-------|
+| 1 | Describe the task imperatively | `XX-CAP-01` | `tdd-guide` | `sonnet` | todo | |
+| 2 | Another task | `XX-CAP-01` | `code-reviewer` | `sonnet` | todo | |
 
 ---
 
@@ -34,9 +34,9 @@ external_url: ""
 
 **Exit criteria.** ...
 
-| # | Task | Covers | Role | Status | Notes |
-|---|------|--------|------|--------|-------|
-| 1 | ... | `XX-CAP-02` | `planner` | todo | |
+| # | Task | Covers | Role | Model | Status | Notes |
+|---|------|--------|------|-------|--------|-------|
+| 1 | ... | `XX-CAP-02` | `planner` | `opus` | todo | |
 
 ---
 
@@ -53,6 +53,24 @@ external_url: ""
 | docs, documentation            | `doc-updater`     |
 | cleanup, refactor              | `refactor-cleaner` |
 | _anything else_                | `general-purpose` |
+
+---
+
+## Model legend
+
+The `Model` column sets the tier the orchestrator dispatches each task on — cheapest
+capable, per `~/.claude/rules/subagent-model-selection.md`. `/continue-tasks` and
+`/iterate-tasks` read it and pass `model:` to the `Agent` call; an empty cell falls back
+to the agent type's own default.
+
+| Task shape                                              | Model    |
+|---------------------------------------------------------|----------|
+| Architecture / design / planning (`planner`)            | `opus`   |
+| Security review (`security-reviewer`)                   | `opus`   |
+| RED test-writing (mechanical — `tdd-guide` role `test`) | `haiku`  |
+| Docs / bookkeeping (`doc-updater`)                      | `haiku`  |
+| Implementation (`tdd-guide` role `implementation`)      | `sonnet` |
+| Code review (`code-reviewer`), E2E (`e2e-runner`), build fixes | `sonnet` |
 
 ---
 

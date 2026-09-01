@@ -230,7 +230,15 @@ Map the plan role to the agent type:
 | `cleanup`, `refactor` | `refactor-cleaner` |
 | anything else | `general-purpose` |
 
-Spawn with:
+Then read the task's **`Model`** column from the plan row (the plan template's `Model`
+legend defines the tiers). Pass it to the `Agent` call as `model:` so the worker runs on
+the cheapest capable tier — `haiku` for mechanical RED-test / docs rows, `sonnet` for
+implementation / review / e2e, `opus` for architecture / security. If the `Model` cell is
+empty or absent, omit `model:` and let the agent type's own default apply. Never let a
+worker silently inherit the orchestrator's model (see
+`~/.claude/rules/subagent-model-selection.md`).
+
+Spawn with (`Agent` tool, `subagent_type` + `model` set as above):
 
 > Read the task file at `{path}`. Perform all actions described. When complete, append a final
 > `## Completion` block to the bottom of the task file exactly as specified in the template. Do not
