@@ -7,7 +7,12 @@ description: Start any type of modern application — web apps, APIs, full-stack
 
 Provides the end-to-end workflow for discovering, selecting, and executing the correct startup procedure for any modern application — then validating success and recovering from failures.
 
-The skill also maintains a per-solution **intelligence cache** at `docs/framework/start-app.md` so subsequent runs skip the expensive discovery pass and go straight to execution. Always begin with **Step 0** below; it decides whether Steps 1–3 are needed at all.
+The skill persists two independent layers of state so repeat runs are near-instant:
+
+1. A per-solution **discovery cache** (committed) at `docs/framework/start-app.md` — the authoritative start command, service URLs/ports, env requirements, and known failure recoveries. Lets subsequent runs skip the expensive discovery pass. Managed by **Step 0**.
+2. A per-machine **runtime state sidecar** (gitignored) at `docs/framework/.start-app-runtime.json` — the live health-probe URLs, bound ports, PIDs, and the last observed startup duration. Lets a run **detect the app is already running and skip execute-and-wait entirely**, and calibrate its health-poll deadline to reality instead of a fixed 150 s. Managed by the **Step 3 pre-flight probe**.
+
+Always begin with **Step 0** below; it decides whether Steps 1–3 are needed at all. The discovery cache answers *"what command do I run?"*; the runtime sidecar answers *"is it already up, so I don't have to run anything?"*.
 
 ---
 
@@ -31,7 +36,7 @@ Every invocation begins here and resolves into exactly one of three modes.
 This is the whole point of the cache. When it is fresh:
 
 1. If the user's prompt names a variant (e.g. "start in prod mode", "backend only", "rebuild"), look up the matching row in the *Startup variants* section of the cache. Otherwise use the *Default startup command*.
-2. Skip Steps 1 and 2 entirely. Proceed directly to **Step 3 — Execute and Inspect Results** using that command.
+2. Skip Steps 1 and 2 entirely. Proceed directly to **Step 3 — Execute and Inspect Results** using that command — which begins with the [Step 3 pre-flight probe](#step-3-pre-flight--already-running-probe). If the sidecar shows the app already healthy for the requested variant, the probe short-circuits here and no command is executed at all.
 3. On success, touch only the cache's `generated` timestamp and append a `Change log` row noting the run. Do not rewrite the rest of the file — its answers are still valid.
 4. On failure, consult the cache's *Known failure recoveries* table first. If the error matches a known pattern, apply the recorded fix and retry. If it does not match, treat this as drift and fall through to **Mode 3 — Update**.
 
@@ -48,6 +53,8 @@ The cache exists but must be rewritten. Run Steps 1–3 seeded with the previous
 ### When the cache is absent by design
 
 Some repos should not have the cache checked in — e.g. ephemeral sandboxes or scratch repos. If `docs/framework/` is explicitly gitignored or the user says "don't write a cache for this repo", skip the persist step at the end of Step 3b and note the choice in the run summary. Do not create the file silently.
+
+This governs the **committed discovery cache** only. The **runtime sidecar** is gitignored and machine-local by design, so it is written even in these repos (it never enters version control) — unless the user says "don't persist anything for this repo", in which case skip both and note it.
 
 ---
 
@@ -132,6 +139,30 @@ After the user selects one, read the script to identify its parameters. Then ask
 
 ## Step 3 — Execute and Inspect Results
 
+### Step 3 pre-flight — Already-running probe
+
+**Do this before running any command.** It is the single biggest wait-saver: if the app is already up from a previous launch, executing the start command again wastes 15–150 s and can cause `EADDRINUSE` port collisions or duplicate containers.
+
+1. **Bypass conditions.** Skip the probe entirely and go straight to execution when the user's prompt asks for a fresh boot — match on `--restart`, `restart`, `--force`, `force restart`, `rebuild`, or when Step 0 resolved to **Mode 3 — Update** (a changed solution should be started fresh, not adopted). In those cases, if the sidecar records live PIDs/ports, first stop the old instance (e.g. `docker compose down`, or kill the recorded PIDs) so the fresh start is clean.
+2. **Read the sidecar.** Load `docs/framework/.start-app-runtime.json`. If it is absent, malformed, or its `machine` field does not match the current hostname, there is nothing to probe — proceed to execution.
+3. **Match the variant.** Only a run whose requested variant equals the sidecar's `last_variant` (or: no variant requested and the sidecar recorded the default) is a candidate for short-circuit. A "prod" request must not adopt a running "dev" instance — on a variant mismatch, skip to execution.
+4. **Probe health.** For each entry in the sidecar's `health_probes`, issue a cheap HTTP GET (≈2 s timeout) and compare the status to `expect_status`.
+
+```bash
+# Probe every recorded health URL; all must pass to short-circuit.
+all_healthy=1
+for url in "${HEALTH_URLS[@]}"; do
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 2 "$url" 2>/dev/null || echo 000)
+  [ "$code" = "200" ] || all_healthy=0
+done
+```
+
+5. **Decide.**
+   - **All probes pass →** the app is already running. **Short-circuit.** Announce it and stop: *"App already running (variant: `<variant>`) — <web-url>, <api-url>. Nothing to start. Use `/start-app --restart` to force a fresh boot."* Do NOT run the command, do NOT sleep, do NOT poll. Touch the sidecar's `last_probe` timestamp and exit. This is the near-instant path.
+   - **Some or no probes pass →** the app is not (fully) up. Proceed to execution below. Use the sidecar's recorded `startup_seconds` to set an informed poll deadline (`max(startup_seconds × 2, 30)`) and tell the user the expected wait: *"Typically ready in ~`<startup_seconds>` s."*
+
+Only if the pre-flight probe did **not** short-circuit do you run the command:
+
 Run the chosen command. Capture both stdout and stderr. For long-running processes (dev servers), let output stream for 10–20 seconds and then evaluate the tail.
 
 ```bash
@@ -188,6 +219,15 @@ Report the success clearly:
 - Which URL/port the app is running on
 - Which services/processes were started
 - Any relevant next steps (e.g. open browser, run migrations first, available API docs)
+
+**First, persist the runtime state sidecar** — this is what makes the *next* run's pre-flight probe able to short-circuit. Write `docs/framework/.start-app-runtime.json` (see [Runtime state sidecar — purpose and structure](#runtime-state-sidecar--purpose-and-structure)) capturing:
+- `machine`: the current hostname (so the sidecar is ignored on any other machine).
+- `last_variant` + `command`: exactly what was just run.
+- `health_probes`: the URLs and expected statuses observed responding during this start — these are the URLs the next pre-flight probe will hit.
+- `ports` / `pids`: what got bound / spawned, so a `--restart` can stop the old instance cleanly.
+- `startup_seconds`: how long this start actually took, measured from launch to first healthy probe. This calibrates the next run's poll deadline and ETA. Measure it from the run itself — do not guess.
+
+Ensure `docs/framework/.start-app-runtime.json` is gitignored before writing it (append the path to `.gitignore` if absent — it holds machine-specific PIDs/ports that must never be committed).
 
 **Then persist the intelligence cache.** Which write to perform depends on the mode Step 0 resolved to:
 
@@ -962,3 +1002,71 @@ Before saving a generated or updated cache, verify:
 - [ ] Every row in *Services* lists a URL/port that was actually observed responding during Step 3
 - [ ] *Known failure recoveries* has no duplicate rows carried over from prior runs
 - [ ] *Change log* has a new row describing the current write
+
+## Runtime state sidecar — purpose and structure
+
+### Location
+
+Always `docs/framework/.start-app-runtime.json` relative to the repo root. It sits beside the discovery cache but is a **different kind of state**: where the discovery cache is stable, human-readable, and *committed*, the runtime sidecar is volatile, machine-specific, and **must be gitignored**. It records live process facts (PIDs, bound ports) that are meaningless on another machine or after a reboot.
+
+### Purpose
+
+The discovery cache eliminates *discovery* wait ("what do I run?"). The runtime sidecar eliminates *execution* wait ("do I need to run anything at all?"). Together they turn a warm repeat invocation — same solution, app already up — into a sub-second health probe instead of a 15–150 s execute-and-poll cycle.
+
+It also carries the **observed startup duration**, which lets each run replace the generic fixed poll deadline with a calibrated one (`max(startup_seconds × 2, 30)`) and show the user a real ETA.
+
+### Why not put this in the committed cache?
+
+- PIDs and ports are true only for the machine and boot that produced them; committing them would hand every other checkout stale, misleading state.
+- Health-probe results churn on every run; committing them would create noisy diffs and merge conflicts.
+- The gitignore boundary is the mechanism that keeps the *committed* cache clean and shareable while the *local* sidecar stays honest about this machine.
+
+### `.gitignore` handling
+
+Before the first write, ensure the sidecar path is ignored. Append to the repo's `.gitignore` if the entry is absent:
+
+```
+# start-app runtime state (machine-specific — never commit)
+docs/framework/.start-app-runtime.json
+```
+
+### Structure
+
+```json
+{
+  "schema": "start-app-runtime/v1",
+  "machine": "<hostname of the machine that wrote this>",
+  "last_start": "<ISO-8601 UTC timestamp of the last successful start>",
+  "last_probe": "<ISO-8601 UTC timestamp of the last short-circuit probe>",
+  "last_variant": "<variant that was started, e.g. 'dev' or 'default'>",
+  "command": "<exact command that was executed>",
+  "startup_seconds": 42,
+  "health_probes": [
+    { "service": "api", "url": "http://127.0.0.1:8000/health", "expect_status": 200 },
+    { "service": "web", "url": "http://127.0.0.1:5173", "expect_status": 200 }
+  ],
+  "ports": [8000, 5173],
+  "pids": [12345, 12346]
+}
+```
+
+| Field | Role |
+|---|---|
+| `schema` | Versions the sidecar format; bump if the shape changes. |
+| `machine` | Guards against adopting another machine's state. A mismatch means "ignore this sidecar." |
+| `last_start` / `last_probe` | Freshness and diagnostics; not used for correctness decisions. |
+| `last_variant` | Gate for the short-circuit — only a matching requested variant may adopt a running instance. |
+| `command` | What to re-run on a `--restart`; also human context. |
+| `startup_seconds` | Calibrates the poll deadline and the ETA shown to the user. |
+| `health_probes` | The URLs the pre-flight probe hits; **all** must return `expect_status` to short-circuit. |
+| `ports` / `pids` | What to stop cleanly before a forced `--restart`. |
+
+### Writing checklist
+
+Before saving the sidecar, verify:
+
+- [ ] `docs/framework/.start-app-runtime.json` is present in `.gitignore`
+- [ ] `machine` is this host's actual name
+- [ ] `health_probes` lists only URLs that were observed returning their `expect_status` during *this* start
+- [ ] `startup_seconds` is measured from the run, not estimated
+- [ ] `last_variant` matches the variant actually started (use `"default"` when none was requested)
