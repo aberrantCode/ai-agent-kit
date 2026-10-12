@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-08-26",
+  "generated": "2026-10-12",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -624,7 +624,8 @@
         },
         "workspace": {
           "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
-          "category": "Tooling & DevOps"
+          "category": "Tooling & DevOps",
+          "has_commands": true
         },
         "worldview-layer-scaffold": {
           "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
@@ -1026,7 +1027,8 @@
         },
         "workspace": {
           "description": "Dynamic multi-repo and monorepo awareness - analyze workspace topology, track API contracts, and maintain cross-repo context",
-          "category": "Tooling & DevOps"
+          "category": "Tooling & DevOps",
+          "has_commands": true
         },
         "worldview-layer-scaffold": {
           "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
