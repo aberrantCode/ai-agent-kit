@@ -1,6 +1,7 @@
 ---
 name: github
 category: Foundations & Workflow
+install-target: global
 description: >
   Use when the user wants to perform a git or GitHub repository operation from the terminal —
   merging a pull request, branch, or worktree into dev; shipping working changes through a
