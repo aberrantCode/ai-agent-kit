@@ -1,6 +1,7 @@
 ---
 name: project-manager
 category: AI & LLM
+install-target: global
 description: >
   Automated project implementation orchestrator that drives feature-driven development from a single
   initial prompt through to completed code. Use this skill when the user invokes /init-project,

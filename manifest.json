@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-10-12",
+  "generated": "2026-10-15",
   "standard_skills": [
     "code-review",
     "git-cleanup",
@@ -478,7 +478,7 @@
           "category": "SEO & Web Presence"
         },
         "skills-manager": {
-          "description": "Full lifecycle management of LLM skills across the workstation \u2014 finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes /find-skills, /sync-skill, /install-skill, /update-skill, or /import-skill. All user interaction MUST go through the AskUserQuestion tool \u2014 never free-form text, never inline markdown questions.",
+          "description": "Full lifecycle management of LLM skills across the workstation \u2014 finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes /find-skills, /sync-skill, /install-skill, /update-skill, /push-skill, or /import-skill \u2014 AND whenever the user asks in plain language to install / deploy / push / add / set up a skill, especially phrased as \"from aberrantcode/ai-agent-kit\" (the GitHub slug for this archive), or asks to make a skill available globally or in a project. Triggers on prompts like \"install the github skill from aberrantcode/ai-agent-kit\", \"push the project-manager skill to my profile\", \"add the security skill to this repo\". Deployment is ALWAYS script-driven via scripts/push-to-profile.ps1 \u2014 never hand-copy or hand-write bundle files. All user interaction MUST go through the AskUserQuestion tool \u2014 never free-form text, never inline markdown questions.",
           "category": "Tooling & DevOps",
           "has_commands": true
         },
