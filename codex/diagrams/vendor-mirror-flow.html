@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Mirror Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f5f0ff; --surface: #ffffff; --surface2: #f0e6ff; --surface-elevated: #faf8ff;
+    --border: rgba(88,28,135,0.08); --border-bright: rgba(88,28,135,0.16);
+    --text: #1a0f2e; --text-dim: #524878;
+    --violet: #7c3aed; --violet-dim: rgba(124,58,237,0.1);
+    --indigo: #4f46e5; --indigo-dim: rgba(79,70,229,0.1);
+    --blue: #0369a1; --blue-dim: rgba(3,105,161,0.1);
+    --slate: #64748b; --slate-dim: rgba(100,116,139,0.08);
+    --emerald: #059669; --emerald-dim: rgba(5,150,105,0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a0f2e; --surface: #241a3a; --surface2: #2d1f45; --surface-elevated: #312248;
+      --border: rgba(196,181,253,0.1); --border-bright: rgba(196,181,253,0.18);
+      --text: #f0e6ff; --text-dim: #b8a5d1;
+      --violet: #d8b4fe; --violet-dim: rgba(216,180,254,0.12);
+      --indigo: #a5b4fc; --indigo-dim: rgba(165,180,252,0.12);
+      --blue: #38bdf8; --blue-dim: rgba(56,189,248,0.12);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.08);
+      --emerald: #10b981; --emerald-dim: rgba(16,185,129,0.12);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 80% 10%, var(--violet-dim) 0%, transparent 50%),
+      radial-gradient(ellipse at 15% 90%, var(--indigo-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section, .flow-section { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.08s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { max-width:1200px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin-bottom:20px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--violet { border-color:var(--violet-dim); }
+  .section--indigo { border-color:var(--indigo-dim); }
+  .section--blue { border-color:var(--blue-dim); }
+  .section-label--violet { color:var(--violet); }
+  .section-label--indigo { color:var(--indigo); }
+  .section-label--blue { color:var(--blue); }
+  .dot--violet { background:var(--violet); }
+  .dot--indigo { background:var(--indigo); }
+  .dot--blue { background:var(--blue); }
+
+  .flow-diagram { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:28px; }
+  .flow-node { background:var(--surface); border:2px solid var(--border); border-radius:10px; padding:20px; text-align:center; position:relative; transition:all 0.2s; }
+  .flow-node:hover { border-color:var(--border-bright); transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,0.08); }
+
+  .flow-node--source { border-color:var(--violet); background:linear-gradient(135deg, var(--surface) 0%, var(--violet-dim) 100%); }
+  .flow-node--mirror { border-color:var(--indigo); background:linear-gradient(135deg, var(--surface) 0%, var(--indigo-dim) 100%); }
+  .flow-node--frozen { border-color:var(--blue); background:linear-gradient(135deg, var(--surface) 0%, var(--blue-dim) 100%); }
+  .flow-node--detector { border-color:var(--emerald); background:linear-gradient(135deg, var(--surface) 0%, var(--emerald-dim) 100%); }
+
+  .node-id { font-family:var(--font-mono); font-size:13px; font-weight:700; margin-bottom:8px; }
+  .flow-node--source .node-id { color:var(--violet); }
+  .flow-node--mirror .node-id { color:var(--indigo); }
+  .flow-node--frozen .node-id { color:var(--blue); }
+  .flow-node--detector .node-id { color:var(--emerald); }
+
+  .node-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
+  .role-tag { display:inline-block; font-family:var(--font-mono); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; padding:4px 8px; border-radius:4px; margin-top:10px; }
+  .role-tag--source { background:var(--violet-dim); color:var(--violet); }
+  .role-tag--mirror { background:var(--indigo-dim); color:var(--indigo); }
+  .role-tag--frozen { background:var(--blue-dim); color:var(--blue); }
+  .role-tag--detector { background:var(--emerald-dim); color:var(--emerald); }
+
+  .flow-container { position:relative; margin:40px 0; padding:20px; background:var(--surface2); border-radius:12px; border:1px solid var(--border); }
+  .flow-title { font-family:var(--font-mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-dim); margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+  .flow-title .dot { width:5px; height:5px; }
+
+  .flow-arrows { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px; }
+  .arrow-item { display:flex; align-items:center; gap:12px; font-size:12px; color:var(--text-dim); }
+  .arrow-svg { flex-shrink:0; width:48px; height:32px; }
+  .arrow-label { display:flex; flex-direction:column; gap:4px; }
+  .arrow-from { font-family:var(--font-mono); font-weight:600; font-size:11px; }
+  .arrow-desc { font-size:10px; line-height:1.4; }
+
+  .audit-section { background:var(--surface); border:2px solid var(--emerald); border-radius:12px; padding:24px; margin-top:28px; }
+  .audit-title { font-size:14px; font-weight:700; color:var(--emerald); margin-bottom:12px; }
+  .audit-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
+  .audit-desc code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:2px 6px; border-radius:3px; }
+
+  .principles { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:24px; }
+  .principle { background:var(--surface2); border-left:3px solid var(--indigo); border-radius:8px; padding:16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .principle strong { color:var(--text); }
+  .principle code { font-family:var(--font-mono); font-size:10px; background:var(--indigo-dim); color:var(--indigo); padding:1px 5px; border-radius:3px; }
+
+  svg { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .arrow-line { stroke:var(--indigo); stroke-dasharray:4,4; opacity:0.6; }
+
+  @media (max-width:960px) { body{padding:24px 16px;} .flow-diagram{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Vendor Mirror Flow</h1>
+<p class="subtitle">Canonical authoring → on-demand mirrors → frozen exports · one-way sync</p>
+
+<div class="diagram">
+
+  <!-- Hero Section -->
+  <div class="section section--hero" style="--i:0">
+    <div class="section-label"><span class="dot dot--violet"></span> Core Concept</div>
+    <p style="font-size:13px; line-height:1.7; color:var(--text-dim);">
+      The <strong>claude/</strong> directory is the canonical authoring surface. Skills authored here flow downstream to <strong>codex/</strong> (on-demand mirror, created when actually used) and <strong>gemini/</strong> (frozen mirror, grows only by deliberate decision). Every mirror carries a source-version stamp referencing the Claude skill/version it was mirrored from. The <code>/audit-skills</code> command watches both paths for staleness and reports gaps <em>informationally</em>, never as a failure.
+    </p>
+  </div>
+
+  <!-- Flow Diagram: The Nodes -->
+  <div class="flow-diagram" style="--i:1">
+
+    <div class="flow-node flow-node--source">
+      <div class="node-id">claude/</div>
+      <div class="node-desc">Canonical authoring surface. Everything authored here first.</div>
+      <span class="role-tag role-tag--source">Source</span>
+    </div>
+
+    <div class="flow-node flow-node--mirror">
+      <div class="node-id">codex/</div>
+      <div class="node-desc">On-demand mirror. Created manually when skill is actually used from Codex. Carries source-version stamp referencing Claude skill/version.</div>
+      <span class="role-tag role-tag--mirror">Mirror</span>
+    </div>
+
+    <div class="flow-node flow-node--frozen">
+      <div class="node-id">gemini/</div>
+      <div class="node-desc">Frozen mirror. Frozen at current skill set. New Claude skills NOT automatically mirrored. Growing this set is deliberate, manual decision.</div>
+      <span class="role-tag role-tag--frozen">Frozen</span>
+    </div>
+
+    <div class="flow-node flow-node--detector">
+      <div class="node-id">/audit-skills</div>
+      <div class="node-desc">Watches both claude→codex and claude→gemini gaps. Reports staleness/gaps informationally by comparing source-version stamps.</div>
+      <span class="role-tag role-tag--detector">Monitor</span>
+    </div>
+
+  </div>
+
+  <!-- Flow Paths -->
+  <div class="flow-container" style="--i:2">
+    <div class="flow-title"><span class="dot"></span> Data Flows · One-way sync only</div>
+    <div class="flow-arrows">
+      <div class="arrow-item">
+        <svg class="arrow-svg" viewBox="0 0 48 32"><path class="arrow-line" d="M2 16 L42 16"/><path stroke="var(--indigo)" d="M38 12 L46 16 L38 20"/></svg>
+        <div class="arrow-label">
+          <div class="arrow-from">claude/ → codex/</div>
+          <div class="arrow-desc">Mirrors on-demand. Manual creation when skill is used from Codex.</div>
+        </div>
+      </div>
+
+      <div class="arrow-item">
+        <svg class="arrow-svg" viewBox="0 0 48 32"><path class="arrow-line" d="M2 16 L42 16"/><path stroke="var(--blue)" d="M38 12 L46 16 L38 20"/></svg>
+        <div class="arrow-label">
+          <div class="arrow-from">claude/ → gemini/</div>
+          <div class="arrow-desc">Frozen mirror. Deliberate, manual decision to grow.</div>
+        </div>
+      </div>
+
+      <div class="arrow-item">
+        <svg class="arrow-svg" viewBox="0 0 48 32"><path class="arrow-line" d="M46 16 L6 16"/><path stroke="var(--emerald)" d="M10 12 L2 16 L10 20"/></svg>
+        <div class="arrow-label">
+          <div class="arrow-from">/audit-skills → all</div>
+          <div class="arrow-desc">Watches. Never blocks or fails — reports only.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mirror Mechanics -->
+  <div class="section section--indigo" style="--i:3">
+    <div class="section-label"><span class="dot dot--indigo"></span> Mirror Mechanics</div>
+    <div class="principles">
+      <div class="principle">
+        <strong>codex/ is on-demand</strong><br>
+        Created manually by running a mirror command <strong>only when a skill is actually used from Codex</strong>. Does not exist by default. Each mirror carries a <code>source-version</code> stamp referencing the Claude skill name + version it was mirrored from.
+      </div>
+      <div class="principle">
+        <strong>gemini/ is frozen</strong><br>
+        Frozen at its current set of skills. New Claude skills are NOT automatically mirrored here. Growing this set is a deliberate, manual decision made by the maintainers.
+      </div>
+      <div class="principle">
+        <strong>Flow is one-way only</strong><br>
+        <code>claude/ → codex/ → (never backwards)</code>. <code>claude/ → gemini/ → (never backwards)</code>. Mirrors never push changes back to the source.
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit Mechanism -->
+  <div class="audit-section" style="--i:4">
+    <div class="audit-title">audit-skills · Gap Detection & Staleness Reporting</div>
+    <div class="audit-desc">
+      The <code>/audit-skills</code> command is the observation lens. It watches both the <strong>claude→codex</strong> and <strong>claude→gemini</strong> paths by comparing each mirror's <code>source-version</code> stamp against the current Claude original.
+    </div>
+    <div class="principles" style="margin-top:16px">
+      <div class="principle" style="border-left-color:var(--emerald)">
+        <strong>Reporting is informational</strong><br>
+        Gaps and staleness are reported for human awareness, never as a CI failure or blocker.
+      </div>
+      <div class="principle" style="border-left-color:var(--emerald)">
+        <strong>Timestamp-based staleness</strong><br>
+        Detects when a mirror's source-version stamp is older than the current Claude skill version, indicating the mirror is out of sync.
+      </div>
+      <div class="principle" style="border-left-color:var(--emerald)">
+        <strong>Presence detection</strong><br>
+        Flags skills that exist in Claude but are missing from codex/ or gemini/, or skills in mirrors with missing source-version stamps.
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Principles -->
+  <div class="section section--violet" style="--i:5">
+    <div class="section-label"><span class="dot dot--violet"></span> Design Principles</div>
+    <div class="principles">
+      <div class="principle" style="border-left-color:var(--violet)">
+        <strong>Source of truth</strong><br>
+        <code>claude/</code> is always the canonical source. All truth comes from here; mirrors are caches of intentional decisions, never authoritative.
+      </div>
+      <div class="principle" style="border-left-color:var(--violet)">
+        <strong>Manual gate on mirrors</strong><br>
+        Mirrors do not auto-sync. Each mirror creation or update is an intentional human action (running a command), ensuring deliberate control over what propagates.
+      </div>
+      <div class="principle" style="border-left-color:var(--violet)">
+        <strong>Observability over automation</strong><br>
+        <code>/audit-skills</code> provides visibility into gaps without forcing sync. Humans decide when/if to close gaps based on the report.
+      </div>
+      <div class="principle" style="border-left-color:var(--violet)">
+        <strong>Versioning is explicit</strong><br>
+        Every mirror-to-source relationship is versioned and stamped, making it easy to see exactly which Claude skill version a mirror copied and when.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

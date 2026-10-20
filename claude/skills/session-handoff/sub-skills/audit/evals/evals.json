@@ -1,0 +1,50 @@
+{
+  "skill_name": "compliance-audit",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "model-effort-delegation",
+      "prompt": "Audit ac-repo-radar Claude Code sessions from the last 6 hours for compliance with the subagent-model-selection rule in ~/.claude/rules/subagent-model-selection.md — I want to know whether subagent dispatches actually defaulted to haiku for mechanical work like I asked, or whether they silently inherited a more expensive model. Give me a report with real numbers, not a guess.",
+      "expected_output": "A rendered *.review.md report under ~/.agent/reports/ mining subagents/**/*.meta.json (and/or the bundled mine_dispatches.py script) scoped to ac-repo-radar over the last ~6 hours, with a headline compliant/violation/ambiguous breakdown backed by specific session/dispatch citations, opened via `code`. Should not fabricate dispatch counts if the actual window has zero or very few dispatches — an honest 'nothing found in this narrow window' is a valid, correct outcome.",
+      "files": [],
+      "expectations": [
+        "Report is a rendered .review.md file saved under ~/.agent/reports/",
+        "Report was opened with `code` (or the user is told the exact path to open)",
+        "Report cites ~/.claude/rules/subagent-model-selection.md by name/path",
+        "Report breaks dispatches down by requested model (haiku/sonnet/opus/unset), not just one aggregate number",
+        "Report is scoped to ac-repo-radar specifically, not all repos",
+        "Report explicitly confirms no transcript, config, or repo file was modified",
+        "If the 6h window has few or zero dispatches, the report says so honestly rather than inventing findings"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "askuserquestion-usage",
+      "prompt": "Check whether the last day of my Claude Code sessions in ac-repo-radar actually used AskUserQuestion for decisions instead of just printing a question as plain text, per ~/.claude/rules/interaction.md. I keep telling Claude to use the tool and I'm not sure it's sticking.",
+      "expected_output": "A rendered report that mines assistant message text in ac-repo-radar .jsonl transcripts from the last 24h for inline question patterns not accompanied by an AskUserQuestion tool_use, distinguishing genuine violations from rhetorical/non-blocking questions (per interaction.md's stated exceptions), with specific transcript citations (session + rough location) rather than a vague impression.",
+      "files": [],
+      "expectations": [
+        "Report is a rendered .review.md file saved under ~/.agent/reports/",
+        "Report cites ~/.claude/rules/interaction.md by name/path",
+        "Report identifies specific instances with session/location citations, not just a vague overall impression",
+        "Report distinguishes genuine violations from exceptions interaction.md itself allows (rhetorical questions, single yes/no confirmations)",
+        "Mining approach is text/tool-call based (grepping assistant messages and AskUserQuestion tool_use blocks) rather than force-fitting the meta.json subagent-dispatch script from the other eval",
+        "Report explicitly confirms no transcript, config, or repo file was modified"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "git-push-target-discipline",
+      "prompt": "In ac-repo-radar over the last 3 days, did any session ever run git push targeting dev or main directly, instead of going through a PR like CLAUDE.md requires? Just want a straight answer with evidence, and if you find any, don't fix anything, just report it.",
+      "expected_output": "A rendered report grepping Bash tool_use command strings in ac-repo-radar transcripts from the last 3 days for `git push origin dev`/`git push origin main` (or equivalents), reporting either confirmed instances with session+timestamp citations or a clean result, explicitly confirming no fix/revert was applied since the prompt said not to.",
+      "files": [],
+      "expectations": [
+        "Report is a rendered .review.md file saved under ~/.agent/reports/",
+        "Report gives a clear yes/no on whether a direct dev/main push was found, with session+timestamp evidence if yes",
+        "Report explicitly confirms no fix/revert/config change was applied, honoring the prompt's 'don't fix anything' instruction",
+        "Mining approach targets Bash tool_use command text for git push, not an unrelated data source",
+        "Report is scoped to ac-repo-radar, last 3 days"
+      ]
+    }
+  ]
+}

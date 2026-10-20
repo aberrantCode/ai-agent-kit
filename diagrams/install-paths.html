@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Install Paths</title>
+    <style>
+        :root {
+            --color-decision: #6366f1;
+            --color-action: #8b5cf6;
+            --color-step: #d946ef;
+            --color-outcome: #0891b2;
+            --color-accent: #f59e0b;
+
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+            --font-mono: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--color-decision) 0%, var(--color-action) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        .decision-tree {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .branch {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .node {
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 2px solid;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, currentColor, transparent);
+            opacity: 0.5;
+        }
+
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .node-decision {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border-color: var(--color-decision);
+            color: var(--color-decision);
+        }
+
+        .node-action {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border-color: var(--color-action);
+            color: var(--color-action);
+        }
+
+        .node-step {
+            background: linear-gradient(135deg, rgba(217, 70, 239, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%);
+            border-color: var(--color-step);
+            color: var(--text-secondary);
+        }
+
+        .node-outcome {
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, rgba(8, 145, 178, 0.05) 100%);
+            border-color: var(--color-outcome);
+            color: var(--text-secondary);
+        }
+
+        .node-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .node-decision .node-title,
+        .node-action .node-title {
+            color: currentColor;
+        }
+
+        .node-type-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 1;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .node-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .node-step .node-description,
+        .node-outcome .node-description {
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .node-step .code-block {
+            border-left-color: var(--color-step);
+        }
+
+        .connector {
+            height: 40px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .connector::after {
+            content: '';
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, currentColor 0%, transparent 100%);
+            opacity: 0.3;
+        }
+
+        .branch:nth-child(1) .connector::after {
+            background: linear-gradient(180deg, var(--color-decision) 0%, var(--color-action) 100%);
+        }
+
+        .branch:nth-child(2) .connector::after {
+            background: linear-gradient(180deg, var(--color-decision) 0%, var(--color-action) 100%);
+        }
+
+        .branch:nth-child(3) .connector::after {
+            background: linear-gradient(180deg, var(--color-decision) 0%, var(--color-action) 100%);
+        }
+
+        .start-node {
+            grid-column: 1 / -1;
+            max-width: 300px;
+            margin: 0 auto 2rem;
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-dot-decision { background: var(--color-decision); }
+        .legend-dot-action { background: var(--color-action); }
+        .legend-dot-step { background: var(--color-step); }
+        .legend-dot-outcome { background: var(--color-outcome); }
+
+        .caveat {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--color-accent);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .caveat-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .decision-tree {
+                grid-template-columns: 1fr;
+            }
+
+            .branch {
+                max-width: 500px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-dark: #f8fafc;
+                --bg-card: #f1f5f9;
+                --bg-hover: #e2e8f0;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --border-color: #cbd5e1;
+            }
+
+            .node {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .node:hover {
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            .code-block {
+                background: rgba(0, 0, 0, 0.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Skill Install Paths</h1>
+        <p class="subtitle">Choose the installation method that matches your scope and workflow.</p>
+
+        <div class="decision-tree">
+            <div class="start-node">
+                <div class="node node-decision">
+                    <div class="node-title">
+                        <span class="node-type-icon">◊</span>
+                        Pick by scope
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Install Branch -->
+            <div class="branch">
+                <div class="connector"></div>
+                <div class="node node-action">
+                    <div class="node-title">
+                        <span class="node-type-icon">⊕</span>
+                        Profile install
+                    </div>
+                    <div class="node-description">Scope: every project on this machine</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Run one-liner</div>
+                    <div class="code-block">irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-skills.ps1' | iex</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Interactive installer</div>
+                    <div class="node-description">Pick platform, asset type, deploy paths, browse/select</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-outcome">
+                    <div class="node-title">Lands in CLI home directory</div>
+                    <div class="caveat">
+                        <span class="caveat-icon">⚠</span>
+                        Executes unreviewed code from <code>main</code> with no version pin — trust caveat
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Install Branch -->
+            <div class="branch">
+                <div class="connector"></div>
+                <div class="node node-action">
+                    <div class="node-title">
+                        <span class="node-type-icon">⊕</span>
+                        Project install
+                    </div>
+                    <div class="node-description">Scope: one repository</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Run command</div>
+                    <div class="code-block">/install-skill &lt;name&gt; &lt;target-dir&gt;</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Copies bundle</div>
+                    <div class="node-description">SKILL.md + sub-skills/ + commands/ + references/ + rules/</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-outcome">
+                    <div class="node-title">Lands in .claude/ directory</div>
+                    <div class="node-description">Stamped <code>installed-from: ai-agent-kit</code>. Requires skills-manager skill profile-installed first.</div>
+                </div>
+            </div>
+
+            <!-- Clone and Copy Branch -->
+            <div class="branch">
+                <div class="connector"></div>
+                <div class="node node-action">
+                    <div class="node-title">
+                        <span class="node-type-icon">⊕</span>
+                        Clone and copy
+                    </div>
+                    <div class="node-description">No tooling required</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">git clone</div>
+                    <div class="node-description">Clone the ai-agent-kit repository</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">cp -r</div>
+                    <div class="code-block">cp -r ai-agent-kit/claude/skills/&lt;name&gt; your-project/.claude/skills/&lt;name&gt;</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-outcome">
+                    <div class="node-title">Skill installed locally</div>
+                    <div class="node-description">Manual installation, no versioning metadata</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-dot legend-dot-decision"></span>
+                Decision
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot legend-dot-action"></span>
+                Action Path
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot legend-dot-step"></span>
+                Step
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot legend-dot-outcome"></span>
+                Outcome
+            </div>
+        </div>
+    </div>
+</body>
+</html>

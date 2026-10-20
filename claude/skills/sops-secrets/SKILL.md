@@ -32,7 +32,9 @@ When **agents** need to check, provision, rotate, or apply secrets, use the
 **Secrets-Broker MCP server** (Python FastMCP on the workstation). Its tools
 return **references + fingerprints only, never plaintext** — removing the
 handoff pause and closing the transcript side-channels. Setup:
-`bash scripts/mcp/setup-venv.sh`.
+`bash scripts/mcp/setup-venv.sh` — this script and the MCP server it
+bootstraps live in the workstation-side tooling repo, not in this skill
+bundle.
 
 Key tools:
 - **`secret_exists(file, key)`** — check existence; returns a `sha256:<8hex>` fingerprint.
@@ -113,7 +115,9 @@ All commands are thin wrappers that:
 
 - **`/sync-keepass`** — Re-mirror SOPS → KeePass on demand (thin wrapper around
   `scripts/sync-secrets-to-keepass.sh`). Useful after a manual `sops` edit on
-  ac-devops. See `.claude/commands/sync-keepass.md`.
+  ac-devops. See `.claude/commands/sync-keepass.md`. `scripts/sync-secrets-to-keepass.sh`
+  is the existing AC_OPBTA-side sync script, not shipped by this bundle (same
+  class as `scripts/get-secret.sh` below).
 
 ## What the skill is *not* for
 
@@ -163,7 +167,9 @@ scripts/sops/
 older, lower-level interface — give it a SOPS file basename and a key, get the
 value. It's **kept as-is** for raw SOPS access and for things outside the
 service catalog (ad PSKs, Wireguard preshared keys, the qBittorrent conf
-payload, etc.).
+payload, etc.). Both `.claude/commands/get-secret.md` and the
+`scripts/get-secret.sh` it backs predate this skill and live in the consuming
+repo (AC_OPBTA) — neither is shipped by this bundle.
 
 `/get-service-auth` is the higher-level, opinionated alternative for the
 common case ("I just need the admin login for X"). Most session interactions

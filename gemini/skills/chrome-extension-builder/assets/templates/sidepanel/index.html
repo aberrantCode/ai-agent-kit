@@ -1,0 +1,19 @@
+<!-- entrypoints/sidepanel/index.html -->
+<!-- WXT HTML entrypoint. Drop this folder in as entrypoints/sidepanel/ and
+     WXT will register it as the extension's side panel (see
+     ../../references/wxt-config.md#html-entrypoints-popup-side-panel-options
+     and set `manifest.permissions: ['sidePanel']`,
+     `manifest.side_panel.default_path: 'sidepanel.html'` per
+     ../../references/mv3-permissions.md#side-panel-sidepanel). -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Side Panel</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

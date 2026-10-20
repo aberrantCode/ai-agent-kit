@@ -25,6 +25,10 @@ codex/
 gemini/
   instructions/                     — agent instructions for Gemini CLI
   skills/<name>/SKILL.md
+shared/                       — vendor-neutral assets (any CLI can consume)
+  prompts/  workflows/  configs/  plugins/
+  guardrails/<name>.md        — reusable CLAUDE.md/AGENTS.md/GEMINI.md rules & snippets
+                                (managed by the guardrails-manager skill)
 .claude/commands/             — repo-local slash commands (skills-manager)
 logs/timing.jsonl             — `/ship` timing log
 ```
@@ -52,6 +56,7 @@ logs/timing.jsonl             — `/ship` timing log
 | `status:` | no | `draft` \| `active` \| `deprecated` — defaults to `active` |
 | `version:` | no | semver or ISO date |
 | `requires:` | no | list of skill names this skill depends on |
+| `install-target:` | no | `global` \| `project` — default deploy target for `/install-skill`; unset ⇒ `global` (and always `global` when the cwd is not a repo). Workflow skills (`github`, `project-manager`, `skills-manager`) are `global` |
 | `installed-from:` | no | set to `ai-agent-kit` on installed copies only (legacy: `llm_skills`) |
 
 ---
@@ -69,6 +74,10 @@ logs/timing.jsonl             — `/ship` timing log
 | `/push-skill <name>` | Push skill bundle to global `~/.claude/skills/` |
 | `/search-skill <query>` | Keyword search across archive |
 | `/backfill-diagrams` | Generate missing `diagram.html` files |
+| `/archive-guardrail` | Capture a `CLAUDE.md`/`AGENTS.md` file, section, or snippet into `shared/guardrails/` |
+| `/install-guardrail <name> [dir]` | Deploy a guardrail into a project's `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` |
+
+**Deployment is script-driven — never hand-copy.** `/install-skill`, `/push-skill`, and the write phase of `/update-skill` deploy a bundle only by running `scripts/push-to-profile.ps1` (preview, then `-Force`; `-TargetDir <project>/.claude/skills` for a project target). Hand-authoring bundle files into a target with the editor skips provenance stamping, sub-skill nesting, companion-command relocation, backups, and draft gating. A natural-language request like "install the github skill from aberrantcode/ai-agent-kit" routes to `/install-skill`.
 
 ---
 
@@ -93,6 +102,7 @@ This project uses the `project-manager` skill from the LLM Skills archive. All f
 ```
 docs/
   REQUIREMENTS.md         Product requirements — source of truth (never modified)
+  requirements/*.md       Approved requirements docs — binding scope for a body of work
   features/*.md           Feature specs — scope authority
   features/template.md    Canonical spec template
   plans/*.md              One plan per feature spec

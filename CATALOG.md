@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-07-28, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-15, schemaVersion: 1)
 -->
 
 # Catalog
@@ -24,7 +24,6 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`claim-discipline`](claude/skills/claim-discipline/SKILL.md) | Use when about to state a checkable claim as fact — a file path, a line number, a count ("appears N times", "2 stale branches"), a quote ("the rule says X"), or "file Y contains / lacks Z". Verify it with a tool call ... | — |
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
-| [`continue-new-session-prompt`](claude/skills/continue-new-session-prompt/SKILL.md) | Hand off the current session's unresolved decisions to a fresh Claude Code session running in a new Windows Terminal tab. Use this skill whenever the user says "continue in a new session", "spawn a new terminal and ke... | — |
 | [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/SKILL.md) | Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps — mine prior Claude conversation transcripts instead... | — |
 | [`existing-repo`](claude/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | codex |
 | [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
@@ -34,6 +33,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`guide-assistant`](claude/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | codex |
 | [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/SKILL.md) | Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification... | — |
 | [`iterative-development`](claude/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | codex |
+| [`one-job-test`](claude/skills/one-job-test/SKILL.md) | Test an installed agent skill against one real job to decide whether to keep it, fork it, or delete it. Use this whenever the user mentions installing, evaluating, auditing, trusting, pruning, or being disappointed by... | — |
 | [`parallel-subagent-fanout`](claude/skills/parallel-subagent-fanout/SKILL.md) | Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature b... | — |
 | [`pre-pr`](claude/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | codex |
 | [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/SKILL.md) | Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, a... | — |
@@ -41,14 +41,16 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`requesting-code-review`](claude/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | codex |
 | [`retro-fit-spec`](claude/skills/retro-fit-spec/SKILL.md) | Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section | codex |
 | [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/SKILL.md) | Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, com... | — |
+| [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Umbrella for two related but distinct session-lifecycle operations: handing off open work to a fresh Claude Code session, and auditing whether past session behavior actually followed a stated rule. Use this skill when... | — |
 | [`session-management`](claude/skills/session-management/SKILL.md) | Context preservation, tiered summarization, resumability | codex |
+| [`spawn-terminal`](claude/skills/spawn-terminal/SKILL.md) | Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script — independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to "o... | — |
 | [`spec-align`](claude/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | codex |
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/SKILL.md) | Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scop... | — |
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/SKILL.md) | Use when a script, agent, or session is about to act on a remembered reference — a git default branch, a cached IP/credential, an "SSH is broken" note in memory — before any destructive or high-stakes operation. Verif... | — |
 | [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/SKILL.md) | Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them — a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one s... | — |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | codex |
 | [`team-coordination`](claude/skills/team-coordination/SKILL.md) | Multi-person projects - shared state, todo claiming, handoffs | codex |
-| [`what-next`](claude/skills/what-next/SKILL.md) | Decide what the agent should do next in the current repository. Use this skill whenever the user asks "what next?", "what should I work on?", "where did we leave off?", "what's on the backlog?", "help me pick the next... | — |
+| [`work-resume`](claude/skills/work-resume/SKILL.md) | Use when the operator wants to pick up where they left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish that", "what's next here", "I forgot where I left off". Scans... | — |
 
 ### Languages & Runtimes
 
@@ -145,6 +147,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`agentic-development`](claude/skills/agentic-development/SKILL.md) | Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js) | codex |
 | [`ai-models`](claude/skills/ai-models/SKILL.md) | Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate | codex |
 | [`csv-driven-llm-pipeline`](claude/skills/csv-driven-llm-pipeline/SKILL.md) | Build a stateful, resumable batch pipeline driven by CSV files with per-row pipeline-state columns. Use whenever the user wants to iterate over a corpus and do per-row work that may take time, hit external APIs, call ... | — |
+| [`fleet-llm`](claude/skills/fleet-llm/SKILL.md) | Talk to the operator's self-hosted Open WebUI / ollama fleet from the terminal — list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull or remove models, or hit any fleet endpoint ... | — |
 | [`honcho`](claude/skills/honcho/SKILL.md) | Work with Honcho — the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, in... | — |
 | [`llm-patterns`](claude/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | codex |
 | [`project-manager`](claude/skills/project-manager/SKILL.md) | Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-fea... | codex, gemini |
@@ -184,10 +187,13 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`add-remote-installer`](claude/skills/add-remote-installer/SKILL.md) | Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install dir... | codex |
 | [`content-aware-file-renaming`](claude/skills/content-aware-file-renaming/SKILL.md) | Use when renaming files into a structured naming formula based on their contents — especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files ... | — |
 | [`graphify`](claude/skills/graphify/SKILL.md) | any input (code, docs, papers, images) → knowledge graph → clustered communities → HTML + JSON + audit report. Use when user asks any question about a codebase, project content, architecture, or file relationships — e... | — |
+| [`guardrails-manager`](claude/skills/guardrails-manager/SKILL.md) | Lifecycle management of vendor-neutral agent guardrails — the reusable CLAUDE.md / AGENTS.md / GEMINI.md rules, snippets, and whole-file captures archived under shared/guardrails/. Use when the user invokes /archive-g... | — |
 | [`project-tooling`](claude/skills/project-tooling/SKILL.md) | gh, vercel, supabase, render CLI and deployment platform setup | codex |
 | [`remote-installer`](claude/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | codex |
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
 | [`start-app`](claude/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | codex |
+| [`startup-context-audit`](claude/skills/startup-context-audit/SKILL.md) | Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big — "why does a new session start with tokens", "what's in my context window at launch", "... | — |
+| [`statusline`](claude/skills/statusline/SKILL.md) | Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line — the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on... | — |
 | [`usage-limit-reducer`](claude/skills/usage-limit-reducer/SKILL.md) | Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like "hit my limit", "running out of tok... | — |
 | [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
@@ -422,18 +428,18 @@ count (G5, `docs/requirements/canonical-repo.md`).
 |---|---|---|
 | [architect](claude/instructions/architect.md) | Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions. | opus |
 | [backend-api-developer](claude/instructions/backend-api-developer.md) | Use this agent when working on backend API development tasks in the monorepo, including implementing FastAPI routes, creating or modifying SQLModel/Pydantic models, running database migrations with Alembic, writing or... | sonnet |
-| [build-error-resolver](claude/instructions/build-error-resolver.md) | Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quic... | opus |
-| [code-reviewer](claude/instructions/code-reviewer.md) | Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes. | opus |
-| [doc-updater](claude/instructions/doc-updater.md) | Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides. | opus |
+| [build-error-resolver](claude/instructions/build-error-resolver.md) | Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quic... | sonnet |
+| [code-reviewer](claude/instructions/code-reviewer.md) | Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes. | sonnet |
+| [doc-updater](claude/instructions/doc-updater.md) | Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides. | haiku |
 | [docs-test-engineer](claude/instructions/docs-test-engineer.md) | Use this agent when you need to create or update documentation, write unit or integration tests, design test plans, or establish QA guidance for the monorepo. This includes writing README files, API documentation, tes... | sonnet |
-| [e2e-runner](claude/instructions/e2e-runner.md) | End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ... | opus |
+| [e2e-runner](claude/instructions/e2e-runner.md) | End-to-end testing specialist using Playwright. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ... | sonnet |
 | [non-blocking-loading](claude/instructions/non-blocking-loading.md) |  | — |
 | [planner](claude/instructions/planner.md) | Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks. | opus |
-| [refactor-cleaner](claude/instructions/refactor-cleaner.md) | Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it. | opus |
+| [refactor-cleaner](claude/instructions/refactor-cleaner.md) | Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it. | sonnet |
 | [security-reviewer](claude/instructions/security-reviewer.md) | Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto,... | opus |
 | [ship-to-prod](claude/instructions/ship-to-prod.md) |  | — |
 | [ship-to-uat](claude/instructions/ship-to-uat.md) |  | — |
-| [tdd-guide](claude/instructions/tdd-guide.md) | Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage. | opus |
+| [tdd-guide](claude/instructions/tdd-guide.md) | Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage. | sonnet |
 | [webui-developer](claude/instructions/webui-developer.md) | Use this agent when working on the React/TypeScript WebUI application located in apps/webui. This includes component development, Storybook stories, linting, testing, build issues, and local development environment se... | sonnet |
 
 ## Codex Instructions
@@ -469,10 +475,12 @@ than duplicated here.
 | [/diff-review](claude/commands/diff-review.md) | Generate a visual HTML diff review — before/after architecture comparison with code review analysis |
 | [/e2e](claude/commands/e2e.md) | Generate and run end-to-end tests with Playwright. Creates test journeys, runs tests, captures screenshots/videos/traces, and uploads artifacts. |
 | [/fact-check](claude/commands/fact-check.md) | Verify the factual accuracy of a document against the actual codebase, correct inaccuracies in place |
+| [/fleet-llm](claude/commands/fleet-llm.md) | Talk to the self-hosted Open WebUI / ollama fleet — list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull/remove models, or hit any fleet endpoint raw. Thin wrapper over the fleet... |
 | [/generate-slides](claude/commands/generate-slides.md) | Generate a stunning magazine-quality slide deck as a self-contained HTML page |
 | [/generate-web-diagram](claude/commands/generate-web-diagram.md) | Generate a beautiful standalone HTML diagram and open it in the browser |
 | [/initialize-project](claude/commands/initialize-project.md) | Full project setup with Claude coding guardrails. Works for both new and existing projects. |
 | [/new-action](claude/commands/new-action.md) | You are creating a new action JSON file for the OSM profile configurator. The file will be placed in `assets/actions/all/`. |
+| [/opbta-update](claude/commands/opbta-update.md) | Alias of /update-service — update an existing OPBTA service on svc.opbta.com (bump/reconcile image, config, ports, env, or exposure). Matches the opbta-service skill's /opbta-* command family. |
 | [/plan](claude/commands/plan.md) | Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code. |
 | [/plan-review](claude/commands/plan-review.md) | Generate a visual HTML plan review — current codebase state vs. proposed implementation plan |
 | [/project-recap](claude/commands/project-recap.md) | Generate a visual HTML project recap — rebuild mental model of a project's current state, recent decisions, and cognitive debt hotspots |
@@ -485,6 +493,7 @@ than duplicated here.
 | [/update-code-index](claude/commands/update-code-index.md) | Regenerates `CODE_INDEX.md` by scanning the codebase for all functions, classes, hooks, and components. Organizes by capability to prevent semantic duplication. |
 | [/update-codemaps](claude/commands/update-codemaps.md) | Analyze the codebase structure and update architecture documentation: |
 | [/update-docs](claude/commands/update-docs.md) | Sync documentation from source-of-truth: |
+| [/update-service](claude/commands/update-service.md) | Update an existing OPBTA service on svc.opbta.com — bump/reconcile image, config, ports, env, or exposure. Resolves the target from the current repo's .opbta-service breadcrumb (else a service picker), plans once for ... |
 
 ## Shared Assets
 

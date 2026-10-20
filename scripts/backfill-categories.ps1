@@ -236,7 +236,6 @@ $script:CategorySeed = [ordered]@{
     'web-content' = 'SEO & Web Presence'
     'web-design-guidelines' = 'UI & Design'
     'web-payments' = 'Commerce & Payments'
-    'what-next' = 'Foundations & Workflow'
     'woocommerce' = 'Commerce & Payments'
     'workspace' = 'Tooling & DevOps'
     'worldview-layer-scaffold' = 'Research & OSINT'

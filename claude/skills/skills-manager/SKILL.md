@@ -1,12 +1,19 @@
 ---
 name: skills-manager
 category: Tooling & DevOps
+install-target: global
 description: >
   Full lifecycle management of LLM skills across the workstation — finding, archiving,
   installing, updating, and importing skills with their complete bundles (sub-skills +
   companion commands). Use when the user invokes /find-skills, /sync-skill, /install-skill,
-  /update-skill, or /import-skill. All user interaction MUST go through the AskUserQuestion
-  tool — never free-form text, never inline markdown questions.
+  /update-skill, /push-skill, or /import-skill — AND whenever the user asks in plain language
+  to install / deploy / push / add / set up a skill, especially phrased as "from
+  aberrantcode/ai-agent-kit" (the GitHub slug for this archive), or asks to make a skill
+  available globally or in a project. Triggers on prompts like "install the github skill from
+  aberrantcode/ai-agent-kit", "push the project-manager skill to my profile", "add the
+  security skill to this repo". Deployment is ALWAYS script-driven via scripts/push-to-profile.ps1
+  — never hand-copy or hand-write bundle files. All user interaction MUST go through the
+  AskUserQuestion tool — never free-form text, never inline markdown questions.
 ---
 
 # Skills Manager
@@ -21,6 +28,11 @@ You are the domain expert for the AI Agent Kit at `C:\development\ai-agent-kit`.
 
 ### Archive
 `C:\development\ai-agent-kit` is the single source of truth for all LLM skills, agents, and commands. It consolidates skills from the global Claude profile (`~/.claude/`) and all projects under `C:\development\`.
+
+**`aberrantcode/ai-agent-kit` IS this archive.** When a user says "install the github skill from aberrantcode/ai-agent-kit" (or any variation — `aberrantCode/ai-agent-kit`, "the ai-agent-kit repo", "the archive"), they mean this archive. **Local-first:** if `C:\development\ai-agent-kit` exists, it is the source — deploy from it with the local scripts (it reflects the newest local edits). Only fall back to the remote GitHub bootstrap (`irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-skills.ps1' | iex`) when there is no local checkout. Before deploying from a local checkout, check whether it is in sync with its upstream (`git -C C:\development\ai-agent-kit status -sb`, or `git rev-list --left-right --count '@{u}...HEAD'`); if the local checkout is **ahead of** or **behind** `origin`, warn the user via `AskUserQuestion` (local is ahead → you may deploy unpushed work; local is behind → you may deploy stale work) and let them choose to continue, pull first, or abort.
+
+### Deployment is script-driven (never hand-copy)
+Every deployment of a bundle to a target — `/install-skill` (into a project or the profile), `/push-skill` (to the profile), and the write phase of `/update-skill` — MUST be performed by running `scripts/push-to-profile.ps1`, never by authoring files with the Write/Edit tools. The script does configuration work a manual copy silently skips: it stamps `installed-from: ai-agent-kit` provenance on every copied `SKILL.md`, keeps sub-skills **nested** inside the bundle (a loose top-level copy shadows the bundle's own sub-skill — `audit.ps1` Check 8 `profile-shadowing`), relocates companion commands to the discoverable top-level `commands/` dir, backs up any existing bundle before replacing it, and skips `status: draft` bundles. A hand-copy that misses any of these produces a subtly broken install. The script is preview-only by default; pass `-Force` to write.
 
 ### Skill Bundle
 A skill directory may contain optional subdirectories that travel with it:
@@ -75,6 +87,19 @@ All `SKILL.md` files support these optional frontmatter fields beyond the requir
 - **`version`**: semver string (e.g. `1.2.0`) or ISO date (e.g. `2026-04-05`) — displayed by `/update-skill` so the user sees the version delta before accepting an update
 
 - **`requires`**: YAML list of skill names this skill depends on (e.g. `[project-manager, base]`) — `/install-skill` reads this and auto-installs all listed dependencies before installing the target skill
+
+- **`install-target`**: `global` | `project` (optional) — the skill's preferred default deployment target when `/install-skill` is run without an explicit target. `global` → the user profile (`~/.claude/`), available in every project; `project` → the current project's `.claude/`. Workflow skills that must be available everywhere are stamped `global` (`github`, `project-manager`, `skills-manager`); content/implementation skills can opt into `project`.
+
+### Install-target resolution
+
+When `/install-skill` must decide where to deploy and the user did not name a target, resolve in this order (first match wins):
+
+1. **Explicit user instruction** in the prompt ("…to my profile", "…into this repo") — honor it.
+2. **The skill's `install-target:` frontmatter** — if set, use it.
+3. **Not in a repo → `global`.** If Claude's working directory is not a git repository (`git rev-parse --is-inside-work-tree` is false/errors), deploy to the profile — there is no project to install into.
+4. **Default → `global`.** With no field and no other signal, deploy to the profile.
+
+A skill reaches the current project (not the profile) only when step 1 or step 2 selects `project` **and** step 3 found a repo. Always confirm the resolved target with `AskUserQuestion` before writing (see `/install-skill`).
 
 ---
 
@@ -162,48 +187,37 @@ Archive a specific skill (or all discovered skills) including its full bundle.
 
 ## Operation: /install-skill [name] [target-dir]
 
-Deploy a skill bundle from the archive into a project.
+Deploy a skill bundle from the archive to a target — the global profile or a specific project. This operation is the landing spot for natural-language requests such as *"install the github skill from aberrantcode/ai-agent-kit"*, *"push the project-manager skill to my profile"*, or *"add the security skill to this repo"*.
+
+**Deployment is script-driven — do NOT hand-copy.** Every write goes through `scripts/push-to-profile.ps1` (see *Deployment is script-driven* under Core Concepts). The Write/Edit tools must never author bundle files into a target.
 
 ### Steps
 
 1. **Determine scope:**
    - If `name` given: install that skill only
-   - If no `name`: enumerate all skills in `claude/skills/` that have not already been installed in `target-dir`; use `AskUserQuestion` to confirm:
-     - Question: "Install all N available skills into `<target>`? This will write N files."
-     - Options: "Yes, install all" | "Cancel"
-     - Proceed only on confirm
+   - If no `name`: enumerate all skills in `claude/skills/` not already deployed to the resolved target; use `AskUserQuestion` to confirm "Install all N available skills into `<target>`?" → "Yes, install all" | "Cancel"
 
-2. For a named skill: locate `claude/skills/<name>/` in the archive; if not found use `AskUserQuestion`:
+2. For a named skill: confirm `claude/skills/<name>/` exists in the archive; if not, use `AskUserQuestion`:
    - Question: "Skill `<name>` not found in archive. Check the name and try again."
    - Options: "OK" | "List available skills"
 
-3. If `target-dir` not provided, use `AskUserQuestion`:
-   - Question: "Where should the skill(s) be installed?"
-   - Options: "Current project directory" | "Other path (specify below)"
+3. **Resolve the target** (see *Install-target resolution* under Skill Metadata Standards): honor an explicit user instruction → else the skill's `install-target:` frontmatter → else `global` if not in a repo → else `global`. Then confirm with `AskUserQuestion`:
+   - Question: "Install `<name>` to `<resolved target>`? (global = `~/.claude/`, project = `<cwd>/.claude/`)"
+   - Options: "Yes, <resolved> (Recommended)" | "The other target" | "Cancel"
 
-4. Resolve dependencies: read `requires:` list from each skill's frontmatter; recursively locate those skill bundles in the archive and add them to the install scope. Deduplicate — never install the same skill twice.
+4. **Local-first + sync check:** the source is the local archive at `C:\development\ai-agent-kit`. Before deploying, verify it is in sync with `origin` (`git -C C:\development\ai-agent-kit status -sb`); if ahead or behind, warn via `AskUserQuestion` and let the user continue / pull first / abort. If there is no local checkout, fall back to the remote bootstrap (`irm '…/install-skills.ps1' | iex`).
 
-5. Inventory what will be installed (target skill + all resolved dependencies):
-   - `SKILL.md` (1 file per skill)
-   - Sub-skills from `sub-skills/` (N files)
-   - Commands from `commands/` (N files)
-   - References from `references/` (N files)
-   - Rules from `rules/` (N files)
-   - Scripts from `scripts/` (N files)
+5. Resolve dependencies: read each skill's `requires:` frontmatter; recursively add those bundles to the install scope. Deduplicate.
 
-6. If `name` was given, use `AskUserQuestion` to confirm:
-   - Question: "Install `<name>` (+ N dependencies) into `<target>`? This will write N files."
-   - Options: "Yes, install" | "Cancel"
+6. **Preview** with the script (no `-Force`), once per bundle in scope:
+   - Global target: `pwsh ./scripts/push-to-profile.ps1 -Name <name>`
+   - Project target: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -TargetDir "<project>/.claude/skills"` — the script writes the bundle under that skills root and relocates companion commands to the sibling `<project>/.claude/commands`, stamping provenance exactly as a profile push does.
 
-7. On confirm:
-   - Write `<target>/.claude/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (add after existing fields)
-   - Write each sub-skill to `<target>/.claude/skills/<sub>/SKILL.md` with same marker
-   - Write each command to `<target>/.claude/commands/<cmd>.md` (no marker — commands are not skills)
-   - Copy each `references/**` file to `<target>/.claude/skills/<name>/references/**` (no marker)
-   - Copy each `rules/**` file to `<target>/.claude/skills/<name>/rules/**` (no marker)
-   - Copy each `scripts/**` file to `<target>/.claude/skills/<name>/scripts/**` (no marker)
+   Show the previewed file list / member summary to the user.
 
-8. Report all files written
+7. On confirm, re-run each command **with `-Force`** to write. The script stamps `installed-from: ai-agent-kit`, nests sub-skills, relocates commands, and backs up any existing bundle automatically.
+
+8. Report the script's output (files written, sub-skills nested, commands relocated, any backup taken) for the target skill and every dependency.
 
 ---
 
@@ -226,14 +240,13 @@ Update installed skills in the current project when the archive has newer versio
    - If updating one by name: "Update `<name>` to the archive version? (v1.0 → v1.2)"
    - Options: "Yes, update" | "Cancel"
 
-5. On confirm:
-   - Overwrite each `SKILL.md`, preserving the `installed-from: ai-agent-kit` marker in frontmatter
-   - Also check `commands/` in the archive bundle — write any new or changed commands to `<project>/.claude/commands/`
-   - Also check `sub-skills/` — update any installed sub-skills that are outdated
-   - Also check `references/`, `rules/`, and `scripts/` in the archive bundle — write any new or changed files to `<project>/.claude/skills/<name>/references/**`, `<project>/.claude/skills/<name>/rules/**`, and `<project>/.claude/skills/<name>/scripts/**`
-   - Regenerate the diagram: invoke `visual-explainer:generate-web-diagram` for each updated skill and overwrite `claude/skills/<name>/diagram.html`; update the `## Diagram` section in SKILL.md if the path changed
+5. On confirm — **re-deploy via the script, do NOT hand-overwrite** (same engine as `/install-skill`; `sync-installed.ps1` remains a stub):
+   - Profile copy: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -Force`
+   - Project copy: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -TargetDir "<project>/.claude/skills" -Force`
 
-6. Report updated files
+   The script re-copies the whole bundle (SKILL.md + sub-skills + references + rules + scripts), relocates companion commands, re-stamps `installed-from: ai-agent-kit`, and backs up the previous copy — so an update is just a push over the existing install.
+
+6. Report the script's output for each updated skill
 
 ---
 
@@ -395,7 +408,9 @@ strict subset of the bundle version is safe to delete outright.
 
 ## Operation: /push-skill [name]
 
-Push a skill bundle from the archive to the global user profile (`~/.claude/`) so it is available across all projects.
+Push a skill bundle from the archive to the global user profile (`~/.claude/`) so it is available across all projects. `/push-skill <name>` is exactly `/install-skill <name>` with the target fixed to `global`.
+
+**Deployment is script-driven — do NOT hand-copy.** `scripts/push-to-profile.ps1` is the implementation; it stamps provenance, nests sub-skills, relocates companion commands to the top-level `~/.claude/commands/`, backs up any existing bundle, and skips drafts. The Write/Edit tools must never author profile files.
 
 ### Steps
 
@@ -406,21 +421,15 @@ Push a skill bundle from the archive to the global user profile (`~/.claude/`) s
      - Options: "Yes, push all" | "Cancel"
      - Proceed only on confirm
 
-2. For each skill to push:
-   - Check if `status: draft` — skip with a warning; drafts are not pushed to the global profile
-   - Check if `~/.claude/skills/<name>/SKILL.md` already exists and differs — use `AskUserQuestion`:
-     - Question: "~/.claude/skills/<name> exists and differs. Overwrite with archive version?"
-     - Options: "Yes, overwrite" | "Skip this skill"
+2. **Local-first + sync check** (see *aberrantcode/ai-agent-kit* under Core Concepts): the source is the local archive; warn via `AskUserQuestion` if it is ahead of or behind `origin` before deploying.
 
-3. On confirm — deploy the bundle **nested**, mirroring the archive. The parent skill plus its companion commands are the only top-level entry points; each sub-skill stays *inside* the bundle and is reached through the parent's relative `sub-skills/<sub>` path. **Never write a sub-skill to a loose top-level `~/.claude/skills/<sub>/` directory** — that shadows the bundle's own sub-skill (`audit.ps1` Check 8, `profile-shadowing`) and breaks the parent's delegation. This is exactly what `scripts/push-to-profile.ps1` does — prefer running it (`-Name <name> -Force`) over hand-copying. Writes:
-   - `SKILL.md` → `~/.claude/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (after existing fields). A pushed bundle is a downstream **copy** of the archive — a deployment target, exactly like `/install-skill` writing into a project, NOT an authoritative source. The marker makes `/find-skills` and `/sync-skill` skip it, so a pushed copy can never masquerade as a profile-authored source and clobber the archive it came from (the profile is priority #1 in conflict resolution). Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.
-   - Each sub-skill → `~/.claude/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
-   - Each companion command → `~/.claude/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
-   - Each `references/**` file → `~/.claude/skills/<name>/references/**` (no marker).
-   - Each `rules/**` file → `~/.claude/skills/<name>/rules/**` (no marker).
-   - Each `scripts/**` file → `~/.claude/skills/<name>/scripts/**` (no marker).
+3. **Preview** each bundle with no `-Force`: `pwsh ./scripts/push-to-profile.ps1 -Name <name>`. The script reports the members it would copy; `status: draft` bundles report as skipped. If a destination bundle already exists it will be backed up to a sibling `<skillsRoot>-backups/<name>.bak-<ts>` (not a silent clobber), so no separate overwrite prompt is needed — but show the preview and confirm with `AskUserQuestion` before writing.
 
-4. Report all files written
+4. On confirm, re-run **with `-Force`**: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -Force`.
+
+5. Report the script's output. (A pushed bundle is a downstream **copy** — stamped `installed-from: ai-agent-kit` so `/find-skills` and `/sync-skill` skip it and it can never masquerade as a profile-authored source and clobber the archive it came from. Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.)
+
+For a non-default vendor or skills root, pass `-Vendor claude|codex|gemini` and/or `-TargetDir`; see the script's comment-based help.
 
 ---
 
@@ -482,6 +491,7 @@ If no keywords match: **Uncategorized**. Multiple matches: most keyword hits win
 3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
 4. **Toolset is determined by directory, not content.**
 5. **Installed copies are not project-developed skills.** The `installed-from: ai-agent-kit` marker gates this distinction.
+6. **Deployment is script-driven — never hand-copy.** `/install-skill`, `/push-skill`, and the write phase of `/update-skill` deploy a bundle ONLY by running `scripts/push-to-profile.ps1` (preview, then `-Force`). Authoring bundle files into a target with the Write/Edit tools is prohibited — it skips provenance stamping, sub-skill nesting, command relocation, backups, and draft gating, producing a subtly broken install.
 
 ## Diagram
 

@@ -1,0 +1,33 @@
+# Service -> SOPS file -> key paths (machine-readable).
+#
+# `/get-service-auth` and `/list-service-auth` read this file; `scripts/sops/get-auth.sh`
+# and `scripts/sops/list-services.sh` are the scripts that actually parse it (via the
+# python3 shim — see parser-tooling.md, never `yq`).
+#
+# When adding a new service's credentials to this skill, add an entry here FIRST
+# (per SKILL.md "What the skill is *not* for"), then everything else — /get-service-auth,
+# /update-auth, /rotate-service-password — works against it automatically.
+#
+# Schema per entry:
+#   <service-key>:
+#     url: <admin URL for the service, or null if there isn't one>
+#     sops_file: secrets/<file>.enc.yml   # relative to repo root on ac-devops
+#     username_key: <dotted key path inside the decrypted file, or "static:<value>"
+#                    if the username is fixed and not stored in SOPS, e.g. "admin">
+#     password_key: <dotted key path inside the decrypted file>
+#
+# The entries below are illustrative placeholders, not live credentials data —
+# populate real entries from this repo's actual `secrets/*.enc.yml` key layout as
+# services are onboarded.
+
+example-service:
+  url: https://example-service.svc.opbta.com
+  sops_file: secrets/example-service.enc.yml
+  username_key: "static:admin"
+  password_key: admin_password
+
+example-service-with-token:
+  url: https://example-token-service.svc.opbta.com
+  sops_file: secrets/example-token-service.enc.yml
+  username_key: null
+  password_key: api_token

@@ -48,8 +48,8 @@ empty, then generate §2/§3.
 - `docs/backlog-archive.md` — archive of completed backlog items; used for BL-id uniqueness validation across live + archive
 - `docs/STATUS.md` — the current file, to preserve its curated fences
 
-If `references/scripts/pm-status.ps1` exists, prefer it for the §2 counts; otherwise
-do the markdown scan below.
+If the skill-relative `references/scripts/pm-status.ps1` exists, prefer it for the §2 counts;
+otherwise do the markdown scan below.
 
 ## Step 1 — Generate §2 Progress by feature
 

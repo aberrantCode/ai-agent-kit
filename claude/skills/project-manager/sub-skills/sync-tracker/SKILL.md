@@ -14,14 +14,14 @@ markdown remains the source of truth.
 
 1. Confirm the repo has project-manager scaffolding.
 2. Run `gh auth status`. If it fails, stop and report that GitHub sync is unavailable.
-3. Run `references/scripts/pm-validate.ps1` if present. If validation fails, stop before syncing.
+3. Run the skill-relative `references/scripts/pm-validate.ps1` if present. If validation fails, stop before syncing.
 4. Never overwrite local markdown from remote issue state without explicit user approval.
 
 ## Local Fields
 
 Use these optional frontmatter fields on plan and task files:
 
-- `external_issue`: numeric GitHub issue id, blank until created
+- `external_issue`: GitHub issue number (the repository-scoped number used by `gh issue view <number>`, not a GraphQL node ID or database ID), blank until created
 - `external_url`: GitHub issue URL, blank until created
 
 ## Idempotent Behavior

@@ -8,7 +8,7 @@ schema_version: 1
 
 > **Source of truth for the Verification Gate.** This file lists every test runner the orchestrator should consult when verifying that a code-changing task's claim of `Tests: passing: true` is real. Confirmed rows (`Confirmed: yes`) are authoritative; unconfirmed rows are discovery candidates pending user review.
 >
-> Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc by running `references/scripts/pm-test-runners.ps1 -DiscoverOnly` and rewriting this table.
+> Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc by running the project-manager skill's `references/scripts/pm-test-runners.ps1 -DiscoverOnly` helper and rewriting this table.
 
 ## Confirmed runners
 

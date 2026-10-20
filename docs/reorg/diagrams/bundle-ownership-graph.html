@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bundle Ownership Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1200px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .graph-container { position:relative; width:100%; min-height:900px; }
+  svg { width:100%; height:100%; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+  .ve-card code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  .bundle-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:14px; }
+  .bundle-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:12px; font-family:var(--font-mono); font-weight:600; color:var(--text); }
+
+  .boundary-section { margin-top:28px; }
+  .boundary-item { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--teal); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); margin-bottom:10px; }
+  .boundary-item strong { color:var(--text); font-weight:600; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .bundle-list{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Bundle Ownership Graph</h1>
+<p class="subtitle">core bundle portfolio · ownership boundaries · sub-skills and lifecycle concerns</p>
+
+<div class="diagram">
+
+  <!-- Graph visualization -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Ownership Map · SVG graph</div>
+    <div class="graph-container">
+      <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="rgba(4,120,87,0.4)"/>
+          </marker>
+          <marker id="arrowHeadTeal" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="rgba(15,118,110,0.4)"/>
+          </marker>
+          <marker id="arrowHeadViolet" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="rgba(91,33,182,0.4)"/>
+          </marker>
+        </defs>
+
+        <!-- Bundle nodes -->
+        <circle cx="150" cy="150" r="45" fill="rgba(4,120,87,0.15)" stroke="#047857" stroke-width="2"/>
+        <text x="150" y="155" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#047857">project-manager</text>
+
+        <circle cx="350" cy="150" r="45" fill="rgba(15,118,110,0.15)" stroke="#0f766e" stroke-width="2"/>
+        <text x="350" y="155" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#0f766e">agent-manager</text>
+
+        <circle cx="550" cy="150" r="45" fill="rgba(91,33,182,0.15)" stroke="#5b21b6" stroke-width="2"/>
+        <text x="550" y="155" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#5b21b6">quality-manager</text>
+
+        <circle cx="750" cy="150" r="45" fill="rgba(146,64,14,0.15)" stroke="#92400e" stroke-width="2"/>
+        <text x="750" y="155" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#92400e">design-manager</text>
+
+        <circle cx="950" cy="150" r="45" fill="rgba(185,28,28,0.15)" stroke="#b91c1c" stroke-width="2"/>
+        <text x="950" y="155" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#b91c1c">github</text>
+
+        <circle cx="250" cy="400" r="45" fill="rgba(30,41,59,0.15)" stroke="#1e293b" stroke-width="2"/>
+        <text x="250" y="405" text-anchor="middle" font-family="Inconsolata" font-size="13" font-weight="600" fill="#1e293b">ops-manager</text>
+
+        <circle cx="600" cy="400" r="45" fill="rgba(252,211,77,0.15)" stroke="#fcd34d" stroke-width="2"/>
+        <text x="600" y="405" text-anchor="middle" font-family="Inconsolata" font-size="12" font-weight="600" fill="#fcd34d">skills-manager</text>
+
+        <!-- Boundary nodes -->
+        <circle cx="100" cy="600" r="40" fill="rgba(110,231,183,0.15)" stroke="#6ee7b7" stroke-width="2" opacity="0.7"/>
+        <text x="100" y="608" text-anchor="middle" font-family="Inconsolata" font-size="11" font-weight="600" fill="#6ee7b7">gated-batch</text>
+
+        <!-- Ownership edges from project-manager -->
+        <line x1="150" y1="195" x2="150" y2="280" stroke="#047857" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="170" y="245" font-family="Lexend" font-size="11" fill="#047857" font-weight="500">session-handoff</text>
+
+        <!-- Ownership edges from agent-manager -->
+        <line x1="350" y1="195" x2="320" y2="280" stroke="#0f766e" stroke-width="2" marker-end="url(#arrowHeadTeal)" opacity="0.5"/>
+        <text x="310" y="245" font-family="Lexend" font-size="10" fill="#0f766e" font-weight="500">session-JSONL-toolkit</text>
+
+        <line x1="360" y1="195" x2="390" y2="280" stroke="#0f766e" stroke-width="2" marker-end="url(#arrowHeadTeal)" opacity="0.5"/>
+        <text x="400" y="245" font-family="Lexend" font-size="10" fill="#0f766e" font-weight="500">stalled-agent-recovery</text>
+
+        <line x1="350" y1="195" x2="350" y2="280" stroke="#0f766e" stroke-width="2" marker-end="url(#arrowHeadTeal)" opacity="0.5"/>
+        <text x="365" y="245" font-family="Lexend" font-size="10" fill="#0f766e" font-weight="500">llm-json-output-repair</text>
+
+        <!-- Ownership edges from quality-manager -->
+        <line x1="550" y1="195" x2="550" y2="280" stroke="#5b21b6" stroke-width="2" marker-end="url(#arrowHeadViolet)" opacity="0.5"/>
+        <text x="560" y="245" font-family="Lexend" font-size="11" fill="#5b21b6" font-weight="500">/diagnose-runbook</text>
+
+        <!-- Ownership edges from design-manager -->
+        <line x1="750" y1="195" x2="750" y2="280" stroke="#92400e" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="765" y="245" font-family="Lexend" font-size="10" fill="#92400e" font-weight="500">(sub-skills mapping)</text>
+
+        <!-- Ownership edges from github -->
+        <line x1="950" y1="195" x2="920" y2="280" stroke="#b91c1c" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="880" y="245" font-family="Lexend" font-size="10" fill="#b91c1c" font-weight="500">worktree-task-lifecycle</text>
+
+        <line x1="960" y1="195" x2="990" y2="280" stroke="#b91c1c" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="1000" y="245" font-family="Lexend" font-size="10" fill="#b91c1c" font-weight="500">large-asset-vendoring</text>
+
+        <!-- Ownership edges from ops-manager -->
+        <line x1="250" y1="445" x2="220" y2="520" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="190" y="495" font-family="Lexend" font-size="10" fill="#1e293b" font-weight="500">shell-fleet-migration</text>
+
+        <line x1="280" y1="445" x2="310" y2="520" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="310" y="495" font-family="Lexend" font-size="10" fill="#1e293b" font-weight="500">secrets-ops</text>
+
+        <line x1="250" y1="445" x2="250" y2="520" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="260" y="495" font-family="Lexend" font-size="10" fill="#1e293b" font-weight="500">ops-index-convention</text>
+
+        <!-- Ownership edges from skills-manager -->
+        <line x1="600" y1="445" x2="600" y2="520" stroke="#fcd34d" stroke-width="2" marker-end="url(#arrowHead)" opacity="0.5"/>
+        <text x="615" y="495" font-family="Lexend" font-size="10" fill="#fcd34d" font-weight="500">external-skill-intake</text>
+
+        <!-- Boundary connections -->
+        <path d="M 100 640 Q 200 680 250 400" stroke="#6ee7b7" stroke-width="2" fill="none" stroke-dasharray="5,5" opacity="0.6"/>
+        <text x="160" y="680" font-family="Lexend" font-size="10" fill="#6ee7b7" font-weight="600">data-plane / session-plane</text>
+
+        <path d="M 150 195 Q 200 250 350 195" stroke="#047857" stroke-width="2.5" fill="none" opacity="0.4"/>
+        <text x="220" y="215" font-family="Lexend" font-size="9" fill="#047857" font-weight="600" font-style="italic">composition ↔ dispatch</text>
+
+        <path d="M 550 195 Q 650 250 750 195" stroke="#5b21b6" stroke-width="2.5" fill="none" opacity="0.4"/>
+        <text x="610" y="215" font-family="Lexend" font-size="9" fill="#5b21b6" font-weight="600" font-style="italic">judge ↔ good</text>
+
+      </svg>
+    </div>
+  </div>
+
+  <!-- Bundle roster -->
+  <div class="section section--teal" style="--i:1">
+    <div class="section-label"><span class="dot"></span> Core Bundles</div>
+    <ul class="bundle-list">
+      <li class="bundle-item">project-manager</li>
+      <li class="bundle-item">agent-manager</li>
+      <li class="bundle-item">quality-manager</li>
+      <li class="bundle-item">design-manager</li>
+      <li class="bundle-item">github</li>
+      <li class="bundle-item">ops-manager</li>
+      <li class="bundle-item">skills-manager</li>
+    </ul>
+  </div>
+
+  <!-- Ownership table -->
+  <div class="section section--amber" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Owned Concerns · bundle → sub-skill</div>
+    <table style="width:100%; font-size:12px; border-collapse:collapse;">
+      <thead style="background:var(--surface2);">
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left; padding:8px 0; font-weight:600; font-family:var(--font-mono);">Bundle</th>
+          <th style="text-align:left; padding:8px 0; font-weight:600; font-family:var(--font-mono);">Owned Concern</th>
+          <th style="text-align:left; padding:8px 0; font-weight:600; font-family:var(--font-mono);">Sub-Skill</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;">project-manager</td>
+          <td style="padding:10px 0;">Session handoff / give me a prompt for the next session</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">session-handoff</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;" rowspan="3">agent-manager</td>
+          <td style="padding:10px 0;">Session-JSONL parsing + token-efficiency page</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">session-jsonl-toolkit</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0;">Stall/salvage/re-dispatch (reset --soft) procedure</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">stalled-agent-recovery</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0;">LLM JSON output repair (repair_results.py, UUID-stem merge)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">llm-json-output-repair</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;">quality-manager</td>
+          <td style="padding:10px 0;">/diagnose-runbook</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">—</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;" rowspan="3">ops-manager</td>
+          <td style="padding:10px 0;">Shell-fleet trio (helper library, migration, skip taxonomy)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">shell-fleet-migration</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0;">/get-secret (operational secrets)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">secrets-ops</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0;">repo-local ops-index convention (generation: skills-manager)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">ops-index-convention</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;">skills-manager</td>
+          <td style="padding:10px 0;">Plugin-precedence declarations (superpowers, impeccable, interface-design, codex, built-in verify)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">external-skill-intake</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 0; font-family:var(--font-mono); font-weight:600;" rowspan="2">github</td>
+          <td style="padding:10px 0;">Worktree lifecycle (incl. OAuth/credential-loss lesson)</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">worktree-task-lifecycle</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;">Big-binary / large-asset policy</td>
+          <td style="padding:10px 0; font-family:var(--font-mono);">large-asset-vendoring</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Boundary sentences -->
+  <div class="section section--violet" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Boundary Sentences · ownership articulation</div>
+    <div class="boundary-section">
+      <div class="boundary-item">
+        <strong>project-manager ↔ agent-manager:</strong> project-manager owns single-agent multi-turn loop composition and durable state files; agent-manager owns multi-agent dispatch, recovery, and session-JSONL infrastructure.
+      </div>
+      <div class="boundary-item">
+        <strong>gated-batch ↔ project-manager:</strong> gated-batch owns per-item data-plane state; project-manager owns session-plane resumption.
+      </div>
+      <div class="boundary-item">
+        <strong>quality-manager ↔ developer-manager ↔ ops-manager:</strong> quality-manager owns observe-and-judge + pre-ship smoke; developer-manager owns launch; ops-manager owns post-deploy verification.
+      </div>
+      <div class="boundary-item">
+        <strong>design-manager ↔ quality-manager:</strong> design-manager owns 'is it good'; quality-manager owns 'does it work'.
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

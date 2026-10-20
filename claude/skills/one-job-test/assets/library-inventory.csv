@@ -1,0 +1,2 @@
+skill_name,source,last_used,carries_judgment,description_overlap,cost_if_wrong,test_priority,verdict
+"<skill>","<url or marketplace>","never noticed it fire",yes/no,"<colliding skill names>",cosmetic/real,1-4,keep/fork/delete/test-later

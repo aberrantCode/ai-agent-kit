@@ -76,6 +76,22 @@ Do not silently work around any of these. The orchestrator's Error Recovery Loop
 
 ---
 
+## Guardrails as archived assets
+
+This repo treats **agent guardrail content itself** as a first-class, vendor-neutral asset
+class: `shared/guardrails/` holds reusable `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` rules, snippets,
+and whole-file captures, managed by the `guardrails-manager` skill (`/archive-guardrail`,
+`/install-guardrail`). When you author or mine a durable operating rule, archive it there so
+every repo and profile can adopt it — don't leave it stranded in one repo's config.
+
+Two guardrails bind work in *this* repo directly:
+
+- **Scope, not size, is the gate** (`shared/guardrails/scope-cohesion-over-line-count.md`).
+  There is no hard line-count cap on a PR. Never block, stop, or raise a decision item on line
+  count alone; split a PR only when it bundles **unrelated** concerns. This supersedes any
+  prior "800-line hard cap" language.
+- Full git mechanics live at `~/.claude/rules/git-workflow.md`.
+
 ## When AGENTS.md Conflicts With User Instructions
 
 User instructions always win. If the user says "skip the task file, just edit this one line", do as asked but note in the affected feature's plan `Notes` column that work was done outside the orchestration loop.

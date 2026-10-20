@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Kit — Repo Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.flow-arrow { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1100px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+  .section--recessed { background:var(--surface2); }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+  .section--slate   .section-label{color:var(--slate)}   .section--slate .dot{background:var(--slate)}   .section--slate{border-color:var(--slate-dim)}
+
+  .tree { font-family:var(--font-mono); font-size:12px; line-height:1.8; color:var(--text); }
+  .tree-item { margin:0; padding:0; list-style:none; }
+  .tree-item { padding-left:16px; position:relative; }
+  .tree-branch::before { content:"├─ "; color:var(--text-dim); }
+  .tree-last::before { content:"└─ "; color:var(--text-dim); }
+  .tree-item.root { padding-left:0; }
+  .tree-item.root::before { content:""; }
+
+  .tree-desc { color:var(--text-dim); font-size:11px; margin-left:8px; }
+  .tree-folder { color:var(--teal); font-weight:600; }
+  .tree-file { color:var(--text); }
+
+  .flow-arrow { display:flex; justify-content:center; align-items:center; gap:8px; color:var(--text-dim); font-family:var(--font-mono); font-size:11px; padding:2px 0; }
+  .flow-arrow svg { width:18px; height:18px; fill:none; stroke:var(--border-bright); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  .flow-diagram { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .flow-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px 20px; flex:1; min-width:140px; text-align:center; }
+  .flow-box strong { display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text); }
+  .flow-box .desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+
+  .flow-connector { color:var(--text-dim); font-family:var(--font-mono); font-size:11px; }
+
+  .ve-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-top:8px; }
+  .ve-card .title { font-weight:600; font-size:12px; margin-bottom:5px; }
+  .ve-card .desc { font-size:11px; color:var(--text-dim); line-height:1.55; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  @media (max-width:860px) { body{padding:24px 16px;} .flow-diagram{flex-direction:column;} .two-col{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Kit</h1>
+<p class="subtitle">canonical archive · single source of truth · deploy out to profiles and projects</p>
+
+<div class="diagram">
+
+  <!-- Directory Tree -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Directory Tree</div>
+    <div class="tree">
+      <div class="tree-item root">
+        <span class="tree-folder">ai-agent-kit/</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-file">README.md</span>
+        <span class="tree-desc">you are here — mission + orientation</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-file">CATALOG.md</span>
+        <span class="tree-desc">GENERATED — every asset, every vendor</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-file">CONTRIBUTING.md</span>
+        <span class="tree-desc">how to add a skill, vendor, or asset class</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-file">manifest.json</span>
+        <span class="tree-desc">GENERATED — machine-readable source of truth</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-file">install-skills.ps1</span>
+        <span class="tree-desc">remote installer; root path is published contract</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-folder">claude/</span>
+        <span class="tree-desc">canonical authoring surface: skills, instructions, commands</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-folder">codex/</span>
+        <span class="tree-desc">on-demand mirror of the Claude surface</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-folder">gemini/</span>
+        <span class="tree-desc">frozen mirror</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-folder">shared/</span>
+        <span class="tree-desc">vendor-neutral: prompts, workflows, configs, plugins</span>
+      </div>
+      <div class="tree-item tree-branch">
+        <span class="tree-folder">scripts/</span>
+        <span class="tree-desc">lifecycle automation — audit, generate, install, sync</span>
+      </div>
+      <div class="tree-item tree-last">
+        <span class="tree-folder">docs/</span>
+        <span class="tree-desc">requirements, plans, and binding reorg governance</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow" style="--i:1">
+    <svg viewBox="0 0 20 20"><path d="M10 4 L10 16 M6 12 L10 16 L14 12"/></svg>
+    source of truth → deployment → consumption
+  </div>
+
+  <!-- Archive → Consumer Flow -->
+  <div class="section section--teal" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Asset Lifecycle</div>
+    <div class="flow-diagram">
+      <div class="flow-box">
+        <strong>Author</strong>
+        <div class="desc">Write skill, instruction, or command in ai-agent-kit (archive)</div>
+      </div>
+      <div class="flow-connector">→</div>
+      <div class="flow-box">
+        <strong>Deploy</strong>
+        <div class="desc">Profile install OR project install via /install-skill</div>
+      </div>
+      <div class="flow-connector">→</div>
+      <div class="flow-box">
+        <strong>Consume</strong>
+        <div class="desc">User's profile or a project repo invokes the asset</div>
+      </div>
+    </div>
+    <div class="ve-card">
+      <div class="title">Flow Direction</div>
+      <div class="desc">Every asset is authored once, lives here, and deploys out to a profile or a project. The flow is always archive → consumer.</div>
+    </div>
+  </div>
+
+  <!-- Key Concepts -->
+  <div class="two-col" style="--i:3">
+    <div class="section section--violet">
+      <div class="section-label"><span class="dot"></span> Core Surfaces</div>
+      <div class="ve-card">
+        <div class="title">claude/</div>
+        <div class="desc">Canonical authoring surface. Primary source. Skills, instructions, and commands all live here.</div>
+      </div>
+      <div class="ve-card">
+        <div class="title">codex/ · gemini/</div>
+        <div class="desc">Mirrors of the Claude surface. Codex: on-demand. Gemini: frozen. Dual-CLI support.</div>
+      </div>
+      <div class="ve-card">
+        <div class="title">shared/</div>
+        <div class="desc">Vendor-neutral assets: prompts, workflows, configs, plugins. Used by all surfaces.</div>
+      </div>
+    </div>
+    <div class="section section--amber">
+      <div class="section-label"><span class="dot"></span> Governance & Automation</div>
+      <div class="ve-card">
+        <div class="title">docs/</div>
+        <div class="desc">Requirements, plans, feature specs, and binding reorg governance. CAP-ID registry. Single source of scope authority.</div>
+      </div>
+      <div class="ve-card">
+        <div class="title">scripts/</div>
+        <div class="desc">Lifecycle automation: audit skills, generate CATALOG.md and manifest.json, install to profiles/projects, sync archives.</div>
+      </div>
+      <div class="ve-card">
+        <div class="title">Generated artifacts</div>
+        <div class="desc">CATALOG.md, manifest.json. Source of truth for asset inventory. Never manually edited.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

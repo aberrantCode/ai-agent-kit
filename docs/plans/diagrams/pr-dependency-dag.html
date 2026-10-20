@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PR Dependency DAG — Repository Restructuring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    /* ============ THEME ============ */
+    :root {
+      --font-body: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+      --bg: #faf8f6;
+      --surface: #ffffff;
+      --surface-elevated: #ffffff;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-bright: rgba(0, 0, 0, 0.15);
+      --text: #2d1b1f;
+      --text-dim: #6b5a5e;
+
+      --primary: #be123c;
+      --primary-dim: rgba(190, 18, 60, 0.08);
+      --secondary: #881337;
+      --secondary-dim: rgba(136, 19, 55, 0.08);
+      --accent: #7c2d12;
+      --accent-dim: rgba(124, 45, 18, 0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a0f0f;
+        --surface: #2d1b1f;
+        --surface-elevated: #3a262a;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-bright: rgba(255, 255, 255, 0.14);
+        --text: #f5e6e8;
+        --text-dim: #c9a5ad;
+
+        --primary: #fb7185;
+        --primary-dim: rgba(251, 113, 133, 0.12);
+        --secondary: #f43f5e;
+        --secondary-dim: rgba(244, 63, 94, 0.12);
+        --accent: #fed7aa;
+        --accent-dim: rgba(254, 215, 170, 0.12);
+      }
+    }
+
+    /* ============ RESET + BASE ============ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(at 20% 80%, var(--primary-dim) 0%, transparent 50%),
+        radial-gradient(at 80% 20%, var(--secondary-dim) 0%, transparent 50%);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      padding: 48px 32px;
+      min-height: 100vh;
+    }
+
+    /* ============ ANIMATION ============ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate {
+      animation: fadeUp 0.5s ease-out both;
+    }
+
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+      }
+      .mermaid-wrap .mermaid { transition: none !important; }
+    }
+
+    /* ============ LAYOUT ============ */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--text);
+      text-wrap: balance;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--primary);
+    }
+
+    .subtitle {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .description {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-dim);
+      max-width: 720px;
+      margin-bottom: 32px;
+    }
+
+    .description code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--primary-dim);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ============ DIAGRAM SECTION ============ */
+    .diagram-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 40px;
+    }
+
+    .diagram-section h2 {
+      font-size: 24px;
+      font-weight: 400;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .diagram-section .subtitle {
+      margin-bottom: 32px;
+    }
+
+    /* ============ MERMAID CONTAINER ============ */
+    .mermaid-wrap {
+      position: relative;
+      background: color-mix(in srgb, var(--surface) 98%, var(--primary) 2%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 32px;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 500px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .mermaid-wrap::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .mermaid-wrap::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .mermaid-wrap::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .mermaid-wrap::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
+
+    .mermaid-wrap .mermaid {
+      transition: transform 0.2s ease;
+      transform-origin: center center;
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 4px;
+      z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px;
+    }
+
+    .zoom-controls button {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .zoom-controls button:hover {
+      background: var(--primary-dim);
+      color: var(--primary);
+    }
+
+    .mermaid-wrap.is-zoomed {
+      cursor: grab;
+    }
+
+    .mermaid-wrap.is-panning {
+      cursor: grabbing;
+      user-select: none;
+    }
+
+    /* ============ MERMAID SVG OVERRIDES ============ */
+    .mermaid .nodeLabel {
+      font-family: var(--font-body) !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+    }
+
+    .mermaid .edgeLabel {
+      font-family: var(--font-mono) !important;
+      font-size: 12px !important;
+    }
+
+    .mermaid .node rect,
+    .mermaid .node circle,
+    .mermaid .node polygon {
+      stroke-width: 1.5px !important;
+    }
+
+    .mermaid .edge-pattern-solid {
+      stroke-width: 1.5px !important;
+    }
+
+    /* ============ INFO SECTION ============ */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 40px;
+    }
+
+    .info-card {
+      padding: 24px;
+      background: color-mix(in srgb, var(--surface) 95%, var(--primary) 5%);
+      border-left: 3px solid var(--primary);
+      border-radius: 8px;
+    }
+
+    .info-card h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--primary);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 10px;
+    }
+
+    .info-card p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .info-card code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--primary-dim);
+      color: var(--primary);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 768px) {
+      body {
+        padding: 32px 16px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      .diagram-section {
+        padding: 24px;
+      }
+
+      .mermaid-wrap {
+        padding: 24px 16px;
+        min-height: 400px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .zoom-controls {
+        top: 8px;
+        right: 8px;
+      }
+
+      .zoom-controls button {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="animate">
+      <div class="subtitle">AI Agent Kit Restructuring</div>
+      <h1>PR Dependency <em>DAG</em></h1>
+      <p class="description">
+        This diagram shows the sequential and converging dependencies across eight pull requests
+        that restructure the canonical repository. Each PR builds on previous work, with later PRs
+        depending on artifacts (folders, scripts, manifests) created by earlier ones.
+      </p>
+    </header>
+
+    <div class="diagram-section animate animate-delay-1">
+      <h2>Dependency Flow</h2>
+      <div class="subtitle">Top-down view of PR prerequisites and convergence</div>
+      <div class="mermaid-wrap">
+        <div class="zoom-controls">
+          <button id="zoom-in" title="Zoom in (Ctrl+Scroll)">+</button>
+          <button id="zoom-reset" title="Reset zoom">◉</button>
+          <button id="zoom-out" title="Zoom out (Ctrl+Scroll)">−</button>
+        </div>
+        <div class="mermaid">
+graph TD
+    PR1["<strong>PR 1</strong><br/>requirements doc + plan"]
+    PR2["<strong>PR 2</strong><br/>shared/ tree + prompts move<br/>+ all folder READMEs<br/>(T1, T2)"]
+    PR3["<strong>PR 3</strong><br/>script stubs<br/>+ scripts/README.md<br/>(T3)"]
+    PR4["<strong>PR 4</strong><br/>audit.ps1 implemented<br/>+ generate-manifest.py flags<br/>(T4)"]
+    PR5["<strong>PR 5</strong><br/>category frontmatter backfill<br/>+ manifest generator<br/>taxonomy removal<br/>(T5)"]
+    PR6["<strong>PR 6</strong><br/>generate-catalog.ps1 implemented<br/>+ CATALOG.md<br/>(T6)"]
+    PR7["<strong>PR 7</strong><br/>root README.md rewrite<br/>+ CLAUDE.md pointer fix<br/>(T7)"]
+    PR8["<strong>PR 8</strong><br/>local validation gate<br/>+ CONTRIBUTING.md<br/>(T8, T9)"]
+
+    PR1 --> PR2
+    PR2 --> PR3
+    PR3 --> PR4
+    PR4 --> PR5
+    PR5 --> PR6
+    PR6 --> PR7
+    PR4 -.-> PR8
+    PR6 -.-> PR8
+
+    classDef primary fill:#be123c,stroke:#881337,stroke-width:2px,color:#fff
+    classDef secondary fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff
+    classDef convergent fill:#0891b2,stroke:#0e7490,stroke-width:2px,color:#fff
+    classDef terminal fill:#059669,stroke:#047857,stroke-width:2px,color:#fff
+
+    class PR1,PR2,PR3,PR4,PR5,PR6,PR7 primary
+    class PR8 convergent
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid animate animate-delay-2">
+      <div class="info-card">
+        <h3>Primary Path</h3>
+        <p>
+          Linear sequence from <code>PR 1</code> through <code>PR 7</code>: each step creates
+          foundational structure (folder organization, scripts, then audit/manifest tools)
+          that subsequent PRs depend on.
+        </p>
+      </div>
+      <div class="info-card">
+        <h3>Convergence Point</h3>
+        <p>
+          <code>PR 8</code> (validation gate) requires both <code>PR 4</code> (audit.ps1)
+          and <code>PR 6</code> (generate-catalog.ps1) to exist, as the gate orchestrates
+          these tools before accepting a PR.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mermaid configuration
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#faf8f6',
+        primaryBorderColor: '#be123c',
+        primaryTextColor: '#2d1b1f',
+        lineColor: '#881337',
+        secondBkgColor: '#f5e6e8',
+        secondBorderColor: '#d97706',
+        tertiaryColor: '#0891b2',
+        noteBkgColor: '#faf8f6',
+        fontSize: '14px',
+        fontFamily: "'Instrument Serif', Georgia, serif"
+      },
+      look: 'classic',
+      layout: 'elk',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'linear'
+      }
+    });
+
+    // Zoom controls
+    const wrap = document.querySelector('.mermaid-wrap');
+    const mermaidSvg = document.querySelector('.mermaid svg');
+    let currentZoom = 1;
+    const minZoom = 0.5;
+    const maxZoom = 3;
+    const zoomStep = 0.1;
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+      updateZoom();
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+      updateZoom();
+    });
+
+    document.getElementById('zoom-reset').addEventListener('click', () => {
+      currentZoom = 1;
+      updateZoom();
+    });
+
+    function updateZoom() {
+      const mermaid = document.querySelector('.mermaid');
+      if (mermaid) {
+        mermaid.style.transform = `scale(${currentZoom})`;
+        wrap.classList.toggle('is-zoomed', currentZoom > 1);
+      }
+    }
+
+    // Scroll-to-zoom
+    wrap.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        currentZoom += (e.deltaY > 0 ? -1 : 1) * zoomStep;
+        currentZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom));
+        updateZoom();
+      }
+    });
+
+    // Drag-to-pan
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+
+    wrap.addEventListener('mousedown', (e) => {
+      if (currentZoom <= 1) return;
+      isPanning = true;
+      startX = e.pageX - wrap.offsetLeft;
+      startY = e.pageY - wrap.offsetTop;
+      scrollLeft = wrap.scrollLeft;
+      scrollTop = wrap.scrollTop;
+      wrap.classList.add('is-panning');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      const x = e.pageX - wrap.offsetLeft;
+      const y = e.pageY - wrap.offsetTop;
+      const walkX = (x - startX);
+      const walkY = (y - startY);
+      wrap.scrollLeft = scrollLeft - walkX;
+      wrap.scrollTop = scrollTop - walkY;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isPanning = false;
+      wrap.classList.remove('is-panning');
+    });
+  </script>
+</body>
+</html>

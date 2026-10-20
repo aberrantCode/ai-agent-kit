@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent-Orchestrator Handoff · Task Lifecycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section,.swimlane-container { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram { display:grid; grid-template-columns:1fr; gap:20px; max-width:1300px; margin:0 auto; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+  .section--red     .section-label{color:var(--red)}     .section--red .dot{background:var(--red)}     .section--red{border-color:var(--red-dim)}
+  .section--amber   .section-label{color:var(--amber)}   .section--amber .dot{background:var(--amber)}   .section--amber{border-color:var(--amber-dim)}
+  .section--violet  .section-label{color:var(--violet)}  .section--violet .dot{background:var(--violet)}  .section--violet{border-color:var(--violet-dim)}
+
+  /* Swimlane styles */
+  .swimlane-container {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:2px;
+    background:var(--border-bright);
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--border-bright);
+  }
+  .lane { background:var(--surface); padding:0; }
+  .lane-header {
+    background:var(--surface2);
+    padding:16px 20px;
+    border-bottom:2px solid var(--border-bright);
+    font-weight:700;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .lane-header .dot { width:8px; height:8px; }
+  .lane-content { padding:0; }
+  .swim-step {
+    padding:16px 20px;
+    border-bottom:1px solid var(--border);
+    position:relative;
+    min-height:80px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .swim-step:last-child { border-bottom:none; }
+  .swim-step-num {
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:700;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:6px;
+  }
+  .swim-step-title {
+    font-weight:600;
+    font-size:12px;
+    margin-bottom:4px;
+    color:var(--text);
+  }
+  .swim-step-desc {
+    font-size:11px;
+    color:var(--text-dim);
+    line-height:1.5;
+    margin-bottom:0;
+  }
+  .swim-step-desc code {
+    font-family:var(--font-mono);
+    font-size:9px;
+    background:var(--emerald-dim);
+    color:var(--emerald);
+    padding:1px 5px;
+    border-radius:3px;
+  }
+
+  /* Lane-specific colors */
+  .lane--orch .swim-step { background:var(--surface); }
+  .lane--orch .swim-step-title { color:var(--emerald); }
+  .lane--agent .swim-step { background:var(--surface); }
+  .lane--agent .swim-step-title { color:var(--teal); }
+
+  /* Arrow between lanes */
+  .swim-arrow {
+    position:absolute;
+    right:-12px;
+    top:50%;
+    transform:translateY(-50%);
+    width:24px;
+    height:24px;
+    background:var(--surface-elevated);
+    border:2px solid var(--border-bright);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    color:var(--text-dim);
+    z-index:10;
+  }
+
+  /* Status legend */
+  .status-legend {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:12px;
+    margin-top:20px;
+  }
+  .status-badge {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:11px;
+  }
+  .status-badge-dot {
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .status-badge-dot--todo { background:var(--amber); }
+  .status-badge-dot--inprogress { background:var(--teal); }
+  .status-badge-dot--done { background:var(--emerald); }
+  .status-badge-dot--blocked { background:var(--red); }
+  .status-badge-text { color:var(--text-dim); }
+  .status-badge-text strong { color:var(--text); }
+
+  /* Connecting flow lines (visual guide) */
+  .flow-guide {
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:16px;
+    align-items:center;
+    margin:20px 0;
+    padding:16px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:11px;
+    color:var(--text-dim);
+  }
+  .flow-guide-arrow {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    background:var(--surface-elevated);
+    border:1px solid var(--border-bright);
+    border-radius:50%;
+    font-family:var(--font-mono);
+    font-weight:700;
+    color:var(--text-dim);
+  }
+
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); }
+  .callout strong { color:var(--text); }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:960px) { body{padding:24px 16px;} .swimlane-container{grid-template-columns:1fr;} .flow-guide{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Agent-Orchestrator Handoff</h1>
+<p class="subtitle">task lifecycle · plan → task → execution → completion → reconciliation</p>
+
+<div class="diagram">
+
+  <!-- Context callout -->
+  <div class="section section--emerald section--hero" style="--i:0">
+    <div class="section-label"><span class="dot"></span> Coordination Model</div>
+    <div class="callout">
+      The orchestrator and agent communicate through files, not directly. The plan file is the orchestrator's source of truth; task files are the agent's workspace. Completion is signaled via a sentinel block appended to the task file. Reconciliation happens when the orchestrator reads the sentinel.
+    </div>
+  </div>
+
+  <!-- Swimlane diagram -->
+  <div class="swimlane-container" style="--i:1">
+    <div class="lane lane--orch">
+      <div class="lane-header"><span class="dot" style="background:var(--emerald)"></span> Orchestrator</div>
+      <div class="lane-content">
+        <div class="swim-step">
+          <div class="swim-step-num">1</div>
+          <div class="swim-step-title">Create / Update Plan File</div>
+          <div class="swim-step-desc">Creates or updates <code>docs/plans/&lt;slug&gt;-plan.md</code> with tasks table: # | Task | Covers CAP-ID | Role | Status | Notes. Each row starts with Status=<code>todo</code>.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">3</div>
+          <div class="swim-step-title">Run /continue-tasks</div>
+          <div class="swim-step-desc">Command picks up a <code>todo</code> row from the plan. Creates a corresponding task file in <code>docs/tasks/active/</code>.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">6</div>
+          <div class="swim-step-title">Read Completion Sentinel</div>
+          <div class="swim-step-desc">Watches for <code>## Completion</code> block appended to the task file by the agent. When observed, proceeds to reconciliation.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">7</div>
+          <div class="swim-step-title">Reconcile &amp; Archive</div>
+          <div class="swim-step-desc">Updates the plan file's Status column to <code>done</code>. Moves task file from <code>docs/tasks/active/</code> to <code>docs/tasks/archive/</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lane lane--agent">
+      <div class="lane-header"><span class="dot" style="background:var(--teal)"></span> Agent</div>
+      <div class="lane-content">
+        <div class="swim-step">
+          <div class="swim-step-num">2</div>
+          <div class="swim-step-title">Claim Task</div>
+          <div class="swim-step-desc">Agent sees the task file in <code>docs/tasks/active/</code>. Updates status to <code>in-progress</code>. Role (from plan) determines which agent type: planner, tdd-guide, code-reviewer, security-reviewer, build-error-resolver, e2e-runner, doc-updater, refactor-cleaner, or general-purpose.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">4</div>
+          <div class="swim-step-title">Execute Work</div>
+          <div class="swim-step-desc">Performs the work specified in the task file. Works only in <code>docs/tasks/active/</code> — does <strong>NOT</strong> edit the plan file. Commits changes and updates task file as needed.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">5</div>
+          <div class="swim-step-title">Append Completion Block</div>
+          <div class="swim-step-desc">When work is done, appends <code>## Completion</code> block to the task file. This is the completion sentinel that signals to the orchestrator: work finished, ready for reconciliation.</div>
+        </div>
+        <div class="swim-step">
+          <div class="swim-step-num">8</div>
+          <div class="swim-step-title">Next Task</div>
+          <div class="swim-step-desc">Orchestrator's reconciliation triggers removal of the task file. Agent loop repeats: picks next <code>todo</code> task and begins execution cycle again.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status legend and flow guide -->
+  <div class="section" style="--i:2">
+    <div class="section-label"><span class="dot"></span> Status Vocabulary</div>
+    <div class="status-legend">
+      <div class="status-badge">
+        <div class="status-badge-dot status-badge-dot--todo"></div>
+        <div class="status-badge-text"><strong>todo</strong> — eligible for pickup</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-badge-dot status-badge-dot--inprogress"></div>
+        <div class="status-badge-text"><strong>in-progress</strong> — task file exists in active/</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-badge-dot status-badge-dot--done"></div>
+        <div class="status-badge-text"><strong>done</strong> — completion sentinel observed, archived</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-badge-dot status-badge-dot--blocked"></div>
+        <div class="status-badge-text"><strong>blocked</strong> — blocker issue written, no auto-retry</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role mapping -->
+  <div class="section" style="--i:3">
+    <div class="section-label"><span class="dot"></span> Role → Agent Type Mapping</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--emerald);margin-bottom:4px;">architecture, design, planning</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">planner</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--teal);margin-bottom:4px;">feature, implementation, API</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">tdd-guide</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--amber);margin-bottom:4px;">review, quality, testing</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">code-reviewer</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--red);margin-bottom:4px;">security</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">security-reviewer</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--violet);margin-bottom:4px;">build, types, errors</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">build-error-resolver</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--slate);margin-bottom:4px;">E2E, testing, automation</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">e2e-runner</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--emerald);margin-bottom:4px;">documentation, guides</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">doc-updater</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--teal);margin-bottom:4px;">cleanup, refactoring</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">refactor-cleaner</code></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;">
+        <div style="font-weight:600;color:var(--amber);margin-bottom:4px;">anything else</div>
+        <div style="color:var(--text-dim);">→ <code style="font-family:var(--font-mono);font-size:10px;">general-purpose</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key principles -->
+  <div class="section section--violet" style="--i:4">
+    <div class="section-label"><span class="dot"></span> Key Principles</div>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+      <li style="font-size:12px;color:var(--text-dim);line-height:1.5;padding-left:16px;position:relative;">
+        <span style="position:absolute;left:0;color:var(--violet);font-family:var(--font-mono);">→</span>
+        <strong style="color:var(--text);">Plan file is orchestrator-owned.</strong> Only the orchestrator updates plan Status. Agents never edit it.
+      </li>
+      <li style="font-size:12px;color:var(--text-dim);line-height:1.5;padding-left:16px;position:relative;">
+        <span style="position:absolute;left:0;color:var(--violet);font-family:var(--font-mono);">→</span>
+        <strong style="color:var(--text);">Task files are agent-owned.</strong> Agents work within <code style="font-family:var(--font-mono);font-size:10px;">docs/tasks/active/</code>, appending completion blocks when done.
+      </li>
+      <li style="font-size:12px;color:var(--text-dim);line-height:1.5;padding-left:16px;position:relative;">
+        <span style="position:absolute;left:0;color:var(--violet);font-family:var(--font-mono);">→</span>
+        <strong style="color:var(--text);">Completion is file-based.</strong> The <code style="font-family:var(--font-mono);font-size:10px;">## Completion</code> block is the signal, not a direct API call.
+      </li>
+      <li style="font-size:12px;color:var(--text-dim);line-height:1.5;padding-left:16px;position:relative;">
+        <span style="position:absolute;left:0;color:var(--violet);font-family:var(--font-mono);">→</span>
+        <strong style="color:var(--text);">Reconciliation is automatic.</strong> Orchestrator reads the sentinel, updates the plan, and archives the task file.
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

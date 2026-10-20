@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Directory Reorganization — Disposition Sankey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Lexend', system-ui, sans-serif;
+    --font-mono: 'Inconsolata', 'SF Mono', Consolas, monospace;
+    --bg: #f0f8f4; --surface: #ffffff; --surface2: #e6f4ec; --surface-elevated: #f8fdf9;
+    --border: rgba(0,80,40,0.07); --border-bright: rgba(0,80,40,0.15);
+    --text: #0a1f12; --text-dim: #4a7060;
+    --emerald: #047857; --emerald-dim: rgba(4,120,87,0.08); --emerald-light: rgba(4,120,87,0.3);
+    --teal: #0f766e; --teal-dim: rgba(15,118,110,0.08); --teal-light: rgba(15,118,110,0.3);
+    --slate: #1e293b; --slate-dim: rgba(30,41,59,0.07);
+    --red: #b91c1c; --red-dim: rgba(185,28,28,0.08);
+    --amber: #92400e; --amber-dim: rgba(146,64,14,0.08);
+    --violet: #5b21b6; --violet-dim: rgba(91,33,182,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030d08; --surface: #081510; --surface2: #0d1e14; --surface-elevated: #112518;
+      --border: rgba(80,200,120,0.07); --border-bright: rgba(80,200,120,0.15);
+      --text: #d8f0e0; --text-dim: #5a9070;
+      --emerald: #6ee7b7; --emerald-dim: rgba(110,231,183,0.1); --emerald-light: rgba(110,231,183,0.2);
+      --teal: #5eead4; --teal-dim: rgba(94,234,212,0.1); --teal-light: rgba(94,234,212,0.2);
+      --slate: #94a3b8; --slate-dim: rgba(148,163,184,0.07);
+      --red: #fca5a5; --red-dim: rgba(252,165,165,0.1);
+      --amber: #fcd34d; --amber-dim: rgba(252,211,77,0.1);
+      --violet: #c4b5fd; --violet-dim: rgba(196,181,253,0.1);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, var(--emerald-dim) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, var(--teal-dim) 0%, transparent 50%);
+    color:var(--text); font-family:var(--font-body); padding:48px 40px; min-height:100vh;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .section { animation:fadeUp 0.35s ease-out both; animation-delay:calc(var(--i,0)*0.06s); }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; animation-delay:0ms!important; } }
+
+  h1 { font-size:36px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .subtitle { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:44px; }
+  .section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  .diagram-container { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:32px; margin-bottom:20px; }
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+  .section--hero { background:var(--surface-elevated); border-color:var(--border-bright); box-shadow:0 4px 24px rgba(0,0,0,0.07); padding:28px 32px; }
+
+  .section--emerald .section-label{color:var(--emerald)} .section--emerald .dot{background:var(--emerald)} .section--emerald{border-color:var(--emerald-dim)}
+  .section--teal    .section-label{color:var(--teal)}    .section--teal .dot{background:var(--teal)}    .section--teal{border-color:var(--teal-dim)}
+
+  /* Sankey SVG container */
+  .sankey-wrapper { display:flex; justify-content:center; width:100%; overflow-x:auto; margin:20px 0; }
+  svg.sankey { min-width:100%; height:auto; }
+
+  /* Stage labels and nodes */
+  .sankey-stage { display:grid; gap:12px; }
+  .sankey-stage-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); padding-bottom:8px; }
+  .sankey-node { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px; font-size:12px; line-height:1.4; }
+  .sankey-node-title { font-weight:600; margin-bottom:4px; }
+  .sankey-node-value { font-family:var(--font-mono); font-size:11px; color:var(--emerald); font-weight:700; }
+
+  /* Node color variants */
+  .sankey-node--source { background:var(--teal-dim); border-color:var(--teal); }
+  .sankey-node--source .sankey-node-title { color:var(--teal); }
+  .sankey-node--disposition { background:var(--surface2); border-color:var(--border); }
+  .sankey-node--target-primary { background:var(--emerald-dim); border-color:var(--emerald); }
+  .sankey-node--target-primary .sankey-node-title { color:var(--emerald); }
+  .sankey-node--target-secondary { background:var(--amber-dim); border-color:var(--amber); }
+  .sankey-node--target-secondary .sankey-node-title { color:var(--amber); }
+  .sankey-node--target-tertiary { background:var(--violet-dim); border-color:var(--violet); }
+  .sankey-node--target-tertiary .sankey-node-title { color:var(--violet); }
+
+  /* Grid layout for 3-stage sankey */
+  .sankey-grid { display:grid; grid-template-columns:1fr 2fr 1fr; gap:32px; align-items:start; margin:32px 0; }
+  .sankey-column { display:flex; flex-direction:column; }
+
+  /* Disposition column — scrollable list */
+  .disposition-list { display:flex; flex-direction:column; gap:8px; max-height:680px; overflow-y:auto; padding-right:8px; }
+  .disposition-list::-webkit-scrollbar { width:6px; }
+  .disposition-list::-webkit-scrollbar-track { background:var(--surface2); border-radius:3px; }
+  .disposition-list::-webkit-scrollbar-thumb { background:var(--border-bright); border-radius:3px; }
+
+  .callout { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--emerald); border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; line-height:1.6; color:var(--text-dim); margin-top:16px; }
+  .callout code { font-family:var(--font-mono); font-size:10px; background:var(--emerald-dim); color:var(--emerald); padding:1px 5px; border-radius:3px; }
+
+  @media (max-width:1200px) {
+    .sankey-grid { grid-template-columns:1fr; gap:24px; }
+    .disposition-list { max-height:none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Skill Directory Reorganization</h1>
+<p class="subtitle">master-skills reorg · disposition-ledger summary · 142 directories (2026-07-10 audit)</p>
+
+<div class="diagram-container section--hero" style="--i:0">
+  <div class="section-label"><span class="dot"></span> Three-Stage Disposition Flow</div>
+
+  <div class="sankey-grid">
+    <!-- Stage 1: Source -->
+    <div class="sankey-column">
+      <div class="sankey-stage-label">Source</div>
+      <div class="sankey-node sankey-node--source">
+        <div class="sankey-node-title">All Skill Directories</div>
+        <div class="sankey-node-value">142 total</div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">2026-07-10 audit</div>
+      </div>
+    </div>
+
+    <!-- Stage 2: Disposition Types (scrollable) -->
+    <div class="sankey-column">
+      <div class="sankey-stage-label">Disposition Type</div>
+      <div class="disposition-list">
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Absorb into a bundle sub-skill, then delete</div>
+          <div class="sankey-node-value">74</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Stays standalone; frontmatter improved in place</div>
+          <div class="sankey-node-value">35</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Stays standalone (no change)</div>
+          <div class="sankey-node-value">10</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Reconcile flat/bundle duplicate, keep bundle copy, delete flat copy</div>
+          <div class="sankey-node-value">7</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Split across two owners, then delete</div>
+          <div class="sankey-node-value">4</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Extend in place (bundle head, slug retained)</div>
+          <div class="sankey-node-value">4</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Merge into an existing sub-skill, then delete</div>
+          <div class="sankey-node-value">2</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Lift into a bundle unchanged, then delete the top-level copy</div>
+          <div class="sankey-node-value">2</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Merge with sibling into a new standalone skill</div>
+          <div class="sankey-node-value">2</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Move into a bundle (content unchanged)</div>
+          <div class="sankey-node-value">1</div>
+        </div>
+        <div class="sankey-node sankey-node--disposition">
+          <div class="sankey-node-title">Delete outright (not a skill)</div>
+          <div class="sankey-node-value">1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3: Target Categories -->
+    <div class="sankey-column">
+      <div class="sankey-stage-label">Target Category</div>
+      <div class="sankey-node sankey-node--target-primary">
+        <div class="sankey-node-title">Standalone (no bundle)</div>
+        <div class="sankey-node-value">45</div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">10 + 35</div>
+      </div>
+      <div class="sankey-node sankey-node--target-secondary">
+        <div class="sankey-node-title">Existing bundle head</div>
+        <div class="sankey-node-value">4</div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">github · project-manager · skills-manager</div>
+      </div>
+      <div class="sankey-node sankey-node--target-tertiary">
+        <div class="sankey-node-title">Absorbed/merged into *-manager bundle</div>
+        <div class="sankey-node-value">93</div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">or sibling skill</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Aggregated for readability</strong> — Stage 3 groups multiple target bundles into three categories. See <code>docs/reorg/disposition-ledger.md</code> for the full per-skill breakdown and target-bundle assignments.
+  </div>
+</div>
+
+<div class="section section--emerald" style="--i:1">
+  <div class="section-label"><span class="dot"></span> Flow Summary</div>
+  <div style="font-size:12px; line-height:1.7; color:var(--text-dim);">
+    <p style="margin-bottom:12px;">
+      <strong>Total skills reorganized:</strong> 142 directories catalogued in the 2026-07-10 audit.
+    </p>
+    <p style="margin-bottom:12px;">
+      <strong>Strategic outcomes:</strong> Of the 142 skills, 97 move into the *-manager bundle ecosystem (absorb, merge, reconcile, split, lift); 4 extend in-place as existing bundle heads; 2 merge with siblings into new standalone skills; 1 moves into a bundle unchanged; 1 deleted outright as non-skill. The remaining 45 stay standalone, with 35 receiving frontmatter improvements.
+    </p>
+    <p>
+      <strong>Execution state:</strong> Disposition assignments complete; implementation not yet started. This diagram captures the 2026-07-10 board-approved master-skills reorg plan (11-bundle consolidation, 27-iteration tracker).
+    </p>
+  </div>
+</div>
+
+</body>
+</html>

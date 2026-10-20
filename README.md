@@ -29,6 +29,8 @@ loads to work well in a given domain, and the automation that moves them around.
 
 ## Repository map
 
+> **▣ Diagram —** the directory tree and the archive→consumer flow *(type: tree + flow)* — [view](diagrams/repo-map.html)
+
 ```
 ai-agent-kit/
 ├── README.md            # you are here — mission + orientation
@@ -39,7 +41,7 @@ ai-agent-kit/
 ├── claude/              # canonical authoring surface: skills, instructions, commands
 ├── codex/               # on-demand mirror of the Claude surface
 ├── gemini/              # frozen mirror
-├── shared/              # vendor-neutral: prompts, workflows, configs, plugins
+├── shared/              # vendor-neutral: prompts, workflows, configs, plugins, guardrails
 ├── scripts/             # lifecycle automation — audit, generate, install, sync
 └── docs/                # requirements, plans, and binding reorg governance
 ```
@@ -48,6 +50,9 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 `shared/` holds everything that is not: plain markdown or config any vendor's agent can read.
 
 ## Quick start
+
+> **▣ Diagram —** the three install paths (profile install / project install / clone-and-copy)
+> as a decision flow *(type: flow)* — [view](diagrams/install-paths.html)
 
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can
 use the asset. A **project install** copies one bundle into one repository, so it travels with
@@ -62,15 +67,9 @@ irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-sk
 The installer is interactive: pick platform, asset type, deploy paths, then browse and select.
 Requires PowerShell 5.1+ on Windows, or `pwsh` on macOS and Linux.
 
-**Know what that one-liner does.** It downloads whatever is sitting on this repo's `main`
-branch at this moment and executes it as you, unreviewed. There is no version pin and no
-integrity check in it. You are trusting this repo's `main`, GitHub's content CDN, and the
-timing of your own request.
-
-**To extend less trust than that:** clone the repo, read `install-skills.ps1`, and run it
-locally — or pin the raw URL to a commit SHA instead of `main`, so the content cannot change
-underneath you. [`scripts/README.md`](scripts/README.md) spells out both, plus the checksum
-check to run against tagged releases once releases publish a SHA256.
+**Know what that one-liner does.** It executes unreviewed code from this repo's `main` branch
+as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
+for the full trust model and lower-trust alternatives.
 
 ### Into a single project
 
@@ -98,8 +97,9 @@ number that drifts.
 
 ## Conventions
 
-Skill bundles live at `{vendor}/skills/{name}/SKILL.md` and may ship `sub-skills/`,
-`commands/`, `references/`, and `rules/` beside it. Frontmatter:
+Skill bundles live at `{vendor}/skills/{name}/SKILL.md`. For the full bundle anatomy —
+`sub-skills/`, `commands/`, `references/`, `rules/`, `diagram.html`, `evals/` — see
+[`claude/README.md`](claude/README.md). Frontmatter:
 
 ```yaml
 ---
@@ -131,3 +131,5 @@ requires: [base]                    # dependency list              (optional)
   task list and acceptance criteria.
 - [`scripts/README.md`](scripts/README.md) — every script, its status, and the full installer
   trust model.
+- [`CHANGELOG.md`](CHANGELOG.md) — dated record of merged changes.
+- [`ROADMAP.md`](ROADMAP.md) — planned and in-progress work.

@@ -6,7 +6,7 @@ schema_version: 1
 
 # Test Runners — AI Agent Kit
 
-> **Source of truth for the Verification Gate.** This file lists every test runner the orchestrator should consult when verifying that a code-changing task's claim of `Tests: passing: true` is real. Confirmed rows (`Confirmed: yes`) are authoritative; unconfirmed rows are discovery candidates pending user review.
+> **Source of truth for the [Verification Gate](SDLC.md#verification-gate).** This file lists every test runner the orchestrator should consult when verifying that a code-changing task's claim of `Tests: passing: true` is real. Confirmed rows (`Confirmed: yes`) are authoritative; unconfirmed rows are discovery candidates pending user review.
 >
 > Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc by running `references/scripts/pm-test-runners.ps1 -DiscoverOnly` and rewriting this table.
 
