@@ -62,6 +62,9 @@ function Invoke-GitHubApi {
 
 # Manifest data (populated in Phase 4)
 $script:Manifest = $null
+
+# Repo file listing (fetched on first bundle install/remove; see Get-RepoTree)
+$script:RepoTree = $null
 $script:DescLookup = @{}
 
 # ── Simple Checkbox Picker (for platform/type selection) ──────────────────────
@@ -336,67 +339,120 @@ function Invoke-Selector {
 
 # ── Install Helpers ───────────────────────────────────────────────────────────
 
-function Install-GitHubDirectory {
-    param(
-        [string]$ApiPath,
-        [string]$Destination
-    )
+function Get-RepoTree {
+    # One API call lists every file on the branch; cached for the run. Returns $null when
+    # the listing fails or comes back truncated, so callers fall back to per-directory listing.
+    if ($null -eq $script:RepoTree) {
+        $script:RepoTree = @()
+        try {
+            $resp = Invoke-RestMethod -Uri "$ApiBase/git/trees/$($Branch)?recursive=1" `
+                -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
+            if (-not $resp.truncated) {
+                $script:RepoTree = @($resp.tree | Where-Object { $_.type -eq 'blob' } | ForEach-Object { $_.path })
+            }
+        } catch { }
+    }
+    if ($script:RepoTree.Count -eq 0) { return $null }
+    return $script:RepoTree
+}
+
+function Get-GitHubDirectoryFiles {
+    param([string]$ApiPath)
 
     $items = Invoke-GitHubApi "contents/$ApiPath"
-    if (-not $items) { return $false }
-
-    if (-not (Test-Path -LiteralPath $Destination)) {
-        New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    if (-not $items) { return }
+    foreach ($item in @($items)) {
+        if ($item.type -eq 'file') { $item.path }
+        elseif ($item.type -eq 'dir') { Get-GitHubDirectoryFiles $item.path }
     }
+}
 
-    foreach ($item in $items) {
-        $destPath = Join-Path $Destination $item.name
-        if ($item.type -eq 'file' -and $item.download_url) {
-            Invoke-WebRequest -Uri $item.download_url -OutFile $destPath `
-                -UseBasicParsing -ErrorAction Stop
-        } elseif ($item.type -eq 'dir') {
-            Install-GitHubDirectory -ApiPath "$ApiPath/$($item.name)" -Destination $destPath | Out-Null
-        }
+# Every file in the bundle, as paths relative to <platform>/skills/<name>/.
+function Get-BundleFiles {
+    param([string]$SkillName, [string]$Platform)
+
+    $prefix = "$Platform/skills/$SkillName/"
+    $tree   = Get-RepoTree
+    if ($tree) {
+        $paths = $tree | Where-Object { $_.StartsWith($prefix, [StringComparison]::Ordinal) }
+    } else {
+        $paths = Get-GitHubDirectoryFiles "$Platform/skills/$SkillName"
     }
+    return @($paths | Where-Object { $_ } | ForEach-Object { $_.Substring($prefix.Length) })
+}
 
-    return $true
+# Same layout as scripts/push-to-profile.ps1: members nest under the skill directory,
+# top-level commands/*.md move to the sibling commands/ directory (where the CLI discovers
+# slash commands), and the archive-only diagram.html is left behind. $null = skip.
+function Resolve-BundleTarget {
+    param([string]$RelPath, [string]$SkillDir, [string]$CommandsDir)
+
+    $parts = $RelPath -split '/'
+    if ($RelPath -eq 'diagram.html') { return $null }
+    if ($parts[0] -eq 'commands') {
+        if ($parts.Count -eq 2 -and $parts[1] -like '*.md') { return Join-Path $CommandsDir $parts[1] }
+        return $null
+    }
+    return Join-Path $SkillDir ($parts -join [System.IO.Path]::DirectorySeparatorChar)
+}
+
+# Stamp `installed-from: ai-agent-kit` right after the opening frontmatter fence.
+# Idempotent (no-op if already stamped or if there is no frontmatter).
+function Add-Provenance {
+    param([string]$Path)
+
+    $text = Get-Content -LiteralPath $Path -Raw
+    if ($text -match '^---\r?\n' -and $text -notmatch '(?m)^installed-from:') {
+        $text = $text -replace '^(---\r?\n)', "`${1}installed-from: ai-agent-kit`n"
+        [System.IO.File]::WriteAllText($Path, $text, (New-Object System.Text.UTF8Encoding($false)))
+    }
 }
 
 function Install-SkillBundle {
     param([string]$SkillName, [string]$Platform, [string]$InstallDir)
 
-    $skillDir = Join-Path $InstallDir $SkillName
-    if (-not (Test-Path $skillDir)) { New-Item -ItemType Directory -Path $skillDir -Force | Out-Null }
-
-    try {
-        Invoke-WebRequest -Uri "$RawBase/$Platform/skills/$SkillName/SKILL.md" `
-            -OutFile (Join-Path $skillDir 'SKILL.md') -UseBasicParsing -ErrorAction Stop
-    } catch {
-        Write-Warning "    Could not download $SkillName/SKILL.md - skipping"
+    $files = Get-BundleFiles -SkillName $SkillName -Platform $Platform
+    if ($files -notcontains 'SKILL.md') {
+        Write-Warning "    Could not find $SkillName/SKILL.md - skipping"
         return $false
     }
 
-    try {
-        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/commands" `
-            -Destination (Join-Path $skillDir 'commands') | Out-Null
-    } catch { Write-Warning "    commands/ incomplete for $SkillName" }
+    $skillDir    = Join-Path $InstallDir $SkillName
+    $commandsDir = Join-Path (Split-Path -Parent $InstallDir) 'commands'
+    $ok = $true
 
-    try {
-        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/sub-skills" `
-            -Destination (Join-Path $skillDir 'sub-skills') | Out-Null
-    } catch { Write-Warning "    sub-skills/ incomplete for $SkillName" }
+    foreach ($rel in $files) {
+        $dest = Resolve-BundleTarget -RelPath $rel -SkillDir $skillDir -CommandsDir $commandsDir
+        if (-not $dest) { continue }
 
-    try {
-        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/references" `
-            -Destination (Join-Path $skillDir 'references') | Out-Null
-    } catch { Write-Warning "    references/ incomplete for $SkillName" }
+        $parent = Split-Path -Parent $dest
+        if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
 
-    try {
-        Install-GitHubDirectory -ApiPath "$Platform/skills/$SkillName/rules" `
-            -Destination (Join-Path $skillDir 'rules') | Out-Null
-    } catch { Write-Warning "    rules/ incomplete for $SkillName" }
+        $url = "$RawBase/$Platform/skills/$SkillName/" + (($rel -split '/' | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/')
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -ErrorAction Stop
+            if ((Split-Path -Leaf $rel) -eq 'SKILL.md') { Add-Provenance $dest }
+        } catch {
+            Write-Warning "    Could not download $SkillName/$rel"
+            $ok = $false
+        }
+    }
 
-    return $true
+    return $ok
+}
+
+function Remove-SkillBundle {
+    param([string]$SkillName, [string]$Platform, [string]$InstallDir)
+
+    $skillDir    = Join-Path $InstallDir $SkillName
+    $commandsDir = Join-Path (Split-Path -Parent $InstallDir) 'commands'
+
+    foreach ($rel in (Get-BundleFiles -SkillName $SkillName -Platform $Platform)) {
+        if ($rel -notlike 'commands/*') { continue }
+        $dest = Resolve-BundleTarget -RelPath $rel -SkillDir $skillDir -CommandsDir $commandsDir
+        if ($dest -and (Test-Path -LiteralPath $dest)) { Remove-Item -LiteralPath $dest -Force }
+    }
+    if (Test-Path -LiteralPath $skillDir) { Remove-Item -LiteralPath $skillDir -Recurse -Force }
 }
 
 function Install-Instruction {
@@ -627,7 +683,11 @@ foreach ($change in $allChanges) {
             $path = Join-Path $installDir "$name.md"
         }
         if (Test-Path $path) {
-            Remove-Item -Path $path -Recurse -Force
+            if ($change.assetType -eq 'skills') {
+                Remove-SkillBundle -SkillName $name -Platform $platform -InstallDir $installDir
+            } else {
+                Remove-Item -Path $path -Recurse -Force
+            }
             Write-Host "  - Removed $name ($($change.platform) $($change.assetType))" -ForegroundColor Red
         }
     }

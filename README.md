@@ -71,11 +71,10 @@ Windows only — PowerShell 5.1+; its default deploy paths are built from `%USER
 stops at startup on macOS and Linux. There, use the clone-based
 [bootstrap](#bootstrap-a-new-profile-standard-set) below.
 
-It copies each selected skill's `SKILL.md`, `commands/`, `sub-skills/`, `references/`, and
-`rules/` into the skill's folder as-is: companion commands stay nested there instead of moving
-to the CLI's `commands/` directory, other bundle members (`assets/`, `templates/`, scripts) are
-not copied, and no `installed-from` provenance is stamped. For a complete install, use the
-bootstrap or [`push-to-profile.ps1`](scripts/push-to-profile.ps1).
+Each selected skill lands in the same layout [`push-to-profile.ps1`](scripts/push-to-profile.ps1)
+produces: the whole bundle (except `diagram.html`) under the skill's folder, companion commands
+in the CLI's `commands/` directory, and every `SKILL.md` stamped `installed-from: ai-agent-kit`.
+Unlike that script, it takes no backups — removing a skill deletes its folder and commands.
 
 **Know what that one-liner does.** It executes unreviewed code from this repo's `main` branch
 as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
@@ -142,10 +141,9 @@ These steps are written so an agent can follow them as-is:
 `diagram.html`) into that project's `.claude/skills/`, moves its companion commands to
 `.claude/commands/`, and stamps it `installed-from: ai-agent-kit`. That slash command is not
 built into your CLI: it ships with `skills-manager`, which is itself a skill in this archive.
-Install it into your profile once — the [bootstrap](#bootstrap-a-new-profile-standard-set)
-includes it, or run `push-to-profile.ps1 -Name skills-manager -Force` — and the command is
-available everywhere. The one-liner installer is not enough here: it leaves the command
-nested inside the skill's folder.
+Install it into your profile once — with the one-liner above, the
+[bootstrap](#bootstrap-a-new-profile-standard-set) (which includes it), or
+`push-to-profile.ps1 -Name skills-manager -Force` — and the command is available everywhere.
 
 For a script-driven install without slash commands, clone the archive and use PowerShell 7:
 
