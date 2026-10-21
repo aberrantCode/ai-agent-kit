@@ -13,6 +13,79 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.12.0] - 2026-10-21
+
+### Added
+
+- route NL skill-install to script-driven deployment (`9432d8a`)
+- author youtube-prd-forensics checklist + keyframe scripts (claude+codex) (`81270e0`)
+- author workspace analyze/sync-contracts commands (claude+codex) (`295b255`)
+- author sops-secrets missing files (`688f5ad`)
+- author usage-limit-reducer usage-report.py (`3165390`)
+- author chrome-extension-builder starter templates (`549a322`)
+- add already-running short-circuit (runtime state sidecar) to start-app skill (`3f5ae23`)
+- align subagent model tiers with cost-tier policy (`f42f7cc`)
+- add statusline skill for token-aware status line lifecycle (`b9b6c6a`)
+- add sync-dev github sub-skill for local fast-forward (`c9b35c4`)
+- archive Claude status-line script as claude/statuslines asset (`5d2289f`)
+- seed shared/guardrails with the 12 global rule modules (`54286de`)
+- add guardrails shared asset class + guardrails-manager skill (`9669041`)
+- add startup-context-audit skill (`3ad00cf`)
+- extract generic spawn-terminal skill; delegate handoff launcher to it (`c79c64f`)
+- init-project fragment-version self-heal (`0185f26`)
+- merge continue-new-session-prompt + compliance-audit into session-handoff (`aaca3be`)
+- add fleet-llm skill + /fleet-llm command for the Open WebUI/ollama fleet (`a39c564`)
+- add /repo-status read-only inspect operation to github skill (`8982683`)
+- add /update-service command (alias /opbta-update) for opbta-service updates (`68a21f6`)
+- import one-job-test skill into archive (`323586e`)
+- add work-resume skill for resuming recent session work (`7c82086`)
+- add selectable terminal-mono presentation theme variant (`fd6c562`)
+
+### Changed
+
+- rename pm/github sub-skills to pm-/gh- prefixes (`307b473`)
+- delete superseded standalone continue-new-session-prompt skill (`d30e5d7`)
+- rename /continue-new-session-prompt command to /handoff (`18fee1c`)
+
+### Fixed
+
+- skip Windows Store python alias stubs when resolving Python (`c89522c`)
+- audit companion-command placement in the profile (`ec46c3e`)
+- clarify ownership of 3 leftover sops-secrets script mentions (`60a8e54`)
+- sync chrome-extension-builder references+templates to gemini (`6efdc91`)
+- sync project-manager reference templates to codex+gemini (`f123654`)
+- author opbta-service reference files promised by SKILL.md (`63ada6c`)
+- deliver handoff prompt via file pointer, not inlined arg (`cb54f98`)
+- read PM & session-handoff sub-skills as files, not colon-dispatched (`b4dbbf0`)
+- read github sub-skills as files, not dispatched skills (`ef18ccb`)
+- recover MSYS-mangled raw paths, use ansible ssh key for SOPS seed (`bbe0fae`)
+
+### Documentation
+
+- skill reference audit (`919db8b`)
+- mark /sync-dev shipped in namespace registry + refresh github diagram (`2e86355`)
+- add session-handoff prompts and github skill audit report (`431c172`)
+- add diagram.html for one-job-test skill (`6425219`)
+- backfill 17 denoted diagram artifacts across governance docs (`21d23d8`)
+- add CHANGELOG/ROADMAP links, fix rationalization report link (`e5012a4`)
+- relocate orphaned reports into docs/reports/, link CHANGELOG/ROADMAP (`448fd7a`)
+- refocus README + governance doc tree — de-jargon, link, denote diagrams (`497ab7b`)
+- align project-manager reference paths and external_issue semantics (`6d3aa06`)
+
+### Internal
+
+- trim descriptions and add sub-skill prefix (`c55542c`)
+- trim skill, command, and sub-skill descriptions (`9d0ede2`)
+- finish spawn-terminal extraction — docs, diagram, catalog regen (`fdb4fae`)
+- retire old skills, preserve compliance-audit evals, update namespace registry (`a2afc61`)
+- archive completed pm-doc-consistency task (`1765c66`)
+- ignore docs/issues/guard-bypass.log (`5c5bbbc`)
+- regenerate CHANGELOG for v0.11.0 (`cc7cb89`)
+
+### Other
+
+- remove what-next skill (`d9ecf03`)
+
 ## [0.11.0] - 2026-07-29
 
 ### Added
