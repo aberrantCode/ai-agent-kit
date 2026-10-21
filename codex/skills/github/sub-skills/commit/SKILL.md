@@ -1,5 +1,7 @@
 ---
 name: github-commit
+mirror-of: claude/skills/github/sub-skills/commit
+source-version: 2026-10-21
 description: >
   Sub-skill of `github`. Stage all changes, pull latest (resolving conflicts), commit with a
   conventional-commit message, and push. Triggers on "commit this", "commit and push", "save my
@@ -7,6 +9,10 @@ description: >
 ---
 
 # Operation: commit
+
+> **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/commit`
+> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> bump the stamp — never edit this file in isolation.
 
 **Goal.** Stage, pull, commit, push on the current branch. Obey the **Output Contract** below:
 silent run, errors as they occur, one concise summary. Do not ask for confirmation unless a
@@ -89,6 +95,11 @@ git commit -m "fix: …"
 # with a body:
 printf '%s\n\n%s\n' "fix: subject" "- bullet one" > "$TMP" && git commit -F "$TMP"; rm -f "$TMP"
 ```
+
+After committing, confirm `git log -1 --format=%s` matches the message you wrote and
+`git show --name-only --format= HEAD` matches what you staged — a `prepare-commit-msg` hook or
+harness intercept can silently swap the message (observed: correct files, unrelated message).
+On a mismatch, bail loudly (print both, stop) rather than pushing a mislabeled commit.
 
 ---
 
