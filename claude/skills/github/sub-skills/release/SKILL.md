@@ -45,6 +45,19 @@ follow-up table row, delete it instead.
 
 ---
 
+## Commits in the primary checkout
+
+Release work runs from the primary checkout. A repo that keeps that checkout edit-free (a
+multi-agent worktree protocol) blocks commits there with a repo-owned
+`pre-commit.d/` check, and exempts a commit whose environment sets `ALLOW_PRIMARY_COMMIT=1`.
+Release is that sanctioned exception, so **every command in this operation that can create a
+commit** — `git commit`, `git merge`, and the commit that concludes a conflicted merge — runs
+with `ALLOW_PRIMARY_COMMIT=1` in its environment. In a repo without such a check the variable
+is inert. Never reach for `--no-verify` instead: it would also skip the secrets scan and the
+validator.
+
+---
+
 ## Step 0 — Branch preflight (existence)
 
 A release needs both `main` and `dev`. Verify each on origin and **create the missing one from
@@ -97,7 +110,7 @@ BEHIND_CONTENT=$(git rev-list --no-merges origin/dev..origin/main --count)
 ```bash
 LAST_TAG=$(git describe --tags --abbrev=0 origin/main 2>/dev/null || echo initial)
 git checkout -b chore/sync-dev-after-$LAST_TAG origin/dev
-git merge origin/main -m "chore: sync dev with main after $LAST_TAG"
+ALLOW_PRIMARY_COMMIT=1 git merge origin/main -m "chore: sync dev with main after $LAST_TAG"
 git push -u origin chore/sync-dev-after-$LAST_TAG
 gh pr create --base dev --head chore/sync-dev-after-$LAST_TAG \
   --title "chore: sync dev with main after $LAST_TAG" \
@@ -210,7 +223,7 @@ grep -rlE 'badge/version-v[0-9]+\.[0-9]+\.[0-9]+' --include=*.md . 2>/dev/null \
 ```bash
 git checkout -b "chore/prepare-$VERSION" origin/dev
 # ...stamp the files, roll the changelog...
-git commit -am "chore: prepare $VERSION"
+ALLOW_PRIMARY_COMMIT=1 git commit -am "chore: prepare $VERSION"
 git push -u origin "chore/prepare-$VERSION"
 gh pr create --base dev --head "chore/prepare-$VERSION" --title "chore: prepare $VERSION" \
   --body $'## Summary\n- Stamp '"$VERSION"' onto the repo\'s own version references and roll the changelog.\n\n## Test Plan\n- [ ] repo gates green'
@@ -328,7 +341,8 @@ pwsh ./scripts/Generate-Changelog.ps1           # local tag exists -> emits ## [
 ```
 
 Then land `CHANGELOG.md` on `dev` the way any other change lands — a `chore:` branch and PR
-(`chore: regenerate CHANGELOG for $VERSION`), never a direct push to a protected branch.
+(`chore: regenerate CHANGELOG for $VERSION`, committed with `ALLOW_PRIMARY_COMMIT=1`), never a
+direct push to a protected branch.
 **Never** bypass the gate with `--no-verify` or a `SKIP_*` env var: that gate is what stops the
 committed changelog falling one release behind after every release.
 
@@ -423,7 +437,7 @@ Open a sync PR instead of force-pushing (matches the `chore: sync dev with main 
 
 ```bash
 git checkout -b chore/sync-dev-after-$VERSION dev
-git merge origin/main -m "chore: sync dev with main after $VERSION"   # usually a fast-forward
+ALLOW_PRIMARY_COMMIT=1 git merge origin/main -m "chore: sync dev with main after $VERSION"   # usually a fast-forward
 git push -u origin chore/sync-dev-after-$VERSION
 gh pr create --base dev --head chore/sync-dev-after-$VERSION \
   --title "chore: sync dev with main after $VERSION" \

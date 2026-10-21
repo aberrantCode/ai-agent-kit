@@ -5,6 +5,16 @@
 # missing tool makes every commit impossible on a machine that has not been
 # set up yet, which is exactly when a new contributor first hits it.
 
+# Repo-owned checks. Scripts in pre-commit.d/ beside this hook belong to the repo,
+# not to repo-init: add a check there instead of editing this file, which
+# /init-repo restores to the template. Each runs under sh, in name order; a
+# non-zero exit aborts the commit.
+hooks_dir=$(dirname "$0")
+for check in "$hooks_dir"/pre-commit.d/*; do
+  [ -f "$check" ] || continue
+  sh "$check" || exit 1
+done
+
 if command -v gitleaks >/dev/null 2>&1; then
   if ! gitleaks protect --staged --redact --verbose; then
     echo ""

@@ -106,6 +106,19 @@ try {
     git -C $work commit -m "chore: smoke test baseline" 2>&1 | Out-Null
     Add-Result 'git-commit (pre-commit + commit-msg fire, degrade)' ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
 
+    # Repo-owned pre-commit.d/ checks: a failing one aborts the commit, a passing one does not.
+    $checksDir = Join-Path $hooksDst 'pre-commit.d'
+    New-Item -ItemType Directory -Path $checksDir -Force | Out-Null
+    $check = Join-Path $checksDir '10-smoke'
+    [System.IO.File]::WriteAllText($check, "#!/bin/sh`necho 'smoke check refused'`nexit 1`n")
+    Set-Content -LiteralPath (Join-Path $work 'checked.txt') -Value 'x' -Encoding utf8NoBOM
+    git -C $work add -A | Out-Null
+    $out = git -C $work commit -m "chore: blocked by a repo check" 2>&1
+    Add-Result 'pre-commit.d failing check aborts commit' ($LASTEXITCODE -ne 0 -and ($out -join ' ') -match 'smoke check refused') "exit $LASTEXITCODE"
+    [System.IO.File]::WriteAllText($check, "#!/bin/sh`nexit 0`n")
+    git -C $work commit -m "chore: allowed by a repo check" 2>&1 | Out-Null
+    Add-Result 'pre-commit.d passing check allows commit' ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
+
     # Real push -> fires pre-push (no validator present -> warn + exit 0).
     git -C $work remote add origin $remote
     $branch = (git -C $work rev-parse --abbrev-ref HEAD).Trim()
