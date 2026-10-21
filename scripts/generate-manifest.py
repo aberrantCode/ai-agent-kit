@@ -53,9 +53,18 @@ CATEGORY_ORDER = [
     'Research & OSINT',
 ]
 
+# The standard set every new profile gets: deployed by scripts/bootstrap-profile.ps1
+# (dependencies from `requires:` are added there) and shown as "Standard Skills" by
+# install-skills.ps1. Names must match claude/skills/<name>.
 STANDARD_SKILLS = [
-    'code-review', 'git-cleanup', 'project-manager',
-    'release-to-main', 'ship-to-dev', 'skills-manager',
+    'base', 'github', 'project-manager', 'skills-manager', 'statusline',
+]
+
+# Guardrails (shared/guardrails/<name>.md) that bootstrap-profile.ps1 concatenates into a
+# new profile's global CLAUDE.md / AGENTS.md / GEMINI.md, filtered by each one's applies-to.
+STANDARD_GUARDRAILS = [
+    'claim-discipline', 'git-workflow', 'scope-cohesion-over-line-count',
+    'security', 'testing',
 ]
 
 
@@ -176,6 +185,7 @@ def build_manifest():
         'schemaVersion': SCHEMA_VERSION,
         'generated': date.today().isoformat(),
         'standard_skills': STANDARD_SKILLS,
+        'standard_guardrails': STANDARD_GUARDRAILS,
         'categories': CATEGORY_ORDER,
         'platforms': {'claude': claude_scan},
     }

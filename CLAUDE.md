@@ -79,6 +79,14 @@ logs/timing.jsonl             — `/ship` timing log
 
 **Deployment is script-driven — never hand-copy.** `/install-skill`, `/push-skill`, and the write phase of `/update-skill` deploy a bundle only by running `scripts/push-to-profile.ps1` (preview, then `-Force`; `-TargetDir <project>/.claude/skills` for a project target). Hand-authoring bundle files into a target with the editor skips provenance stamping, sub-skill nesting, companion-command relocation, backups, and draft gating. A natural-language request like "install the github skill from aberrantcode/ai-agent-kit" routes to `/install-skill`.
 
+**Bootstrapping a new profile** ("set up my profile", "install the standard skills") runs
+`pwsh -NoProfile -File scripts/bootstrap-profile.ps1` (preview), then again with `-Force`. It
+deploys `manifest.json`'s `standard_skills` (plus `requires:` dependencies) through
+`push-to-profile.ps1`, installs the status line, and writes default global
+`CLAUDE.md`/`AGENTS.md`/`GEMINI.md` from `standard_guardrails` (existing files are skipped). Both
+lists are edited in `scripts/generate-manifest.py` (`STANDARD_SKILLS`, `STANDARD_GUARDRAILS`),
+then regenerated. When no local clone exists, follow README → "Bootstrap a new profile".
+
 ---
 
 ## Git Workflow
