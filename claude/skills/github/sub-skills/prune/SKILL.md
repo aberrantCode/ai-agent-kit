@@ -1,5 +1,5 @@
 ---
-name: github-prune
+name: gh-prune
 description: Sub-skill of `github`. Audit and remove stale git worktrees, local branches, and remote (origin) branches that are already merged into dev, protecting anything with uncommitted changes. Honors the Output Contract inlined below.
 ---
 

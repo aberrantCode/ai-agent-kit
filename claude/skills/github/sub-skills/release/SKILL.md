@@ -1,5 +1,5 @@
 ---
-name: github-release
+name: gh-release
 description: Sub-skill of `github`. Promote dev to main as a versioned production release — rebase dev if behind, auto-derive the next semantic version from conventional commits, stamp that version onto the repo's own version references (README badge, manifests) and roll the changelog before tagging, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the parent Output Contract.
 ---
 

@@ -1,6 +1,9 @@
 ---
-name: init-features
-description: Run the Feature Interview to capture initial feature specs from docs/REQUIREMENTS.md — extracts functional areas, interviews the user one area at a time, and writes one feature spec per area to docs/features/
+name: pm-init-features
+description: >
+  Sub-skill of `project-manager`. Run the Feature Interview to capture initial feature specs
+  from docs/REQUIREMENTS.md — extracts functional areas, interviews the user one area at a
+  time, and writes one feature spec per area to docs/features/
 ---
 
 # Init Features

@@ -1,6 +1,8 @@
 ---
-name: update-tasks
-description: Reconcile active task files with plans without spawning new workers, including success, failure, blocked, malformed, and stale states
+name: pm-update-tasks
+description: >
+  Sub-skill of `project-manager`. Reconcile active task files with plans without spawning new
+  workers, including success, failure, blocked, malformed, and stale states
 ---
 
 # Update Tasks

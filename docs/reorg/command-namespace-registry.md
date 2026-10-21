@@ -132,8 +132,10 @@ duplicates, not separate names.
 Source: the [PM Lifecycle Redesign spec](../reports/2026-07-16-pm-lifecycle-redesign.review.md) ([§2.4](../reports/2026-07-16-pm-lifecycle-redesign.review.md#24-new--changed-commands), [§3](../reports/2026-07-16-pm-lifecycle-redesign.review.md#3-new--changed-artifacts-at-a-glance)). All four are
 `pm-`-prefixed to satisfy the Generic-Verb Rule above (the bare forms are banned generic
 verbs/nouns); the spec's §3 "open naming question" is resolved here in favor of the prefix.
-Owner: **project-manager** bundle. Sub-skill names are unprefixed (`capture`, `groom`, `task`,
-`retro`); the command wrappers carry the prefix.
+Owner: **project-manager** bundle. Sub-skill directories are unprefixed (`capture`, `groom`,
+`task`, `retro`) and the command wrappers carry the `pm-` prefix; sub-skill `name:` fields
+carry the short `pm-` prefix (`pm-capture`, …) since 2026-10-21, as `github` sub-skills
+carry `gh-`.
 
 | Command | Sub-skill | [Build step](../reports/2026-07-16-pm-lifecycle-redesign.review.md#6-suggested-build-order-once-approved) | Status |
 |---|---|---|---|

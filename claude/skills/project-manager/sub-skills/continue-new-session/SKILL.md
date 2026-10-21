@@ -1,9 +1,9 @@
 ---
-name: continue-new-session
+name: pm-continue-new-session
 description: >
-  Generate a copy-ready prompt that a fresh session (Claude Code, Codex, or Gemini) can paste in to
-  immediately begin work on the next recommended action that was identified in this session's most
-  recent recap. Reference-style — names file paths with short excerpts, no large inline content.
+  Sub-skill of `project-manager`. Generate a copy-ready prompt that a fresh Claude, Codex, or
+  Gemini session can paste to start the next action from this session's latest recap,
+  referencing files rather than inlining content.
 ---
 
 # Continue New Session

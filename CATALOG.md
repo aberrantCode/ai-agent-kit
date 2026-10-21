@@ -150,7 +150,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`fleet-llm`](claude/skills/fleet-llm/SKILL.md) | Talk to the operator's self-hosted Open WebUI / ollama fleet from the terminal — list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull or remove models, or hit any fleet endpoint ... | — |
 | [`honcho`](claude/skills/honcho/SKILL.md) | Work with Honcho — the open-source, AI-native memory backend for stateful agents. Use when integrating Honcho memory/social-cognition into a Python or TypeScript codebase, migrating the Honcho SDK between versions, in... | — |
 | [`llm-patterns`](claude/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | codex |
-| [`project-manager`](claude/skills/project-manager/SKILL.md) | Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Use this skill when the user invokes /init-project, /init-features, /add-fea... | codex, gemini |
+| [`project-manager`](claude/skills/project-manager/SKILL.md) | Feature-driven project orchestrator whose shared state is markdown in docs/ (REQUIREMENTS.md, feature specs, plans, task files with completion sentinels). Use to bootstrap the workflow on a repo, capture feature specs... | codex, gemini |
 
 ### Commerce & Payments
 
