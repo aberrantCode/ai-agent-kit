@@ -8,7 +8,7 @@ applies-to: [claude, codex, gemini]
 targets: git-workflow
 source: ~/.claude/rules/git-workflow.md, archived 2026-08-09
 status: active
-version: 2026-08-09
+version: 2026-10-21
 ---
 
 ## Protected Branches
@@ -42,7 +42,8 @@ Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
 
 - **Atomic commits** — one logical change per commit; must not break the build
 - **No `WIP` commits** — squash before opening a PR
-- Attribution disabled globally via `~/.claude/settings.json`
+- **No AI attribution** — don't add `Co-Authored-By:` trailers for an AI agent to commits, or
+  "Generated with …" footers to PR descriptions
 
 ## Feature Branch Workflow
 
