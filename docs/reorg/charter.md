@@ -46,16 +46,24 @@ stated here as verbatim paired sentences rather than a lookup table.*
 
 Each sentence below must appear **verbatim in both SKILL.md files** of its pair:
 
-1. > project-manager owns single-agent multi-turn loop composition and durable state files;
-   > agent-manager owns multi-agent dispatch, recovery, and session-JSONL infrastructure.
-2. > gated-batch owns per-item data-plane state; project-manager owns session-plane
-   > resumption.
+1. > project-manager owns single-agent multi-turn loop composition; agent-manager owns multi-agent dispatch and recovery; session-manager owns session handoff, durable session state, and session-JSONL infrastructure.
+2. > gated-batch owns per-item data-plane state; session-manager owns session-plane resumption.
 3. > quality-manager owns observe-and-judge + pre-ship smoke; developer-manager owns
    > launch; ops-manager owns post-deploy verification.
 4. > design-manager owns "is it good"; quality-manager owns "does it work".
 
 Routing corollary for boundary sentence #2 (above): "resume the batch" routes on whether
 durable per-item state exists.
+
+> **Amendment (2026-10-21) — session-manager.** Sentences 1 and 2 and the two §4 rows for
+> session handoff and session-JSONL parsing were re-pointed from `project-manager` /
+> `agent-manager` to the new `session-manager` bundle. Why: session handoff already lived
+> outside `project-manager` (the standalone `session-handoff` umbrella, 2026-08-03), and
+> `agent-manager` does not exist yet, so the session-JSONL parser had no owner and five
+> scripts each carried their own copy. `session-manager` now owns the whole session lifecycle
+> plus the shared transcript parser. Pair files: sentence 1 lives verbatim in
+> `session-manager` and `project-manager` (and in `agent-manager` when that bundle ships);
+> sentence 2 lives verbatim in `session-manager` (and in `gated-batch` when it ships).
 
 ## 4. Single Owners
 
@@ -66,8 +74,8 @@ same ownership map, stated here as a lookup table rather than paired sentences.*
 
 | Concern | Sole owner |
 |---|---|
-| Session handoff / "give me a prompt for the next session" | project-manager `session-handoff` |
-| Session-JSONL parsing + token-efficiency page | agent-manager `session-jsonl-toolkit` |
+| Session handoff / "give me a prompt for the next session" | session-manager `handoff` |
+| Session-JSONL parsing + token-efficiency page | session-manager `transcripts` (parser) + `usage` (token page) |
 | Stall/salvage/re-dispatch (`reset --soft`) procedure | agent-manager `stalled-agent-recovery` |
 | LLM JSON output repair (`repair_results.py`, UUID-stem merge) | agent-manager `llm-json-output-repair` |
 | `/diagnose-runbook` | quality-manager |

@@ -18,6 +18,15 @@ This skill implements a self-driving project pipeline. Markdown files in `docs/`
 source of truth — they persist across sessions and coordinate between the orchestrator (you) and
 worker agents.
 
+## Ownership Boundary
+
+Verbatim per the ai-agent-kit reorg charter §3 (`docs/reorg/charter.md`), sentence 1:
+
+> project-manager owns single-agent multi-turn loop composition; agent-manager owns multi-agent dispatch and recovery; session-manager owns session handoff, durable session state, and session-JSONL infrastructure.
+
+Session handoff ("give me a prompt for the next session"), checkpoints, and resume live in the
+`session-manager` bundle — route those requests there.
+
 ## Directory Conventions
 
 ```
