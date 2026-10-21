@@ -141,11 +141,19 @@ function Get-PropertyNames {
 
 # Resolve a Python interpreter explicitly (cross-platform).
 function Get-PythonExe {
+    # Probe each match rather than trusting the first one on PATH: on Windows the
+    # App Execution Alias stubs (WindowsApps\python3.exe / python.exe) resolve via
+    # Get-Command but only print a Microsoft Store hint and exit 9009. A candidate
+    # counts only if `--version` actually runs and exits 0.
     foreach ($candidate in 'python3', 'python') {
-        $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-        if ($cmd) { return $cmd.Source }
+        foreach ($cmd in @(Get-Command $candidate -CommandType Application -All -ErrorAction SilentlyContinue)) {
+            try {
+                & $cmd.Source --version *> $null
+                if ($LASTEXITCODE -eq 0) { return $cmd.Source }
+            } catch { }
+        }
     }
-    throw "No Python interpreter found on PATH (tried python3, python)."
+    throw "No working Python interpreter found on PATH (tried python3, python; Windows Store alias stubs are skipped)."
 }
 
 # Normalized set of markdown heading texts (## and deeper) from a document. Used by
