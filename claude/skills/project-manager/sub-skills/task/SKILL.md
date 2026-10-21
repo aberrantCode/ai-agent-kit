@@ -1,6 +1,9 @@
 ---
 name: task
-description: Express path for chore-task fast-lane — capture + materialize as chore in one shot for "I just need to fix this now". The construct that makes docs/tasks honored. Chore lane only; spec-authority guard re-asserts scope. Triggers on `/pm-task` and "just fix", "quick chore task".
+description: >
+  Sub-skill of `project-manager`. Express chore lane — capture and materialize a chore task in
+  one shot, with the spec-authority guard. Triggers on `/pm-task`, "just fix", "quick chore
+  task".
 ---
 
 # Task

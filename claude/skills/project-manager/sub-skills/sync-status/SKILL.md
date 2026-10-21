@@ -1,6 +1,10 @@
 ---
 name: sync-status
-description: Regenerate the generated sections of docs/STATUS.md (progress table + outstanding-work list) from the canonical specs/plans/tasks/issues, preserving the curated sections. The single-source-of-truth writer for the outstanding-work tracker.
+description: >
+  Sub-skill of `project-manager`. Regenerate the generated sections of docs/STATUS.md
+  (progress table + outstanding-work list) from the canonical specs/plans/tasks/issues,
+  preserving the curated sections. The single-source-of-truth writer for the outstanding-work
+  tracker.
 ---
 
 # Sync Status

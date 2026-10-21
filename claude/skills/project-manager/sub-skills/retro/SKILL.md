@@ -1,6 +1,9 @@
 ---
 name: retro
-description: Systematic close-out learning harvest — collects archived task Notes/Handoff fields and resolved issues into the workflow ledger with idempotent dedup. Triggers on `/pm-retro`, "retro", "harvest learnings", "close-out digest".
+description: >
+  Sub-skill of `project-manager`. Systematic close-out learning harvest — collects archived
+  task Notes/Handoff fields and resolved issues into the workflow ledger with idempotent
+  dedup. Triggers on `/pm-retro`, "retro", "harvest learnings", "close-out digest".
 ---
 
 # Retro

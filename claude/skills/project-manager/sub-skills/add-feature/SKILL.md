@@ -1,6 +1,9 @@
 ---
 name: add-feature
-description: Create a new feature spec — interviews user, detects overlap with existing specs, populates the canonical template, generates a diagram, and updates the feature index
+description: >
+  Sub-skill of `project-manager`. Create a new feature spec — interviews user, detects overlap
+  with existing specs, populates the canonical template, generates a diagram, and updates the
+  feature index
 ---
 
 # Add Feature

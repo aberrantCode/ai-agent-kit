@@ -1,6 +1,10 @@
 ---
 name: groom
-description: Triage and promotion — the moment the feature-vs-chore lane is decided. Asks "does this change product scope?" and offers per-item: promote-to-feature (for ideas), materialize-as-chore-task (with spec-authority guard), merge-into-plan, or close. Triggers on `/pm-groom`, "groom the backlog", "triage BL-###", "promote this item".
+description: >
+  Sub-skill of `project-manager`. Triage a backlog item into the feature or chore lane:
+  promote to feature, materialize as a chore task (spec-authority guarded), merge into a plan,
+  or close. Triggers on `/pm-groom`, "groom the backlog", "triage BL-###", "promote this
+  item".
 ---
 
 # Groom

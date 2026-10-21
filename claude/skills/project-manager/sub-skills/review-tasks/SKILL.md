@@ -1,9 +1,9 @@
 ---
 name: review-tasks
 description: >
-  Dry-run project status report. Produces a read-only snapshot of feature specs, dependency
-  blockers, plans, active tasks, stale work, verification backlog, and open issues without spawning
-  agents or modifying files.
+  Sub-skill of `project-manager`. Dry-run project status report. Produces a read-only snapshot
+  of feature specs, dependency blockers, plans, active tasks, stale work, verification
+  backlog, and open issues without spawning agents or modifying files.
 ---
 
 # Review Tasks

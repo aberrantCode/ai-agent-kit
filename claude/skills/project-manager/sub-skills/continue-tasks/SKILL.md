@@ -1,6 +1,8 @@
 ---
 name: continue-tasks
-description: Run the full project orchestration loop with approved-spec gating, dependency ordering, verified completion, and deterministic failure/blocked handling
+description: >
+  Sub-skill of `project-manager`. Run the full project orchestration loop with approved-spec
+  gating, dependency ordering, verified completion, and deterministic failure/blocked handling
 ---
 
 # Continue Tasks
