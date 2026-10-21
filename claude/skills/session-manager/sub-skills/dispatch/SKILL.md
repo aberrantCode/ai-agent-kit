@@ -84,8 +84,13 @@ the guardrail off, the prompt's hard-constraints section is the only protection 
 
 **Environment.** A script-launched session inherits nothing from your shell. The defaults (see
 `$script:DefaultEnvironment` in the script) cover terminal colour, anchoring bash to the project
-root, long bash and subagent-stall timeouts, and silencing nonessential traffic. Change them with
-`-SetEnv` `KEY=VALUE` pairs; a bare `KEY=` drops a default:
+root, long bash and subagent-stall timeouts, and silencing nonessential traffic. The opposite also
+holds: a new `wt` window *does* inherit the launching process's environment, so the launcher's own
+identity variables (`CLAUDECODE`, `CLAUDE_PID`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_CHILD_SESSION`,
+`CLAUDE_CODE_MESSAGING_SOCKET`/`_TOKEN`) can leak into the spawned claude and make it start up as a
+child of the handing-off session instead of a session of its own — the runner always clears them
+first (`$script:InheritedSessionVariables`, passed through to `spawn-terminal -ClearEnv`). Change the
+defaults with `-SetEnv` `KEY=VALUE` pairs; a bare `KEY=` drops a default:
 
 ```powershell
 -SetEnv "ANTHROPIC_LOG=debug","FORCE_COLOR="

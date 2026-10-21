@@ -82,8 +82,10 @@ Exactly one of the two is required.
   whose tab should vanish when they complete.
 - **Environment** — a spawned tab inherits nothing from the shell you launched it from. Add
   variables with `-SetEnv "KEY=VALUE","OTHER=VALUE"`, and drop one you set earlier with a bare
-  `KEY=`. The generic core carries **no** default environment — it stays neutral; tool-specific
-  launchers layer their own defaults on top.
+  `KEY=`. Remove inherited variables before the command starts with `-ClearEnv "NAME","OTHER"` — a
+  new window can inherit the launching process's environment. The generic core carries **no**
+  default environment and clears nothing by default — it stays neutral; tool-specific launchers
+  layer their own defaults on top.
 - **`-VerifyProcess '<name>'`** — poll for a new process of that name to confirm the launch came up
   (a tab that opens and dies immediately looks identical to success otherwise). Omit it to just
   confirm the terminal itself started.
