@@ -48,11 +48,10 @@ claude/skills/<name>/
 
 Deploying a bundle to a repo copies:
 - `SKILL.md` → `<target>/.claude/skills/<name>/SKILL.md`
-- Each `sub-skills/<sub>/SKILL.md` → `<target>/.claude/skills/<sub>/SKILL.md`
+- Each `sub-skills/<sub>/**` → `<target>/.claude/skills/<name>/sub-skills/<sub>/**` (nested, never loose)
 - Each `commands/<cmd>.md` → `<target>/.claude/commands/<cmd>.md`
-- Each `references/**` file → `<target>/.claude/skills/<name>/references/**`
-- Each `rules/**` file → `<target>/.claude/skills/<name>/rules/**`
-- Each `scripts/**` file → `<target>/.claude/skills/<name>/scripts/**`
+- Every other bundle member (`references/`, `rules/`, `scripts/`, `assets/`, `templates/`, root
+  files, …) → `<target>/.claude/skills/<name>/…` — only the archive-only `diagram.html` stays behind
 
 ### Installed Copy
 A skill file is an installed copy when its YAML frontmatter carries an `installed-from:` marker pointing at this archive. New installs stamp `installed-from: ai-agent-kit`; copies installed before the repository was renamed carry the legacy value `installed-from: llm_skills`. **Treat either value as an installed copy** — throughout this document, `installed-from: ai-agent-kit` is shorthand for *either the current or the legacy marker*. The sync and find operations skip these — they are not project-developed skills.
@@ -244,7 +243,7 @@ Update installed skills in the current project when the archive has newer versio
    - Profile copy: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -Force`
    - Project copy: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -TargetDir "<project>/.claude/skills" -Force`
 
-   The script re-copies the whole bundle (SKILL.md + sub-skills + references + rules + scripts), relocates companion commands, re-stamps `installed-from: ai-agent-kit`, and backs up the previous copy — so an update is just a push over the existing install.
+   The script re-copies the whole bundle (every member except `commands/` and `diagram.html`), relocates companion commands, re-stamps `installed-from: ai-agent-kit`, and backs up the previous copy — so an update is just a push over the existing install.
 
 6. Report the script's output for each updated skill
 
@@ -471,9 +470,8 @@ Push a skill bundle from the archive to the global user profile (`~/.claude/`) s
    - `SKILL.md` → `~/.claude/skills/<name>/SKILL.md`, stamped `installed-from: ai-agent-kit` (after existing fields).
    - Each sub-skill → `~/.claude/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
    - Each companion command → `~/.claude/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
-   - Each `references/**` file → `~/.claude/skills/<name>/references/**` (no marker).
-   - Each `rules/**` file → `~/.claude/skills/<name>/rules/**` (no marker).
-   - Each `scripts/**` file → `~/.claude/skills/<name>/scripts/**` (no marker).
+   - Every other bundle member — `references/`, `rules/`, `scripts/`, `assets/`, `templates/`,
+     root files — → `~/.claude/skills/<name>/…` (no marker). Only `diagram.html` is left behind.
 
 4. On confirm, re-run **with `-Force`**: `pwsh ./scripts/push-to-profile.ps1 -Name <name> -Force`.
 

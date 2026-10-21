@@ -10,9 +10,9 @@
 
         ~/.<vendor>/skills/<Name>/SKILL.md          (parent skill)
         ~/.<vendor>/skills/<Name>/sub-skills/**      (NESTED — see below)
-        ~/.<vendor>/skills/<Name>/references/**
-        ~/.<vendor>/skills/<Name>/rules/**
-        ~/.<vendor>/skills/<Name>/scripts/**
+        ~/.<vendor>/skills/<Name>/<every other member>/**  (references, rules, scripts,
+                                                     assets, templates, root files, ...;
+                                                     only diagram.html is left behind)
         ~/.<vendor>/commands/<cmd>.md                (companion commands — top level)
 
     NESTED sub-skills, not flattened. Sub-skills stay INSIDE the bundle and are reached
@@ -153,11 +153,13 @@ function Get-StatusField {
     return ''
 }
 
-# Bundle members that live NESTED inside the deployed bundle. SKILL.md is a file; the
-# rest are directories copied recursively. `commands` is deliberately NOT here — it is
-# relocated to the profile's top-level commands/ dir (see below).
+# Every top-level entry of the bundle is copied NESTED into the deployed bundle (dirs
+# recursively), so a skill's own sub-skills/, references/, assets/, templates/, ... and
+# root files (e.g. an .env.example it points at) all ship. Two exclusions: `commands`
+# is relocated to the profile's top-level commands/ dir (see below), and diagram.html is
+# an archive-only visual, never read at runtime.
 $MemberFile = 'SKILL.md'
-$MemberDirs = @('sub-skills', 'references', 'rules', 'scripts')
+$ExcludedMembers = @('commands', 'diagram.html')
 
 $archiveRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 
@@ -227,11 +229,12 @@ try {
     $result.commandsDest = $commandsRoot
 
     # --- Enumerate the members that are present ----------------------------
+    $memberItems = @(Get-ChildItem -LiteralPath $sourceDir -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ne $MemberFile -and $ExcludedMembers -notcontains $_.Name } |
+        Sort-Object -Property Name -Culture ([cultureinfo]::InvariantCulture))
     $present = [System.Collections.Generic.List[string]]::new()
     $present.Add($MemberFile)
-    foreach ($d in $MemberDirs) {
-        if (Test-Path -LiteralPath (Join-Path $sourceDir $d) -PathType Container) { $present.Add($d) }
-    }
+    foreach ($m in $memberItems) { $present.Add($m.Name) }
     $hasCommands = Test-Path -LiteralPath (Join-Path $sourceDir 'commands') -PathType Container
     if ($hasCommands) { $present.Add('commands') }
     $result.members = @($present)
@@ -245,12 +248,13 @@ try {
     # File count across the nested members + commands (for the report).
     $files = [System.Collections.Generic.List[string]]::new()
     $files.Add($sourceSkillMd)
-    foreach ($d in $MemberDirs) {
-        $dir = Join-Path $sourceDir $d
-        if (Test-Path -LiteralPath $dir) {
-            foreach ($f in Get-ChildItem -LiteralPath $dir -Recurse -File -ErrorAction SilentlyContinue) {
+    foreach ($m in $memberItems) {
+        if ($m.PSIsContainer) {
+            foreach ($f in Get-ChildItem -LiteralPath $m.FullName -Recurse -File -Force -ErrorAction SilentlyContinue) {
                 $files.Add($f.FullName)
             }
+        } else {
+            $files.Add($m.FullName)
         }
     }
     $commandFiles = @()
@@ -282,13 +286,10 @@ try {
         }
         New-Item -ItemType Directory -Path $destDir -Force | Out-Null
 
-        # Copy the parent SKILL.md + nested member dirs.
+        # Copy the parent SKILL.md + every other member (dirs recursively).
         Copy-Item -LiteralPath $sourceSkillMd -Destination (Join-Path $destDir $MemberFile) -Force
-        foreach ($d in $MemberDirs) {
-            $src = Join-Path $sourceDir $d
-            if (Test-Path -LiteralPath $src -PathType Container) {
-                Copy-Item -LiteralPath $src -Destination $destDir -Recurse -Force
-            }
+        foreach ($m in $memberItems) {
+            Copy-Item -LiteralPath $m.FullName -Destination $destDir -Recurse -Force
         }
 
         # Stamp provenance into EVERY copied SKILL.md (parent + each nested sub-skill).
