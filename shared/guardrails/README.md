@@ -60,6 +60,13 @@ available everywhere):
 Flow is always **source → archive** (`/archive-guardrail`); `/install-guardrail` is the only
 reverse direction, mirroring the skill lifecycle.
 
+**Profile defaults.** [`scripts/bootstrap-profile.ps1`](../../scripts/bootstrap-profile.ps1)
+builds a new profile's global `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` from the guardrails
+listed in `STANDARD_GUARDRAILS` (`scripts/generate-manifest.py`, published as
+`standard_guardrails` in `manifest.json`), each filtered by its `applies-to`. Bodies are
+concatenated verbatim, so a standard guardrail's body must read correctly on its own in a
+global instructions file.
+
 ## Conventions
 
 - **One concern per file** — a guardrail is atomic, like a `~/.claude/rules/*.md` module.

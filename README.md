@@ -71,6 +71,60 @@ Requires PowerShell 5.1+ on Windows, or `pwsh` on macOS and Linux.
 as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
 for the full trust model and lower-trust alternatives.
 
+### Bootstrap a new profile (standard set)
+
+Every new user profile should get the standard setup without the interactive picker.
+[`scripts/bootstrap-profile.ps1`](scripts/bootstrap-profile.ps1) does it in one pass:
+
+- **Skills** — `base`, `github`, `project-manager`, `skills-manager`, `statusline` (the
+  `standard_skills` list in [`manifest.json`](manifest.json)) plus any `requires:`
+  dependencies, each deployed through `push-to-profile.ps1`.
+- **Status line** — `~/.claude/statusline.sh`, wired into `~/.claude/settings.json`. A status
+  line you already configured is left alone. Needs `bash`, `jq`, and `git` on `PATH`; any that are
+  missing are installed with `winget` — `jqlang.jq`, and `Git.Git` for `bash` + `git` (the
+  WSL `bash` launcher doesn't count). Pass `-SkipPrereqInstall` to only warn.
+- **Default instructions** — `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and
+  `~/.gemini/GEMINI.md`, built from the core rules in
+  [`shared/guardrails/`](shared/guardrails/) (the `standard_guardrails` list). A file that
+  already exists is skipped, never overwritten.
+
+These steps are written so an agent can follow them as-is:
+
+1. **Find a local clone.** Use the first of these that contains `scripts/bootstrap-profile.ps1`:
+   `C:\development\ai-agent-kit`, then `~/development/ai-agent-kit`.
+2. **No clone? Get one.** Clone into `~/development/ai-agent-kit` (or
+   `C:\development\ai-agent-kit` on this workstation):
+
+   ```powershell
+   git clone --branch main https://github.com/aberrantCode/ai-agent-kit.git "$HOME/development/ai-agent-kit"
+   ```
+
+   No `git`? Copy it instead — download and extract the `main` archive (no `-Pull` updates
+   later; re-download to refresh):
+
+   ```powershell
+   $dest = "$HOME/development"; New-Item -ItemType Directory -Force $dest | Out-Null
+   Invoke-WebRequest https://github.com/aberrantCode/ai-agent-kit/archive/refs/heads/main.zip -OutFile "$env:TEMP/ai-agent-kit.zip"
+   Expand-Archive "$env:TEMP/ai-agent-kit.zip" $dest -Force
+   Rename-Item "$dest/ai-agent-kit-main" ai-agent-kit
+   ```
+3. **Preview, then deploy** (PowerShell 7 — `winget install Microsoft.PowerShell` if `pwsh`
+   is missing):
+
+   ```powershell
+   pwsh -NoProfile -File <clone>/scripts/bootstrap-profile.ps1          # preview
+   pwsh -NoProfile -File <clone>/scripts/bootstrap-profile.ps1 -Force   # deploy
+   ```
+
+   Add `-Pull` to fast-forward an existing clone first, `-Vendor codex|gemini` to deploy that
+   CLI's skills instead, `-Name a,b` for a different skill set, `-SkipStatusline` /
+   `-SkipInstructions` to leave those alone, `-ProfileHome <dir>` to rehearse against a scratch
+   directory (add `-SkipPrereqInstall` there — tool installs are machine-wide), and `-Json` for a machine-readable report. Re-running is safe: bundles are backed
+   up to `~/.claude/skills-backups/` before being replaced, `settings.json` is backed up before
+   it changes, and instruction files are never overwritten. Exit `0` = done, `1` = a bundle or
+   rule is missing or failed, `2` = execution error.
+4. **Start a new session** — skills and commands load at session start.
+
 ### Into a single project
 
 `/install-skill <name> <target-dir>` copies a bundle — `SKILL.md` plus any `sub-skills/`,

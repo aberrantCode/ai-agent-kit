@@ -2,12 +2,18 @@
   "schemaVersion": 1,
   "generated": "2026-10-21",
   "standard_skills": [
-    "code-review",
-    "git-cleanup",
+    "base",
+    "github",
     "project-manager",
-    "release-to-main",
-    "ship-to-dev",
-    "skills-manager"
+    "skills-manager",
+    "statusline"
+  ],
+  "standard_guardrails": [
+    "claim-discipline",
+    "git-workflow",
+    "scope-cohesion-over-line-count",
+    "security",
+    "testing"
   ],
   "categories": [
     "Foundations & Workflow",
