@@ -67,7 +67,15 @@ irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-sk
 ```
 
 The installer is interactive: pick platform, asset type, deploy paths, then browse and select.
-Requires PowerShell 5.1+ on Windows, or `pwsh` on macOS and Linux.
+Windows only — PowerShell 5.1+; its default deploy paths are built from `%USERPROFILE%`, so it
+stops at startup on macOS and Linux. There, use the clone-based
+[bootstrap](#bootstrap-a-new-profile-standard-set) below.
+
+It copies each selected skill's `SKILL.md`, `commands/`, `sub-skills/`, `references/`, and
+`rules/` into the skill's folder as-is: companion commands stay nested there instead of moving
+to the CLI's `commands/` directory, other bundle members (`assets/`, `templates/`, scripts) are
+not copied, and no `installed-from` provenance is stamped. For a complete install, use the
+bootstrap or [`push-to-profile.ps1`](scripts/push-to-profile.ps1).
 
 **Know what that one-liner does.** It executes unreviewed code from this repo's `main` branch
 as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
@@ -106,8 +114,9 @@ These steps are written so an agent can follow them as-is:
 
    ```powershell
    $dest = "$HOME/development"; New-Item -ItemType Directory -Force $dest | Out-Null
-   Invoke-WebRequest https://github.com/aberrantCode/ai-agent-kit/archive/refs/heads/main.zip -OutFile "$env:TEMP/ai-agent-kit.zip"
-   Expand-Archive "$env:TEMP/ai-agent-kit.zip" $dest -Force
+   $zip = Join-Path ([IO.Path]::GetTempPath()) 'ai-agent-kit.zip'
+   Invoke-WebRequest https://github.com/aberrantCode/ai-agent-kit/archive/refs/heads/main.zip -OutFile $zip
+   Expand-Archive $zip $dest -Force
    Rename-Item "$dest/ai-agent-kit-main" ai-agent-kit
    ```
 3. **Preview, then deploy** (PowerShell 7 — `winget install Microsoft.PowerShell` if `pwsh`
@@ -122,18 +131,21 @@ These steps are written so an agent can follow them as-is:
    CLI's skills instead, `-Name a,b` for a different skill set, `-SkipStatusline` /
    `-SkipInstructions` to leave those alone, `-ProfileHome <dir>` to rehearse against a scratch
    directory (add `-SkipPrereqInstall` there — tool installs are machine-wide), and `-Json` for a machine-readable report. Re-running is safe: bundles are backed
-   up to `~/.claude/skills-backups/` before being replaced, `settings.json` is backed up before
+   up to `~/.<vendor>/skills-backups/` (`~/.claude/skills-backups/` by default) before being replaced, `settings.json` is backed up before
    it changes, and instruction files are never overwritten. Exit `0` = done, `1` = a bundle or
    rule is missing or failed, `2` = execution error.
 4. **Start a new session** — skills and commands load at session start.
 
 ### Into a single project
 
-`/install-skill <name> <target-dir>` copies a bundle — `SKILL.md` plus any `sub-skills/`,
-`commands/`, `references/`, and `rules/` — into that project's `.claude/`, stamping it
-`installed-from: ai-agent-kit`. That slash command is not built into your CLI: it ships with
-`skills-manager`, which is itself a skill in this archive. Profile-install it once with the
-one-liner above and the command is available everywhere.
+`/install-skill <name> <target-dir>` copies a whole bundle (every member except
+`diagram.html`) into that project's `.claude/skills/`, moves its companion commands to
+`.claude/commands/`, and stamps it `installed-from: ai-agent-kit`. That slash command is not
+built into your CLI: it ships with `skills-manager`, which is itself a skill in this archive.
+Install it into your profile once — the [bootstrap](#bootstrap-a-new-profile-standard-set)
+includes it, or run `push-to-profile.ps1 -Name skills-manager -Force` — and the command is
+available everywhere. The one-liner installer is not enough here: it leaves the command
+nested inside the skill's folder.
 
 For a script-driven install without slash commands, clone the archive and use PowerShell 7:
 
@@ -171,6 +183,7 @@ category: Foundations & Workflow    # sole source of category truth
 status: active                      # active | draft | deprecated  (optional)
 version: 1.0.0                      # semver or ISO date           (optional)
 requires: [base]                    # dependency list              (optional)
+install-target: global              # global | project             (optional)
 ---
 ```
 
