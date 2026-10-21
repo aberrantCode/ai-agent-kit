@@ -80,30 +80,56 @@ DIRTY=$(git status --short | grep -c . || true)
 ```
 
 - **Pre-committed** — `$CURRENT_BRANCH` is not `dev` and `$AHEAD > 0`: skip Steps 1–3, set
-  `$BRANCH=$CURRENT_BRANCH`, infer `$MSG` from `git log -1 --format=%s`. If `$DIRTY > 0`, the
-  dirty files would not ship — use `AskUserQuestion` (ship committed only / include as new
-  commit / abort).
+  `$BRANCH=$CURRENT_BRANCH`, infer `$MSG` from `git log -1 --format=%s`. If `$DIRTY > 0`,
+  classify the dirty files as in Step 3: if they belong to the branch's change, commit them as
+  one more atomic commit (message inferred per Step 1) and ship them; if they are unrelated,
+  this is a Step 1 **ask** case (ship committed only / ship separately / abort).
   - **Naming check:** if `$CURRENT_BRANCH` does not match `$CONV`, it must be **renamed**
     before it can ship. Infer a conventional name from the commit type (`git log -1 --format=%s`
-    → `feat:`→`feat/…`, `fix:`→`fix/…`, else `chore/…`) plus a slug of the subject, then
-    confirm the new name via `AskUserQuestion` (proposed name / keep current / enter a name).
-    Apply with `git branch -m "$NEW_NAME"`, and if the old branch was already pushed,
+    → `feat:`→`feat/…`, `fix:`→`fix/…`, else `chore/…`) plus a slug of the subject and apply
+    it without asking: `git branch -m "$NEW_NAME"`, and if the old branch was already pushed,
     re-point the remote: `git push origin -u "$NEW_NAME"` and
-    `git push origin --delete "$CURRENT_BRANCH"`. Update `$BRANCH=$NEW_NAME`.
-- **Normal** — continue to Step 1. Step 5 will **create** the conforming branch with
-  `git checkout -b "$BRANCH"`.
+    `git push origin --delete "$CURRENT_BRANCH"`. Update `$BRANCH=$NEW_NAME`. **Ask only** if
+    the old branch already has an open PR (`gh pr list --head "$CURRENT_BRANCH"`) — deleting
+    its remote closes that PR.
+- **Normal** — continue to Step 1. If `$CURRENT_BRANCH` is a feature branch that already
+  matches `$CONV` (created ahead of the work, `$AHEAD == 0`), reuse it as `$BRANCH`; otherwise
+  Step 5 will **create** the conforming branch with `git checkout -b "$BRANCH"`.
 
 ---
 
 ## Step 1 — Branch name and commit message
 
-If the user supplied both, use them. Otherwise infer up to two suggestions each from the diff
-and recent commits and ask with `AskUserQuestion` (headers `Branch name`, `Commit msg`).
-Branch: `<type>/<slug>`. Message: conventional commit. Store as `$BRANCH`, `$MSG`.
+**Infer, don't ask.** Use whatever the user supplied; derive the rest yourself from
+`git status --short`, `git diff`, and recent commits. Do **not** confirm the inferred names via
+`AskUserQuestion` — report them in the summary instead.
 
-Validate `$BRANCH` against `$CONV` before continuing. If it does not match (e.g. the user typed
-a bare slug), normalize it — prefix the type inferred from `$MSG` and re-confirm — so the branch
-created in Step 5 always conforms.
+- **Type** — from what the change does: bug fix → `fix`, new capability → `feat`, docs-only →
+  `docs`, tests-only → `test`, CI/hooks → `ci`, behavior-neutral restructure → `refactor`,
+  deps/config/housekeeping → `chore`.
+- **`$MSG`** — `<type>: <imperative summary of the main change>`; add a body only when the why
+  is not obvious from the subject.
+- **`$BRANCH`** — the reused branch from Step 0b, else `<type>/<short-kebab-slug>` of the same
+  summary. If that name already exists locally or on origin and is not this change's branch,
+  append `-2`, `-3`, …
+- **Cohesive but mixed** — an incidental, related tweak (e.g. a `.gitignore` line for the
+  change's own artifacts) is a **separate atomic commit** in the same PR, each with its own
+  inferred message. No question needed.
+
+Normalize a user-supplied bare slug by prefixing the inferred type, so `$BRANCH` always matches
+`$CONV`.
+
+**Ask via `AskUserQuestion` only when inference genuinely cannot decide:**
+
+| Situation | Options to offer |
+|---|---|
+| The changes bundle **unrelated** scopes that would normally be separate PRs (two features, a feature plus an unrelated refactor, edits to unrelated skills/modules) | ship as separate PRs, one per scope (run Steps 3–7 per group, sequentially) / ship together / ship only one group |
+| Untracked or modified paths that look **unrelated or unintended** — scratch files, tool output (`.worktrees/`, `.reviews/`, logs), local config, large binaries | exclude them / include them / abort |
+| Anything that looks like a **secret** (key, token, `.env`, credentials file) | exclude / abort — never offer "include" |
+| Pre-committed branch with **unrelated** dirty files, or a rename that would close an open PR (Step 0b) | as listed in Step 0b |
+| The diff's **intent is unreadable** (e.g. only binary or generated changes with no clue in paths or history) | the two best guesses for type/summary |
+
+Size alone is never a reason to ask — a large cohesive change ships as one PR.
 
 ---
 
@@ -130,9 +156,10 @@ TO_STAGE=$(git status --short | grep -c . || true)
 ```
 
 - `$TO_STAGE == 0` → nothing to ship, stop.
-- `$TO_STAGE ≤ 10` and every path plausibly belongs to this change → `git add --all`.
-- `$TO_STAGE > 10`, or any path looks unrelated → `AskUserQuestion` (stage all / stage a
-  subset you name / abort).
+- Every path plausibly belongs to this change (any count) → stage them, path by path or with
+  `git add --all`, grouped into the atomic commits chosen in Step 1.
+- Any path is unrelated, unintended, or secret-like → the Step 1 ask table decides; stage only
+  what it resolves to ship.
 
 ---
 
@@ -163,8 +190,8 @@ silently when not requested.
 ## Step 5 — Branch, commit, push
 
 ```bash
-git checkout -b "$BRANCH"   # skip if already on the pre-committed branch
-git commit -m "$MSG"        # skip if pre-committed
+git checkout -b "$BRANCH"   # skip if already on $BRANCH (pre-committed or reused)
+git commit -m "$MSG"        # skip if pre-committed; one commit per atomic group from Step 1
 git push -u origin "$BRANCH"
 ```
 
@@ -215,8 +242,11 @@ resists deletion.
 ## Step 8 — Summary (only expected output)
 
 ```
-Shipped feat/foo → dev — PR #123, merge commit abc1234. Branch + worktree cleaned.
+Shipped feat/foo → dev — PR #123 "feat: add foo", merge commit abc1234. Branch + worktree cleaned.
 ```
+
+Always name the branch and PR title — they were inferred, not confirmed, so the summary is
+where the user sees them. List any paths excluded in Step 1 as a follow-up table row.
 
 ---
 
