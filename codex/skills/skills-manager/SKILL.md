@@ -340,6 +340,7 @@ Run a comprehensive read-only health check across the entire archive. No changes
 5. **Deprecated installs**: scan all projects under `C:\development\` for installed skills (`installed-from: ai-agent-kit`) where the archive copy has `status: deprecated` — list project and skill name
 6. **Codex/Gemini parity gaps**: README rows with `✓` only in the Claude column — grouped by subsection, sorted by description length as a proxy for skill complexity (longer = more porting value)
 7. **Profile skill shadowing**: loose top-level skills in `~/.claude/skills/<name>/` whose name matches a **sub-skill of an installed bundle**
+8. **Profile companion-command placement**: installed bundles whose companion commands are not registered in `~/.claude/commands/` — either because a `commands/` directory sits nested inside the bundle, or because the archive ships commands the profile lacks
 
 ### Check 7 — profile skill shadowing
 
@@ -367,6 +368,40 @@ loose copy against the bundle sub-skill; if it holds anything unique, `/import-s
 that content into the archive *before* removing anything. Only a copy that is a
 strict subset of the bundle version is safe to delete outright.
 
+### Check 8 — profile companion-command placement
+
+The mirror image of Check 7, and the same silent failure. A bundle's companion
+commands are its top-level slash-command entry points, and they are discovered **only**
+in the profile's top-level `commands/` directory. A `commands/` directory nested
+*inside* the installed bundle is never scanned. So copying a bundle directory wholesale
+— instead of running `scripts/push-to-profile.ps1`, which relocates the commands —
+installs the skill while registering none of its commands. On 2026-10-15 the `github`,
+`project-manager`, and `skills-manager` bundles were all hand-copied this way: 34
+commands sat in `~/.claude/skills/<name>/commands/`, a path nothing reads, and `/ship`,
+`/merge`, and `/release` simply did not exist. The skill loaded fine, which is what made
+it hard to see.
+
+Implemented in `scripts/audit.ps1` as two findings, because a partial push produces the
+second without the first:
+
+- `profile-command-nesting` — the installed bundle has a nested `commands/` directory.
+  This is the signature of a wholesale directory copy.
+- `profile-command-gap` — commands the archive ships for that bundle are missing from
+  the profile's `commands/` root. Aggregated to one finding per bundle, so a 17-command
+  bundle does not emit 17 findings.
+
+Note that `audit.ps1`'s profile checks read the **Claude** profile
+(`~/.claude/skills` by default, overridable with `-ProfileRoot`) — they are not
+re-vendored per toolset.
+
+**Severity is `warn`, never `error`**, for the same reason as Check 7 — profile state must
+not fail an archive PR. Same guards: no-ops when the profile is absent, disabled by
+`-SkipProfile`.
+
+**Resolution:** re-run `/push-skill <name>` (or
+`scripts/push-to-profile.ps1 -Name <name> -Force`). It relocates the commands and drops
+the nested copy. Nothing needs to be hand-moved, and nothing unique is ever lost — a
+nested `commands/` dir is by construction a verbatim copy of the archive's.
 
 ### Output format
 
@@ -378,6 +413,7 @@ strict subset of the bundle version is safe to delete outright.
 │ Bad frontmatter (N):    skill-c (missing description)          │
 │ Deprecated installs (N): project-x uses deprecated skill-d     │
 │ Profile shadowing (N):  merge shadows github/sub-skills/merge  │
+│ Profile command gaps (N): github — 8 commands unregistered     │
 │ Parity gaps — Claude only (N skills, top candidates):          │
 │   - security (Security & Credentials)                          │
 │   - typescript (Languages & Runtimes)                          │
@@ -389,30 +425,35 @@ strict subset of the bundle version is safe to delete outright.
 
 ## Operation: /push-skill [name]
 
-Push a skill bundle from the archive to the global user profile (`~/.claude/`) so it is available across all projects.
+Push a skill bundle from the archive to the global user profile (`~/.codex/`) so it is available across all projects.
 
 ### Steps
 
 1. **Determine scope:**
    - If `name` given: push that skill bundle only
-   - If no `name`: enumerate all skills in `claude/skills/`; prompt the user to confirm:
-     - Question: "Push all N archive skills to the global profile (~/.claude/)?"
+   - If no `name`: enumerate all skills in `codex/skills/`; prompt the user to confirm:
+     - Question: "Push all N archive skills to the global profile (~/.codex/)?"
      - Options: "Yes, push all" | "Cancel"
      - Proceed only on confirm
 
 2. For each skill to push:
    - Check if `status: draft` — skip with a warning; drafts are not pushed to the global profile
-   - Check if `~/.claude/skills/<name>/SKILL.md` already exists and differs — ask the user:
-     - Question: "~/.claude/skills/<name> exists and differs. Overwrite with archive version?"
+   - Check if `~/.codex/skills/<name>/SKILL.md` already exists and differs — ask the user:
+     - Question: "~/.codex/skills/<name> exists and differs. Overwrite with archive version?"
      - Options: "Yes, overwrite" | "Skip this skill"
 
-3. On confirm — deploy the bundle **nested**, mirroring the archive. The parent skill plus its companion commands are the only top-level entry points; each sub-skill stays *inside* the bundle and is reached through the parent's relative `sub-skills/<sub>` path. **Never write a sub-skill to a loose top-level `~/.claude/skills/<sub>/` directory** — that shadows the bundle's own sub-skill (`audit.ps1` Check 8, `profile-shadowing`) and breaks the parent's delegation. This is exactly what `scripts/push-to-profile.ps1` does — prefer running it (`-Name <name> -Force`) over hand-copying. Writes:
-   - `SKILL.md` → `~/.claude/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (after existing fields). A pushed bundle is a downstream **copy** of the archive — a deployment target, exactly like `/install-skill` writing into a project, NOT an authoritative source. The marker makes `/find-skills` and `/sync-skill` skip it, so a pushed copy can never masquerade as a profile-authored source and clobber the archive it came from (the profile is priority #1 in conflict resolution). Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.
-   - Each sub-skill → `~/.claude/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
-   - Each companion command → `~/.claude/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
-   - Each `references/**` file → `~/.claude/skills/<name>/references/**` (no marker).
-   - Each `rules/**` file → `~/.claude/skills/<name>/rules/**` (no marker).
-   - Each `scripts/**` file → `~/.claude/skills/<name>/scripts/**` (no marker).
+3. On confirm — **deploy by running `scripts/push-to-profile.ps1 -Name <name> -Vendor codex -Force`.** This is the deployment path, not a suggestion: the layout below has two traps that are easy to fall into by hand, and the script handles both. Deploy the bundle **nested**, mirroring the archive.
+
+   - **Never copy the bundle directory wholesale.** A plain recursive copy leaves `commands/` nested *inside* the installed bundle, and that path is never scanned for slash commands — the skill installs while every one of its commands stays unregistered. This is how `/ship`, `/merge`, and `/release` silently went missing from the Claude profile on 2026-10-15. Caught by `audit.ps1` as `profile-command-nesting` + `profile-command-gap`.
+   - **Never write a sub-skill to a loose top-level `~/.codex/skills/<sub>/` directory.** That shadows the bundle's own sub-skill and breaks the parent's delegation — each sub-skill stays *inside* the bundle and is reached through the parent's relative `sub-skills/<sub>` path. Caught by `audit.ps1` as `profile-shadowing`.
+
+   The parent skill plus its companion commands are the only top-level entry points. The layout the script writes — verify against this, never hand-build it:
+   - `SKILL.md` → `~/.codex/skills/<name>/SKILL.md`; inject `installed-from: ai-agent-kit` into frontmatter (after existing fields). A pushed bundle is a downstream **copy** of the archive — a deployment target, exactly like `/install-skill` writing into a project, NOT an authoritative source. The marker makes `/find-skills` and `/sync-skill` skip it, so a pushed copy can never masquerade as a profile-authored source and clobber the archive it came from (the profile is priority #1 in conflict resolution). Hand-authored profile skills stay unmarked and remain valid sources; to pull in-place edits to a pushed copy back to the archive, use `/import-skill`.
+   - Each sub-skill → `~/.codex/skills/<name>/sub-skills/<sub>/SKILL.md` (nested; preserve any `templates/` and other sub-skill files), each stamped with the same `installed-from: ai-agent-kit` marker.
+   - Each companion command → `~/.codex/commands/<cmd>.md` (no marker — commands are not skills; they are the top-level entry points that dispatch into the bundle).
+   - Each `references/**` file → `~/.codex/skills/<name>/references/**` (no marker).
+   - Each `rules/**` file → `~/.codex/skills/<name>/rules/**` (no marker).
+   - Each `scripts/**` file → `~/.codex/skills/<name>/scripts/**` (no marker).
 
 4. Report all files written
 

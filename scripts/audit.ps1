@@ -18,6 +18,9 @@
       * Claude<->Codex mirror gap ............................. [info]
       * Missing diagram.html ................................. [info]
       * Profile skill shadowing a bundle sub-skill ............ [warn]
+      * Profile bundle script gap ............................. [warn]
+      * Profile bundle with a nested commands/ dir, and
+        companion commands missing from ~/.claude/commands/ ... [warn]
       * Output Contract inlined in every sub-skill (no dangling
         pointer) .............................................. [error]
       * Command "sub-skills/<x>" path resolution + github
@@ -27,13 +30,17 @@
       * Command-file frontmatter YAML validity .............. [error]
       * templates/hooks/** pinned eol=lf in .gitattributes .. [error]
 
-    The profile-shadowing check is the one check that reads outside the archive. A
+    The profile checks are the only ones that read outside the archive. A
     loose top-level skill in `~/.claude/skills/<name>` whose name matches a sub-skill
     of an installed bundle wins name resolution over the bundle's copy, so `/<name>`
     silently runs the stale loose file instead of the maintained bundle sub-skill.
-    Severity is `warn`, never `error`: this is a condition of one developer's profile,
+    The companion-command checks catch the mirror-image failure: a bundle's commands
+    are discovered only in `~/.claude/commands/`, so a bundle copied wholesale — with
+    its `commands/` dir left nested inside it — installs the skill while registering
+    none of its slash commands.
+    Severity is `warn`, never `error`: these are conditions of one developer's profile,
     and validate.ps1 gates pull requests on this script's exit code — an archive PR
-    must never fail because of unrelated local state. The check no-ops when the
+    must never fail because of unrelated local state. They no-op when the
     profile directory does not exist (CI, fresh clones).
 
     Frontmatter parsing is delegated entirely to
@@ -50,11 +57,13 @@
     Emit findings + summary as a JSON document to stdout instead of a console table.
 
 .PARAMETER ProfileRoot
-    Installed-skills directory to check for bundle shadowing. Defaults to
-    `~/.claude/skills`. Ignored when the path does not exist.
+    Installed-skills directory to check for bundle shadowing, script gaps, and
+    companion-command placement. Defaults to `~/.claude/skills`. Ignored when the path
+    does not exist. Companion commands are looked for in its sibling `commands/`
+    directory, matching where push-to-profile.ps1 writes them.
 
 .PARAMETER SkipProfile
-    Skip the profile-shadowing check entirely (archive-only audit).
+    Skip every profile check entirely (archive-only audit).
 
 .OUTPUTS
     Console table (default) or JSON (-Json). Findings are also reflected in the exit code.
@@ -402,6 +411,56 @@ try {
                             "archive ships scripts/$($src.Name) but the installed profile copy lacks it - " +
                             "the skill's SKILL.md will point at a script that is not there. Re-run /push-skill $($top.Name)")
                     }
+                }
+            }
+
+            # Companion-command placement in the profile. A bundle's commands are its
+            # top-level slash-command entry points and are only discovered in
+            # `~/.claude/commands/`; a `commands/` dir *inside* the profile bundle is
+            # never scanned. Copying a bundle directory wholesale (instead of running
+            # push-to-profile.ps1, which relocates them) therefore installs the skill
+            # but silently registers none of its commands - exactly how /ship, /merge
+            # and /release went missing after the github bundle was hand-copied on
+            # 2026-10-15. Two independent signals, because a partial push shows the
+            # second without the first. Same three guards as the checks above:
+            # skippable, no-op without a profile, warn-only.
+            $commandsRoot = Join-Path (Split-Path -Parent $ProfileRoot) 'commands'
+            foreach ($top in $installed) {
+                $archiveCommands = Join-Path $RepoRoot "claude/skills/$($top.Name)/commands"
+                if (-not (Test-Path -LiteralPath $archiveCommands)) { continue }
+                $archiveCmdFiles = @(Get-ChildItem -LiteralPath $archiveCommands -File -Filter '*.md' -ErrorAction SilentlyContinue)
+                if ($archiveCmdFiles.Count -eq 0) { continue }
+
+                # Signal 1: nested commands/ dir - the hand-copy signature.
+                $nested = Join-Path $top.FullName 'commands'
+                if (Test-Path -LiteralPath $nested -PathType Container) {
+                    $nestedCount = @(Get-ChildItem -LiteralPath $nested -File -Filter '*.md' -ErrorAction SilentlyContinue).Count
+                    Add-Finding warn 'profile-command-nesting' $top.Name (
+                        "the installed bundle has a nested commands/ directory ($nestedCount file(s)) - " +
+                        "that path is never scanned for slash commands, so none of them are registered. " +
+                        "This is the signature of a wholesale directory copy; re-run /push-skill $($top.Name) " +
+                        "(or scripts/push-to-profile.ps1 -Name $($top.Name) -Force), which relocates commands " +
+                        "to $commandsRoot and removes the nested copy")
+                }
+
+                # Signal 2: archive commands absent from the profile commands root.
+                # Aggregated into one finding per bundle - a 17-command bundle must not
+                # emit 17 findings.
+                $missing = [System.Collections.Generic.List[string]]::new()
+                foreach ($cmd in $archiveCmdFiles) {
+                    if (-not (Test-Path -LiteralPath (Join-Path $commandsRoot $cmd.Name) -PathType Leaf)) {
+                        $missing.Add([System.IO.Path]::GetFileNameWithoutExtension($cmd.Name))
+                    }
+                }
+                if ($missing.Count -gt 0) {
+                    # @(...) around the pipeline: a single missing command would otherwise
+                    # yield a scalar string, and .Count on it throws under strict mode.
+                    $names = @(@(Sort-Ordinal @($missing)) | ForEach-Object { "/$_" })
+                    $shown = if ($names.Count -gt 6) { (($names[0..5]) -join ', ') + ", +$($names.Count - 6) more" } else { $names -join ', ' }
+                    Add-Finding warn 'profile-command-gap' $top.Name (
+                        "$($missing.Count) of $($archiveCmdFiles.Count) companion command(s) are missing from " +
+                        "$commandsRoot - $shown. The bundle is installed but those slash commands are " +
+                        "unregistered. Re-run /push-skill $($top.Name)")
                 }
             }
         }
