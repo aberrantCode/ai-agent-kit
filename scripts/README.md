@@ -1,7 +1,7 @@
 # scripts/
 
 All lifecycle automation for the archive — installation, deployment, sync, catalog
-generation, and (in a later PR) validation — as real scripts, so the archive's
+generation, and validation — as real scripts, so the archive's
 deploy/install/overlay/integration lifecycle no longer depends solely on LLM-driven
 slash commands (a [core goal of the repo standard](../docs/requirements/canonical-repo.md)).
 
@@ -41,9 +41,11 @@ above in the same PR, per the binding rule in the [implementation plan](../docs/
 
 ## PowerShell 7 floor, and the grandfathered exception
 
-Every script in this directory declares `#Requires -Version 7.0` and is written to be
-cross-platform — no Windows-only APIs, `utf8NoBOM` output encoding, ordinal
-(culture-invariant) sorting — per the [repo standard's portability requirement](../docs/requirements/canonical-repo.md).
+PowerShell lifecycle scripts require PowerShell 7 (`#Requires -Version 7.0`); the manifest
+generator runs with Python 3. Portability conventions include `utf8NoBOM` output and ordinal
+(culture-invariant) sorting — see the [repo standard](../docs/requirements/canonical-repo.md).
+Bootstrap prerequisite installation uses `winget` on Windows; on other platforms install
+`bash`, `jq`, and `git` with your platform's package manager, or use `-SkipPrereqInstall`.
 This keeps a future Python port (an [open question tracked in the repo standard](../docs/requirements/canonical-repo.md))
 and a future hosted-CI mirror of the local validation gate cheap, even though today's
 gate runs locally only.
@@ -237,16 +239,16 @@ per erik's explicit direction to reduce reliance on GitHub Actions for this effo
 ## Cross-links
 
 - [`shared/README.md`](../shared/README.md) — the vendor-neutral asset tree
-  (`prompts/`, `workflows/`, `configs/`, `plugins/`). Assets under `shared/` carry no
-  vendor-specific frontmatter, so they are covered by the same manifest/catalog
-  regeneration duty as vendor skills whenever `generate-manifest.py` is extended to
-  index them.
+  (`prompts/`, `workflows/`, `configs/`, `plugins/`, `guardrails/`). The catalog generator
+  currently scans the first four classes directly; rerun `generate-catalog.ps1 -Force`
+  when those listings change. Guardrails are documented in their class README and
+  selected for bootstrap via `standard_guardrails`; individual guardrails are not yet
+  cataloged. Shared assets are not a separate section of `manifest.json`.
 - [`claude/README.md`](../claude/README.md) — canonical authoring surface; the
   `category:` frontmatter that `backfill-categories.ps1` writes and
   `generate-manifest.py` reads is documented there (see also the
   [repo standard](../docs/requirements/canonical-repo.md)).
-- [`codex/README.md`](../codex/README.md) — on-demand mirror; `push-to-profile.ps1`'s
-  "or vendor equivalent" destination and `sync-installed.ps1`'s drift scan both apply
-  here once implemented.
-- [`gemini/README.md`](../gemini/README.md) — frozen mirror; same applicability note
-  as `codex/README.md`.
+- [`codex/README.md`](../codex/README.md) — on-demand mirror; deployment already supports
+  `push-to-profile.ps1 -Vendor codex`. `sync-installed.ps1` remains a stub.
+- [`gemini/README.md`](../gemini/README.md) — frozen mirror; deployment already supports
+  `push-to-profile.ps1 -Vendor gemini`, with the same sync limitation.

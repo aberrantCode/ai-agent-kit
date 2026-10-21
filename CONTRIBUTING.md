@@ -85,6 +85,14 @@ Unlike the passive shared classes, guardrails have a lifecycle skill —
 `/install-guardrail` rather than hand-copying. See that class README for the frontmatter
 contract.
 
+## Task tracking before edits
+
+Read [`AGENTS.md`](AGENTS.md) before editing archive assets. Source-tree work needs an
+active task in [`docs/tasks/active/`](docs/tasks/active/) naming the owning agent with
+`status: in-progress`; `/continue-tasks` creates tasks through the feature workflow.
+Documentation maintenance can use the project-manager chore lane (`/pm-task`) without
+changing feature scope. See [`docs/tasks/README.md`](docs/tasks/README.md).
+
 ## Governance
 
 **Reorg-charter precedence.** [`docs/reorg/charter.md`](docs/reorg/charter.md) is binding for
@@ -92,12 +100,14 @@ anything touching skill *structure* — bundle composition, absorptions, deletio
 (see the [slug rules](docs/reorg/charter.md#2-slug-rules)), the
 [cross-CLI mirror policy](docs/reorg/charter.md#5-cross-cli-mirror-policy), and the
 [parity follow-through every deletion PR must ship](docs/reorg/charter.md#6-parity-follow-through-every-deletion-pr)
-(updated README row, regenerated manifest, diagram add/update/remove). Where this file and
+(regenerated manifest and catalog, diagram add/update/remove). Where this file and
 the charter disagree, the charter wins. Never move, rename, or delete anything under
 `claude/skills/`, `codex/skills/`, or `gemini/skills/` outside that process.
 
 **Git workflow.** Full rules live at `~/.claude/rules/git-workflow.md` (branch naming,
-commit format, PR size limits — global, not repeated here). Two things are repo-specific:
+commit format, and merge mechanics). PR scope is governed by
+[scope cohesion](shared/guardrails/scope-cohesion-over-line-count.md), with no hard line-count cap.
+Two things are repo-specific:
 
 - `/ship` runs [`scripts/validate.ps1`](scripts/validate.ps1) before opening any PR and
   aborts on a nonzero exit (local validation gate — see [`CLAUDE.md`](CLAUDE.md) and
