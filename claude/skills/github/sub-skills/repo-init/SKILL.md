@@ -179,7 +179,7 @@ Standard hook set — **overridable per repo** via `hooks.set` in the manifest:
 
 | Hook | Contract | Default |
 |---|---|---|
-| `pre-commit` | `gitleaks protect --staged --redact`; then the repo's validate script if one exists | on |
+| `pre-commit` | repo-owned `pre-commit.d/*` checks; `gitleaks protect --staged --redact`; then the repo's validate script if one exists | on |
 | `pre-push` | full validation (`scripts/validate.ps1`, `scripts/validate.sh`, or the detected equivalent) | on |
 | `commit-msg` | conventional-commit format check | off |
 | `post-checkout` / `post-rewrite` | regeneration of generated files | off |
@@ -187,6 +187,13 @@ Standard hook set — **overridable per repo** via `hooks.set` in the manifest:
 Each hook is a thin wrapper that **degrades to a warning when its tool is absent** — a hook
 that hard-fails because `gitleaks` isn't installed makes every commit impossible on a fresh
 machine. Templates: `./templates/hooks/`.
+
+**Repo-owned checks go in `<hooks dir>/pre-commit.d/`, never in the managed hook.** The
+`pre-commit` template runs every file in that directory under `sh`, in name order, before the
+secrets scan, and aborts the commit on a non-zero exit. The directory and its contents belong to
+the repo: never flag them as drift, never offer to remove or rewrite them. A managed hook that
+carries extra repo logic **is** drift — offer to move that logic into `pre-commit.d/` and restore
+the template, so a later `/init-repo` cannot silently delete it.
 
 **Interaction with the global git-push-opens-Zed hook.** That hook is a Claude Code
 `PreToolUse` hook on the harness side; `pre-push` here is a git hook. They fire at different
