@@ -131,9 +131,3 @@ load a sub-skill without this parent file in context.
   command and confirm stdout + exit 0 before declaring done. Include a worktree/handoff-shaped
   payload (native `context_window`, no transcript on disk) in every verification.
 - **All user prompts go through `AskUserQuestion`.**
-
----
-
-## Diagram
-
-[View diagram](diagram.html)

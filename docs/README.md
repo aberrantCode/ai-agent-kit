@@ -17,7 +17,7 @@ Requirements, plans, reorg governance, and point-in-time reports for work on thi
 | [`reports/`](reports/) | Point-in-time audit/consensus artifacts, dated |
 | [`backlog.md`](backlog.md) | Intake for not-yet-scheduled bugs, chores, debt, and ideas |
 | [`STATUS.md`](STATUS.md) | Single entry point for "what's outstanding, what's next" |
-| [`REQUIREMENTS.md`](REQUIREMENTS.md) | Legacy product-requirements intake (superseded by `requirements/`; kept for existing links) |
+| [`REQUIREMENTS.md`](REQUIREMENTS.md) | User-owned product requirements read by `/init-features`; reconciled with binding reorg governance |
 
 ## `requirements/`
 

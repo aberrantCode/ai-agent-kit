@@ -366,15 +366,15 @@
                 </div>
             </div>
 
-            <!-- Clone and Copy Branch -->
+            <!-- Direct Script Install Branch -->
             <div class="branch">
                 <div class="connector"></div>
                 <div class="node node-action">
                     <div class="node-title">
                         <span class="node-type-icon">⊕</span>
-                        Clone and copy
+                        Direct script install
                     </div>
-                    <div class="node-description">No tooling required</div>
+                    <div class="node-description">PowerShell 7; no slash commands required</div>
                 </div>
 
                 <div class="connector"></div>
@@ -385,14 +385,15 @@
 
                 <div class="connector"></div>
                 <div class="node node-step">
-                    <div class="node-title">cp -r</div>
-                    <div class="code-block">cp -r ai-agent-kit/claude/skills/&lt;name&gt; your-project/.claude/skills/&lt;name&gt;</div>
+                    <div class="node-title">Preview, then deploy</div>
+                    <div class="code-block">pwsh -NoProfile -File ./ai-agent-kit/scripts/push-to-profile.ps1 -Name &lt;name&gt; -TargetDir "./your-project/.claude/skills"</div>
+                    <div class="node-description">Review the preview, then repeat with <code>-Force</code>.</div>
                 </div>
 
                 <div class="connector"></div>
                 <div class="node node-outcome">
                     <div class="node-title">Skill installed locally</div>
-                    <div class="node-description">Manual installation, no versioning metadata</div>
+                    <div class="node-description">Provenance stamped, companion commands relocated, existing bundle backed up</div>
                 </div>
             </div>
         </div>
