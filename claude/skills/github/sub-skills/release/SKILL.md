@@ -1,6 +1,6 @@
 ---
 name: gh-release
-description: Sub-skill of `github`. Promote dev to main as a versioned production release — rebase dev if behind, auto-derive the next semantic version from conventional commits, stamp that version onto the repo's own version references (README badge, manifests) and roll the changelog before tagging, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the parent Output Contract.
+description: Sub-skill of `github`. Promote dev to main as a versioned production release — sync dev from main via PR if behind, auto-derive the next semantic version from conventional commits, stamp that version onto the repo's own version references (README badge, manifests) and roll the changelog before tagging, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the parent Output Contract.
 ---
 
 # Operation: release
@@ -76,21 +76,38 @@ AHEAD=$(git rev-list origin/main..origin/dev --count)     # the release payload
 ```
 
 - `$AHEAD == 0` → nothing to release; stop.
-- `$BEHIND > 0` → rebase dev onto main (Step 2) before merging.
+- `$BEHIND > 0` → bring main's commits onto dev (Step 2) before merging — never rebase dev.
 
 ---
 
-## Step 2 — Rebase dev onto main (only if behind)
+## Step 2 — Bring main's commits onto dev (only if behind)
+
+**Never rebase or force-push `dev`** — it is protected and shared. Bring `main` in with a merge,
+through a PR, exactly as Step 7 Route B does.
 
 ```bash
-git checkout dev
-git stash --include-untracked
-git rebase origin/main
-git stash pop   # only if stashed
-git push --force-with-lease origin dev
+BEHIND_CONTENT=$(git rev-list --no-merges origin/dev..origin/main --count)
 ```
 
-On conflict, resolve the obvious ones; otherwise `AskUserQuestion` (resolve manually / abort).
+- `$BEHIND_CONTENT == 0` → `main` is ahead only by earlier release merge commits (e.g. a
+  previous release that skipped Step 7). They carry no content `dev` lacks, so the release PR
+  merges cleanly — **skip this step**; Step 7 syncs them back afterwards.
+- `$BEHIND_CONTENT > 0` → `main` has real commits `dev` lacks (a hotfix). Sync before merging:
+
+```bash
+LAST_TAG=$(git describe --tags --abbrev=0 origin/main 2>/dev/null || echo initial)
+git checkout -b chore/sync-dev-after-$LAST_TAG origin/dev
+git merge origin/main -m "chore: sync dev with main after $LAST_TAG"
+git push -u origin chore/sync-dev-after-$LAST_TAG
+gh pr create --base dev --head chore/sync-dev-after-$LAST_TAG \
+  --title "chore: sync dev with main after $LAST_TAG" \
+  --body $'## Summary\n- Merge main\'s commits into dev ahead of the release.'
+gh pr merge <PR#> --merge --delete-branch
+git checkout dev && git pull origin dev && git fetch origin --prune
+```
+
+On merge conflict, resolve the obvious ones; otherwise `AskUserQuestion` (resolve manually /
+abort).
 
 ---
 
@@ -393,9 +410,12 @@ violation there.
 
 ```bash
 git checkout dev
-git rebase origin/main         # typically a fast-forward
-git push --force-with-lease origin dev
+git merge --ff-only origin/main   # the release merge sits on top of dev
+git push origin dev
 ```
+
+If `--ff-only` refuses, `dev` gained commits after the release merge — use Route B. Never
+rebase or force-push `dev`.
 
 ### Route B — `dev` is PR-only
 
@@ -427,7 +447,7 @@ Released v0.2.0 — dev → main (merge commit def5678), tagged + GitHub Release
 | Situation | Recovery |
 |---|---|
 | `$AHEAD == 0` | Nothing to release — stop |
-| Rebase conflict (Step 2/7) | AskUserQuestion: resolve manually or abort |
+| Merge/rebase conflict (Step 2/7) | AskUserQuestion: resolve manually or abort |
 | Local main diverged | **STOP** — do not merge |
 | `main` is PR-only (hook/protection/project rule) | Detect in **Step 5** and take **Route B** from the start — do not attempt a direct push first |
 | Push to main rejected by hook/protection | Not "behind" — discard local merge (`git reset --hard origin/main`) and switch to Route B. Never `--no-verify` / `SKIP_*` / force-push main |

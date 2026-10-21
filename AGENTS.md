@@ -92,6 +92,21 @@ Two guardrails bind work in *this* repo directly:
   prior "800-line hard cap" language.
 - Full git mechanics live at `~/.claude/rules/git-workflow.md`.
 
+## Bootstrapping a profile
+
+Asked to set up a new user profile with this archive's standard skills? Run
+`pwsh -NoProfile -File scripts/bootstrap-profile.ps1` to preview, then add `-Force` to deploy
+(`-Vendor codex` or `-Vendor gemini` to deploy those CLIs' skills). It deploys
+`manifest.json`'s `standard_skills` plus their `requires:` dependencies through
+`scripts/push-to-profile.ps1`, installs the Claude status line, and writes default global
+`CLAUDE.md` / `AGENTS.md` / `GEMINI.md` files from `standard_guardrails` — skipping any that
+already exist. Never copy bundle files by hand. If this repository is not
+cloned locally yet, follow [README → Bootstrap a new profile](README.md#bootstrap-a-new-profile-standard-set)
+to clone it (or download and extract it) first. Profile deployment is not source-tree work,
+so the Iron Law's task-file requirement does not apply.
+
+---
+
 ## When AGENTS.md Conflicts With User Instructions
 
 User instructions always win. If the user says "skip the task file, just edit this one line", do as asked but note in the affected feature's plan `Notes` column that work was done outside the orchestration loop.
