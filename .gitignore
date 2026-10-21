@@ -9,6 +9,9 @@ gemini/skills/*-workspace/
 __pycache__/
 *.pyc
 
+# Local adversarial review reports and verification output
+.reviews/
+
 # OS + editor noise
 .DS_Store
 Thumbs.db
