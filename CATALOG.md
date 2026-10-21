@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-15, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-21, schemaVersion: 1)
 -->
 
 # Catalog
@@ -29,7 +29,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the br... | codex |
 | [`fix-start`](claude/skills/fix-start/SKILL.md) | Use when starting any HomeRadar bug fix or regression investigation, before writing any code | codex |
-| [`github`](claude/skills/github/SKILL.md) | Use when the user wants to perform a git or GitHub repository operation from the terminal — merging a pull request, branch, or worktree into dev; shipping working changes through a feature-branch PR; cutting a dev→mai... | codex |
+| [`github`](claude/skills/github/SKILL.md) | Use for any git or GitHub repository operation in the terminal, even when "git" isn't said: commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev, cut a dev→main release or provi... | codex |
 | [`guide-assistant`](claude/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | codex |
 | [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/SKILL.md) | Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification... | — |
 | [`iterative-development`](claude/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | codex |

@@ -1,16 +1,10 @@
 ---
 name: github-worktree-task-lifecycle
 description: >
-  Sub-skill of `github`. Full per-task worktree lifecycle: create an isolated worktree under
-  `<repo>-wt/.worktrees/`, work in it safely, and remove it idempotently after merge — with
-  Windows file-lock recovery, credentials-stay-in-primary-checkout rules, same-branch
-  collision guards, and identical-file pull-collision handling. Use when starting feature
-  work that needs isolation from the primary checkout, when running agent work that must not
-  collide with concurrent edits, or when a worktree needs to be cleaned up after its branch
-  merged. Triggers on "create a worktree", "set up an isolated workspace", "work in a
-  worktree", "remove the worktree", "worktree won't delete", "permission denied removing
-  worktree", and similar phrasings. Single lifecycle authority — the github merge/prune
-  operations and multi-agent worktree-per-agent harnesses delegate here.
+  Sub-skill of `github`. Create, work in, and idempotently remove an isolated per-task
+  worktree under `<repo>-wt/.worktrees/`, with Windows file-lock recovery and same-branch
+  collision guards. Triggers on "create a worktree", "set up an isolated workspace", "remove
+  the worktree", "worktree won't delete". Lifecycle authority that merge and prune delegate to.
 ---
 
 # Worktree Task Lifecycle

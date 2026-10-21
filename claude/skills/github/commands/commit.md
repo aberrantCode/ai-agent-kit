@@ -1,5 +1,5 @@
 ---
-description: Stage all changes, pull latest (resolving conflicts), commit with a conventional-commit message, and push. Responds with minimal output — a concise summary at the end, errors as they occur.
+description: Stage all changes, pull latest (resolving conflicts), commit with a conventional-commit message, and push.
 ---
 
 Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/commit/SKILL.md` to run its `commit` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:commit)`.

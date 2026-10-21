@@ -1,5 +1,5 @@
 ---
-description: Publish the current local project as a new hardened GitHub repository — gitleaks pre-commit hook, .gitignore/.gitattributes, main + dev branches, and branch protection requiring PRs on both. Responds with minimal output — a concise summary at the end, errors as they occur.
+description: Publish this local project as a new hardened GitHub repo — gitleaks hook, .gitignore/.gitattributes, main + dev branches, PR-required branch protection.
 ---
 
 Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/publish/SKILL.md` to run its `publish` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:publish)`.

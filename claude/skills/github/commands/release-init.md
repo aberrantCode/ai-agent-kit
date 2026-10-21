@@ -1,5 +1,5 @@
 ---
-description: Provision or repair this repo's release automation to the Release-Automation Standard — a persistent changelog generator plus a tag-triggered workflow that regenerates release notes from git at tag time. Responds with minimal output — a concise summary at the end, errors as they occur.
+description: Provision or repair release automation — a persistent changelog generator plus a tag-triggered workflow that regenerates release notes at tag time.
 ---
 
 Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/release-init/SKILL.md` to run its `release-init` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:release-init)`.
