@@ -4,8 +4,10 @@ description: Ship working changes (or a committed feature branch) into dev via a
 
 Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/ship/SKILL.md` to run its `ship` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:ship)`.
 
-An optional message may supply a branch name and/or commit message; otherwise infer them and
-confirm via `AskUserQuestion`.
+An optional message may supply a branch name and/or commit message; otherwise infer them
+without asking. Use `AskUserQuestion` only for the cases the sub-skill's Step 1 lists
+(unrelated scopes that belong in separate PRs, unintended or secret-like paths, an
+unreadable intent).
 
 Follow the parent skill's **Output Contract** strictly: stay silent during execution, surface
 errors the moment they occur, and end with a single concise summary. Do not narrate steps.
