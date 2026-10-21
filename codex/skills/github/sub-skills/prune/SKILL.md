@@ -1,13 +1,19 @@
 ---
 name: github-prune
+mirror-of: claude/skills/github/sub-skills/prune
+source-version: 2026-10-21
 description: >
   Sub-skill of `github`. Audit and remove stale git worktrees, local branches, and remote
   (origin) branches that are already merged into dev, protecting anything with uncommitted
-  changes. Triggers on "clean up branches", "prune stale branches", "clean up worktrees".
-  Honors the Output Contract inlined below.
+  changes. Triggers on "clean up branches", "prune stale branches", "clean up worktrees". Honors
+  the Output Contract inlined below.
 ---
 
 # Operation: prune
+
+> **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/prune`
+> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> bump the stamp — never edit this file in isolation.
 
 **Goal.** Remove stale worktrees and branches (local + origin) already merged into `dev`,
 protecting anything dirty. Obey the **Output Contract** below: silent run, errors as they
@@ -89,6 +95,12 @@ Parse `git worktree list --porcelain` (skip the first/main entry). Exclude `dev`
 Categorize: merged + clean → stale (deletion candidate); merged + dirty → blocked (never
 delete); not merged → active (ignore).
 
+**Orphaned worktree directories.** A directory under the canonical `<repo>-wt/.worktrees/`
+(or a legacy in-repo `.worktrees/`) that is **not** listed in `git worktree list` is an orphan
+— left behind when a previous teardown removed the git metadata but a locked handle kept the
+directory. Offer each orphan for deletion alongside the stale worktrees (same dirty-check
+guard: never delete one with uncommitted changes without confirmation).
+
 ---
 
 ## Step 4 — Present and confirm
@@ -104,8 +116,17 @@ or exclude some (follow up with a multi-select of items to **keep**). Confirm th
 ```bash
 git worktree remove <path>            # retry with --force if the branch is checked out there
 git branch -d <branch>                # safe delete only; never silently escalate to -D
-git push origin --delete <branch>     # strip the origin/ prefix
+
+# remote branch — skip cleanly if the server already deleted it (deleteBranchOnMerge).
+if git ls-remote --heads origin "<branch>" | grep -q .; then
+  git push origin --delete "<branch>"   # strip any origin/ prefix from <branch> first
+else
+  : # already gone server-side — record "remote already removed", not a failure
+fi
 ```
+
+A `push origin --delete` that still races the server-side deletion and returns `remote ref
+does not exist` is also success — record it and move on, never surface it.
 
 Track each result (success / failure with stderr). Apply the **Windows worktree-lock footgun**
 rule from the parent skill if a worktree dir resists removal.

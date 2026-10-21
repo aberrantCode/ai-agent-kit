@@ -1,11 +1,23 @@
 ---
 name: github-release
-description: Sub-skill of `github`. Promote dev to main as a versioned production release — sync dev from main via PR if behind, auto-derive the next semantic version from conventional commits, merge with a merge commit, tag, publish a GitHub Release, and sync dev. Honors the Output Contract inlined in this file.
+mirror-of: claude/skills/github/sub-skills/release
+source-version: 2026-10-21
+description: >
+  Sub-skill of `github`. Promote dev to main as a versioned production release — sync dev from
+  main via PR if behind, auto-derive the next semantic version from conventional commits, stamp
+  that version onto the repo's own version references (README badge, manifests) and roll the
+  changelog before tagging, merge with a merge commit, tag, publish a GitHub Release, and sync
+  dev. Triggers on "release", "cut a release", "promote dev to main". Honors the parent Output
+  Contract.
 ---
 
 # Operation: release
 
-**Goal.** Promote `dev` → `main` as a versioned release. Obey the **Output Contract** below:
+> **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/release`
+> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> bump the stamp — never edit this file in isolation.
+
+**Goal.** Promote `dev` → `main` as a versioned release. Obey the parent **Output Contract**:
 silent run, errors as they occur, one concise summary.
 
 ---
@@ -129,12 +141,19 @@ commits on `origin/dev`; otherwise scan `"$LAST_TAG"..origin/dev`. Bump rule (pr
 Present the three candidate versions via `AskUserQuestion`, pre-selecting the auto-detected
 bump. Store the choice as `$VERSION`.
 
+**Fold Step 4 into this one prompt.** Put the from→into / commit-count summary in the question
+text, make the recommended version the first option, and add a fourth **Abort** option — the
+version choice *is* the go-ahead. One prompt, not two round-trips; only split them if the
+payload assessment needs its own confirmation.
+
 ---
 
 ## Step 4 — Confirm
 
-Show a one-block summary (from → into, last → new version, commit count) and confirm via
-`AskUserQuestion` (ship it / abort). On abort, stop with zero git changes made.
+Normally folded into Step 3 (see above). Only stands alone when Step 3 was skipped (version
+pinned by the invocation message): show a one-block summary (from → into, last → new version,
+commit count) and confirm via `AskUserQuestion` (ship it / abort). On abort, stop with zero git
+changes made.
 
 ---
 
@@ -231,7 +250,8 @@ burns a round-trip. Detect up front:
 # 1. Project rule — grep the repo contract for a PR-only mandate on main
 PR_ONLY_RULE=$(grep -riE "release PR|only .*(via|through) .*PR|push.*main.*forbidden" \
   CLAUDE.md AGENTS.md GEMINI.md docs/ 2>/dev/null | grep -ic main || true)
-# 2. GitHub branch protection on main
+# 2. GitHub branch protection on main (no leading slash is DELIBERATE — a leading "/..."
+#    is rewritten by MSYS on Git-Bash and the call silently no-ops; this form is MSYS-safe)
 PROTECTED=$(gh api "repos/{owner}/{repo}/branches/main/protection" --jq '.url' 2>/dev/null | grep -c . || true)
 # 3. A tracked pre-push hook that refuses main (best-effort textual signal)
 HOOK_BLOCKS=$(grep -rilE "refus.*push.*main|push.*main.*forbidden" .githooks .git/hooks 2>/dev/null | grep -c . || true)
