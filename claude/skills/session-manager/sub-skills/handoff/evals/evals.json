@@ -1,0 +1,82 @@
+{
+  "skill_name": "session-manager/handoff",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "launch-mode-default",
+      "prompt": "/handoff   (my last response ended with a numbered list: 1. fix the stale slug check in validate.ps1, 2. re-run the manifest generator, 3. open a PR. Go do all that in a new session.)",
+      "expected_output": "A prompt file under docs/PROMPTS/ in the main checkout, ordered by dependency, handed to the dispatch sub-skill for worktree creation and launch.",
+      "files": [],
+      "expectations": [
+        "Prompt file is written to docs/PROMPTS/<date>-<slug>.md in the main checkout, not inside a worktree",
+        "Tasks follow the recovered decision list in dependency order, with the ordering rationale stated (fix the rule before re-running the generator)",
+        "Prompt contains hard constraints first, State already established, What we tried / dead ends, Tasks, Finishing, Delegation, Delegation logging and Reporting sections",
+        "Every state claim in the prompt is tagged [V] or [?]",
+        "Prompt says the worktree and branch already exist and must not be re-created",
+        "Prompt instructs model: \"haiku\" explicitly for mechanical subagents and states which model was pinned and why",
+        "Prompt requires the end-of-session delegation tally tagged with -PromptPath as the final step, using absolute script paths",
+        "Launch is delegated to dispatch; handoff does not itself run new-task-worktree.ps1 or launch-claude-session.ps1"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "scope-mode-argument",
+      "prompt": "/dispatch-session-prompt Rename the foo() helper to bar() across the 40 files under src/ in repo X, update tests, and open a PR.",
+      "expected_output": "A prompt file built from the supplied scope (no recovery from prior conversation), handed to dispatch.",
+      "files": [],
+      "expectations": [
+        "Scope is parsed from the invocation argument, not from a prior decision list",
+        "Ambiguity (e.g. whether to rename in docs) is settled via AskUserQuestion before writing, not passed downstream",
+        "Prompt file contains all required sections including a What we tried / dead ends section (\"None - first attempt\" if empty)",
+        "State claims such as the file count are tagged [V] when measured this session and [?] otherwise",
+        "Questions about the handoff itself are resolved and encoded as constraints, not left as tasks",
+        "Launch is handed to dispatch"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "copy-mode-codex",
+      "prompt": "/continue-new-session  - I want to paste it into Codex. (Last recap ended: 'Next: implement P2-T3 for auth-flow, use TDD.')",
+      "expected_output": "A single fenced markdown block printed to chat for Codex; no file written, nothing launched.",
+      "files": [],
+      "expectations": [
+        "Names Codex as the target CLI and refers to AGENTS.md rather than CLAUDE.md",
+        "Output is exactly one fenced markdown code block followed by one sentence telling the user to paste it",
+        "Recommended action is taken from the recap (implement P2-T3 for auth-flow, TDD) without re-deriving from project state",
+        "Referenced docs paths are verified to exist; missing ones are noted, not emitted as broken references",
+        "Contains no unresolved {placeholder} text",
+        "Contains state claims tagged [V]/[?] and a What we tried / dead ends section",
+        "Writes no prompt file, launches no terminal, and does not call dispatch or any launcher script",
+        "Does not modify files under docs/"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "chain-mode-migration",
+      "prompt": "I need to migrate ~200 scripts off the deprecated Get-Foo helper across many sessions. Set up a chained handoff so each session does one chunk and hands off the next.",
+      "expected_output": "A self-similar chain prompt carrying a sequence number, a discovery command, one capped batch, and an instruction to re-emit itself.",
+      "files": [],
+      "expectations": [
+        "Prompt carries a sequence number (Handoff N) that is to be incremented on re-emit",
+        "Prompt embeds a discovery command (e.g. a grep for Get-Foo) as the single source of truth and says to re-run it fresh each session",
+        "Prompt defines a batch-selection heuristic with a size cap of roughly 20-30 targets and one PR per batch",
+        "Execution recipe requires per-file judgment and forbids blind sed/find-replace",
+        "Prompt requires prepending an entry to a progress log and notes recurring failure modes at the top",
+        "Prompt instructs the next session to repeat the process and re-emit this same prompt with only state and sequence number updated, with a stop condition when discovery returns zero",
+        "Prompt includes What we tried / dead ends and [V]/[?]-tagged state",
+        "No separate central master plan is created"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "heavy-context-offer-only",
+      "prompt": "(Mid-session, context is very long after several compactions; the user has not asked for a handoff.)",
+      "expected_output": "A one-sentence offer to hand off; no prompt file written and nothing launched.",
+      "files": [],
+      "expectations": [
+        "Offers a handoff in a single sentence",
+        "Does not write a prompt file or launch anything without the user's go-ahead"
+      ]
+    }
+  ]
+}
