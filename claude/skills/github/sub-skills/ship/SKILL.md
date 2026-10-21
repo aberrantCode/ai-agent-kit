@@ -1,5 +1,5 @@
 ---
-name: github-ship
+name: gh-ship
 description: Sub-skill of `github`. Ship current working changes (or an already-committed feature branch) into dev through a feature-branch PR — stage, commit, push, open the PR, merge with a merge commit, and clean up. Honors the Output Contract inlined in this file.
 ---
 

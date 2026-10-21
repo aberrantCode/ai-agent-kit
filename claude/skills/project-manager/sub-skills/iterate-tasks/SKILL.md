@@ -1,11 +1,9 @@
 ---
-name: iterate-tasks
+name: pm-iterate-tasks
 description: >
-  Self-perpetuating, subagent-driven iteration of the project pipeline. One invocation:
-  (1) merges any pending PR left by the previous turn, (2) dispatches the recap-recommended
-  next action as a fresh subagent so each unit of work gets a clean context, then
-  (3) emits a copy-ready prompt for the action that comes AFTER the one just completed.
-  Designed to pair with /loop for unattended runs and to minimize parent-context growth.
+  Sub-skill of `project-manager`. One self-perpetuating iteration: merge the previous turn's
+  pending PR, run the recap's next action in a fresh subagent, then emit a copy-ready prompt
+  for the following action. Pair with /loop for unattended runs.
 ---
 
 # Iterate Tasks

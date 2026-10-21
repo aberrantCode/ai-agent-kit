@@ -1,5 +1,5 @@
 ---
-name: github-sync-dev
+name: gh-sync-dev
 description: Sub-skill of `github`. Fast-forward the local checkout to its upstream (typically `dev` ↔ `origin/dev`) without touching uncommitted or untracked work — fetch, verify the branch is behind-only, clear byte-identical untracked-file collisions, then fast-forward. Read-only-safe: never rebases, merges divergent history, force-pushes, or discards changes. Honors the Output Contract inlined below.
 ---
 

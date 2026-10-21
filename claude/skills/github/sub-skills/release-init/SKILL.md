@@ -1,5 +1,5 @@
 ---
-name: github-release-init
+name: gh-release-init
 description: Sub-skill of `github`. Provision or repair a repo's release automation to the Release-Automation Standard — a persistent changelog generator, a tag-triggered workflow that regenerates release notes from git at tag time, and a pre-push changelog-staleness gate. Detects missing artifacts, the stale-changelog anti-pattern, and unrolled [Unreleased] blocks, then installs or repairs idempotently. Honors the Output Contract inlined below.
 ---
 

@@ -1,6 +1,9 @@
 ---
-name: init-project
-description: Use when starting a new project from scratch or retrofitting the project-manager workflow onto an existing repo. Scaffolds the docs/ tree, copies canonical templates, installs agent-enforcement artifacts (AGENTS.md, CLAUDE.md fragment, pre-commit guard, Claude Code hook, PR template, ROADMAP), and seeds the product-requirements doc (docs/REQUIREMENTS.md). Idempotent: re-running only fills gaps.
+name: pm-init-project
+description: >
+  Sub-skill of `project-manager`. Scaffold or retrofit the project-manager workflow on a repo
+  — docs/ tree, canonical templates, enforcement artifacts (AGENTS.md, CLAUDE.md fragment,
+  pre-commit guard, hook, PR template, ROADMAP) — and seed docs/REQUIREMENTS.md. Idempotent.
 ---
 
 # Init Project

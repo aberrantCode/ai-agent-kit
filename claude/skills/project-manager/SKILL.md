@@ -3,18 +3,12 @@ name: project-manager
 category: AI & LLM
 install-target: global
 description: >
-  Automated project implementation orchestrator that drives feature-driven development from a single
-  initial prompt through to completed code. Use this skill when the user invokes /init-project,
-  /init-features, /add-feature, /continue-tasks, /continue-new-session, /iterate-tasks, /review-tasks,
-  /update-tasks, /analyze-features, or /reinit. Also trigger proactively when docs/REQUIREMENTS.md exists and the user says
-  anything like "move forward", "keep building", "what's next", "continue the implementation",
-  or "start working on the project", AND when the user says "set up project management",
-  "bootstrap a new project", "initialize the project workflow", or "make sure agents follow the
-  project plan". This skill manages the full lifecycle: scaffolding a new project with enforcement
-  artifacts, extracting feature specs via interview, generating phased implementation plans,
-  spawning typed agents to execute tasks, monitoring completion sentinels, recovering from
-  failures, and archiving finished work — all driven by markdown files that act as the shared
-  state between orchestrator and worker agents.
+  Feature-driven project orchestrator whose shared state is markdown in docs/
+  (REQUIREMENTS.md, feature specs, plans, task files with completion sentinels). Use to
+  bootstrap the workflow on a repo, capture feature specs, plan, dispatch an agent per task,
+  and archive finished work. Trigger proactively when docs/REQUIREMENTS.md exists and the user
+  says "what's next", "keep building", "continue the implementation", "set up project
+  management", or "make sure agents follow the project plan".
 requires: [base]
 ---
 
