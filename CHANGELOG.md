@@ -13,6 +13,29 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.15.0] - 2026-10-21
+
+### Added
+
+- mark release commits in the primary checkout as sanctioned (`b209b29`)
+- run repo-owned pre-commit.d checks from the managed pre-commit hook (`2142880`)
+
+### Fixed
+
+- deploy installer bundles in the push-to-profile layout (`cddb978`)
+
+### Documentation
+
+- add bootstrap path to install-paths diagram (`b1fa900`)
+- correct inaccurate install claims in root README (`224ac37`)
+- correct recursive README documentation audit findings (`d86218b`)
+
+### Internal
+
+- re-mirror Codex github skill from the Claude source (`a06ed68`)
+- ignore local .worktrees directory (`32b41d0`)
+- regenerate CHANGELOG for v0.14.0 (`622ee24`)
+
 ## [0.14.0] - 2026-10-21
 
 ### Added
