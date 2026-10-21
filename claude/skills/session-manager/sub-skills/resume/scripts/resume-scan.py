@@ -6,7 +6,7 @@ WITHOUT loading hundreds of MB of JSONL into context.
 
 Read-only. Mutates nothing. Prints JSON (default) or Markdown to stdout.
 
-Companion skill: work-resume (SKILL.md). This script does ONLY the mechanical
+Companion skill: session-manager `resume` sub-skill (SKILL.md). This script does ONLY the mechanical
 half of the funnel — locate the repo's sessions (including its git worktrees),
 stream each one, and emit a per-session digest: the initiating goal, the last
 operator turn, the last assistant turn (the "what was expected next" signal),
