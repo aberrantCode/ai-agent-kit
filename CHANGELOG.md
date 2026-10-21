@@ -13,6 +13,21 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.14.0] - 2026-10-21
+
+### Added
+
+- infer ship branch and commit message without asking (`0d5a80e`)
+
+### Fixed
+
+- wire resolved Git Bash path in bootstrap status line (`169b2d7`)
+
+### Internal
+
+- ignore local .reviews artifacts (`a9371cd`)
+- regenerate CHANGELOG for v0.13.0 (`a5c9664`)
+
 ## [0.13.0] - 2026-10-21
 
 ### Added
