@@ -1,25 +1,23 @@
 ---
 name: github
+mirror-of: claude/skills/github
+source-version: 2026-10-21
 category: Foundations & Workflow
 description: >
-  Use when the user wants to perform a git or GitHub repository operation from the terminal —
-  merging a pull request, branch, or worktree into dev; shipping working changes through a
-  feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
-  automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
-  stale branches and worktrees; bringing a repo's configuration up to standard (branch
-  protection, merge policy, security settings, local hook gate); or creating, working in, and
-  tearing down an isolated per-task worktree. Triggers on "merge 1209", "merge this branch",
-  "merge the current worktree", "ship it", "release", "set up releases", "release init",
-  "provision release workflow", "fix changelog automation", "commit", "clean up branches",
-  "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
-  "why can I push straight to dev", "apply the repo standard", "create a
-  worktree", "set up an isolated workspace", "remove the worktree", and similar
-  phrasings — even
-  when the word "git" is absent. This is a thin-command bundle: each command names one
-  operation and this skill runs it against the current repo with minimal terminal output.
+  Use for any git or GitHub repository operation in the terminal, even when "git" isn't said:
+  commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev,
+  cut a dev→main release or provision release automation, prune stale branches and worktrees,
+  harden repo config (branch protection, merge policy, hook gate), create or remove per-task
+  worktrees ("set up an isolated workspace"), fast-forward dev to origin, or report repo status
+  ("ship it", "merge PR 76", "what's in flight"). Route through the named operation, never a raw
+  gh/git sequence.
 ---
 
 # GitHub
+
+> **Codex mirror.** Source of truth is `claude/skills/github` (`source-version: 2026-10-21`,
+> charter §5). Change the Claude copy first, then re-mirror and bump the stamp — never edit
+> this file in isolation.
 
 Single entry point for git and GitHub repository operations on this workstation. This skill is
 a **thin orchestrator**: each command in `commands/` names one operation, and this skill runs
@@ -99,11 +97,13 @@ question.
 | `/publish` | publish | `sub-skills/publish` |
 | `/init-repo` | repo-init | `sub-skills/repo-init` |
 | `/commit` | commit | `sub-skills/commit` |
+| `/sync-dev` | sync-dev | `sub-skills/sync-dev` |
 | `/ship` | ship | `sub-skills/ship` |
 | `/merge [targets]` | merge | `sub-skills/merge` |
 | `/release` | release | `sub-skills/release` |
 | `/release-init` | release-init | `sub-skills/release-init` |
 | `/prune` | prune | `sub-skills/prune` |
+| `/repo-status` | inspect | `sub-skills/inspect` |
 
 One sub-skill has **no command of its own** and triggers directly on worktree phrasings:
 
@@ -116,6 +116,13 @@ recovery, and credential rules. `merge` and `prune` delegate their worktree hand
 so do multi-agent harnesses (agent-manager) that run one worktree per agent.
 
 The operations form one repo lifecycle: **publish → commit → ship → merge → release → prune**.
+`inspect` (`/repo-status`) sits beside that lifecycle rather than in it — a read-only report of
+what's in flight that recommends which of the others to run next; it never runs them itself.
+`sync-dev` (`/sync-dev`) also sits beside the lifecycle — a **local-only** helper that
+fast-forwards the current checkout to its upstream (typically `dev` ↔ `origin/dev`). It pulls
+in remote commits but never pushes, rebases, merges divergent history, or discards local work;
+on any non-fast-forward it stops and defers to `/ship` or a manual decision. `inspect` commonly
+recommends it when the working checkout is behind `origin/dev`.
 
 Two `*-init` operations sit beside that lifecycle. Both are idempotent provisioning passes
 that own one standard each, are safe to re-run forever, and never commit — they leave files
@@ -150,10 +157,38 @@ re-implement:
 
 ---
 
+## Prefer the named operation over hand-rolling git/gh
+
+When you are about to run `gh pr create`, `gh pr merge`, a `git push` that opens or lands a
+PR, or to replicate init/release/prune logic by hand — **route through the matching operation
+instead of reimplementing it in Bash.** `/ship`, `/merge`, `/release`, `/init-repo`, `/prune`
+carry the preflight, cleanup, ref-hygiene, and Output-Contract guarantees; a hand-rolled
+`gh`/`git` sequence silently drops all of them. This applies most in autonomous, `/loop`, and
+background runs, where the temptation to inline a quick `gh pr merge` is highest.
+
+When a **batch** of PRs is left pending, surface the merge decision through `AskUserQuestion`
+(a multi-select of PRs to merge) — never a prose paragraph asking the user what to do.
+
+---
+
 ## Cross-Operation Principles
 
 These hold for every operation, present or future:
 
+- **Route repository actions through the named operation.** Opening/landing a PR, cutting a
+  release, or pruning branches goes through `/ship` `/merge` `/release` `/prune` — not an
+  ad-hoc `gh`/`git` sequence that skips their guarantees. See "Prefer the named operation".
+- **Never merge before a preflight passes.** Before any `gh pr merge`, read
+  `gh pr view <n> --json state,isDraft,mergeable,mergeStateStatus,reviewDecision` and
+  `gh pr checks <n>`. A `mergeable == "UNKNOWN"` right after a push is transient — poll, don't
+  fail. `isDraft` is its own gate (ask: mark-ready or skip). Required checks / `BLOCKED` mean
+  either `--auto` (only if the repo has auto-merge enabled) or watch-to-green — never bypass.
+  `merge` and `ship` carry the executable preflight; see their steps.
+- **Refresh remote refs before reasoning; treat an already-gone remote delete as success.**
+  Any op that decides "merged?" or "still needs deleting?" from local refs runs
+  `git fetch --prune origin` first — `deleteBranchOnMerge` (which `repo-init` enables) removes
+  branches server-side, so unpruned `origin/*` refs are phantoms. Before deleting a remote
+  branch, `git ls-remote --heads origin <b>`; absent → record "already removed", not a failure.
 - **Protected branches.** Never push directly to `dev` or `main`; never delete them. Feature
   work merges into `dev` via PR; `dev` merges into `main` only for releases. Enforcement is
   a **ruleset** per branch (`repo-init` provisions them) — rulesets are used over the legacy
@@ -186,11 +221,15 @@ These hold for every operation, present or future:
   the source (`git remote set-head origin -a`) rather than working around it, and never
   guess-continue past a failed verification.
 - **All user prompts go through `AskUserQuestion`.** Never write "type yes/no".
+- **`gh api` leading-slash paths on Git-Bash need `MSYS_NO_PATHCONV=1`, and read back the
+  result.** MSYS rewrites a leading `/repos/...` into a Windows filesystem path before `gh`
+  sees it, so the call silently no-ops (branch protection *looked* applied but wasn't). Prefix
+  such calls `MSYS_NO_PATHCONV=1 gh api "/repos/…"` (or drop the leading slash:
+  `gh api "repos/…"`), and confirm the applied state by re-reading it — never trust exit 0.
+- **A git-bash `fork`/`add_item … failed` is a shell failure, not a git failure.** On Windows
+  Cygwin after heavy use, bash cannot fork; re-run the same `git`/`gh` step through `pwsh`.
+  Shell state does not persist but repo state does, so just repeat the last command. `ship`,
+  `merge`, and `release` carry this row in their Error-Recovery tables.
 - **Never force-push `dev` or `main` blind, never skip failing CI gates.** Surface the failure
   and stop.
 
----
-
-## Diagram
-
-[View diagram](diagram.html)

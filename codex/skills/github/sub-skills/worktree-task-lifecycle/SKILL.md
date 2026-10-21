@@ -1,19 +1,20 @@
 ---
 name: github-worktree-task-lifecycle
+mirror-of: claude/skills/github/sub-skills/worktree-task-lifecycle
+source-version: 2026-10-21
 description: >
-  Sub-skill of `github`. Full per-task worktree lifecycle: create an isolated worktree under
-  `<repo>-wt/.worktrees/`, work in it safely, and remove it idempotently after merge — with
-  Windows file-lock recovery, credentials-stay-in-primary-checkout rules, same-branch
-  collision guards, and identical-file pull-collision handling. Use when starting feature
-  work that needs isolation from the primary checkout, when running agent work that must not
-  collide with concurrent edits, or when a worktree needs to be cleaned up after its branch
-  merged. Triggers on "create a worktree", "set up an isolated workspace", "work in a
-  worktree", "remove the worktree", "worktree won't delete", "permission denied removing
-  worktree", and similar phrasings. Single lifecycle authority — the github merge/prune
-  operations and multi-agent worktree-per-agent harnesses delegate here.
+  Sub-skill of `github`. Create, work in, and idempotently remove an isolated per-task worktree
+  under `<repo>-wt/.worktrees/`, with Windows file-lock recovery and same-branch collision
+  guards. Triggers on "create a worktree", "set up an isolated workspace", "remove the
+  worktree", "worktree won't delete". Lifecycle authority that merge and prune delegate to.
 ---
 
 # Worktree Task Lifecycle
+
+> **Codex mirror.** Source of truth is
+> `claude/skills/github/sub-skills/worktree-task-lifecycle` (`source-version: 2026-10-21`,
+> charter §5). Change the Claude copy first, then re-mirror and bump the stamp — never edit
+> this file in isolation.
 
 One worktree per task, created in a predictable place, torn down idempotently after merge.
 This sub-skill is the **single authority** for worktree mechanics in the archive — `merge`
@@ -85,10 +86,14 @@ preference for a worktree directory overrides both defaults.
 1. Resolve the primary root and target branch:
    `root=$(git rev-parse --show-toplevel)`; branch off latest `dev` unless told otherwise.
 2. `git worktree add "<repo>-wt/.worktrees/<branch>" -b <branch> dev`
-3. Run project setup inside the worktree, auto-detected from project files
+3. **Verify the add completed.** `git worktree add` can exit apparently-fine yet leave an
+   empty, non-git directory. Confirm both: the path appears in `git worktree list`, and
+   `git -C "<path>" rev-parse --is-inside-work-tree` returns `true`. If the dir exists but is
+   not linked, `git worktree prune` and re-add once; if it still fails, stop and surface it.
+4. Run project setup inside the worktree, auto-detected from project files
    (`package.json` → `npm install`, `Cargo.toml` → `cargo build`, `requirements.txt` /
    `pyproject.toml` → pip/poetry, `go.mod` → `go mod download`). Skip when none match.
-4. Verify a clean baseline: run the project's test command. If tests fail, report the
+5. Verify a clean baseline: run the project's test command. If tests fail, report the
    failures and ask (via `AskUserQuestion`) whether to proceed — a dirty baseline makes new
    breakage indistinguishable from pre-existing breakage.
 
@@ -147,12 +152,19 @@ Safe to re-run at any point; every step skips cleanly if already done:
 1. `git worktree remove "<path>"` — if it refuses on modified/untracked files, confirm the
    branch is merged, then `--force`.
 2. `git worktree prune` — clears metadata even when step 1 half-succeeded.
-3. If the directory lingers, force-remove it (`rm -rf` / `Remove-Item -Recurse -Force`).
-   **Windows lock recovery:** a transient "Permission denied" here is benign — git has
-   already untracked the worktree. Retry prune + remove once; if the directory still
-   resists (lingering file handle), leave it on disk and state that in the summary
-   ("worktree dir left on disk — locked handle; delete manually") rather than looping.
-4. Delete the backing branch separately — removing a worktree never deletes its branch.
+3. If the directory lingers, diagnose the lock **before** giving up. A retry can never win
+   while a live process holds a handle inside the worktree (a dev server writing a log there):
+   - Windows: find holders rooted in the path and end their tree —
+     `Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*<path>*" }`,
+     then `Stop-Process -Id <pid> -Force` for each (children first).
+   - Then `git worktree prune` + `rm -rf`/`Remove-Item -Recurse -Force` once more.
+   Only if it *still* resists (a handle you cannot attribute) leave it on disk and say so in
+   the summary ("worktree dir left on disk — locked handle; delete manually"). Never loop.
+4. If teardown finds a stale `index.lock` or a half-finished `rebase-merge`/`rebase-apply`
+   in the worktree's gitdir, clear it first: remove the `*.lock`, `git rebase --abort` (or
+   `git merge --abort`) inside the worktree, then proceed. A locked index blocks both remove
+   and prune.
+5. Delete the backing branch separately — removing a worktree never deletes its branch.
    Cleanup order is **worktree → local branch → remote branch** (parent principle).
 
 ---

@@ -23,7 +23,9 @@ loads to work well in a given domain, and the automation that moves them around.
 
 - **Using an agent CLI?** Take the [Quick start](#quick-start) — install what you need into
   your profile or into one project.
-- **Looking for a particular asset?** Everything is listed in **[`CATALOG.md`](CATALOG.md)**.
+- **Looking for a particular asset?** Browse **[`CATALOG.md`](CATALOG.md)** for skills,
+  instructions, commands, and indexed shared assets; browse [`shared/guardrails/`](shared/guardrails/)
+  for guardrails, which are not yet included in catalog generation.
 - **Adding or changing an asset?** Start with [`CONTRIBUTING.md`](CONTRIBUTING.md), then the
   governance documents below.
 
@@ -51,7 +53,7 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 
 ## Quick start
 
-> **▣ Diagram —** the three install paths (profile install / project install / clone-and-copy)
+> **▣ Diagram —** the four install paths (profile one-liner / profile bootstrap / project install / direct script install)
 > as a decision flow *(type: flow)* — [view](diagrams/install-paths.html)
 
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can
@@ -65,7 +67,14 @@ irm 'https://raw.githubusercontent.com/aberrantCode/ai-agent-kit/main/install-sk
 ```
 
 The installer is interactive: pick platform, asset type, deploy paths, then browse and select.
-Requires PowerShell 5.1+ on Windows, or `pwsh` on macOS and Linux.
+Windows only — PowerShell 5.1+; its default deploy paths are built from `%USERPROFILE%`, so it
+stops at startup on macOS and Linux. There, use the clone-based
+[bootstrap](#bootstrap-a-new-profile-standard-set) below.
+
+Each selected skill lands in the same layout [`push-to-profile.ps1`](scripts/push-to-profile.ps1)
+produces: the whole bundle (except `diagram.html`) under the skill's folder, companion commands
+in the CLI's `commands/` directory, and every `SKILL.md` stamped `installed-from: ai-agent-kit`.
+Unlike that script, it takes no backups — removing a skill deletes its folder and commands.
 
 **Know what that one-liner does.** It executes unreviewed code from this repo's `main` branch
 as you, with no version pin or integrity check — see [`scripts/README.md`](scripts/README.md)
@@ -104,8 +113,9 @@ These steps are written so an agent can follow them as-is:
 
    ```powershell
    $dest = "$HOME/development"; New-Item -ItemType Directory -Force $dest | Out-Null
-   Invoke-WebRequest https://github.com/aberrantCode/ai-agent-kit/archive/refs/heads/main.zip -OutFile "$env:TEMP/ai-agent-kit.zip"
-   Expand-Archive "$env:TEMP/ai-agent-kit.zip" $dest -Force
+   $zip = Join-Path ([IO.Path]::GetTempPath()) 'ai-agent-kit.zip'
+   Invoke-WebRequest https://github.com/aberrantCode/ai-agent-kit/archive/refs/heads/main.zip -OutFile $zip
+   Expand-Archive $zip $dest -Force
    Rename-Item "$dest/ai-agent-kit-main" ai-agent-kit
    ```
 3. **Preview, then deploy** (PowerShell 7 — `winget install Microsoft.PowerShell` if `pwsh`
@@ -120,31 +130,39 @@ These steps are written so an agent can follow them as-is:
    CLI's skills instead, `-Name a,b` for a different skill set, `-SkipStatusline` /
    `-SkipInstructions` to leave those alone, `-ProfileHome <dir>` to rehearse against a scratch
    directory (add `-SkipPrereqInstall` there — tool installs are machine-wide), and `-Json` for a machine-readable report. Re-running is safe: bundles are backed
-   up to `~/.claude/skills-backups/` before being replaced, `settings.json` is backed up before
+   up to `~/.<vendor>/skills-backups/` (`~/.claude/skills-backups/` by default) before being replaced, `settings.json` is backed up before
    it changes, and instruction files are never overwritten. Exit `0` = done, `1` = a bundle or
    rule is missing or failed, `2` = execution error.
 4. **Start a new session** — skills and commands load at session start.
 
 ### Into a single project
 
-`/install-skill <name> <target-dir>` copies a bundle — `SKILL.md` plus any `sub-skills/`,
-`commands/`, `references/`, and `rules/` — into that project's `.claude/`, stamping it
-`installed-from: ai-agent-kit`. That slash command is not built into your CLI: it ships with
-`skills-manager`, which is itself a skill in this archive. Profile-install it once with the
-one-liner above and the command is available everywhere.
+`/install-skill <name> <target-dir>` copies a whole bundle (every member except
+`diagram.html`) into that project's `.claude/skills/`, moves its companion commands to
+`.claude/commands/`, and stamps it `installed-from: ai-agent-kit`. That slash command is not
+built into your CLI: it ships with `skills-manager`, which is itself a skill in this archive.
+Install it into your profile once — with the one-liner above, the
+[bootstrap](#bootstrap-a-new-profile-standard-set) (which includes it), or
+`push-to-profile.ps1 -Name skills-manager -Force` — and the command is available everywhere.
 
-Prefer no tooling? Clone and copy the bundle directory:
+For a script-driven install without slash commands, clone the archive and use PowerShell 7:
 
-```bash
-git clone https://github.com/aberrantCode/ai-agent-kit.git
-cp -r ai-agent-kit/claude/skills/typescript your-project/.claude/skills/typescript
+```powershell
+git clone --branch main https://github.com/aberrantCode/ai-agent-kit.git
+pwsh -NoProfile -File ./ai-agent-kit/scripts/push-to-profile.ps1 -Name typescript -TargetDir "./your-project/.claude/skills"
+pwsh -NoProfile -File ./ai-agent-kit/scripts/push-to-profile.ps1 -Name typescript -TargetDir "./your-project/.claude/skills" -Force
 ```
+
+Replace `your-project` with the project path. Preview first, then deploy with `-Force`; the
+script stamps provenance, relocates companion commands, and backs up an existing bundle.
 
 ## The full asset list
 
-**[`CATALOG.md`](CATALOG.md)** — every skill, instruction, command, and shared asset, grouped
-by category, with cross-vendor availability. It is generated from `manifest.json`; both are
-produced by `scripts/` and never hand-edited.
+**[`CATALOG.md`](CATALOG.md)** — skills, instructions, global commands, and shared prompts,
+workflows, configs, and plugin references, with cross-vendor availability for skills.
+It is generated from `manifest.json` plus direct scans of commands and those shared classes;
+both generated files are produced by `scripts/` and never hand-edited. Guardrails are
+currently browsed separately under [`shared/guardrails/`](shared/guardrails/).
 
 No tables or counts appear on this page for the same reason: a number written twice is a
 number that drifts.
@@ -163,6 +181,7 @@ category: Foundations & Workflow    # sole source of category truth
 status: active                      # active | draft | deprecated  (optional)
 version: 1.0.0                      # semver or ISO date           (optional)
 requires: [base]                    # dependency list              (optional)
+install-target: global              # global | project             (optional)
 ---
 ```
 
@@ -175,6 +194,9 @@ requires: [base]                    # dependency list              (optional)
   directly.
 
 ## Governance
+
+- [`docs/README.md`](docs/README.md) — documentation index, including feature specs, task
+  tracking, workflow references, and status.
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a skill, a vendor, or a shared asset class.
 - [`docs/reorg/charter.md`](docs/reorg/charter.md) — **binding** for anything touching skill

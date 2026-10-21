@@ -1,13 +1,19 @@
 ---
 name: github-publish
+mirror-of: claude/skills/github/sub-skills/publish
+source-version: 2026-10-21
 description: >
   Sub-skill of `github`. Publish a local project as a new GitHub repository — git init, initial
   commit, repo creation, and pushing main + dev — then hand off to `repo-init` for all
-  configuration hardening. Triggers on "publish this repo", "push this to GitHub", "create a
-  new repo for this". Honors the Output Contract inlined below.
+  configuration hardening. Triggers on "publish this repo", "push this to GitHub", "create a new
+  repo for this". Honors the Output Contract inlined below.
 ---
 
 # Operation: publish
+
+> **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/publish`
+> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> bump the stamp — never edit this file in isolation.
 
 **Goal.** Get the current local project onto GitHub as a repo with `main` and `dev` pushed.
 This is the **day-0 bookend** to the bundle's day-N ops. Obey the **Output Contract** below:

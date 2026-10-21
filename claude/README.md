@@ -3,8 +3,8 @@
 Canonical authoring surface for Claude Code assets — this tree is the single source of
 truth, per the [canonical-repo requirements](../docs/requirements/canonical-repo.md).
 
-> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) and
+> claude (canonical) → gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
 > [view](diagrams/vendor-mirror-flow.html)
 
 Everything here is authored first; `codex/` and `gemini/` are stamped mirrors, never the
@@ -50,9 +50,11 @@ Body is the system prompt for that agent role.
 
 ## `commands/`
 
-Global slash commands available across all skills — distinct from a skill's own
-`skills/<name>/commands/`, which only apply when that skill is active. Global commands live
-here when they aren't owned by a single skill bundle.
+Global slash commands live here when they are not owned by a single skill bundle.
+Bundle-owned commands are authored under `skills/<name>/commands/` and deployed to the
+consumer's sibling `.claude/commands/` directory by
+[`push-to-profile.ps1`](../scripts/push-to-profile.ps1), so they are discoverable as slash
+commands without first loading the owning skill.
 
 ## Conventions
 

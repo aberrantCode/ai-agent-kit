@@ -57,8 +57,8 @@ available everywhere):
 | `/archive-guardrail` | Capture a `CLAUDE.md`/`AGENTS.md` file, a section, or pasted content into this directory as a new guardrail (with frontmatter). |
 | `/install-guardrail <name> [dir]` | Deploy a guardrail into a project's `CLAUDE.md`/`AGENTS.md`/`GEMINI.md` (or a profile rules file), per its `applies-to`/`scope`. |
 
-Flow is always **source → archive** (`/archive-guardrail`); `/install-guardrail` is the only
-reverse direction, mirroring the skill lifecycle.
+Capture is **source → archive** (`/archive-guardrail`). Deployment is **archive → consumer**
+through `/install-guardrail` or the profile bootstrap described below, mirroring the skill lifecycle.
 
 **Profile defaults.** [`scripts/bootstrap-profile.ps1`](../../scripts/bootstrap-profile.ps1)
 builds a new profile's global `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` from the guardrails

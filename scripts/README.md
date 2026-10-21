@@ -1,7 +1,7 @@
 # scripts/
 
 All lifecycle automation for the archive — installation, deployment, sync, catalog
-generation, and (in a later PR) validation — as real scripts, so the archive's
+generation, and validation — as real scripts, so the archive's
 deploy/install/overlay/integration lifecycle no longer depends solely on LLM-driven
 slash commands (a [core goal of the repo standard](../docs/requirements/canonical-repo.md)).
 
@@ -28,7 +28,7 @@ what a *deployed* skill does at runtime — that boundary is held firmly in the
 | [`validate.ps1`](validate.ps1) | implemented | The local pre-PR validation gate: regenerates and byte-diffs `CATALOG.md`, runs `audit.ps1`, and checks `CHANGELOG.md` tag coverage. Console summary, or `-Json`. Exit `0` clean, `1` findings, `2` execution failure. Full contract: [Validation pipeline](#validation-pipeline) below. |
 | [`Generate-Changelog.ps1`](Generate-Changelog.ps1) | implemented | Deterministic full rebuild of `CHANGELOG.md` from `git log`: `[Unreleased]` = `latestTag..HEAD`, each version section = `prevTag..tag`, grouped by conventional-commit prefix into Keep-a-Changelog sections. Skips `release:` bump commits and scaffolding commits (unparseable subject *and* a `.gitkeep`-only diff — the file check only runs once the subject fails to parse, so well-formed commits cost no extra `git show`). Pins `[Console]::OutputEncoding` to UTF-8 before invoking git, so an em-dash in a commit subject round-trips correctly even under a non-interactive invocation. Installed verbatim from [`claude/skills/github/sub-skills/release-init/templates/`](../claude/skills/github/sub-skills/release-init/templates/) — the template is the source of truth, so fixes land there and are copied down (see [Validation pipeline](#validation-pipeline)). |
 | [`install-hooks.ps1`](install-hooks.ps1) | implemented | Opt-in, idempotent installer that points this repo's local `core.hooksPath` at the committed [`scripts/git-hooks/`](git-hooks/) directory (repo-local git config only, never global). Preview by default; `-Force` applies. Re-running once installed is a reported no-op. See [Validation pipeline](#validation-pipeline) below for the Zed-hook interaction note. |
-| [`install-skills.ps1`](../install-skills.ps1) (repo root, not in this directory) | implemented — grandfathered exception | The published remote-bootstrap one-liner. Stays on PowerShell 5.1 (see [below](#powershell-7-floor-and-the-grandfathered-exception)) and at the repo root, because its location is itself part of its [published contract](#root-installer-url-contract) — not moved into `scripts/`. |
+| [`install-skills.ps1`](../install-skills.ps1) (repo root, not in this directory) | implemented — grandfathered exception | The published remote-bootstrap one-liner. Stays on PowerShell 5.1 (see [below](#powershell-7-floor-and-the-grandfathered-exception)) and at the repo root, because its location is itself part of its [published contract](#root-installer-url-contract) — not moved into `scripts/`. Deploys bundles in the same layout as [`push-to-profile.ps1`](push-to-profile.ps1) (whole bundle minus `diagram.html`, companion commands relocated to the sibling `commands/`, every `SKILL.md` stamped), listing files with one recursive git-tree API call (per-directory contents API as fallback) and downloading from raw URLs; removal also deletes the bundle's relocated commands. No backups or draft gating. Unit tests: [`tests/install-skills.Tests.ps1`](tests/install-skills.Tests.ps1) (Pester 5 — `Invoke-Pester ./scripts/tests`). |
 
 "Stub" here means the definition in the [repo standard §6](../docs/requirements/canonical-repo.md):
 the file exists, comment-based help documents purpose/parameters/exit
@@ -41,9 +41,11 @@ above in the same PR, per the binding rule in the [implementation plan](../docs/
 
 ## PowerShell 7 floor, and the grandfathered exception
 
-Every script in this directory declares `#Requires -Version 7.0` and is written to be
-cross-platform — no Windows-only APIs, `utf8NoBOM` output encoding, ordinal
-(culture-invariant) sorting — per the [repo standard's portability requirement](../docs/requirements/canonical-repo.md).
+PowerShell lifecycle scripts require PowerShell 7 (`#Requires -Version 7.0`); the manifest
+generator runs with Python 3. Portability conventions include `utf8NoBOM` output and ordinal
+(culture-invariant) sorting — see the [repo standard](../docs/requirements/canonical-repo.md).
+Bootstrap prerequisite installation uses `winget` on Windows; on other platforms install
+`bash`, `jq`, and `git` with your platform's package manager, or use `-SkipPrereqInstall`.
 This keeps a future Python port (an [open question tracked in the repo standard](../docs/requirements/canonical-repo.md))
 and a future hosted-CI mirror of the local validation gate cheap, even though today's
 gate runs locally only.
@@ -237,16 +239,16 @@ per erik's explicit direction to reduce reliance on GitHub Actions for this effo
 ## Cross-links
 
 - [`shared/README.md`](../shared/README.md) — the vendor-neutral asset tree
-  (`prompts/`, `workflows/`, `configs/`, `plugins/`). Assets under `shared/` carry no
-  vendor-specific frontmatter, so they are covered by the same manifest/catalog
-  regeneration duty as vendor skills whenever `generate-manifest.py` is extended to
-  index them.
+  (`prompts/`, `workflows/`, `configs/`, `plugins/`, `guardrails/`). The catalog generator
+  currently scans the first four classes directly; rerun `generate-catalog.ps1 -Force`
+  when those listings change. Guardrails are documented in their class README and
+  selected for bootstrap via `standard_guardrails`; individual guardrails are not yet
+  cataloged. Shared assets are not a separate section of `manifest.json`.
 - [`claude/README.md`](../claude/README.md) — canonical authoring surface; the
   `category:` frontmatter that `backfill-categories.ps1` writes and
   `generate-manifest.py` reads is documented there (see also the
   [repo standard](../docs/requirements/canonical-repo.md)).
-- [`codex/README.md`](../codex/README.md) — on-demand mirror; `push-to-profile.ps1`'s
-  "or vendor equivalent" destination and `sync-installed.ps1`'s drift scan both apply
-  here once implemented.
-- [`gemini/README.md`](../gemini/README.md) — frozen mirror; same applicability note
-  as `codex/README.md`.
+- [`codex/README.md`](../codex/README.md) — on-demand mirror; deployment already supports
+  `push-to-profile.ps1 -Vendor codex`. `sync-installed.ps1` remains a stub.
+- [`gemini/README.md`](../gemini/README.md) — frozen mirror; deployment already supports
+  `push-to-profile.ps1 -Vendor gemini`, with the same sync limitation.
