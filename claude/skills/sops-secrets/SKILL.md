@@ -43,8 +43,9 @@ Key tools:
 - **`secret_rotate(file, key, generator="hex")`** — rotate; returns old + new fingerprints.
 - **`secret_apply(target, mode="syntax")`** — resolve + apply server-side to a service (`target` is a static enum: tailscale/observability/cloudflare; `check`/`apply` modes are operator-gated).
 
-Full tool reference + security model:
-[`docs/runbooks/security--secrets-broker-mcp.md`](../../../docs/runbooks/security--secrets-broker-mcp.md).
+Full tool reference + security model: `docs/runbooks/security--secrets-broker-mcp.md`
+in the workstation-side tooling repository, alongside `scripts/mcp/setup-venv.sh`. This
+archive does not bundle that runbook; resolve it in the consumer repository before use.
 
 **When NOT to use the broker:** human plaintext reads (copying a password into a
 login form) stay on this skill's `/get-service-auth` / `/get-secret` + the

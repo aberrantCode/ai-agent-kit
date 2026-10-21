@@ -95,10 +95,11 @@ The cross-CLI transpiler is **cut**. Instead:
 
 Every PR that deletes or renames a skill must, in the same PR:
 
-1. Remove/update the [README](../../README.md) row (README parity: every archived skill has
-   a row; every row points to a real file).
+1. Keep [catalog](../../CATALOG.md) parity: every archived skill has a generated row;
+   every row points to a real file. The root README is an orientation page, not an asset table.
 2. Regenerate [`manifest.json`](../../manifest.json) (via
-   [`scripts/generate-manifest.py`](../../scripts/generate-manifest.py)).
+   [`scripts/generate-manifest.py`](../../scripts/generate-manifest.py)), then regenerate
+   `CATALOG.md` with [`scripts/generate-catalog.ps1`](../../scripts/generate-catalog.ps1) `-Force`.
 3. Add/update/remove `diagram.html` as applicable.
 4. Run the installed-copy sweep for affected fleet repos (or schedule it explicitly in the
    same PR series and say so in the PR body).

@@ -8,7 +8,7 @@ Complete reference for `wxt.config.ts` options.
 - [Manifest Configuration](#manifest-configuration)
 - [Entrypoints](#entrypoints)
 - [Modules](#modules)
-- [Vite Configuration](#vite-configuration)
+- [Custom Vite Plugins](#custom-vite-plugins)
 - [Browser Targeting](#browser-targeting)
 
 ---

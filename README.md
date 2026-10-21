@@ -23,7 +23,9 @@ loads to work well in a given domain, and the automation that moves them around.
 
 - **Using an agent CLI?** Take the [Quick start](#quick-start) — install what you need into
   your profile or into one project.
-- **Looking for a particular asset?** Everything is listed in **[`CATALOG.md`](CATALOG.md)**.
+- **Looking for a particular asset?** Browse **[`CATALOG.md`](CATALOG.md)** for skills,
+  instructions, commands, and indexed shared assets; browse [`shared/guardrails/`](shared/guardrails/)
+  for guardrails, which are not yet included in catalog generation.
 - **Adding or changing an asset?** Start with [`CONTRIBUTING.md`](CONTRIBUTING.md), then the
   governance documents below.
 
@@ -51,7 +53,7 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 
 ## Quick start
 
-> **▣ Diagram —** the three install paths (profile install / project install / clone-and-copy)
+> **▣ Diagram —** the three install paths (profile install / project install / direct script install)
 > as a decision flow *(type: flow)* — [view](diagrams/install-paths.html)
 
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can
@@ -133,18 +135,24 @@ These steps are written so an agent can follow them as-is:
 `skills-manager`, which is itself a skill in this archive. Profile-install it once with the
 one-liner above and the command is available everywhere.
 
-Prefer no tooling? Clone and copy the bundle directory:
+For a script-driven install without slash commands, clone the archive and use PowerShell 7:
 
-```bash
-git clone https://github.com/aberrantCode/ai-agent-kit.git
-cp -r ai-agent-kit/claude/skills/typescript your-project/.claude/skills/typescript
+```powershell
+git clone --branch main https://github.com/aberrantCode/ai-agent-kit.git
+pwsh -NoProfile -File ./ai-agent-kit/scripts/push-to-profile.ps1 -Name typescript -TargetDir "./your-project/.claude/skills"
+pwsh -NoProfile -File ./ai-agent-kit/scripts/push-to-profile.ps1 -Name typescript -TargetDir "./your-project/.claude/skills" -Force
 ```
+
+Replace `your-project` with the project path. Preview first, then deploy with `-Force`; the
+script stamps provenance, relocates companion commands, and backs up an existing bundle.
 
 ## The full asset list
 
-**[`CATALOG.md`](CATALOG.md)** — every skill, instruction, command, and shared asset, grouped
-by category, with cross-vendor availability. It is generated from `manifest.json`; both are
-produced by `scripts/` and never hand-edited.
+**[`CATALOG.md`](CATALOG.md)** — skills, instructions, global commands, and shared prompts,
+workflows, configs, and plugin references, with cross-vendor availability for skills.
+It is generated from `manifest.json` plus direct scans of commands and those shared classes;
+both generated files are produced by `scripts/` and never hand-edited. Guardrails are
+currently browsed separately under [`shared/guardrails/`](shared/guardrails/).
 
 No tables or counts appear on this page for the same reason: a number written twice is a
 number that drifts.
@@ -175,6 +183,9 @@ requires: [base]                    # dependency list              (optional)
   directly.
 
 ## Governance
+
+- [`docs/README.md`](docs/README.md) — documentation index, including feature specs, task
+  tracking, workflow references, and status.
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a skill, a vendor, or a shared asset class.
 - [`docs/reorg/charter.md`](docs/reorg/charter.md) — **binding** for anything touching skill

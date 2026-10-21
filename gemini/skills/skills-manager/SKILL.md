@@ -132,7 +132,7 @@ Archive a specific skill (or all discovered skills) including its full bundle.
    - Instruct it to diagram: the skill's purpose (from `description` frontmatter), its key operations or phases (from section headings), significant inputs/outputs, and any decision points or branching paths
    - Save the resulting HTML to `gemini/skills/<name>/diagram.html`
    - Add or update a `## Diagram` section at the bottom of `gemini/skills/<name>/SKILL.md` (before any final horizontal rule) containing exactly: `[View diagram](diagram.html)`
-7. Update README: add row if new, update description if `description` frontmatter changed; include diagram link (see README Update Rules)
+7. Regenerate `manifest.json` and `CATALOG.md` (see Generated Catalog Update Rules).
 8. Report what was written
 
 ### Without a skill name
@@ -143,13 +143,18 @@ Archive a specific skill (or all discovered skills) including its full bundle.
    - Options: "Yes, sync all" | "Cancel"
 3. Proceed only on confirm; process each New and Changed skill in turn
 
-### README Update Rules (sync)
-- New skill: extract `description` from frontmatter, classify subsection (see heuristics), insert alphabetically within subsection, mark `✓` in correct toolset column, increment counts
-- Changed skill: update Description cell only if frontmatter `description` changed; do not move the row
-- Bundled commands: document on the skill's row as `— ships with /cmd1, /cmd2`; do NOT add standalone rows for them in the Commands table
-- Sub-skills in bundles: do NOT list as standalone rows; implied by parent skill row
-- **Diagram link**: every skill row that has a `diagram.html` in its archive directory must include a diagram link in the Skill column cell, formatted as: `` [`<name>`](gemini/skills/<name>/) [(diagram)](gemini/skills/<name>/diagram.html) ``
-- When a skill is deleted from the archive, delete its README row too — every row must point to a real file
+### Generated Catalog Update Rules (sync)
+
+- Author metadata in skill frontmatter; Claude `category:` is the source of category truth.
+  Mirrors inherit the category from the Claude skill of the same name.
+- Run `python scripts/generate-manifest.py`, then
+  `pwsh -NoProfile -File scripts/generate-catalog.ps1 -Force` from the archive root.
+- Never hand-edit `manifest.json`, `CATALOG.md`, or add asset tables/counts to root README.
+- Bundled commands and sub-skills stay in their owning bundle; do not create global rows
+  for them. Keep diagram links in each skill's `## Diagram` section; the catalog links to
+  `SKILL.md` and does not currently emit separate diagram links.
+- After additions, deletions, metadata changes, or diagram changes, regenerate and run
+  `pwsh -NoProfile -File scripts/audit.ps1` to check parity.
 
 ---
 
@@ -261,7 +266,7 @@ Import project-level changes to a skill back into the archive and the global use
    - **User profile**: overwrite `~/.gemini/skills/<name>/SKILL.md` (create dir if needed)
    - **Companion commands**: scan project `.gemini/commands/` for new companion commands not yet in the archive bundle; for each new one, prompt the user: "Bundle `/<cmd>` with `<name>`?" → "Yes" | "Skip"
    - **Helper scripts**: copy any new or changed `scripts/**` files from the project bundle to both `gemini/skills/<name>/scripts/**` and `~/.gemini/skills/<name>/scripts/**`
-   - **README**: update Description cell if frontmatter `description` changed
+   - **Catalog**: regenerate `manifest.json` and `CATALOG.md` after the import
 
 7. Report what was imported
 
@@ -287,7 +292,8 @@ Generate `diagram.html` for archived skills that don't have one, retroactively a
    - Save HTML to `gemini/skills/<name>/diagram.html`
    - Add or update `## Diagram` section in `gemini/skills/<name>/SKILL.md` with `[View diagram](diagram.html)`
 
-4. Update README: for each skill now having a diagram, add the diagram link to its Skill column cell (see README Update Rules)
+4. Verify each generated diagram is linked from its owning `SKILL.md`; leave the root
+   README and generated catalog tables unedited.
 
 5. Report how many diagrams were generated
 
@@ -334,19 +340,19 @@ Run a comprehensive read-only health check across the entire archive. No changes
 ### Checks
 
 1. **Missing diagrams**: skills in `gemini/skills/*/` that lack `diagram.html`
-2. **README drift — broken links**: rows in the README Skills table whose link target directory does not exist in `gemini/skills/`
-3. **README drift — missing rows**: skill directories in `gemini/skills/*/` that have no corresponding row in the README Skills table (match by link text)
+2. **Catalog drift — broken links**: generated `CATALOG.md` rows whose targets no longer exist
+3. **Catalog drift — missing rows**: archived skills absent from generated `CATALOG.md`
 4. **Malformed frontmatter**: `SKILL.md` files missing required `name:` or `description:` fields
 5. **Deprecated installs**: scan all projects under `C:\development\` for installed skills (`installed-from: ai-agent-kit`) where the archive copy has `status: deprecated` — list project and skill name
-6. **Codex/Gemini parity gaps**: README rows with `✓` only in the Claude column — grouped by subsection, sorted by description length as a proxy for skill complexity (longer = more porting value)
+6. **Codex/Gemini parity gaps**: compare platform skill names in `manifest.json`; report gaps informationally per the reorg charter (Codex on demand, Gemini frozen)
 
 ### Output format
 
 ```
 ┌─ Skills Manager: Audit Report ─────────────────────────────────┐
 │ Missing diagrams (N):   skill-a, skill-b, ...                  │
-│ README broken links (N): row-name → path/does/not/exist        │
-│ README missing rows (N): skill-dir has no README entry         │
+│ Catalog broken links (N): row-name → path/does/not/exist     │
+│ Catalog missing rows (N): skill-dir has no catalog entry     │
 │ Bad frontmatter (N):    skill-c (missing description)          │
 │ Deprecated installs (N): project-x uses deprecated skill-d     │
 │ Parity gaps — Claude only (N skills, top candidates):          │
@@ -416,35 +422,20 @@ Push a skill bundle from the archive to the global user profile (`~/.gemini/`) s
 
 ---
 
-## README Classification Heuristics
+## Category Assignment
 
-Infer subsection from keywords in the skill's `description` field:
-
-| Keywords | Subsection |
-|----------|-----------|
-| git, branch, commit, PR, merge, workflow, session, team, coordination, repo | Foundations & Workflow |
-| TypeScript, Python, Node.js, runtime, language | Languages & Runtimes |
-| React, Vue, Next.js, frontend framework, PWA, Flutter | Frontend |
-| Android, iOS, mobile native, Kotlin, Swift | Mobile (Native) |
-| UI, UX, design, Tailwind, accessibility, visual, diagram, explainer | UI & Design |
-| database, SQL, Supabase, Firebase, DynamoDB, Aurora, Cosmos, D1, schema | Databases & Storage |
-| code review, testing, quality, lint, coverage, Playwright, duplication | Code Quality |
-| security, credentials, auth, OWASP, secrets, vulnerability | Security & Credentials |
-| AI, LLM, agent, prompt, model, Anthropic, OpenAI, Gemini | AI & LLM |
-| commerce, Shopify, WooCommerce, Medusa, Stripe, payment | Commerce & Payments |
-| Klaviyo, Reddit, Teams, PostHog, third-party, integration | Third-Party Integrations |
-| SEO, sitemap, robots, web presence, content, GEO | SEO & Web Presence |
-| tooling, DevOps, CLI, deploy, Vercel, render, CI/CD | Tooling & DevOps |
-| OSINT, research, intelligence, GEOINT, worldview, forensics | Research & OSINT |
-
-If no keywords match: **Uncategorized**. Multiple matches: most keyword hits wins; break ties with more specific subsection.
+Choose an existing category from `CATEGORY_ORDER` in `scripts/generate-manifest.py` and
+write it to the canonical Claude skill's `category:` frontmatter. Do not derive catalog
+categories or ordering from description keywords, and do not write a separate category to
+Codex/Gemini mirrors. The generators resolve and render the category; `audit.ps1` flags
+missing canonical categories.
 
 ---
 
 ## Archive Invariants — Never Violate
 
 1. **Sync never auto-deletes; curators do.** The automated flow won't remove an archive copy just because its source file vanished — but superseded skills/commands are *intentionally* deleted (folded-in or obsolete → removed; git history is the record), never kept as permanent `deprecated` tombstones.
-2. **Flow is always source → archive** — except `/import-skill`, which explicitly reverses this.
-3. **The archive README is the authoritative index.** Every archived skill must have a row; every row must point to a real file.
+2. **Capture is source → archive** (`/sync-skill`, `/import-skill`); deployment is archive → consumer (`/install-skill`, `/push-skill`, `/update-skill`).
+3. **The generated catalog is the asset index.** Every archived skill must appear in `CATALOG.md`; regenerate it and `manifest.json` rather than hand-editing rows or README counts.
 4. **Toolset is determined by directory, not content.**
 5. **Installed copies are not project-developed skills.** The `installed-from: ai-agent-kit` marker gates this distinction.

@@ -8,7 +8,7 @@ schema_version: 1
 
 > **Source of truth for the [Verification Gate](SDLC.md#verification-gate).** This file lists every test runner the orchestrator should consult when verifying that a code-changing task's claim of `Tests: passing: true` is real. Confirmed rows (`Confirmed: yes`) are authoritative; unconfirmed rows are discovery candidates pending user review.
 >
-> Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc by running `references/scripts/pm-test-runners.ps1 -DiscoverOnly` and rewriting this table.
+> Maintained by `project-manager:init-project` and `project-manager:reinit`. Refresh ad-hoc with the [runner discovery helper](../../claude/skills/project-manager/references/scripts/pm-test-runners.ps1): run `pwsh -NoProfile -File claude/skills/project-manager/references/scripts/pm-test-runners.ps1 -DiscoverOnly` from this repository's root, then review and update the table. In other projects resolve the helper against the installed project-manager bundle.
 
 ## Confirmed runners
 

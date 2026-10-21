@@ -38,11 +38,11 @@ logs/timing.jsonl             — `/ship` timing log
 ## Key Conventions
 
 - **Delete superseded skills/commands** — git history is the archive of record; `status: deprecated` is a transient "scheduled for removal" marker, not a permanent tombstone
-- **Flow direction** is always source → archive; only `/import-skill` reverses this
+- **Flow direction** is source → archive for capture (`/sync-skill`, `/import-skill`); deployment (`/install-skill`, `/push-skill`, `/update-skill`) is archive → consumer
 - **Installed copies** carry `installed-from: ai-agent-kit` frontmatter (legacy copies: `installed-from: llm_skills`) — skip either during scans
 - **Skill bundles** may include optional `sub-skills/` and `commands/` subdirectories
 - **All changes** go through feature branch → PR → `dev` (never commit directly to `dev` or `main`)
-- **README parity** — every archived skill must have a README row; every row must point to a real file
+- **Catalog parity** — every archived skill must appear in generated `CATALOG.md`; regenerate `manifest.json` and `CATALOG.md` rather than hand-editing asset tables
 - **Master-skills reorg (in progress)** — every skill PR must conform to `docs/reorg/charter.md`; per-directory dispositions live in `docs/reorg/disposition-ledger.md`, command names in `docs/reorg/command-namespace-registry.md`
 
 ---
@@ -53,6 +53,7 @@ logs/timing.jsonl             — `/ship` timing log
 |---|---|---|
 | `name:` | yes | unique identifier |
 | `description:` | yes | one-line summary |
+| `category:` | yes for Claude skills | curated category from `scripts/generate-manifest.py`; Codex/Gemini mirrors inherit by name |
 | `status:` | no | `draft` \| `active` \| `deprecated` — defaults to `active` |
 | `version:` | no | semver or ISO date |
 | `requires:` | no | list of skill names this skill depends on |
@@ -97,7 +98,7 @@ Feature branches: `type/short-description` branching off `dev`, PR back to `dev`
 
 - **Local validation gate (P2, as modified — local, not GitHub Actions):** `/ship`
   MUST run `pwsh ./scripts/validate.ps1` before opening any PR and abort if it exits
-  non-zero. See `scripts/README.md` ("Local validation gate + pre-push hook") for what
+  non-zero. See [`scripts/README.md` → Validation pipeline](scripts/README.md#validation-pipeline) for what
   the gate checks and how it interacts with the optional `pre-push` git hook
   (`scripts/install-hooks.ps1`, opt-in) and the global git-push-opens-Zed hook.
 

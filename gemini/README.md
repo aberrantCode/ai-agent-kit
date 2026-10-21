@@ -5,8 +5,8 @@ charter's [cross-CLI mirror policy](../docs/reorg/charter.md). Gemini is
 **frozen at its current set of skills** — new Claude skills are not automatically mirrored
 here, and growing this set is a deliberate, manual decision, not a default.
 
-> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) and
+> claude (canonical) → gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
 > [view](diagrams/vendor-mirror-flow.html)
 
 ## `skills/<name>/SKILL.md`
@@ -20,13 +20,10 @@ policy](../docs/reorg/charter.md). `/audit-skills` reports the Claude↔Gemini g
 
 ## `instructions/`
 
-**Mirror policy: not yet decided** — this is the [open question on Codex/Gemini
-instruction mirroring](../docs/requirements/canonical-repo.md). Gemini currently has 3
-agent instructions, undocumented in any count table prior to this effort. The mirroring rule
-for instructions has not been ruled on — see the [canonical-repo
-requirements](../docs/requirements/canonical-repo.md). Do not invent a policy here;
-catalog generation must still include these files once `CATALOG.md` ships, per the
-[catalog-generation task](../docs/plans/canonical-repo-plan.md).
+**Mirror policy: not yet decided** — see [OQ4 in the canonical-repo
+requirements](../docs/requirements/canonical-repo.md#open-questions). Existing instructions
+are included in the generated [`CATALOG.md`](../CATALOG.md); catalog coverage does not
+settle their mirroring policy. Do not infer an instruction policy from the skill policy.
 
 ## Conventions
 

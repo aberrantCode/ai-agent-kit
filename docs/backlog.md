@@ -1,18 +1,14 @@
 ---
 kind: backlog
 purpose: Intake for not-yet-scheduled work. The single front door for bugs, chores, debt, and ideas.
-last_updated: 2026-07-27
+last_updated: 2026-10-21
 ---
 
 # Backlog
 
 | ID | Type | Area | Pri | Status | Item | Link |
 |----|------|------|-----|--------|------|------|
-<!-- Example rows (delete when you add real ones):
-| BL-007 | bug | discovery | p1 | open | Avatar 404s on poll refresh | |
-| BL-008 | chore | infra | p2 | triaged | Bump yt-dlp, re-pin lockfile | |
-| BL-009 | debt | ui | p3 | promoted | Re-skin PCB ornament tokens | → discovery-ui-plan P8 |
--->
+
 
 ## Legend
 

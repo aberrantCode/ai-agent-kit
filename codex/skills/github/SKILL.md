@@ -193,4 +193,4 @@ These hold for every operation, present or future:
 
 ## Diagram
 
-[View diagram](diagram.html)
+[View canonical bundle diagram](../../../claude/skills/github/diagram.html)

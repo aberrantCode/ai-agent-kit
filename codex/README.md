@@ -3,8 +3,8 @@
 On-demand mirror of [`claude/`](../claude/README.md) for OpenAI Codex CLI, per the reorg
 charter's [cross-CLI mirror policy](../docs/reorg/charter.md).
 
-> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) →
-> gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
+> **▣ Diagram —** vendor mirror flow: claude (canonical) → codex (on-demand mirror) and
+> claude (canonical) → gemini (frozen mirror), with /audit-skills detecting staleness *(type: flow)* —
 > [view](diagrams/vendor-mirror-flow.html)
 
 The cross-CLI transpiler is cut — mirrors are created manually, only when a skill is
@@ -21,13 +21,10 @@ policy](../docs/reorg/charter.md). `/audit-skills` reports the Claude↔Codex ga
 
 ## `instructions/`
 
-**Mirror policy: not yet decided** — this is the [open question on Codex/Gemini
-instruction mirroring](../docs/requirements/canonical-repo.md). Codex currently has 3
-agent instructions, undocumented in any count table prior to this effort. The mirroring
-rule for instructions (on-demand like skills, frozen like Gemini, or something else) has
-not been ruled on — see the [canonical-repo requirements](../docs/requirements/canonical-repo.md).
-Do not invent a policy here; catalog generation must still include these files once
-`CATALOG.md` ships, per the [catalog-generation task](../docs/plans/canonical-repo-plan.md).
+**Mirror policy: not yet decided** — see [OQ4 in the canonical-repo
+requirements](../docs/requirements/canonical-repo.md#open-questions). Existing instructions
+are included in the generated [`CATALOG.md`](../CATALOG.md); catalog coverage does not
+settle their mirroring policy. Do not infer an instruction policy from the skill policy.
 
 ## Conventions
 
