@@ -53,7 +53,7 @@ Vendor directories hold assets bound to one CLI's frontmatter contract and insta
 
 ## Quick start
 
-> **▣ Diagram —** the three install paths (profile install / project install / direct script install)
+> **▣ Diagram —** the four install paths (profile one-liner / profile bootstrap / project install / direct script install)
 > as a decision flow *(type: flow)* — [view](diagrams/install-paths.html)
 
 Pick by scope. A **profile install** lands in your CLI's home directory, so every project can

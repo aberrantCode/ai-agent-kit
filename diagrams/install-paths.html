@@ -62,8 +62,8 @@
 
         .decision-tree {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.5rem;
             margin-bottom: 3rem;
         }
 
@@ -166,7 +166,8 @@
             font-size: 0.85rem;
             overflow-x: auto;
             margin-top: 0.5rem;
-            white-space: nowrap;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
 
         .node-step .code-block {
@@ -197,6 +198,10 @@
         }
 
         .branch:nth-child(3) .connector::after {
+            background: linear-gradient(180deg, var(--color-decision) 0%, var(--color-action) 100%);
+        }
+
+        .branch:nth-child(4) .connector::after {
             background: linear-gradient(180deg, var(--color-decision) 0%, var(--color-action) 100%);
         }
 
@@ -248,6 +253,12 @@
         .caveat-icon {
             display: inline-block;
             margin-right: 0.5rem;
+        }
+
+        @media (max-width: 1280px) {
+            .decision-tree {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 1024px) {
@@ -311,7 +322,7 @@
                         <span class="node-type-icon">⊕</span>
                         Profile install
                     </div>
-                    <div class="node-description">Scope: every project on this machine</div>
+                    <div class="node-description">Scope: every project on this machine; pick skills interactively. Windows only (PowerShell 5.1+)</div>
                 </div>
 
                 <div class="connector"></div>
@@ -329,10 +340,42 @@
                 <div class="connector"></div>
                 <div class="node node-outcome">
                     <div class="node-title">Lands in CLI home directory</div>
+                    <div class="node-description">Same layout as push-to-profile: whole bundle, companion commands in <code>commands/</code>, <code>SKILL.md</code> stamped. No backups.</div>
                     <div class="caveat">
                         <span class="caveat-icon">⚠</span>
                         Executes unreviewed code from <code>main</code> with no version pin — trust caveat
                     </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap Branch -->
+            <div class="branch">
+                <div class="connector"></div>
+                <div class="node node-action">
+                    <div class="node-title">
+                        <span class="node-type-icon">⊕</span>
+                        Bootstrap a profile
+                    </div>
+                    <div class="node-description">Scope: every project; the standard set, non-interactive. PowerShell 7</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Get a local clone</div>
+                    <div class="node-description"><code>git clone</code>, or download and extract the <code>main</code> archive</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-step">
+                    <div class="node-title">Preview, then deploy</div>
+                    <div class="code-block">pwsh -NoProfile -File &lt;clone&gt;/scripts/bootstrap-profile.ps1</div>
+                    <div class="node-description">Review the preview, then repeat with <code>-Force</code>.</div>
+                </div>
+
+                <div class="connector"></div>
+                <div class="node node-outcome">
+                    <div class="node-title">Standard profile in place</div>
+                    <div class="node-description"><code>standard_skills</code> via push-to-profile, status line wired, default <code>CLAUDE.md</code> / <code>AGENTS.md</code> / <code>GEMINI.md</code> (existing files skipped)</div>
                 </div>
             </div>
 
@@ -356,13 +399,13 @@
                 <div class="connector"></div>
                 <div class="node node-step">
                     <div class="node-title">Copies bundle</div>
-                    <div class="node-description">SKILL.md + sub-skills/ + commands/ + references/ + rules/</div>
+                    <div class="node-description">Runs push-to-profile: every member except <code>diagram.html</code>; companion commands to <code>.claude/commands/</code></div>
                 </div>
 
                 <div class="connector"></div>
                 <div class="node node-outcome">
                     <div class="node-title">Lands in .claude/ directory</div>
-                    <div class="node-description">Stamped <code>installed-from: ai-agent-kit</code>. Requires skills-manager skill profile-installed first.</div>
+                    <div class="node-description">Stamped <code>installed-from: ai-agent-kit</code>. Requires the skills-manager skill in your profile first (one-liner, bootstrap, or push-to-profile).</div>
                 </div>
             </div>
 
