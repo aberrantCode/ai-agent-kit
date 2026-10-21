@@ -1,5 +1,5 @@
 ---
-description: Bring this repository's configuration up to the Repo-Configuration Standard — ruleset-protected main/dev, immutable release tags, merge-commit-only policy, secret-scanning push protection, an active local hook gate, and the standard artifact set. Re-runnable — diffs live state against the standard and applies only the groups you confirm. Responds with minimal output — a concise summary at the end, errors as they occur.
+description: Harden this repo to the Repo-Configuration Standard — protected main/dev rulesets, immutable tags, merge-commit-only, secret-scanning push protection, local hook gate. Re-runnable; applies only the drift you confirm.
 ---
 
 Load the `github` skill (`Skill(github)`), then **read and follow** `sub-skills/repo-init/SKILL.md` to run its `repo-init` operation. The sub-skill is a file in the loaded bundle to read -- not a skill to dispatch; do not call `Skill(github:repo-init)`.

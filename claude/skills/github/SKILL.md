@@ -3,29 +3,12 @@ name: github
 category: Foundations & Workflow
 install-target: global
 description: >
-  Use when the user wants to perform a git or GitHub repository operation from the terminal —
-  merging a pull request, branch, or worktree into dev; shipping working changes through a
-  feature-branch PR; cutting a dev→main release; provisioning or repairing a repo's release
-  automation (changelog generator + tag-triggered workflow); committing and pushing; pruning
-  stale branches and worktrees; bringing a repo's configuration up to standard (branch
-  protection, merge policy, security settings, local hook gate); creating, working in, and
-  tearing down an isolated per-task worktree; fast-forwarding the local checkout to match its
-  upstream (dev ↔ origin/dev) without disturbing uncommitted work; or getting a read-only
-  report of what's in flight in a repo. Triggers on "merge 1209", "merge this branch",
-  "merge the current worktree", "ship it", "release", "set up releases", "release init",
-  "provision release workflow", "fix changelog automation", "commit", "clean up branches",
-  "init the repo", "initialize this repo", "harden this repo", "set up branch protection",
-  "why can I push straight to dev", "apply the repo standard", "create a
-  worktree", "set up an isolated workspace", "remove the worktree",
-  "merge PR 76", "merge these PRs", "land this branch", "open a PR for this",
-  "cut a release", "clean these branches", "what's the status of this repo",
-  "repo status", "what's in flight", "what needs to be shipped or merged",
-  "which branches are stale", "sync dev with origin", "fast-forward my checkout",
-  "catch my local dev up to remote", "my dev is behind origin" — route these through the named
-  operation rather than a raw gh/git sequence — and similar
-  phrasings — even
-  when the word "git" is absent. This is a thin-command bundle: each command names one
-  operation and this skill runs it against the current repo with minimal terminal output.
+  Use for any git or GitHub repository operation in the terminal, even when "git" isn't said:
+  commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev,
+  cut a dev→main release or provision release automation, prune stale branches and worktrees,
+  harden repo config (branch protection, merge policy, hook gate), create or remove per-task
+  worktrees ("set up an isolated workspace"), fast-forward dev to origin, or report repo status ("ship it", "merge PR 76", "what's in
+  flight"). Route through the named operation, never a raw gh/git sequence.
 ---
 
 # GitHub

@@ -1,15 +1,11 @@
 ---
 name: github-repo-init
 description: >
-  Sub-skill of `github`. Bring a repository's configuration up to the Repo-Configuration
-  Standard — protected `main`/`dev` via rulesets, immutable release tags, merge-commit-only
-  policy, secret-scanning push protection, a versioned local hook gate, and the standard
-  artifact set. Idempotent and re-runnable: it diffs live state against the standard, shows
-  the drift grouped by domain, and applies only what the operator confirms. Triggers on
-  "init the repo", "initialize this repo", "repo init", "harden this repo", "set up branch
-  protection", "why can I push straight to dev", "apply the repo standard", "check this repo
-  against the standard", and similar phrasings. Auto-invokes `publish` when the repo has no
-  GitHub remote. Honors the Output Contract inlined below.
+  Sub-skill of `github`. Diff a repo against the Repo-Configuration Standard (protected
+  main/dev rulesets, immutable tags, merge-commit-only, secret-scanning push protection, local
+  hook gate, standard artifacts) and apply only the drift the operator confirms. Triggers on
+  "init the repo", "harden this repo", "set up branch protection", "why can I push straight to
+  dev". Auto-invokes `publish` when the repo has no GitHub remote.
 ---
 
 # Operation: repo-init
