@@ -13,6 +13,25 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.13.0] - 2026-10-21
+
+### Added
+
+- add bootstrap-profile for standard skills, status line, and default instructions (`c0201a9`)
+
+### Fixed
+
+- push every bundle member except commands/ and diagram.html (`81be9db`)
+- never rebase or force-push dev during release (`53908e2`)
+
+### Documentation
+
+- state no-AI-attribution as an instruction (`954a16f`)
+
+### Internal
+
+- regenerate CHANGELOG for v0.12.0 (`f1591c8`)
+
 ## [0.12.0] - 2026-10-21
 
 ### Added

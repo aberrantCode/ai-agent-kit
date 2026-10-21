@@ -257,47 +257,6 @@ try {
         if (-not (Test-Path -LiteralPath $asset)) {
             Add-Result 'statusline' 'statusline.sh' 'missing' "asset not found: $asset" 1
         } else {
-            $claudeDir    = Join-Path $HomeDir '.claude'
-            $scriptTarget = Join-Path $claudeDir 'statusline.sh'
-            $settingsPath = Join-Path $claudeDir 'settings.json'
-            $shPath  = if ($HomeDir -eq $DefaultHome) { '~/.claude/statusline.sh' } else { $scriptTarget -replace '\\', '/' }
-            $command = "bash $shPath"
-
-            $settings = @{}
-            if (Test-Path -LiteralPath $settingsPath) {
-                $raw = Get-Content -LiteralPath $settingsPath -Raw
-                if ($raw.Trim()) { $settings = $raw | ConvertFrom-Json -AsHashtable }
-            }
-            $current = if ($settings.ContainsKey('statusLine')) { $settings['statusLine'] } else { $null }
-            $currentCmd = if ($current -is [System.Collections.IDictionary] -and $current.ContainsKey('command')) { [string]$current['command'] } else { $null }
-
-            if ($current -and $currentCmd -ne $command) {
-                Add-Result 'statusline' 'statusline' 'skipped' "a custom status line is already configured ($currentCmd) - left unchanged"
-            } else {
-                $assetText = ([System.IO.File]::ReadAllText($asset)) -replace "`r`n", "`n"
-                $same = (Test-Path -LiteralPath $scriptTarget) -and (([System.IO.File]::ReadAllText($scriptTarget) -replace "`r`n", "`n") -eq $assetText)
-                $actions = @()
-                if (-not $same) { $actions += "deploy $scriptTarget" }
-                if (-not $current) { $actions += "wire statusLine in $settingsPath" }
-                if ($actions.Count -eq 0) {
-                    Add-Result 'statusline' 'statusline' 'current' 'status line already deployed and wired'
-                } elseif (-not $Force) {
-                    Add-Result 'statusline' 'statusline' 'preview' ("would " + ($actions -join '; '))
-                } else {
-                    $notes = @()
-                    if (-not $same) {
-                        if (Test-Path -LiteralPath $scriptTarget) { $notes += "script backed up to $(Backup-File $scriptTarget)" }
-                        Write-Utf8Lf $scriptTarget $assetText
-                    }
-                    if (-not $current) {
-                        if (Test-Path -LiteralPath $settingsPath) { $notes += "settings backed up to $(Backup-File $settingsPath)" }
-                        $settings['statusLine'] = [ordered]@{ type = 'command'; command = $command }
-                        Write-Utf8Lf $settingsPath (($settings | ConvertTo-Json -Depth 32) + "`n")
-                    }
-                    Add-Result 'statusline' 'statusline' 'deployed' ((@("done: " + ($actions -join '; ')) + $notes) -join '; ')
-                }
-            }
-
             # Prerequisites, installed with winget when missing (Windows). bash and git both
             # come from Git for Windows, so they share one package. A fresh install lands on
             # PATH for new shells only, so each tool also has a known install location.
@@ -312,16 +271,18 @@ try {
                 git  = @{ id = 'Git.Git';   fallback = @($(if ($gitRoot) { Join-Path $gitRoot 'cmd/git.exe' })) }
                 jq   = @{ id = 'jqlang.jq'; fallback = @($linkDirs | ForEach-Object { Join-Path $_ 'jq.exe' }) }
             }
-            function Test-Prereq([string]$tool) {
+            # The supported executable for a tool: first on PATH, else its known install location.
+            function Resolve-Prereq([string]$tool) {
                 $found = @(Get-Command $tool -All -CommandType Application -ErrorAction SilentlyContinue)
                 # On Windows, `bash` in System32 / WindowsApps is the WSL launcher, not the Git
                 # Bash the status line runs under — it does not count.
                 if ($tool -eq 'bash' -and $IsWindows) {
                     $found = @($found | Where-Object { $_.Source -notmatch '\\(System32|WindowsApps)\\' })
                 }
-                if ($found.Count -gt 0) { return $true }
-                return [bool](@($prereqs[$tool].fallback | Where-Object { $_ -and (Test-Path -LiteralPath $_) }).Count)
+                if ($found.Count -gt 0) { return $found[0].Source }
+                return @($prereqs[$tool].fallback | Where-Object { $_ -and (Test-Path -LiteralPath $_) }) | Select-Object -First 1
             }
+            function Test-Prereq([string]$tool) { [bool](Resolve-Prereq $tool) }
 
             $missingTools = @($prereqs.Keys | Where-Object { -not (Test-Prereq $_) })
             $winget = Get-Command winget -ErrorAction SilentlyContinue
@@ -348,6 +309,58 @@ try {
             if ($missingTools) {
                 $hints = ($missingTools | ForEach-Object { "${_}: winget install $($prereqs[$_].id)" }) -join '; '
                 Add-Result 'statusline' 'prerequisites' 'warning' ("status line needs: " + ($missingTools -join ', ') + " - not found ($hints)")
+            }
+
+            $claudeDir    = Join-Path $HomeDir '.claude'
+            $scriptTarget = Join-Path $claudeDir 'statusline.sh'
+            $settingsPath = Join-Path $claudeDir 'settings.json'
+            # Wire the same supported executable prerequisite detection accepted, resolved after
+            # any install. Bare `bash` may select the WSL launcher, so it is never written.
+            $bashPath = Resolve-Prereq 'bash'
+            # Preview: a pending Git.Git install lands at its known location.
+            if (-not $bashPath -and -not $Force) { $bashPath = @($prereqs.bash.fallback)[0] }
+            # POSIX single quoting preserves spaces, apostrophes, and shell metacharacters.
+            $quotePosix = { param($p) "'" + ($p -replace '\\', '/').Replace("'", "'\''") + "'" }
+            $command = if ($bashPath) { "$(& $quotePosix $bashPath) $(& $quotePosix $scriptTarget)" } else { $null }
+
+            $settings = @{}
+            if (Test-Path -LiteralPath $settingsPath) {
+                $raw = Get-Content -LiteralPath $settingsPath -Raw
+                if ($raw.Trim()) { $settings = $raw | ConvertFrom-Json -AsHashtable }
+            }
+            $current = if ($settings.ContainsKey('statusLine')) { $settings['statusLine'] } else { $null }
+            $currentCmd = if ($current -is [System.Collections.IDictionary] -and $current.ContainsKey('command')) { [string]$current['command'] } else { $null }
+
+            $legacyPath = if ($HomeDir -eq $DefaultHome) { '~/.claude/statusline.sh' } else { $scriptTarget -replace '\\', '/' }
+            $isManagedCommand = $currentCmd -eq $command -or $currentCmd -eq "bash $legacyPath"
+            if (-not $command) {
+                Add-Result 'statusline' 'statusline' 'warning' 'no supported bash found - status line not deployed or wired (see prerequisites)'
+            } elseif ($current -and -not $isManagedCommand) {
+                Add-Result 'statusline' 'statusline' 'skipped' "a custom status line is already configured ($currentCmd) - left unchanged"
+            } else {
+                $assetText = ([System.IO.File]::ReadAllText($asset)) -replace "`r`n", "`n"
+                $same = (Test-Path -LiteralPath $scriptTarget) -and (([System.IO.File]::ReadAllText($scriptTarget) -replace "`r`n", "`n") -eq $assetText)
+                $actions = @()
+                if (-not $same) { $actions += "deploy $scriptTarget" }
+                $needsWiring = -not $current -or $currentCmd -ne $command
+                if ($needsWiring) { $actions += "wire statusLine in $settingsPath" }
+                if ($actions.Count -eq 0) {
+                    Add-Result 'statusline' 'statusline' 'current' 'status line already deployed and wired'
+                } elseif (-not $Force) {
+                    Add-Result 'statusline' 'statusline' 'preview' ("would " + ($actions -join '; '))
+                } else {
+                    $notes = @()
+                    if (-not $same) {
+                        if (Test-Path -LiteralPath $scriptTarget) { $notes += "script backed up to $(Backup-File $scriptTarget)" }
+                        Write-Utf8Lf $scriptTarget $assetText
+                    }
+                    if ($needsWiring) {
+                        if (Test-Path -LiteralPath $settingsPath) { $notes += "settings backed up to $(Backup-File $settingsPath)" }
+                        $settings['statusLine'] = [ordered]@{ type = 'command'; command = $command }
+                        Write-Utf8Lf $settingsPath (($settings | ConvertTo-Json -Depth 32) + "`n")
+                    }
+                    Add-Result 'statusline' 'statusline' 'deployed' ((@("done: " + ($actions -join '; ')) + $notes) -join '; ')
+                }
             }
         }
     }
