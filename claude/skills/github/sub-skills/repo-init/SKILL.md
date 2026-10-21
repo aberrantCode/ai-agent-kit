@@ -1,5 +1,5 @@
 ---
-name: github-repo-init
+name: gh-repo-init
 description: >
   Sub-skill of `github`. Diff a repo against the Repo-Configuration Standard (protected
   main/dev rulesets, immutable tags, merge-commit-only, secret-scanning push protection, local

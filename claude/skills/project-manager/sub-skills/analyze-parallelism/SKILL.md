@@ -1,5 +1,5 @@
 ---
-name: analyze-parallelism
+name: pm-analyze-parallelism
 description: >
   Sub-skill of `project-manager`. Read-only future parallelism analysis for project-manager
   plans. Preserves serial execution by default and only identifies guarded batches with

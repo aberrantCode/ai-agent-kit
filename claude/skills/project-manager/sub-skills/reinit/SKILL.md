@@ -1,5 +1,5 @@
 ---
-name: reinit
+name: pm-reinit
 description: >
   Sub-skill of `project-manager`. Archive legacy plans and tasks, normalize feature specs to
   the current project-manager template, then launch the approved-spec orchestration loop

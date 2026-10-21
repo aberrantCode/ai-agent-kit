@@ -1,5 +1,5 @@
 ---
-name: iterate-tasks
+name: pm-iterate-tasks
 description: >
   Sub-skill of `project-manager`. One self-perpetuating iteration: merge the previous turn's
   pending PR, run the recap's next action in a fresh subagent, then emit a copy-ready prompt

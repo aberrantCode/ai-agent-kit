@@ -1,5 +1,5 @@
 ---
-name: init-project
+name: pm-init-project
 description: >
   Sub-skill of `project-manager`. Scaffold or retrofit the project-manager workflow on a repo
   — docs/ tree, canonical templates, enforcement artifacts (AGENTS.md, CLAUDE.md fragment,

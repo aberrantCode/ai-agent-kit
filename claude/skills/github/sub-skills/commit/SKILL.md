@@ -1,5 +1,5 @@
 ---
-name: github-commit
+name: gh-commit
 description: Sub-skill of `github`. Stage all changes, pull latest (resolving conflicts), commit with a conventional-commit message, and push. Honors the Output Contract inlined below.
 ---
 

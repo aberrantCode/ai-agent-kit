@@ -1,5 +1,5 @@
 ---
-name: capture
+name: pm-capture
 description: >
   Sub-skill of `project-manager`. Front-door intake for bugs, chores, tech-debt, and ideas as
   backlog rows — infers type and priority and allocates monotonic `BL-*` ids. Triggers on

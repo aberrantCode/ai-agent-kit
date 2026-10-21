@@ -1,5 +1,5 @@
 ---
-name: continue-tasks
+name: pm-continue-tasks
 description: >
   Sub-skill of `project-manager`. Run the full project orchestration loop with approved-spec
   gating, dependency ordering, verified completion, and deterministic failure/blocked handling

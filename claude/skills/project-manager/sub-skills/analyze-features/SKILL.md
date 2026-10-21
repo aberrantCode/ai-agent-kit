@@ -1,5 +1,5 @@
 ---
-name: analyze-features
+name: pm-analyze-features
 description: >
   Sub-skill of `project-manager`. Audit all feature specs in docs/features/ against the
   current template, CAP-ID standards, open questions, logical gaps, and plan coverage — then

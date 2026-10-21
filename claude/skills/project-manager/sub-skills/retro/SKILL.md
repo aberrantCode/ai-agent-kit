@@ -1,5 +1,5 @@
 ---
-name: retro
+name: pm-retro
 description: >
   Sub-skill of `project-manager`. Systematic close-out learning harvest — collects archived
   task Notes/Handoff fields and resolved issues into the workflow ledger with idempotent

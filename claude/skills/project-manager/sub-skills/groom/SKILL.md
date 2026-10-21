@@ -1,5 +1,5 @@
 ---
-name: groom
+name: pm-groom
 description: >
   Sub-skill of `project-manager`. Triage a backlog item into the feature or chore lane:
   promote to feature, materialize as a chore task (spec-authority guarded), merge into a plan,

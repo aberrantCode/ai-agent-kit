@@ -1,5 +1,5 @@
 ---
-name: github-worktree-task-lifecycle
+name: gh-worktree-task-lifecycle
 description: >
   Sub-skill of `github`. Create, work in, and idempotently remove an isolated per-task
   worktree under `<repo>-wt/.worktrees/`, with Windows file-lock recovery and same-branch

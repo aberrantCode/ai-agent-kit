@@ -1,5 +1,5 @@
 ---
-name: init-features
+name: pm-init-features
 description: >
   Sub-skill of `project-manager`. Run the Feature Interview to capture initial feature specs
   from docs/REQUIREMENTS.md — extracts functional areas, interviews the user one area at a

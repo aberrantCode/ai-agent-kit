@@ -1,5 +1,5 @@
 ---
-name: continue-new-session
+name: pm-continue-new-session
 description: >
   Sub-skill of `project-manager`. Generate a copy-ready prompt that a fresh Claude, Codex, or
   Gemini session can paste to start the next action from this session's latest recap,

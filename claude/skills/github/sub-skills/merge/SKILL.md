@@ -1,5 +1,5 @@
 ---
-name: github-merge
+name: gh-merge
 description: Sub-skill of `github`. Merge one or more open pull requests (resolved from PR numbers, branches, worktrees, or the current context) into dev with a merge commit, then clean up the worktree, local branch, and remote branch in the correct order. Honors the Output Contract inlined in this file — silent run, errors as they occur, one concise summary.
 ---
 

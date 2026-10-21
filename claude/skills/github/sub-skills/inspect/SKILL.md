@@ -1,5 +1,5 @@
 ---
-name: github-inspect
+name: gh-inspect
 description: Sub-skill of `github`. Read-only inspection of repo state — working tree, branch tracking, worktrees, open PRs, and merged-stale branches — culminating in a recommendation for which lifecycle operation (ship/merge/release/prune) to run next. Honors the Output Contract inlined below, adapted for a read-only report.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: review-tasks
+name: pm-review-tasks
 description: >
   Sub-skill of `project-manager`. Dry-run project status report. Produces a read-only snapshot
   of feature specs, dependency blockers, plans, active tasks, stale work, verification

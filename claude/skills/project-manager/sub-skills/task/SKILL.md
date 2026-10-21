@@ -1,5 +1,5 @@
 ---
-name: task
+name: pm-task
 description: >
   Sub-skill of `project-manager`. Express chore lane — capture and materialize a chore task in
   one shot, with the spec-authority guard. Triggers on `/pm-task`, "just fix", "quick chore

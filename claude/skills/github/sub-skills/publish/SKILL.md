@@ -1,5 +1,5 @@
 ---
-name: github-publish
+name: gh-publish
 description: Sub-skill of `github`. Publish a local project as a new GitHub repository — git init, initial commit, repo creation, and pushing main + dev — then hand off to `repo-init` for all configuration hardening. Honors the Output Contract inlined below.
 ---
 

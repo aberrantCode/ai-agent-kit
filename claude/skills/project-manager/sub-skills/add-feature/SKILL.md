@@ -1,5 +1,5 @@
 ---
-name: add-feature
+name: pm-add-feature
 description: >
   Sub-skill of `project-manager`. Create a new feature spec — interviews user, detects overlap
   with existing specs, populates the canonical template, generates a diagram, and updates the

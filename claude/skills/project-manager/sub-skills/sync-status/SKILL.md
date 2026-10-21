@@ -1,5 +1,5 @@
 ---
-name: sync-status
+name: pm-sync-status
 description: >
   Sub-skill of `project-manager`. Regenerate the generated sections of docs/STATUS.md
   (progress table + outstanding-work list) from the canonical specs/plans/tasks/issues,

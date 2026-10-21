@@ -1,5 +1,5 @@
 ---
-name: sync-tracker
+name: pm-sync-tracker
 description: >
   Sub-skill of `project-manager`. Optional project-manager tracker mirroring. Starts with
   GitHub issues through gh, keeps local markdown authoritative, and makes repeated sync runs
