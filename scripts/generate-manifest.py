@@ -57,7 +57,7 @@ CATEGORY_ORDER = [
 # (dependencies from `requires:` are added there) and shown as "Standard Skills" by
 # install-skills.ps1. Names must match claude/skills/<name>.
 STANDARD_SKILLS = [
-    'base', 'github', 'project-manager', 'skills-manager', 'statusline',
+    'base', 'github', 'project-manager', 'session-manager', 'skills-manager', 'statusline',
 ]
 
 # Guardrails (shared/guardrails/<name>.md) that bootstrap-profile.ps1 concatenates into a
