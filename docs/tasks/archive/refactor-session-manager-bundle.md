@@ -5,7 +5,7 @@ task: 1
 covers: []
 role: "orchestrator"
 agent: "claude-opus-5-5"
-status: in-progress
+status: done
 created: "2026-10-21"
 claimed_by: "orchestrator session (refactor/session-manager-bundle)"
 claimed_at: "2026-10-21"
@@ -51,7 +51,7 @@ Tick a box only after you have checked its Done-when condition.
 
 ## Phase A: Governance (land first; every later item depends on it)
 
-- [ ] **A1. Amend `docs/reorg/charter.md`.**
+- [x] **A1. Amend `docs/reorg/charter.md`.**
   - In §4 Single Owners, set the owner of "Session handoff / 'give me a prompt for the next
     session'" to `session-manager` `handoff`. Set the owner of "Session-JSONL parsing +
     token-efficiency page" to `session-manager` `transcripts` (parser) and `usage` (token page).
@@ -69,7 +69,7 @@ Tick a box only after you have checked its Done-when condition.
     and nothing in §4 still names `project-manager` `session-handoff` or `agent-manager`
     `session-jsonl-toolkit`.
 
-- [ ] **A2. Update `docs/reorg/disposition-ledger.md`.**
+- [x] **A2. Update `docs/reorg/disposition-ledger.md`.**
   - Add or replace rows for `session-handoff`, `spawn-terminal` (standalone, unchanged) and
     `work-resume`. None of these three has a row today.
   - Repoint `analyze-conversations`, `conversation-history-mining-for-domain-knowledge`,
@@ -81,7 +81,7 @@ Tick a box only after you have checked its Done-when condition.
   - **Done when:** every source skill in Phase C has exactly one ledger row naming its
     `session-manager` destination, and the rows you completed say `done`.
 
-- [ ] **A3. Update `docs/reorg/command-namespace-registry.md`.**
+- [x] **A3. Update `docs/reorg/command-namespace-registry.md`.**
   - Add one row per command in the table in Phase B.
   - Mark `/hand-off-audit`, `/dispatch-session-prompt` and `/continue-new-session` as
     back-compat **aliases**.
@@ -92,7 +92,7 @@ Tick a box only after you have checked its Done-when condition.
 
 ## Phase B: Bundle skeleton
 
-- [ ] **B1. Create `claude/skills/session-manager/SKILL.md`.**
+- [x] **B1. Create `claude/skills/session-manager/SKILL.md`.**
   - This master file is a router. Set `category: Foundations & Workflow`, `requires:
     [spawn-terminal]` and `install-target: global`.
   - It states what the bundle owns: the session lifecycle (start: resume; during: checkpoint;
@@ -106,7 +106,7 @@ Tick a box only after you have checked its Done-when condition.
   - **Done when:** the frontmatter parses and the description contains every trigger phrase
     listed in the absorbed skills' descriptions.
 
-- [ ] **B2. Give each sub-skill frontmatter that lets it trigger on its own** (charter §1).
+- [x] **B2. Give each sub-skill frontmatter that lets it trigger on its own** (charter §1).
   - Use `claude/skills/session-manager/sub-skills/<name>/SKILL.md`, where `name:` equals the
     directory name.
   - Each description opens with ``Sub-skill of `session-manager`.`` followed by trigger-rich
@@ -133,7 +133,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
 
 ## Phase C: Sub-skills (each item is one specialist subagent's job)
 
-- [ ] **C1. `transcripts`: shared JSONL library.** Build this first; C6, C7, C8 and C9 depend on it.
+- [x] **C1. `transcripts`: shared JSONL library.** Build this first; C6, C7, C8 and C9 depend on it.
   - Create `sub-skills/transcripts/` with a `SKILL.md` aimed at skill authors, not end users.
   - Add `scripts/cc_transcripts.py`, a stdlib-only Python module that provides:
     - project-directory discovery, including worktree path encodings
@@ -153,7 +153,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
     - The module has unit tests under `scripts/tests/` (or the repo's existing Python test
       location), and they pass.
 
-- [ ] **C2. `handoff`: write the prompt for the next session.**
+- [x] **C2. `handoff`: write the prompt for the next session.**
   - Move the writing steps from `session-handoff/sub-skills/handoff/SKILL.md`: entry modes, item
     recovery, dependency order, prompt sections, delegation instructions and model choice.
   - Add these modes:
@@ -172,7 +172,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** the evals in `evals/evals.json` cover all four modes, and a dry-run of each
     mode against a sample scope produces a well-formed prompt file.
 
-- [ ] **C3. `dispatch`: worktree, launch and verification.**
+- [x] **C3. `dispatch`: worktree, launch and verification.**
   - Move `new-task-worktree.ps1` and `launch-claude-session.ps1`. Move the steps for worktree
     creation, launch, environment variables, `-SetEnv` model pinning, tab colour, the WT-absent
     fallback and PID verification.
@@ -183,14 +183,14 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
     the archive layout, and the "spawn-terminal not found" error still fires when the skill is
     absent.
 
-- [ ] **C4. `retire`: cleanup gate.**
+- [x] **C4. `retire`: cleanup gate.**
   - Move `complete-task-session.ps1` and its five gate checks.
   - Keep `-Confirmed` as a human-only gate.
   - It must find the delegation ledger script through the C8 sub-skill's new path.
   - **Done when:** running it without `-Confirmed` against a throwaway merged branch prints all
     five checks and deletes nothing.
 
-- [ ] **C5. `checkpoint`: durable session state.**
+- [x] **C5. `checkpoint`: durable session state.**
   - Absorb `session-management` (tiered summaries and the current-state.md/decisions.md layout)
     and `state-file-driven-multi-turn-resumption` (one step per turn, recorded evidence, a resume
     prompt).
@@ -201,7 +201,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** the sub-skill is under about 200 lines, and every rule from both sources is
     either kept or listed as deliberately dropped in the PR description.
 
-- [ ] **C6. `resume`: pick up where the user left off.**
+- [x] **C6. `resume`: pick up where the user left off.**
   - Absorb the whole `work-resume` bundle: its SKILL.md, README, four commands and
     `resume-scan.py`, rewired onto C1.
   - Add an optional SessionStart hook snippet that injects the newest handoff/checkpoint file.
@@ -209,7 +209,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** `resume-scan.py` output is unchanged (C1's check) and all four commands load
     this sub-skill.
 
-- [ ] **C7. `audit`: check past sessions against a stated rule.**
+- [x] **C7. `audit`: check past sessions against a stated rule.**
   - Move `session-handoff/sub-skills/audit`: SKILL.md, evals, `report-template.md` and
     `mine_dispatches.py` rewired onto C1.
   - Rename frontmatter `name: compliance-audit` to `audit`. Keep "compliance audit" as a
@@ -218,7 +218,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** the evals still pass their assertions, and `/session-audit` and
     `/hand-off-audit` both load it.
 
-- [ ] **C8. `mine`: find patterns in session history.**
+- [x] **C8. `mine`: find patterns in session history.**
   - Absorb `analyze-conversations` as friction mode and
     `conversation-history-mining-for-domain-knowledge` as knowledge mode.
   - Add an option that turns repeated corrections into proposed (never applied) CLAUDE.md or
@@ -227,14 +227,14 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
     checking against a specific rule (hand that to `audit`) and extracting domain knowledge.
   - **Done when:** friction mode reproduces the original extractor's report on a fixed window.
 
-- [ ] **C9. `delegation-ledger`: record and report delegated work.**
+- [x] **C9. `delegation-ledger`: record and report delegated work.**
   - Move `log-delegation-outcome.ps1` and `delegation-report.ps1`, plus the "Delegation logging"
     rationale from the handoff SKILL.md.
   - The ledger path `~/.claude/telemetry/delegation-outcomes.jsonl` does not change.
   - **Done when:** `delegation-report.ps1` produces the same report from the new path, and the C4
     retire gate still credits a tally tagged with `-PromptPath`.
 
-- [ ] **C10. `usage`: token cost.**
+- [x] **C10. `usage`: token cost.**
   - Absorb `usage-limit-reducer` (historical burn, `usage-report.py`, the 11 rules) and
     `startup-context-audit` (startup baseline, `startup-context.py`, `/startup-cost`).
   - Rewire both scripts onto C1.
@@ -244,7 +244,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
 
 ## Phase D: Retire, rewire, regenerate
 
-- [ ] **D1. `session-handoff` alias bundle.**
+- [x] **D1. `session-handoff` alias bundle.**
   - Shrink `claude/skills/session-handoff/` to a router SKILL.md with `status: deprecated` and a
     note to remove it next release.
   - It routes to `session-manager` and contains no sub-skills, scripts or commands. The commands
@@ -252,7 +252,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** the directory holds only SKILL.md (plus a regenerated diagram, if the
     generator requires one).
 
-- [ ] **D2. Delete the absorbed skill directories** (git history is the archive):
+- [x] **D2. Delete the absorbed skill directories** (git history is the archive):
   - `analyze-conversations`
   - `conversation-history-mining-for-domain-knowledge`
   - `recursive-batch-handoff`
@@ -266,7 +266,7 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - the Codex and Gemini `session-management` mirrors
   - **Done when:** none of these paths exist and nothing in the repo still links to them.
 
-- [ ] **D3. Rewrite references across the repo.**
+- [x] **D3. Rewrite references across the repo.**
   - Grep the whole repo (skills, commands, instructions, `shared/guardrails`, docs, scripts,
     `README.md`, `CLAUDE.md`, `AGENTS.md`) for every deleted name and old script path.
   - Rewrite each to its `session-manager` equivalent. This includes `spawn-terminal`'s
@@ -282,20 +282,20 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
   - **Done when:** `bootstrap-profile.ps1` (preview mode) lists `session-manager` and
     `spawn-terminal`.
 
-- [ ] **D5. Diagrams.** Generate a `diagram.html` for the master bundle and each sub-skill that
+- [x] **D5. Diagrams.** Generate a `diagram.html` for the master bundle and each sub-skill that
   needs one, following the repo's diagram standard (see `/backfill-diagrams`).
   - **Done when:** `/audit-skills` reports no missing diagrams for `session-manager`.
 
-- [ ] **D6. Regenerate generated files.** Run `scripts/generate-manifest.py` and
+- [x] **D6. Regenerate generated files.** Run `scripts/generate-manifest.py` and
   `scripts/generate-catalog.ps1`. Never hand-edit `manifest.json` or `CATALOG.md`.
   - **Done when:** both are regenerated and the diff contains only the expected rows.
 
 ## Phase E: Verify and ship
 
-- [ ] **E1.** `pwsh ./scripts/validate.ps1` exits 0. Run the repo's Python and Pester tests,
+- [x] **E1.** `pwsh ./scripts/validate.ps1` exits 0. Run the repo's Python and Pester tests,
   plus every Done-when check above.
-- [ ] **E2.** A read-only `/audit-skills` run shows no new findings for the bundles you touched.
-- [ ] **E3.** Rebase onto `origin/dev`, then use `/ship` to open a PR to `dev` and merge it with
+- [x] **E2.** A read-only `/audit-skills` run shows no new findings for the bundles you touched.
+- [x] **E3.** Rebase onto `origin/dev`, then use `/ship` to open a PR to `dev` and merge it with
   a merge commit.
   - The PR description has a Summary and a Test Plan, cites the task file, and lists the rules
     deliberately dropped in C5.
@@ -311,3 +311,27 @@ The commands and the sub-skill that owns each one. Every command is a thin file 
     sweep charter §2.2 requires.
 - [ ] **F2.** Next release: delete the `session-handoff` alias bundle and the three command
   aliases.
+
+## Completion
+
+Status: success
+Summary: Replaced the session-handoff umbrella and eight neighbouring session skills with the session-manager master bundle (10 dispatchable sub-skills, 17 commands, shared cc_transcripts.py parser), amended the reorg charter, and regenerated manifest/catalog.
+Artifacts:
+  - docs/reorg/charter.md, docs/reorg/disposition-ledger.md, docs/reorg/command-namespace-registry.md
+  - claude/skills/session-manager/** (SKILL.md, diagram.html, commands/, sub-skills/{transcripts,handoff,dispatch,retire,checkpoint,resume,audit,mine,delegation-ledger,usage})
+  - claude/skills/session-handoff/SKILL.md (deprecated alias)
+  - scripts/tests/test_cc_transcripts.py
+  - manifest.json, CATALOG.md (regenerated)
+Tests:
+  added: 29
+  changed: 0
+  passing: true
+Notes:
+  - D4 not satisfied as written: STANDARD_SKILLS never contained session-handoff or any absorbed skill, so its precondition did not fire and bootstrap preview does not list session-manager/spawn-terminal. Adding session-manager to the standard set is a human policy decision.
+  - Deviation (naming): sub-skill names carry the sm- prefix (sm-audit, ...) per the 2026-10-21 gh-/pm- precedent (commit 307b473) instead of bare directory names as B2 literally says.
+  - Deviation (commands): /dispatch -> /dispatch-session and /checkpoint -> /checkpoint-session to satisfy the registry's binding Generic-Verb Rule.
+  - No Gemini session-management mirror existed; only the Codex mirror was deleted.
+  - C1 output identity proven on a frozen ~/.claude snapshot: all five scripts identical except analyze-conversations' removed SyntaxWarning stderr lines (the escape bug was fixed). mine_dispatches --project-substring now matches the project slug, not the full path (documented intent).
+Handoff:
+  - F1 (human): /push-skill session-manager and /push-skill spawn-terminal, then /update-skill sweep across projects with absorbed skills installed.
+  - F2 (next release): delete the session-handoff alias bundle and the /dispatch-session-prompt, /continue-new-session, /hand-off-audit aliases.
