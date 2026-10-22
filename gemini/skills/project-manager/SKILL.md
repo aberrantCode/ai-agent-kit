@@ -14,6 +14,15 @@ This skill implements a self-driving project pipeline. Markdown files in `docs/`
 source of truth — they persist across sessions and coordinate between the orchestrator (you) and
 worker agents.
 
+## Ownership Boundary
+
+Verbatim per the ai-agent-kit reorg charter §3 (`docs/reorg/charter.md`), sentence 1:
+
+> project-manager owns single-agent multi-turn loop composition; agent-manager owns multi-agent dispatch and recovery; session-manager owns session handoff, durable session state, and session-JSONL infrastructure.
+
+`session-manager` is a Claude Code bundle (no Codex/Gemini mirror); the handoff-prompt procedure
+below is kept here for this CLI.
+
 ## Directory Conventions
 
 ```
@@ -122,7 +131,7 @@ When a task fails, do NOT retry the same task blindly. Instead:
 
 ---
 
-### Generate a Session-Handoff Prompt (procedure; Claude users: `session-manager` handoff)
+### `continue-new-session` — Generate a Session-Handoff Prompt
 
 Use when the user wants to pause this session and resume the recommended next action in a brand new
 session (typically because the current context is getting long or they want to switch runtime).
