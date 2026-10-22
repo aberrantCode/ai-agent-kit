@@ -122,7 +122,7 @@ When a task fails, do NOT retry the same task blindly. Instead:
 
 ---
 
-### `continue-new-session` — Generate a Session-Handoff Prompt
+### Generate a Session-Handoff Prompt (procedure; Claude users: `session-manager` handoff)
 
 Use when the user wants to pause this session and resume the recommended next action in a brand new
 session (typically because the current context is getting long or they want to switch runtime).

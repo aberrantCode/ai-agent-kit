@@ -17,7 +17,7 @@
       - Confirming the launch actually came up, rather than trusting that Start-Process returned.
 
     It carries NO default environment and knows nothing about any specific CLI. Callers that need a
-    tool-specific default set (e.g. launch-claude-session.ps1) layer that on top via -SetEnv.
+    tool-specific default set (e.g. session-manager's sub-skills/dispatch/scripts/launch-claude-session.ps1) layer that on top via -SetEnv.
 
 .PARAMETER Command
     A command line to run in the new tab, e.g. 'git status' or 'npm run dev'. Mutually exclusive

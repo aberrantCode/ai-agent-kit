@@ -40,7 +40,7 @@ None. The command derives everything from session state and the repo:
 
 ## Step 1 — Read the recap for the recommended next action
 
-Mirror `project-manager:continue-new-session` Step 1 exactly. Scan your own most recent
+Mirror `session-manager` `handoff` (copy mode, `/continue-new-session`) Step 1 exactly. Scan your own most recent
 assistant turn for:
 
 - An explicit "next step" / "next" / "follow-up" recommendation
@@ -56,7 +56,7 @@ Capture:
    from the previous iteration
 
 If the previous turn had no recap-recommended action, use the **Fallback** section
-from `project-manager:continue-new-session` (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority
+from `session-manager` `handoff` (copy mode, `/continue-new-session`) (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority
 unblocked todo). Prefix the action with `(derived from {source})`.
 
 ## Step 2 — Handle any pending PR
