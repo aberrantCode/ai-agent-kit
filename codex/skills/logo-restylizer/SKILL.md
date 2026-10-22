@@ -71,8 +71,8 @@ Run the script with `Bash`. If Pillow is not available, inform the user and sugg
 ## Step 4 — Determine Output Path
 
 **First pass (new file):** Default output path is the same directory as the source file, with a descriptive suffix if the style label is clear, otherwise `-restyled`:
-- `homeradar-logo.svg` + "dark mode" → `homeradar-logo-dark.svg`
-- `homeradar-logo.svg` + "amber neon" → `homeradar-logo-amber-neon.svg`
+- `app-logo.svg` + "dark mode" → `app-logo-dark.svg`
+- `app-logo.svg` + "amber neon" → `app-logo-amber-neon.svg`
 - `app-icon.png` (ambiguous style) → `app-icon-restyled.png`
 
 Ask the user to confirm the output location only if they seem likely to want a non-default path (e.g., they mentioned deploying to a specific location). Otherwise write to the default and state the path in your response.
@@ -105,7 +105,7 @@ Use this table format:
 ```markdown
 | File | Full Path | Intended Use | Not Used For |
 |------|-----------|-------------|--------------|
-| `homeradar-logo-dark.svg` | `assets/branding/homeradar-logo-dark.svg` | Dark-mode UI, dark backgrounds | Light backgrounds, print |
+| `app-logo-dark.svg` | `assets/branding/app-logo-dark.svg` | Dark-mode UI, dark backgrounds | Light backgrounds, print |
 ```
 
 ### If `docs/assets.md` does not exist:

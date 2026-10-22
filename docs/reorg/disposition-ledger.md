@@ -21,14 +21,14 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | Disposition | Directories |
 |---|---:|
 | Extend in place (bundle head, slug retained) | 4 |
-| Absorb into a bundle sub-skill, then delete | 74 |
+| Absorb into a bundle sub-skill, then delete | 70 |
 | Lift into a bundle unchanged, then delete the top-level copy | 2 |
-| Merge into an existing sub-skill, then delete | 2 |
+| Merge into an existing sub-skill, then delete | 1 |
 | Move into a bundle (content unchanged) | 1 |
 | Split across two owners, then delete | 4 |
 | Reconcile flat/bundle duplicate, keep bundle copy, delete flat copy | 7 |
 | Merge with sibling into a new standalone skill | 2 |
-| Delete outright (not a skill) | 1 |
+| Delete outright (not a skill, or project-specific) | 6 |
 | Stays standalone (no change) | 10 |
 | Stays standalone; frontmatter improved in place | 35 |
 | **Total** | **142** |
@@ -81,12 +81,12 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | `existing-repo` | absorb-delete | project-manager / backfill-features | 9 | pending | Mandatory analysis phase. |
 | `explain-code` | standalone | - | - | pending | Stays standalone; developer-manager routes to it, never absorbs. |
 | `extraction-reporting` | reconcile-delete | youtube-extraction / extraction-reporting | 23 | pending | Flat duplicate deleted; bundle copy extended with repatriated llm_ai_labs post-processing scripts + RESOURCES.md format. |
-| `feature-start` | merge-delete | project-manager / add-feature (existing sub-skill) | 9 | pending | Merges into add-feature, not backfill-features; /feature-start command retired. |
+| `feature-start` | delete | - | - | done | HomeRadar-specific; deleted outright rather than de-branded or bundled (2026-10-22, user decision). HomeRadar's repo keeps its own installed copies; git history is the archive of record. /feature-start command retired. |
 | `file-reconstruction` | reconcile-delete | youtube-extraction / (same-named bundle sub-skill) | 23 | pending | Flat top-level duplicate of the bundled sub-skill; deleted after content reconciliation (bundle copy wins). |
 | `finishing-a-development-branch` | absorb-delete | github / ship (merge/keep/discard decision gate) | 3 | pending | Plugin-precedence vs superpowers:finishing-a-development-branch declared via skills-manager external-skill-intake. |
 | `firebase` | standalone-improve | routed by developer-manager (no relocation) | 20 | pending | Stays standalone; trigger-rich frontmatter description improved in place; developer-manager's router indexes it by repo signal. |
 | `firewall-alias-as-indirection` | absorb-delete | ops-manager / service-lifecycle | 17 | pending |  |
-| `fix-start` | absorb-delete | quality-manager / fix-start | 15 | pending | Generalized from HomeRadar paths; /update-skill pass for zillow_tracker's installed copy in the same PR series. |
+| `fix-start` | delete | - | - | done | HomeRadar-specific; deleted outright rather than de-branded or bundled (2026-10-22, user decision). HomeRadar's repo keeps its own installed copies; git history is the archive of record. /fix-start command retired. |
 | `fleet-cp1252-mojibake-fix` | absorb-delete | utilities-manager / fleet-cp1252-mojibake-fix | 25 | pending | Absorbed as-is; also surfaced in the master's Windows Ground Rules table. |
 | `flutter` | standalone-improve | routed by developer-manager (no relocation) | 20 | pending | Stays standalone; trigger-rich frontmatter description improved in place; developer-manager's router indexes it by repo signal. |
 | `frame-content-recognition` | reconcile-delete | youtube-extraction / (same-named bundle sub-skill) | 23 | pending | Flat top-level duplicate of the bundled sub-skill; deleted after content reconciliation (bundle copy wins). |
@@ -115,7 +115,7 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | `parallel-subagent-fanout` | absorb-delete | agent-manager / fleet-repo-fanout | 12 | pending | subagent-driven-development contributes fresh-agent + two-stage-review doctrine as the single-repo case. |
 | `playwright-testing` | absorb-delete | quality-manager / e2e-playwright | 14 | pending | Global /e2e moves with fleet sweep ([resolution #3](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |
 | `posthog-analytics` | standalone-improve | routed by developer-manager (no relocation) | 20 | pending | Stays standalone; trigger-rich frontmatter description improved in place; developer-manager's router indexes it by repo signal. |
-| `pre-pr` | absorb-delete | github / ship (generic pre-PR gates) | 2 | pending | HomeRadar-branded archive copy; generic gates (tests, 400/800 size cap) fold into ship. Deleted with README/manifest parity in the same PR. |
+| `pre-pr` | delete | - | - | done | HomeRadar-specific; deleted outright rather than de-branded or bundled (2026-10-22, user decision). HomeRadar's repo keeps its own installed copies; git history is the archive of record. /pre-pr command retired. |
 | `project-manager` | extend-in-place | project-manager ([P0](charter.md#9-phases-and-gate)) | 6-9 | pending | Slug retained. Sole owner of session handoff; gains loop-prompt-composer, backlog-burndown, learnings-ledger, backfill-features. Stages product-inception-pack + enhancement-bundle as `status: draft` stubs ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). **PM Lifecycle Redesign (2026-07-16, [PM Lifecycle Redesign spec](../reports/2026-07-16-pm-lifecycle-redesign.review.md)): added sub-skills `capture`/`groom`/`task`/`retro` (commands `/pm-capture` `/pm-groom` `/pm-task` `/pm-retro`), the [`docs/backlog.md`](../backlog.md) intake store + `scope-manifest.md` chore-lane guard, and STATUS §4 generation. PRs #77–#82.** |
 | `project-plan-task-reconciliation` | absorb-delete | project-manager / orchestrator-bookkeeping | 8 | pending |  |
 | `project-tooling` | absorb-delete | developer-manager / local-dev-harness | 19 | pending | /start-app command rewired, name unchanged; gains a generation mode. developer-manager also stages go-development, fastapi-htmx, python-app-scaffolds, ollama-integration as `status: draft` stubs ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |
@@ -131,7 +131,7 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | `reddit-api` | standalone-improve | routed by developer-manager (no relocation) | 20 | pending | Stays standalone; trigger-rich frontmatter description improved in place; developer-manager's router indexes it by repo signal. |
 | `remote-installer` | absorb-delete | utilities-manager / installer-lifecycle | 25 | pending |  |
 | `requesting-code-review` | absorb-delete | quality-manager / code-review (multi-engine) | 14 | pending | Model IDs read from agent-manager's review-model-config convention, never hardcoded. Global /code-review moves with fleet sweep ([resolution #3](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |
-| `retro-fit-spec` | absorb-delete | project-manager / backfill-features | 9 | pending | De-branded on absorption. |
+| `retro-fit-spec` | delete | - | - | done | HomeRadar-specific; deleted outright rather than de-branded or bundled (2026-10-22, user decision). HomeRadar's repo keeps its own installed copies; git history is the archive of record. /retro-fit-spec command retired. |
 | `scanner-plugin-integration` | standalone | - | - | pending | Was architecture-manager absorption; stays standalone. |
 | `security` | absorb-delete | quality-manager / security-review | 14 | pending |  |
 | `security-aware-persistence-design` | standalone | - | - | pending | Was architecture-manager absorption; stays standalone. |
@@ -145,7 +145,7 @@ As each iteration ships, flip its rows' Status from `pending` to `done` in the o
 | `site-architecture` | standalone | - | - | pending | Orphan closed as standalone by board ruling. |
 | `skills-manager` | extend-in-place | skills-manager ([P0](charter.md#9-phases-and-gate)) | 4-5 | pending | Slug retained. Gains skill-parity-guard, installed-copy-sweep, external-skill-intake; owns this ledger + the command-namespace registry. |
 | `sops-secrets` | absorb-delete | ops-manager / secrets-ops | 17 | pending | secrets-ops is the SOLE owner of /get-secret. dropbox-api staged as `status: draft` stub ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |
-| `spec-align` | absorb-delete | project-manager / backfill-features | 9 | pending | Becomes the gap-analysis companion mode. |
+| `spec-align` | delete | - | - | done | HomeRadar-specific; deleted outright rather than de-branded or bundled (2026-10-22, user decision). HomeRadar's repo keeps its own installed copies; git history is the archive of record. /spec-align command retired. |
 | `spec-consistency-doc-refactoring-pattern` | absorb-delete | project-manager / orchestrator-bookkeeping | 8 | pending |  |
 | `stale-symbolic-ref-detection-and-repair` | split-delete | github (git slice) + ops-manager / diagnostics-probe (general half) | 16 | pending | Git slice LANDED in github master principles (iter 1, verify-refs-before-destructive bullet); general verify-cached-state-before-destructive-action half absorbed by ops-manager diagnostics-probe (iter 16); directory deleted once both halves land. |
 | `start-app` | absorb-delete | developer-manager / local-dev-harness | 19 | pending | /start-app command rewired, name unchanged; gains a generation mode. developer-manager also stages go-development, fastapi-htmx, python-app-scaffolds, ollama-integration as `status: draft` stubs ([resolution #2](charter.md#8-human-resolutions-erik-2026-07-10--binding-override-encoded-defaults)). |

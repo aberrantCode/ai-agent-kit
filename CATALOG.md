@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-21, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-22, schemaVersion: 1)
 -->
 
 # Catalog
@@ -24,24 +24,19 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
 | [`existing-repo`](claude/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | codex |
-| [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the br... | codex |
-| [`fix-start`](claude/skills/fix-start/SKILL.md) | Use when starting any HomeRadar bug fix or regression investigation, before writing any code | codex |
 | [`github`](claude/skills/github/SKILL.md) | Use for any git or GitHub repository operation in the terminal, even when "git" isn't said: commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev, cut a dev→main release or provi... | codex |
 | [`guide-assistant`](claude/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | codex |
 | [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/SKILL.md) | Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification... | — |
 | [`iterative-development`](claude/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | codex |
 | [`one-job-test`](claude/skills/one-job-test/SKILL.md) | Test an installed agent skill against one real job to decide whether to keep it, fork it, or delete it. Use this whenever the user mentions installing, evaluating, auditing, trusting, pruning, or being disappointed by... | — |
 | [`parallel-subagent-fanout`](claude/skills/parallel-subagent-fanout/SKILL.md) | Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature b... | — |
-| [`pre-pr`](claude/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | codex |
 | [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/SKILL.md) | Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, a... | — |
 | [`requesting-code-review`](claude/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | codex |
-| [`retro-fit-spec`](claude/skills/retro-fit-spec/SKILL.md) | Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section | codex |
 | [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/SKILL.md) | Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, com... | — |
 | [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Deprecated alias — use `session-manager`. Routes any request that still names "session-handoff" (handing off open work to a fresh session, or auditing whether past sessions followed a stated rule) to the `session-mana... | — |
 | [`session-manager`](claude/skills/session-manager/SKILL.md) | Owns the whole Claude Code session lifecycle plus the shared transcript (JSONL) parser. Start: resume where you left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish... | — |
 | [`spawn-terminal`](claude/skills/spawn-terminal/SKILL.md) | Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script — independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to "o... | — |
-| [`spec-align`](claude/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | codex |
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/SKILL.md) | Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scop... | — |
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/SKILL.md) | Use when a script, agent, or session is about to act on a remembered reference — a git default branch, a cached IP/credential, an "SSH is broken" note in memory — before any destructive or high-stakes operation. Verif... | — |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | codex |
@@ -239,16 +234,11 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`code-deduplication`](codex/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | claude |
 | [`commit-hygiene`](codex/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | claude |
 | [`existing-repo`](codex/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | claude |
-| [`feature-start`](codex/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | claude |
 | [`finishing-a-development-branch`](codex/skills/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the br... | claude |
-| [`fix-start`](codex/skills/fix-start/SKILL.md) | Use when starting any HomeRadar bug fix or regression investigation, before writing any code | claude |
 | [`github`](codex/skills/github/SKILL.md) | Use for any git or GitHub repository operation in the terminal, even when "git" isn't said: commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev, cut a dev→main release or provi... | claude |
 | [`guide-assistant`](codex/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | claude |
 | [`iterative-development`](codex/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | claude |
-| [`pre-pr`](codex/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | claude |
 | [`requesting-code-review`](codex/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | claude |
-| [`retro-fit-spec`](codex/skills/retro-fit-spec/SKILL.md) | Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section | claude |
-| [`spec-align`](codex/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | claude |
 | [`subagent-driven-development`](codex/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | claude |
 | [`team-coordination`](codex/skills/team-coordination/SKILL.md) | Multi-person projects - shared state, todo claiming, handoffs | claude |
 

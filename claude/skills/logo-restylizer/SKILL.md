@@ -45,7 +45,7 @@ SVG is XML text. Edit it directly:
 
 - **Color changes** — find and replace `fill`, `stroke`, `flood-color`, `stop-color` values. Use regex-aware substitution to avoid partial matches.
 - **Style changes** — modify `filter` elements, `opacity`, `rx`/`ry` for corner radius, gradient stops.
-- **Neon/glow effects** — add or modify `<filter>` with `feGaussianBlur` + `feMerge` nodes (see the existing homeradar neon filters as a reference for the pattern).
+- **Neon/glow effects** — add or modify `<filter>` with `feGaussianBlur` + `feMerge` nodes (the standard glow pattern: a blurred copy of the shape merged beneath the original).
 - **Dark/light variants** — swap background fills, invert foreground/accent colors while keeping shapes intact.
 - **Theme changes** — systematically replace the color palette while preserving structural elements.
 
@@ -72,8 +72,8 @@ Run the script with `Bash`. If Pillow is not available, inform the user and sugg
 ## Step 4 — Determine Output Path
 
 **First pass (new file):** Default output path is the same directory as the source file, with a descriptive suffix if the style label is clear, otherwise `-restyled`:
-- `homeradar-logo.svg` + "dark mode" → `homeradar-logo-dark.svg`
-- `homeradar-logo.svg` + "amber neon" → `homeradar-logo-amber-neon.svg`
+- `app-logo.svg` + "dark mode" → `app-logo-dark.svg`
+- `app-logo.svg` + "amber neon" → `app-logo-amber-neon.svg`
 - `app-icon.png` (ambiguous style) → `app-icon-restyled.png`
 
 Use `AskUserQuestion` to confirm the output location only if the user seems likely to want a non-default path (e.g., they mentioned deploying to a specific location). Otherwise write to the default and state the path in your response.
@@ -106,7 +106,7 @@ Use this table format:
 ```markdown
 | File | Full Path | Intended Use | Not Used For |
 |------|-----------|-------------|--------------|
-| `homeradar-logo-dark.svg` | `assets/branding/homeradar-logo-dark.svg` | Dark-mode UI, dark backgrounds | Light backgrounds, print |
+| `app-logo-dark.svg` | `assets/branding/app-logo-dark.svg` | Dark-mode UI, dark backgrounds | Light backgrounds, print |
 ```
 
 ### If `docs/assets.md` does not exist:
@@ -208,7 +208,7 @@ Search the codebase for references to the original source logo filename (and com
 
 ```bash
 # Example: searching for the original filename stem
-grep -r "homeradar-logo" . --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+grep -r "app-logo" . --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
   --include="*.json" --include="*.html" --include="*.css" --include="*.md" -l
 ```
 
