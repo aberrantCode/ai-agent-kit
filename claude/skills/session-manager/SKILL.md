@@ -109,3 +109,7 @@ and are removed together with the deprecated `session-handoff` alias bundle.
 - **Handoff vs dispatch.** `handoff` writes the prompt; `dispatch` launches a prompt file — any
   prompt file, including one a human wrote.
 - If a request is genuinely ambiguous between two stages, ask — don't guess.
+
+## Diagram
+
+[View diagram](diagram.html)
