@@ -120,7 +120,7 @@ project/
 │   │   ├── active.md          # Current sprint/focus
 │   │   ├── backlog.md         # Future work
 │   │   └── completed.md       # Done items (for reference)
-│   ├── session/               # Session state (see session-management.md)
+│   ├── session/               # Session state (`_project_specs/session/` checkpoint convention)
 │   │   ├── current-state.md   # Live session state
 │   │   ├── decisions.md       # Key decisions log
 │   │   ├── code-landmarks.md  # Important code locations
@@ -461,7 +461,7 @@ This catches issues before they hit CI, saving time and keeping the main branch 
 
 ## Session Management (Non-Negotiable)
 
-Maintain context for resumability. See `session-management.md` for full details.
+Maintain context for resumability. Keep `_project_specs/session/` (current-state.md, decisions.md, code-landmarks.md, archive/) updated at natural breakpoints; the Claude `session-manager` bundle's checkpoint sub-skill (Claude only) documents the full protocol.
 
 ### Core Rule: Checkpoint at Natural Breakpoints
 

@@ -362,14 +362,14 @@ mkdir -p scripts
 cp -r ~/.claude/skills/base/ .claude/skills/
 cp -r ~/.claude/skills/security/ .claude/skills/
 cp -r ~/.claude/skills/project-tooling/ .claude/skills/
-cp -r ~/.claude/skills/session-management/ .claude/skills/
+cp -r ~/.claude/skills/session-manager/ .claude/skills/
 ```
 
 **Always copy (overwrite with latest):**
 - `base/` → `.claude/skills/base/`
 - `security/` → `.claude/skills/security/`
 - `project-tooling/` → `.claude/skills/project-tooling/`
-- `session-management/` → `.claude/skills/session-management/`
+- `session-manager/` → `.claude/skills/session-manager/` (checkpoint sub-skill owns the `_project_specs/session/` layout)
 
 **For existing codebases (detected in Phase 1b):**
 - `existing-repo/` → `.claude/skills/existing-repo/` - Structure preservation, guardrails setup
@@ -583,7 +583,7 @@ Read and follow these skills before writing any code:
 - .claude/skills/base/SKILL.md
 - .claude/skills/security/SKILL.md
 - .claude/skills/project-tooling/SKILL.md
-- .claude/skills/session-management/SKILL.md
+- .claude/skills/session-manager/sub-skills/checkpoint/SKILL.md
 - .claude/skills/[language]/SKILL.md
 - .claude/skills/[framework]/SKILL.md (if applicable)
 - .claude/skills/llm-patterns/SKILL.md (if AI-first)
@@ -745,7 +745,7 @@ Done items for reference. Move here from active.md when complete.
 **_project_specs/session/current-state.md** (if missing):
 ```markdown
 <!--
-CHECKPOINT RULES (from session-management.md):
+CHECKPOINT RULES (from session-manager checkpoint sub-skill):
 - Quick update: After any todo completion
 - Full checkpoint: After ~20 tool calls or decisions
 - Archive: End of session or major feature complete

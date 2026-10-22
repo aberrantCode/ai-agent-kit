@@ -771,7 +771,7 @@ For each module in workspace:
 4. Don't duplicate - reference existing-repo output
 ```
 
-### With session-management.md
+### With session-manager checkpoint (session state)
 
 ```markdown
 ## Session State Integration
