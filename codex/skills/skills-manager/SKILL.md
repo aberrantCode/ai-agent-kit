@@ -481,7 +481,7 @@ Push a skill bundle from the archive to the global user profile (`~/.codex/`) so
 | Other projects | `codex/skills/*/SKILL.md` | Codex | `codex/skills/<name>/SKILL.md` |
 | Other projects | `gemini/skills/*/SKILL.md` | Gemini | `gemini/skills/<name>/SKILL.md` |
 
-**Nested paths**: The skill `<name>` is always the leaf directory containing `SKILL.md`. Intermediate path segments (e.g. `homeradar/` in `skills/homeradar/feature-start/SKILL.md`) are discarded.
+**Nested paths**: The skill `<name>` is always the leaf directory containing `SKILL.md`. Intermediate path segments (e.g. `team/` in `skills/team/my-skill/SKILL.md`) are discarded.
 
 **Installed-copy filter**: Apply before any classification. Skip any file with `installed-from: ai-agent-kit` in frontmatter.
 

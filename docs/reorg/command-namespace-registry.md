@@ -85,11 +85,11 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | `/backfill-diagrams` | skills-manager | skills-manager | **retired** into skill-parity-guard fix mode (iter 4) |
 | `/find-logo` `/generate-logo` `/reskin-logo` `/archive-logo` | ac-logo | design-manager `logo-pipeline` | move with bundle absorption, **names unchanged** (iter 21); `/reskin-logo` gains logo-restylizer's variant engine |
 | `/what-next` `/what-next-update` | what-next | project-manager | move into bundle unchanged (iter 9) |
-| `/fix-start` | fix-start | quality-manager | moves with generalization (iter 15) |
-| `/feature-start` | feature-start | — | **cut**: merges into `/add-feature` (iter 9) |
-| `/pre-pr` | pre-pr | — | **cut**: generic gates fold into github `ship` (iter 2) |
-| `/retro-fit-spec` | retro-fit-spec | — | **cut**: absorbed by project-manager `backfill-features` → `/backfill-features` (iter 9) |
-| `/spec-align` | spec-align | — | **cut**: absorbed by `backfill-features` gap-analysis mode (iter 9) |
+| `/fix-start` | fix-start | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/feature-start` | feature-start | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/pre-pr` | pre-pr | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/retro-fit-spec` | retro-fit-spec | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/spec-align` | spec-align | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
 | `/recreate-files` | youtube-extraction | youtube-extraction | unchanged |
 | `/add-remote-installer` | add-remote-installer (skill) | utilities-manager | skill demoted to bundle command (iter 25) |
 | `/handoff` `/dispatch-session-prompt` `/hand-off-audit` | session-manager | session-manager | **moved 2026-10-21 to `session-manager`** (see the Session-Manager table below; `session-handoff` survives one release as a deprecated router alias with no commands). History: **retired + merged** (2026-08-03) — `continue-new-session-prompt` and `compliance-audit` (the latter never previously archived) merged into one umbrella bundle `session-handoff`, addressed via the harness's `parent:child` sub-skill naming: `session-handoff:handoff` (was `continue-new-session-prompt`, owns `/handoff`, `/dispatch-session-prompt`) and `session-handoff:audit` (was `compliance-audit`, still owns `/hand-off-audit`). Both predecessor skills retired from the global profile the same day; see [PR #148](https://github.com/aberrantCode/ai-agent-kit/pull/148). **Command renamed 2026-08-04**: `/continue-new-session-prompt` → `/handoff` (the slash-command file itself was never renamed in the earlier merge, only the skill invocation, so `/handoff` was unrecognized until this rename). **`/repo-color` extracted 2026-08-05** to the new `spawn-terminal` bundle (row below), together with the tab-color scripts and the generic terminal-launch core `handoff` now delegates to. |
