@@ -85,7 +85,7 @@ for the full trust model and lower-trust alternatives.
 Every new user profile should get the standard setup without the interactive picker.
 [`scripts/bootstrap-profile.ps1`](scripts/bootstrap-profile.ps1) does it in one pass:
 
-- **Skills** — `base`, `github`, `project-manager`, `skills-manager`, `statusline` (the
+- **Skills** — `base`, `github`, `project-manager`, `session-manager`, `skills-manager`, `statusline` (the
   `standard_skills` list in [`manifest.json`](manifest.json)) plus any `requires:`
   dependencies, each deployed through `push-to-profile.ps1`.
 - **Status line** — `~/.claude/statusline.sh`, wired into `~/.claude/settings.json`. A status

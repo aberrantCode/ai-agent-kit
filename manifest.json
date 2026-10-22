@@ -5,6 +5,7 @@
     "base",
     "github",
     "project-manager",
+    "session-manager",
     "skills-manager",
     "statusline"
   ],
