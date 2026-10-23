@@ -1,0 +1,138 @@
+{
+  "group": "project-manager",
+  "commands_scanned": ["continue-tasks", "init-features", "init-project"],
+  "opportunities": [
+    {
+      "command": "continue-tasks",
+      "id": "ct-1",
+      "title": "Skill(tool, args) invocation never expands the sub-skill body, causing total protocol bypass",
+      "category": "definition-drift",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 1a48e018: \"The skill body wasn't expanded into my context — only the launch marker.\"",
+      "detail": "When continue-tasks was invoked via the Skill tool with an `args` payload (`Skill(skill: \"continue-tasks\", args: \"...\")`) rather than via the command-wrapper path (`Skill(project-manager)` then Read the sub-skill file), only the 'Launching skill: continue-tasks' marker landed in context — the actual SKILL.md body never did. For the rest of that ~2-hour, multi-task session the assistant improvised entirely from memory of 'the project-manager workflow I've established in this repo': it never checked docs/features/*, docs/plans/*, never built the depends_on graph, never ran pm-validate.ps1/pm-next.ps1, and never spawned a single Agent/Task worker (grep confirms zero Agent/Task tool_use calls across the whole session) despite Step 8 mandating exactly that. Completion blocks were hand-edited with Edit instead of being produced by a spawned worker.",
+      "proposed_change": "Have the continue-tasks command wrapper (and/or the Skill tool's args path) fail closed or self-check when the sub-skill body isn't actually present in context — e.g., require the first action to be a Read of sub-skills/continue-tasks/SKILL.md before any other tool use, not an optional convenience."
+    },
+    {
+      "command": "continue-tasks",
+      "id": "ct-2",
+      "title": "Completion sentinel values drift from the strict success|failure|blocked enum (\"Status: done\") and the gate has no normalization step",
+      "category": "missing-guardrail",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 804e3c5e: \"completion-sentinel drift: three completed tasks used `Status: done` instead of the protocol's strict `success|failure|blocked` token\"",
+      "detail": "Step 4/Step 5 of continue-tasks/SKILL.md treat a completion block as parseable only when Status is exactly success, failure, or blocked. Real task files drifted to an informal `Status: done` (presumably written by a human or an agent not following the sub-skill verbatim). A strict reconciliation pass would read these as malformed/stale and never archive them, even though the work is genuinely finished.",
+      "proposed_change": "Add an explicit normalization rule to Step 4: treat `Status: done` (and similarly-intentioned synonyms) as `success` with a logged normalization note, rather than only recognizing the exact three tokens."
+    },
+    {
+      "command": "continue-tasks",
+      "id": "ct-3",
+      "title": "No defined handling for out-of-band \"operational\" tasks that accumulate outside the plan pipeline",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 804e3c5e: AskUserQuestion \"No plan work remains (all 6 features implemented). Of the active operational tasks, which should I advance this run?\"",
+      "detail": "Step 6 (Select the Next Task) only scans approved plans for todo tasks. It has no rule for task files tagged `agent: \"user-authorized\"` / `\"user-directed (Claude, main session)\"` that live in docs/tasks/active/ without a plan/feature behind them. 8 such files had accumulated by the time this session ran, and the orchestrator had to invent an ad hoc AskUserQuestion flow to decide what to do with them instead of following a documented rule.",
+      "proposed_change": "Add a Step 6 sub-rule for non-plan-linked ('operational') active tasks: how they're prioritized relative to plan-driven todo tasks, and when they count toward 'no eligible work remains'."
+    },
+    {
+      "command": "continue-tasks",
+      "id": "ct-4",
+      "title": "Stale lock files from completed plans accumulate with no release step",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 804e3c5e: \"Now prune the 18 dead locks (all belong to the long-completed `catalog-index-dedup` / `gap-analysis-reporting` plans; no active task holds a lock)\"",
+      "detail": "SKILL.md Step 7 creates docs/tasks/locks/{task-id}.lock.md when a task is written, but no step in the reconciliation rules (Step 5) or elsewhere instructs releasing/deleting the lock when the task is archived — especially when archiving happens via a path other than the exact documented flow (e.g., git mv during a manual cleanup). 18 dead locks had to be manually discovered and pruned in one session.",
+      "proposed_change": "Add an explicit 'release docs/tasks/locks/{task-id}.lock.md' sub-step to each of the Step 5 reconciliation branches (success/failure/blocked) and to any manual-archive path."
+    },
+    {
+      "command": "continue-tasks",
+      "id": "ct-5",
+      "title": "docs/STATUS.md regeneration claim doesn't hold up across ad hoc sessions",
+      "category": "definition-drift",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 804e3c5e: STATUS.md \"last updated 2026-08-04\" claimed 1 active task while 12 had accumulated; SKILL.md: \"`/continue-tasks` and `/update-tasks` regenerate it automatically\"",
+      "detail": "project-manager/SKILL.md states STATUS.md's generated sections are kept current automatically by continue-tasks/update-tasks. In practice, ~2 months of real work happened via ad hoc sessions that never invoked the formal loop (see ct-1), so STATUS.md silently went stale rather than being caught/flagged.",
+      "proposed_change": "Have continue-tasks' Step 0 gate compare STATUS.md's last_updated/generated timestamp against the newest mtime under docs/tasks/ and docs/plans/, and surface a staleness warning before proceeding rather than relying on the regeneration habit alone."
+    },
+    {
+      "command": "continue-tasks",
+      "id": "ct-6",
+      "title": "PR CI-check polling is hand-rolled fresh each time, with an early-match false-positive",
+      "category": "avoidable-tool-calls",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 1a48e018: \"poll 1: IN_PROGRESS:,COMPLETED:SUCCESS\\nGREEN\" then \"One check is still in progress — I matched too early\"",
+      "detail": "Across the session, the orchestrator wrote three separate ad hoc bash polling loops for `gh pr view --json statusCheckRollup` with slightly different matching logic each time; one matched a partial rollup string as 'GREEN' while a check was still IN_PROGRESS, requiring an immediate retry with corrected logic. SKILL.md doesn't supply a canonical polling snippet.",
+      "proposed_change": "Provide one canonical, tested PR-CI-polling snippet (correct all-checks-complete matching) in continue-tasks/SKILL.md or a references/scripts helper, instead of leaving the orchestrator to re-derive it per run."
+    },
+    {
+      "command": "init-features",
+      "id": "if-1",
+      "title": "Step 3 approval question has no \"adversarial review first\" option, forcing an off-menu answer",
+      "category": "preempt-followup",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 6216f16f: user answered the approval AskUserQuestion with \"give me an adversarial prompt I can use in codex to have it review the feature specs looking for inconsistenc[ies]\"",
+      "detail": "init-features/SKILL.md Step 3 offers only an approve/leave-draft decision per spec. The real user's actual response to that exact question wasn't one of the offered options at all — it asked for an external adversarial-consistency review pass before approving anything, a need the step doesn't anticipate.",
+      "proposed_change": "Add an explicit option to the Step 3 approval AskUserQuestion: \"Generate an adversarial review prompt (e.g. for Codex) and hold all specs at draft until reviewed.\""
+    },
+    {
+      "command": "init-features",
+      "id": "if-2",
+      "title": "Specs embed point-in-time factual counts with no freshness marker",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 6216f16f: \"the ground truth advanced to 2026-09-29 since I wrote the specs against the 2026-09-28 snapshot: the registry is now 97 artifacts... (not 78...)\"",
+      "detail": "Capabilities/acceptance-criteria text in the generated specs copied in live counts (artifact counts, source-ingestion status) from an external ground-truth file. Those counts were already stale by the next day because the external file kept moving. init-features/SKILL.md Step 2 doesn't instruct marking such numbers with an 'as of <date>' qualifier or pointing at the live source instead of copying a snapshot.",
+      "proposed_change": "Instruct Step 2 to tag any copied live metric with 'as of {{TODAY}}' or to reference the source file by path instead of inlining a point-in-time count."
+    },
+    {
+      "command": "init-features",
+      "id": "if-3",
+      "title": "Only one 'next step' is suggested (/continue-tasks); real usage branches into multi-session handoff chains immediately",
+      "category": "definition-drift",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "init-features/SKILL.md Step 3: \"Next: tell the user to run `/continue-tasks` to begin plan generation.\" vs. session 6216f16f turn 123: user instead asked to \"Use the handoff command to have another agent drive these feature specs through to completion\"",
+      "detail": "Observed once, so marked [?] rather than [V] as a pattern, but the single data point shows the user skipping /continue-tasks entirely in favor of a session-handoff chain right after init-features finished — a path the sub-skill's 'Next' guidance doesn't mention or integrate with.",
+      "proposed_change": "Mention session-handoff chaining as an alternative next step for large/complex feature sets, alongside the /continue-tasks recommendation."
+    },
+    {
+      "command": "init-project",
+      "id": "ip-1",
+      "title": "PRD-seed options don't include an interactive-interview choice, which is what real usage asked for immediately after init",
+      "category": "preempt-followup",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "init-project/SKILL.md Phase 0 step 5 options: (a) paste now, (b) stub, (c) skip; session 6216f16f turn 84: \"You do it by interviewing me to extract the requirements, starting with the direction that this repo holds...\"",
+      "detail": "Right after init-project finished (stub REQUIREMENTS.md written), the user directed the assistant, in plain text outside any offered option, to run a full interactive interview to populate REQUIREMENTS.md. The assistant improvised this (effectively borrowing init-features' interview pattern) because none of Phase 0's three PRD-seed options cover 'interview me now.'",
+      "proposed_change": "Add a fourth Phase 0 PRD-seed option: \"Interview me now to build docs/REQUIREMENTS.md\" that runs an interview before scaffolding finishes, rather than always deferring to a stub."
+    },
+    {
+      "command": "init-project",
+      "id": "ip-2",
+      "title": "File-inventory verification via `git add -A | wc -l` has a mutating side effect requiring cleanup",
+      "category": "avoidable-tool-calls",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 6216f16f: \"I inadvertently staged files just to count them — let me unstage to leave a clean, predictable index.\"",
+      "detail": "Phase 4 (Reporting) gives no non-mutating method to confirm the full scaffold was created. The agent used `git add -A; git status --short | wc -l` to count created files, which staged the entire new tree, then had to run `git reset` to undo it — an avoidable extra round trip caused by the SKILL.md not specifying a read-only inventory check.",
+      "proposed_change": "Specify a non-mutating inventory check in Phase 4 (e.g. `git status --porcelain` without `git add`, or a plain `find`/`ls` diff against the discovery list) instead of leaving the verification method to improvisation."
+    },
+    {
+      "command": "init-project",
+      "id": "ip-3",
+      "title": "Default scope-manifest.md template is web-app-shaped and inert on non-web-app repos, with no detection/customization step",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 6216f16f: \"The default scope-manifest ships with web-app globs (`src/**`, `api/**`, `components/**`) — none of which exist in this repo. Your actual product surface is `pandera/`...\"",
+      "detail": "init-project/SKILL.md Phase 1 says to copy scope-manifest.md.template VERBATIM with no repo-shape detection, even though the file is a hard prerequisite for the chore-lane guard (per SKILL.md's Spec Authority Rule section) and a wrong manifest silently renders the guard either always-inert or always-blocking. The agent had to improvise an unspecified side-step (copy to `.review.md`, open in VSCode, flag to the user) to surface the mismatch.",
+      "proposed_change": "Add a repo-shape detection sub-step to Phase 1 for scope-manifest.md: infer the actual top-level product directories (from Phase 0's directory scan) and propose them as product_scope candidates via AskUserQuestion instead of copying fixed web-app globs verbatim."
+    }
+  ]
+}

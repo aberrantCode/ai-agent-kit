@@ -1,0 +1,149 @@
+{
+  "group": "github",
+  "commands_scanned": ["ship", "prune", "release", "repo-status"],
+  "opportunities": [
+    {
+      "command": "ship",
+      "id": "ship-1",
+      "title": "gh repo view --json autoMergeAllowed is an invalid field — fails every time",
+      "category": "definition-drift",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 22a4e3db + repo-status->merge in 0f868571: \"Unknown JSON field: \\\"autoMergeAllowed\\\"\"",
+      "detail": "ship/SKILL.md Step 6.5 and merge/SKILL.md both tell the agent to check `gh repo view --json autoMergeAllowed -q .autoMergeAllowed` to decide whether to pass `--auto` on a blocked merge. In two independent repos (win_profiles, taxes) this command fails outright with \"Unknown JSON field\" — the field does not exist in the installed gh CLI's schema. The failure is silently absorbed (AUTO stays unset) so it hasn't broken a ship yet, but the auto-merge branch of Step 6.5 can never actually trigger.",
+      "proposed_change": "Replace the field name with one gh actually exposes (verify against `gh repo view --json --help` or use `gh api repos/{owner}/{repo} --jq .allow_auto_merge`), and re-verify the fix against a live repo before shipping."
+    },
+    {
+      "command": "ship",
+      "id": "ship-2",
+      "title": "No documented recovery path when a repo's own pre-commit guard blocks the commit",
+      "category": "missing-guardrail",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 5df20d93: \"commit is blocked by the project-manager pre-commit guard\"",
+      "detail": "ship/SKILL.md Step 5 assumes `git commit -m \"$MSG\"` just works. In the tax-research repo it was rejected by the project's own `guard-pm-flow.ps1` pre-commit hook (requires an active task file), forcing an improvised AskUserQuestion and a `PM_GUARD_BYPASS=1` bypass that the skill never mentions. `release/SKILL.md` already documents an analogous pattern (`ALLOW_PRIMARY_COMMIT=1`) for its own blocked-commit case, but ship has no equivalent.",
+      "proposed_change": "Add an Error-Recovery row for \"commit blocked by a repo-owned pre-commit hook\": detect the hook's documented bypass env var (or ask), and never suggest --no-verify."
+    },
+    {
+      "command": "ship",
+      "id": "ship-3",
+      "title": "Test-gate worktrees are invented ad hoc in two different non-canonical locations",
+      "category": "definition-drift",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session d313ed1a: \"already used by worktree at '.../.claude/worktrees/...\"",
+      "detail": "ship/SKILL.md has no step for creating an isolated worktree to run the test gate when the primary checkout is dirty or entangled. Faced with that need, the agent improvised two different locations across sessions — `<repo>-wt/.worktrees/<name>` (d313ed1a) and an existing `.claude/worktrees/<name>` from a prior ad hoc choice — which collided (\"fatal: ... already used by worktree\") and sit outside the parent skill's declared canonical location (in-repo `.worktrees/<task>`, owned by `worktree-task-lifecycle`).",
+      "proposed_change": "Ship's test-gate step should explicitly create/reuse its scratch worktree via `worktree-task-lifecycle` at the canonical `.worktrees/` path instead of leaving the location to agent improvisation."
+    },
+    {
+      "command": "ship",
+      "id": "ship-4",
+      "title": "Windows build-server file lock strands the post-merge local dev sync (compiled repos)",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session b48d9415: \"unable to unlink old 'PaperlessWinClient.csproj': Invalid argument\"",
+      "detail": "After merging PR #37 in paperless-win-client, gh's post-merge fast-forward of local dev failed because a lingering MSBuild/VBCSCompiler server still held a lock on a tracked .csproj file from the earlier build-verify step. Recovery (shutting down dotnet build-server + taskkill on VBCSCompiler.exe/MSBuild.exe, then git reset --hard) was improvised; the skill's only documented Windows-lock mitigation is the worktree-directory footgun, not a locked tracked file during Step 7.",
+      "proposed_change": "For repos with a detected build step (dotnet/msbuild), add a Step 7 pre-check that shuts down lingering compiler/build servers before the post-merge pull/fast-forward."
+    },
+    {
+      "command": "ship",
+      "id": "ship-5",
+      "title": "ToolSearch(select:AskUserQuestion) round-trip fires on nearly every ship invocation",
+      "category": "avoidable-tool-calls",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "sessions 22a4e3db, 5df20d93, d313ed1a: `{\"query\": \"select:AskUserQuestion\"}`",
+      "detail": "In at least 3 of 8 observed ship sessions, the agent spends an extra tool-call round-trip loading the AskUserQuestion schema via ToolSearch immediately before its first AskUserQuestion call. Ship's own Step 1 table makes AskUserQuestion likely on almost every non-trivial invocation (staging scope, naming, conflicts), so this lookup is close to guaranteed overhead on most runs.",
+      "proposed_change": "Have ship's SKILL.md instruct an eager ToolSearch(select:AskUserQuestion) at skill-load time (or note that the harness should keep it warm for github-skill operations) rather than deferring it to the point of need each run."
+    },
+    {
+      "command": "ship",
+      "id": "ship-6",
+      "title": "No check for a concurrent session mutating the primary checkout mid-ship",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session d313ed1a: \"Stop — the working tree changed under me\"",
+      "detail": "Mid-ship, a different concurrent session committed 63 files and switched branches in the same primary checkout out from under the running ship operation, triggering an extended, costly recovery investigation before standing down. Ship's Error-Recovery table only covers a concurrent session pruning a *worktree* (Step 7), not one mutating the *primary checkout* ship is actively staging/committing in.",
+      "proposed_change": "Add a cheap HEAD/branch re-check immediately before Step 5's commit/push (compare against the Step 0b snapshot) so drift is caught at the point of use, not discovered later."
+    },
+    {
+      "command": "ship",
+      "id": "ship-7",
+      "title": "Same excluded scratch paths re-flagged on every ship run instead of being gitignored",
+      "category": "preempt-followup",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "sessions b48d9415 (x2), e3b744b3: \"ref_screenshot.png ... still untracked\"",
+      "detail": "Across repeated ship runs in the same repos, the same scratch paths (`ref_screenshot.png`, `docs/PROMPTS/*.md`, `.playwright-cli/`) are excluded from staging and listed again in the follow-up table every single time, with no mechanism to stop the recurrence.",
+      "proposed_change": "When a path is excluded by name on 2+ consecutive ship runs in the same repo, propose adding it to .gitignore in the follow-up table instead of just re-listing it."
+    },
+    {
+      "command": "prune",
+      "id": "prune-1",
+      "title": "Orphan-worktree-directory detection has no concrete snippet, so enumeration is improvised each run",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "prune/SKILL.md Step 3: \"Orphaned worktree directories ... A directory under ... .worktrees/\"",
+      "detail": "Step 3's orphan-directory paragraph is prose only — no script to diff `ls .worktrees/` against `git worktree list`. In session 39dc8450 the agent hand-typed a loop over 6 directory names it had already discovered by other means; a differently-shaped repo would require redoing that derivation from scratch each time.",
+      "proposed_change": "Add a one-line snippet that diffs `ls .worktrees/` against `git worktree list --porcelain` to enumerate orphans programmatically."
+    },
+    {
+      "command": "prune",
+      "id": "prune-2",
+      "title": "Prune's follow-up table sometimes carries findings outside its own scope",
+      "category": "unclear-output",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session 39dc8450: \"3 untracked files (leftover homeradar/, 2 PROMPTS docs)\"",
+      "detail": "Prune is scoped to worktrees/branches, but its closing follow-up table in one session also flagged unrelated untracked working-tree files. Harmless and arguably helpful, but it blurs prune's stated single-purpose scope versus inspect's broader reporting role.",
+      "proposed_change": "Keep prune's follow-up table strictly to worktree/branch items; let /repo-status own untracked-file findings."
+    },
+    {
+      "command": "release",
+      "id": "release-1",
+      "title": "PR-only-main detection relies on a fragile textual grep over CLAUDE.md/AGENTS.md wording",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "release/SKILL.md Step 5: grep -riE \"release PR|only .*(via|through) .*PR|push.*main.*forbidden\"",
+      "detail": "Step 5's only sub-signal besides live GitHub branch protection is a regex scan of project docs for specific phrasing. A repo whose policy is worded differently (or lives in a file this grep doesn't check) would fail this sub-signal silently, relying entirely on the other two signals to still catch the PR-only requirement. The single observed release episode (b48d9415) never reached Step 5, so this risk is unverified in execution — the citation is from the definition text itself.",
+      "proposed_change": "Treat live branch-protection/ruleset API state as authoritative and drop (or clearly demote) the textual-doc grep sub-signal, since it can only add false confidence, never correct a wrong one."
+    },
+    {
+      "command": "release",
+      "id": "release-2",
+      "title": "Only observed release invocation ends at the version-confirmation question with no visible resolution",
+      "category": "unclear-output",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session b48d9415: transcript ends immediately after the version AskUserQuestion",
+      "detail": "The one real-usage release session in scope stops at Step 3's AskUserQuestion (choosing v1.1.0) with no further records in that transcript — Steps 4 through 8 (stamping, tagging, changelog, GitHub Release, dev sync) were never observed executing. This may simply be session continuation elsewhere, but it means release's heavily-branched Step 4b/6/6b logic has no confirmed successful run in the sampled data.",
+      "proposed_change": "No command change implied by this alone — flagged so a future audit knows release's post-version-choice path is still execution-unverified in this sample; re-check against a session where release completed."
+    },
+    {
+      "command": "repo-status",
+      "id": "repo-status-1",
+      "title": "Closing AskUserQuestion offer to launch /ship was rejected when dev's dirty state was mixed with scratch files",
+      "category": "confusing-recommendation",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session 1a620a5f: user rejected the /ship launch offer",
+      "detail": "After reporting uncommitted work directly on protected `dev` (real code changes mixed with scratch docs/screenshot), inspect's closing AskUserQuestion offered to launch /ship immediately; the user rejected it. Single data point, but suggests the auto-offer may be premature when the dirty set visibly mixes real and non-real-work files that need triage first.",
+      "proposed_change": "DEFER TO feat/repo-status-usage-analysis for depth — note only: consider softening the auto-offer when the dirty set contains an obvious non-code/scratch mix."
+    },
+    {
+      "command": "repo-status",
+      "id": "repo-status-2",
+      "title": "No other friction found in the sampled repo-status runs",
+      "category": "unclear-output",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "sessions 0f868571, dd59140a: clean reports, correct recommendations, no errors",
+      "detail": "Both other sampled repo-status runs produced accurate, correctly-prioritized recommendations (merge-over-prune-over-release) and triggered the right next command with no repeated calls or confusion.",
+      "proposed_change": "DEFER TO feat/repo-status-usage-analysis for depth — no action proposed here; recorded only to avoid implying hidden problems beyond repo-status-1."
+    }
+  ]
+}
