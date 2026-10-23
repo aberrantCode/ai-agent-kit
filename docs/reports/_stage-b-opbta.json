@@ -1,0 +1,138 @@
+{
+  "group": "opbta-service",
+  "commands_scanned": ["update-service", "opbta-update"],
+  "opportunities": [
+    {
+      "command": "update-service",
+      "id": "upd-1",
+      "title": "Second plan-gate question fires on a safety blocker not covered by any documented STOP condition",
+      "category": "missing-guardrail",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session cae7b38b: \"vendored installer is fresh-install-only, can't safely build v3\" triggered a 2nd AskUserQuestion",
+      "detail": "routing.md's autonomy contract promises exactly ONE plan-gate approval, then autonomous to PR, with 5 enumerated STOP conditions. Discovering mid-worktree that the update mechanism itself is unsafe for an irreplaceable LXC service isn't one of the 5, so the session had to invent a second ad hoc gate — the safe call, but unsanctioned by the doc, so it reads as a contract violation rather than a known exit path.",
+      "proposed_change": "Add a 6th sanctioned STOP condition to routing.md: 'update mechanism cannot be verified safe for in-place bump' — re-present the gate instead of treating a second AskUserQuestion as drift."
+    },
+    {
+      "command": "update-service",
+      "id": "upd-2",
+      "title": "Stale/missing reference docs on the installed skill cause repeated failed Read calls",
+      "category": "definition-drift",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 5d231e21: \"File does not exist\" x4 on bridge.md/routing.md/lifecycle-map.md before ls fallback",
+      "detail": "SKILL.md's Quick Reference table cites references/bridge.md, routing.md, lifecycle-map.md, manifest-schema.md, service-picker.md. The archive copy of this repo has all five, but at least one installed/global copy the sessions actually ran against was missing references/ at session time, costing 3-4 wasted Read attempts per occurrence before an ls fallback found the real path.",
+      "proposed_change": "Ensure the skill-sync path (push-to-profile.ps1 / update-skill) keeps references/ in lockstep with SKILL.md, or have the dispatcher ls the references/ dir once up front instead of blind-Reading each named file."
+    },
+    {
+      "command": "update-service",
+      "id": "upd-3",
+      "title": "\"Three-perspective\" smoke test is only two perspectives in at least one real deploy script",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 5d231e21: deploy script polls P1 (workstation) + P3 (Traefik) only, no P2/DoH leg wired",
+      "detail": "bridge.md unconditionally describes the smoke test as a three-perspective probe (workstation DNS / public DoH / direct-to-Traefik) and calls it \"the only acceptance signal.\" The homarr deploy script in this session structurally has no DoH leg at all — the probe silently ran at 2-of-3 with no flag raised, so a session can't tell the difference between \"P2 intentionally N/A\" and \"P2 just isn't wired.\"",
+      "proposed_change": "Either wire the missing DoH leg into affected deploy scripts, or require bridge.md's acceptance signal to explicitly report which of the 3 legs ran and why any leg was skipped."
+    },
+    {
+      "command": "update-service",
+      "id": "upd-4",
+      "title": "GHCR tags/list pagination returned a stale 'latest' version before self-correcting",
+      "category": "confusing-recommendation",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session 5d231e21: GHCR latest reported v1.32.0, real latest was v1.77.2 via Releases",
+      "detail": "The session caught the discrepancy itself and pivoted to GitHub Releases as the authoritative source before the plan gate, so no bad plan was presented to the operator — but relying on the registry tag list first is a known-unreliable path for version resolution.",
+      "proposed_change": "Make GitHub Releases (not GHCR tags/list) the primary version source for the update-service version-delta check, falling back to registry tags only when no Releases API exists."
+    },
+    {
+      "command": "update-service",
+      "id": "upd-5",
+      "title": "grep-wrapped exit-code check produced an ambiguous 'failed: rc=0' requiring a rerun",
+      "category": "avoidable-tool-calls",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 5d231e21: \"failed: rc=0\" ambiguity, rerun clean to resolve",
+      "detail": "Self-corrected within one extra turn, but piping a command through grep for a status check masks the real exit code and cost an avoidable retry.",
+      "proposed_change": "Check the underlying command's exit code directly in apply-pattern helper scripts instead of through a grep pipe that can report rc=0 for an unrelated reason."
+    },
+    {
+      "command": "update-service",
+      "id": "upd-6",
+      "title": "Breadcrumb lookup still runs after an explicit slug has already resolved the target",
+      "category": "avoidable-tool-calls",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session be10d3e2: breadcrumb check run after explicit slug \"taxes\" already given",
+      "detail": "Harmless — the explicit arg still won — but routing.md's resolution order says tier 1 (explicit arg) should short-circuit tiers 2-3, not run them anyway.",
+      "proposed_change": "Skip the breadcrumb/picker lookup entirely once an explicit slug arg is present, per the documented resolution order."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-1",
+      "title": "Bare invocation with no arg/breadcrumb resolved its target from conversational memory, not the documented 3-tier order",
+      "category": "missing-guardrail",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 9f35dd14: target injected from \"its own prior-turn summary\" rather than explicit arg/picker",
+      "detail": "routing.md enumerates exactly 3 resolution tiers for a mutating op: explicit arg, breadcrumb, picker. This session had neither, yet proceeded on a slug+action silently inferred from earlier conversation instead of invoking the AskUserQuestion picker required when both named tiers are absent — a 4th, undocumented resolution source for a destructive-capable op.",
+      "proposed_change": "Require the service picker (AskUserQuestion) on any bare invocation with no explicit arg and no breadcrumb, even when a recent turn implies a target — the operator must confirm, not have it inferred silently."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-2",
+      "title": "Same stale-reference-docs failure as update-service, confirming it's systemic",
+      "category": "definition-drift",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 9eb6fc97: failed Read calls on bridge.md/lifecycle-map.md/routing.md before ls fallback",
+      "detail": "Identical root cause to upd-2, reproduced under the opbta-update alias in a separate session — rules out a one-off fluke and confirms a sync-timing gap between SKILL.md's Quick Reference promises and the installed references/ directory.",
+      "proposed_change": "Same fix as upd-2 — one fix at the sync/dispatcher level resolves both commands since they share the underlying skill."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-3",
+      "title": "Public-DoH smoke-test leg skipped for an internal-only FQDN with no documented carve-out",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 9f35dd14: \"internal-only FQDN, no public DNS record by design\" given as reason to skip P2",
+      "detail": "This session reasoned about the skip transparently in its own output, which is good practice, but bridge.md still states the probe as an unconditional three-leg check with no exception for internal-only services — a future session has no documented basis to skip P2 and could either skip it silently or block on it unnecessarily.",
+      "proposed_change": "Codify an explicit internal-only-FQDN carve-out for the P2/DoH leg in bridge.md so this reasoning is contract-sanctioned rather than ad hoc per session."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-4",
+      "title": "Mis-scoped grep matched ~66KB of unrelated docker-inspect output instead of deploy-log markers",
+      "category": "avoidable-tool-calls",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 9f35dd14: grep matched docker inspect JSON (~66KB) instead of deploy-log markers",
+      "detail": "Self-corrected in the next turn, but a tighter log-path/pattern scope would avoid the token-heavy miss entirely.",
+      "proposed_change": "Scope deploy-log greps to the specific log file/line-prefix pattern rather than a broad match that can also catch docker inspect JSON."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-5",
+      "title": "Clean fallback clone placed outside the repo's worktree-isolation convention",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session 9f35dd14: clone built as a sibling of C:\\development\\, not under .worktrees/",
+      "detail": "Transient and cleaned up afterward (low impact), but bridge.md's dirty-checkout fallback (build a clean tag-pinned clone) doesn't specify where that clone should live, and this session put it beside C:\\development\\ instead of under the repo's own .worktrees/.",
+      "proposed_change": "Have bridge.md's dirty-checkout fallback explicitly require the clean clone to land under the repo's own .worktrees/ (or a scratch subdir there), not a sibling of the development root."
+    },
+    {
+      "command": "opbta-update",
+      "id": "opb-6",
+      "title": "Read-only diagnostic probes SSH'd directly to the docker host, bypassing the documented double-hop",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[?]",
+      "evidence": "session 9f35dd14: two read-only probes SSH'd directly to the docker host, not via ac-devops",
+      "detail": "Low severity since these were read-only and the actual mutating apply correctly went through the double-hop via ac-devops, but bridge.md doesn't state whether read-only diagnostic SSH may bypass that pattern, leaving it to session judgment.",
+      "proposed_change": "Clarify in bridge.md / ac-opbta-ops whether read-only diagnostic probes may SSH directly to service hosts, or require the double-hop uniformly for consistency."
+    }
+  ]
+}

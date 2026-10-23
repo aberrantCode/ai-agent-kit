@@ -1,0 +1,301 @@
+{
+  "corpus": {
+    "project_dirs": 51,
+    "jsonl_files": 127,
+    "sessions_scanned": 127
+  },
+  "commands": [
+    {
+      "name": "clear",
+      "marker_count": 48,
+      "leadingslash_count": 0,
+      "union_count": 48,
+      "distinct_sessions": 48,
+      "session_ids": [
+        "0d2d98f2-f8d3-407a-b674-0778841c23c0",
+        "16ea697d-3963-4aa3-988a-0ba7b34918c5",
+        "19fc91a3-ac61-48e4-91f0-542e77ac4334",
+        "1a620a5f-7996-4239-8cc0-f2aab2294c78",
+        "200b0aa2-d1d5-4028-88d8-46efef15ad64",
+        "20a3cb5e-0056-48b9-8fef-2dbdc99533f8",
+        "2259b989-f457-46a7-bbec-639624fe21d2",
+        "22a4e3db-453e-4ed2-83f9-d2a2fcedc1f9",
+        "2474f1cc-3959-4e32-a3e4-b0975506b6fb",
+        "2ab5917c-955b-41c2-99e0-30c20debbed9",
+        "2d932e07-d59c-4f65-bd16-b32b0302204f",
+        "38ecd84b-ea5b-4304-be4b-c227d632ee33",
+        "3e4f5339-7fd8-462f-96a2-02b0dcb5d7e8",
+        "4150a02a-e5f8-4a04-bb98-a8ac889d1250",
+        "4ba607a2-885d-4607-87a1-c43f48a855e7",
+        "4c6cdf9c-eb94-479f-bea2-1737d36d1c90",
+        "55fb68d1-dd10-418b-86fc-2e17c59d974f",
+        "5df124d6-faa1-4a2e-a6e4-5141a653bf3f",
+        "5df20d93-5948-40d2-8633-50daa6ced593",
+        "669e0d9a-6a82-409a-a668-8a45311e6b26",
+        "69e597c9-8ad6-4817-9876-c1b035f3bf92",
+        "6aea4025-4e8d-4412-94b9-2cb3d9ebbfe2",
+        "6f0efe38-3462-488c-8105-d5254034c5a3",
+        "73726272-6a16-41d4-a045-359e3534461b",
+        "75217f67-ba6a-4702-bdc4-9c5e81030191"
+      ],
+      "session_ids_truncated": true,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": true,
+      "improvable": false
+    },
+    {
+      "name": "repo-status",
+      "marker_count": 10,
+      "leadingslash_count": 0,
+      "union_count": 10,
+      "distinct_sessions": 9,
+      "session_ids": [
+        "0f868571-346d-4f1f-87e9-bc89e4e0ff0f",
+        "16ea697d-3963-4aa3-988a-0ba7b34918c5",
+        "1a620a5f-7996-4239-8cc0-f2aab2294c78",
+        "39dc8450-7094-42f2-b30f-16e8da193739",
+        "4150a02a-e5f8-4a04-bb98-a8ac889d1250",
+        "9f35dd14-6b5f-47b5-af71-829f6a78cd42",
+        "b48d9415-b13b-407a-afb3-807398be4d9f",
+        "dd59140a-a653-4630-a825-0aefd1740fde",
+        "f0ae5e0a-ad63-4c1b-9354-160168e155e3"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/github/commands/repo-status.md",
+      "owning_skill": "github",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "ship",
+      "marker_count": 8,
+      "leadingslash_count": 0,
+      "union_count": 8,
+      "distinct_sessions": 8,
+      "session_ids": [
+        "22a4e3db-453e-4ed2-83f9-d2a2fcedc1f9",
+        "2ab5917c-955b-41c2-99e0-30c20debbed9",
+        "5df20d93-5948-40d2-8633-50daa6ced593",
+        "b48d9415-b13b-407a-afb3-807398be4d9f",
+        "bfb7a3cf-0d0f-460c-b3fe-8777ada12c21",
+        "d313ed1a-a89e-47dc-a244-f7e439dee757",
+        "de1b1236-0efa-4be3-8780-770c9438aa24",
+        "e3b744b3-2cb4-487f-b245-4397cf8b06b8"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/github/commands/ship.md",
+      "owning_skill": "github",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "opbta-update",
+      "marker_count": 3,
+      "leadingslash_count": 0,
+      "union_count": 3,
+      "distinct_sessions": 2,
+      "session_ids": [
+        "9eb6fc97-955a-4814-8a72-1af3a8b74205",
+        "9f35dd14-6b5f-47b5-af71-829f6a78cd42"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/commands/opbta-update.md",
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "start-app",
+      "marker_count": 3,
+      "leadingslash_count": 0,
+      "union_count": 3,
+      "distinct_sessions": 3,
+      "session_ids": [
+        "6272da95-0a26-4404-a250-32fa38422d7e",
+        "99fef80f-361b-4c38-ab1d-2a703dcc5dce",
+        "f0ae5e0a-ad63-4c1b-9354-160168e155e3"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/commands/start-app.md",
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "update-service",
+      "marker_count": 3,
+      "leadingslash_count": 0,
+      "union_count": 3,
+      "distinct_sessions": 3,
+      "session_ids": [
+        "5d231e21-3130-4960-834c-c20ff034a6ce",
+        "be10d3e2-3c77-4763-9dec-262526605784",
+        "cae7b38b-3f49-40b2-a01d-971ed3b6a0fb"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/commands/update-service.md",
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "continue-tasks",
+      "marker_count": 2,
+      "leadingslash_count": 0,
+      "union_count": 2,
+      "distinct_sessions": 2,
+      "session_ids": [
+        "1a48e018-81fd-47e3-8694-7bd9b6b2c275",
+        "804e3c5e-c571-414e-9736-530ebb4be62f"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/project-manager/commands/continue-tasks.md",
+      "owning_skill": "project-manager",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "loop",
+      "marker_count": 2,
+      "leadingslash_count": 0,
+      "union_count": 2,
+      "distinct_sessions": 2,
+      "session_ids": [
+        "255351a4-ed2a-468e-8b4d-986316838d7b",
+        "dda99fda-05a9-4c45-96b3-baf0749122d4"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "prune",
+      "marker_count": 2,
+      "leadingslash_count": 0,
+      "union_count": 2,
+      "distinct_sessions": 2,
+      "session_ids": [
+        "39dc8450-7094-42f2-b30f-16e8da193739",
+        "b48d9415-b13b-407a-afb3-807398be4d9f"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/github/commands/prune.md",
+      "owning_skill": "github",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "upgrade-host",
+      "marker_count": 2,
+      "leadingslash_count": 0,
+      "union_count": 2,
+      "distinct_sessions": 2,
+      "session_ids": [
+        "20a3cb5e-0056-48b9-8fef-2dbdc99533f8",
+        "b39ee1a2-4d41-46cd-8e04-f0b83cd288d1"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "honcho:status",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "22a4e3db-453e-4ed2-83f9-d2a2fcedc1f9"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "init",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "92a105a8-136a-4e9d-bc92-f45b03019039"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": true,
+      "improvable": false
+    },
+    {
+      "name": "init-features",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "6216f16f-ae11-4438-8a2b-dea06478029d"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/project-manager/commands/init-features.md",
+      "owning_skill": "project-manager",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "init-project",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "6216f16f-ae11-4438-8a2b-dea06478029d"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/project-manager/commands/init-project.md",
+      "owning_skill": "project-manager",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "release",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "b48d9415-b13b-407a-afb3-807398be4d9f"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": "claude/skills/github/commands/release.md",
+      "owning_skill": "github",
+      "builtin": false,
+      "improvable": true
+    },
+    {
+      "name": "youtube-toolkit",
+      "marker_count": 1,
+      "leadingslash_count": 0,
+      "union_count": 1,
+      "distinct_sessions": 1,
+      "session_ids": [
+        "f2c64091-e509-41c2-ba98-9aa38a59a172"
+      ],
+      "session_ids_truncated": false,
+      "definition_file": null,
+      "owning_skill": null,
+      "builtin": false,
+      "improvable": true
+    }
+  ],
+  "totals": {
+    "distinct_commands": 16,
+    "total_union_invocations": 89
+  }
+}
