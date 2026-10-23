@@ -1,7 +1,7 @@
 ---
 name: github-repo-init
 mirror-of: claude/skills/github/sub-skills/repo-init
-source-version: 2026-10-21
+source-version: 2026-10-23
 description: >
   Sub-skill of `github`. Diff a repo against the Repo-Configuration Standard (protected main/dev
   rulesets, immutable tags, merge-commit-only, secret-scanning push protection, local hook gate,
@@ -13,7 +13,7 @@ description: >
 # Operation: repo-init
 
 > **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/repo-init`
-> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> (`source-version: 2026-10-23`, charter §5). Change the Claude copy first, then re-mirror and
 > bump the stamp — never edit this file in isolation.
 
 **Goal.** Bring the current repo into conformance with the **Repo-Configuration Standard**
@@ -218,24 +218,21 @@ Templates: `./templates/artifacts/`.
 #### Worktree ignore entries — required, but never created
 
 `repo-init` **does not create a worktree directory.** Per charter §4 the worktree lifecycle is
-owned by `worktree-task-lifecycle`, and its canonical location is the **sibling**
-`<repo>-wt/.worktrees/<task>` — deliberately outside the repo, which is precisely why a
-correctly-placed worktree needs no ignore rule at all.
+owned by `worktree-task-lifecycle`, and its canonical location is in-repo
+`.worktrees/<task>`.
 
-The ignore entries are nonetheless required, because they are **defensive**: they cover
-in-repo worktree paths created by *other* tooling. Claude Code's `EnterWorktree` creates
-`.claude/worktrees/` inside the repo, and ad-hoc `git worktree add .worktrees/x` is common.
-Without these lines, a worktree created by either route shows up as a mountain of untracked
+The ignore entries are required because both worktree paths live inside the repo:
+`.worktrees/` is the canonical location, and Claude Code's `EnterWorktree` creates
+`.claude/worktrees/`. Without these lines, a worktree created by either route shows up as a mountain of untracked
 files in `git status` and can be swept into a commit by `git add -A`.
 
 Ensure this block exists in `.gitignore`, comment included — the comment is what stops a
 future reader from "cleaning up" entries whose purpose isn't obvious:
 
 ```gitignore
-# Git worktrees. The canonical location is the SIBLING <repo>-wt/.worktrees/
-# (outside this repo). These entries are defensive: Claude Code's EnterWorktree
-# creates .claude/worktrees/ in-repo, and ad-hoc `git worktree add .worktrees/x`
-# is common. Without them a worktree becomes untracked noise in git status.
+# Git worktrees. Per-task worktrees live in-repo at .worktrees/<task>; Claude
+# Code's EnterWorktree uses .claude/worktrees/. Both must stay ignored, or a
+# worktree becomes untracked noise in git status and gets swept into commits.
 .worktrees/
 .claude/worktrees/
 ```
@@ -296,7 +293,7 @@ Rules, all load-bearing:
   would produce two competing scaffolds.
 
 Content of the block (`./templates/artifacts/claude-md-block.md`) covers the branch model,
-merge strategy, the sibling worktree location, and hook activation.
+merge strategy, the in-repo worktree location, and hook activation.
 
 ### Group 9 — Large assets (detect only)
 

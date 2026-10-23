@@ -1,10 +1,9 @@
 ---
 name: github-worktree-task-lifecycle
 mirror-of: claude/skills/github/sub-skills/worktree-task-lifecycle
-source-version: 2026-10-21
+source-version: 2026-10-23
 description: >
-  Sub-skill of `github`. Create, work in, and idempotently remove an isolated per-task worktree
-  under `<repo>-wt/.worktrees/`, with Windows file-lock recovery and same-branch collision
+  Sub-skill of `github`. Create, work in, and idempotently remove an isolated per-task worktree under the in-repo `.worktrees/`, with Windows file-lock recovery and same-branch collision
   guards. Triggers on "create a worktree", "set up an isolated workspace", "remove the
   worktree", "worktree won't delete". Lifecycle authority that merge and prune delegate to.
 ---
@@ -12,7 +11,7 @@ description: >
 # Worktree Task Lifecycle
 
 > **Codex mirror.** Source of truth is
-> `claude/skills/github/sub-skills/worktree-task-lifecycle` (`source-version: 2026-10-21`,
+> `claude/skills/github/sub-skills/worktree-task-lifecycle` (`source-version: 2026-10-23`,
 > charter §5). Change the Claude copy first, then re-mirror and bump the stamp — never edit
 > this file in isolation.
 
@@ -63,21 +62,20 @@ follow-up table row, delete it instead.
 
 ## Canonical location
 
-Create worktrees under a **sibling directory of the repo**, outside the checkout entirely:
+Create worktrees **inside the repo**, under its git-ignored `.worktrees/` directory:
 
 ```
-<repo>-wt/.worktrees/<branch-name>/
+<repo>/.worktrees/<task-slug>/
 ```
 
 E.g. work for `C:\development\myrepo` on branch `feat/auth` lives at
-`C:\development\myrepo-wt\.worktrees\feat\auth`. Being outside the repo, it needs no
-`.gitignore` entry and can never pollute `git status`.
+`C:\development\myrepo\.worktrees\auth`. This is the only supported location — never
+create a sibling `<repo>-wt/` directory.
 
-**Legacy locations** are recognized, not migrated: if the repo already has an in-repo
-`.worktrees/` or `worktrees/` directory in active use, keep using it (`.worktrees` wins if
-both exist), but **verify it is ignored first** — `git check-ignore -q .worktrees` — and if
-it is not, add it to `.gitignore` and commit before creating the worktree. A repo CLAUDE.md
-preference for a worktree directory overrides both defaults.
+**Verify it is ignored first** — `git check-ignore -q .worktrees/` — and if it is not, add
+`.worktrees/` to `.gitignore` and commit that before creating the worktree. An unignored
+`.worktrees/` shows every worktree file as untracked in the primary checkout and can be swept
+into a commit by `git add -A`.
 
 ---
 
@@ -85,7 +83,7 @@ preference for a worktree directory overrides both defaults.
 
 1. Resolve the primary root and target branch:
    `root=$(git rev-parse --show-toplevel)`; branch off latest `dev` unless told otherwise.
-2. `git worktree add "<repo>-wt/.worktrees/<branch>" -b <branch> dev`
+2. `git worktree add ".worktrees/<task-slug>" -b <branch> dev` (from the repo root)
 3. **Verify the add completed.** `git worktree add` can exit apparently-fine yet leave an
    empty, non-git directory. Confirm both: the path appears in `git worktree list`, and
    `git -C "<path>" rev-parse --is-inside-work-tree` returns `true`. If the dir exists but is
@@ -171,7 +169,8 @@ Safe to re-run at any point; every step skips cleanly if already done:
 
 ## Red flags
 
-- Creating an in-repo worktree directory without verifying it is git-ignored.
+- Creating a worktree under `.worktrees/` without verifying it is git-ignored.
+- Creating a sibling `<repo>-wt/` directory instead of using in-repo `.worktrees/`.
 - Copying `.env`/tokens into a worktree "temporarily".
 - Merging from inside the worktree on Windows.
 - Looping on a locked directory instead of reporting and moving on.

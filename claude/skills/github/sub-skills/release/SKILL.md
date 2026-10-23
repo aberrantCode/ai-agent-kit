@@ -378,7 +378,7 @@ The tag now exists, so the version refs can finally equal it. Do it once, then c
 ```bash
 # 1. Create the tag LOCALLY first (Step 6 already did this) so the gate's
 #    `git tag --sort=-v:refname` sees $VERSION as latest while you stamp.
-git worktree add "<repo>-wt/.worktrees/chore-stamp-$VERSION" -b "chore/stamp-$VERSION" origin/dev
+git worktree add ".worktrees/chore-stamp-$VERSION" -b "chore/stamp-$VERSION" origin/dev
 #    ...in that worktree: bump README badge + manifest version to $VERSION, then rebuild
 #    (python scripts/build_tokens.py, etc.). Gate now passes: refs == latest local tag.
 #    Push the TAG and the branch FROM that worktree (its working tree matches the tag):
