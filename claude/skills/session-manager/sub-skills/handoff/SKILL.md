@@ -68,6 +68,11 @@ An untagged state claim is a defect. Every number in "State already established"
 explicitly `[?]` — a confidently wrong count sends the new session down a false path with no one
 there to catch it.
 
+**Self-check before Step 4 (this rule is widely violated — a `handoff-tuner` run on 2026-10-23 found
+76 of 92 prompts carried at least one untagged state claim):** scan the State section line by line.
+Every bullet that states a count, a path, an id, a SHA, or a PR number must carry a `[V]` or `[?]`.
+If a line has a number or a backticked token and no tag, it is a defect — tag it or delete it.
+
 ## Step 1 — Recover the items (launch / scope)
 
 **Launch mode:** take the numbered decision list from your most recent response. Resolve each item
@@ -156,6 +161,20 @@ second phase that must not start until the first merges).
    handoff. This closes the loop the dispatch-time row (written by `launch-claude-session.ps1`,
    `child_sid: null`) leaves open — without the self-report, `child_sid` stays null forever for a
    live handoff.
+
+   **This section is the single most-dropped required element** — a `handoff-tuner` run on
+   2026-10-23 found **0 of 92** handoff prompts in the corpus contained it, including every
+   launcher-era prompt written *after* this requirement was documented. Treat it as non-optional:
+   paste a concrete self-report instruction into the generated prompt (not a paraphrase), e.g.
+
+   > **Correlation (do this first).** On your first turn, append one line to
+   > `~/.claude/telemetry/handoffs.jsonl`: `{"handoff_id":"<this id>","ts":"<UTC>","parent_sid":null,
+   > "child_sid":"<your $env:CLAUDE_CODE_SESSION_ID>","prompt":"<abs path>","branch":"<branch>",
+   > "repo":"<abs repo>","source":"live","confidence":1.0}`. Pass `-HandoffId <this id>` on every
+   > `log-delegation-outcome.ps1` call.
+
+   Before handing off (Step 4), re-read the prompt you wrote and confirm the Correlation section is
+   present and names the real `handoff_id`. If it is missing, the live join cannot complete.
 4. **State already established.** Verified facts — counts, IDs, file paths, what is already
    merged, what is already green — each tagged `[V]`/`[?]`, and marked "already done, do not redo".
 5. **What we tried / dead ends (required).** Approaches attempted and abandoned, with the concrete
@@ -212,9 +231,18 @@ stronger model for the session and tell it to delegate the mechanical parts to
 ## Step 4 — Hand off to dispatch (launch / scope)
 
 Do not launch from here. Give [`dispatch`](../dispatch/SKILL.md) the prompt path, repo, slug/type,
-the pinned model and a hyphenated title; it creates the worktree
+the pinned model, a hyphenated title, **and the frontmatter `handoff_id` (passed through to
+`launch-claude-session.ps1 -HandoffId`)**; it creates the worktree
 (`dispatch/scripts/new-task-worktree.ps1`), launches
-(`dispatch/scripts/launch-claude-session.ps1`), verifies the PID and reports. Record the prompt
+(`dispatch/scripts/launch-claude-session.ps1`), verifies the PID and reports.
+
+> **Pass the `handoff_id` — do not let the launcher mint one.** When `-HandoffId` is omitted the
+> launcher synthesizes `lv-<title>-<unixms>` so the dispatch row is never without a key — but that
+> synthetic id can never join the prompt's frontmatter id or the forensic row, leaving an orphan.
+> A `handoff-tuner` run on 2026-10-23 found exactly this: the one live registry row carried a
+> synthesized `lv-…` id with `child_sid: null` instead of the prompt's `handoff_id`, so **no live
+> join completed**. The frontmatter `handoff_id`, the Correlation self-report, and this `-HandoffId`
+> pass-through are the three parts of one chain; drop any and the live correlation breaks. Record the prompt
 path and branch it returns — `retire` needs both, and after a context compaction they are
 otherwise gone. If Windows Terminal is unavailable, `dispatch` covers the fallback; if even that
 fails, report the prompt file path and the exact command the user can run — the prompt, the
