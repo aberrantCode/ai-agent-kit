@@ -198,6 +198,9 @@ grep -rlE 'badge/version-v[0-9]+\.[0-9]+\.[0-9]+' --include=*.md . 2>/dev/null \
 [ -f package.json ]       && echo package.json
 [ -f pyproject.toml ]     && echo pyproject.toml
 [ -f VERSION ]            && echo VERSION
+
+# 3. a changelog generator that can roll an untagged release (-Version)
+grep -qE '\[string\]\$Version' scripts/Generate-Changelog.ps1 2>/dev/null && echo CHANGELOG.md
 ```
 
 ### Rules
@@ -215,6 +218,13 @@ grep -rlE 'badge/version-v[0-9]+\.[0-9]+\.[0-9]+' --include=*.md . 2>/dev/null \
   section: rename it to `## [$VERSION] — YYYY-MM-DD`, open a fresh empty `[Unreleased]`, add
   the `[$VERSION]` compare-link definition, and repoint `[Unreleased]` at `$VERSION...HEAD`.
   One "prepare" commit, not two.
+- **Generated changelog with `-Version` (detection 3):** never hand-edit — run
+  `pwsh ./scripts/Generate-Changelog.ps1 -Version $V` and commit the result. It writes the
+  untagged commits as `## [$V] - <today>`, so the changelog merges into `main` *with* the
+  release and the tag lands on a commit that already documents it — no post-tag changelog PR.
+  The generator skips CHANGELOG-only commits, so the section the release workflow rebuilds at
+  tag time matches this one byte for byte **provided the tag is cut the same day** (it dates
+  the section from the tagged commit); if the merge slips a day, re-roll with `-Date`.
 
 ### Land it on `dev`
 
@@ -327,6 +337,11 @@ git tag "$VERSION" origin/main   # tag the merged commit, not a possibly-stale l
 ```
 
 ### Roll the changelog BEFORE pushing the tag
+
+**Skip this block when Step 4b rolled the changelog with `-Version`** — the tagged commit already
+carries its `## [<version>]` section (confirm: `grep -q "^## \[${VERSION#v}\]" CHANGELOG.md`), so
+there is nothing to regenerate and no follow-up PR. Push the tag directly. The block below is the
+fallback for generators that cannot roll an untagged release; prefer adding `-Version` to them.
 
 **Create the tag locally, regenerate the changelog, land it, and only then push the tag.**
 Any repo with a persistent changelog generator hits a hard ordering constraint here: the
@@ -467,7 +482,8 @@ Released v0.2.0 — dev → main (merge commit def5678), tagged + GitHub Release
 | Push to main rejected by hook/protection | Not "behind" — discard local merge (`git reset --hard origin/main`) and switch to Route B. Never `--no-verify` / `SKIP_*` / force-push main |
 | Push to main rejected as non-fast-forward | `git pull --rebase origin main` then retry — never force-push main |
 | PR merge `BLOCKED` / `REVIEW_REQUIRED`, no reviewer | Check `enforce_admins`: if `false`, `AskUserQuestion` then `gh pr merge --admin`; if `true`, STOP — a reviewer is required |
-| Tag push rejected by a changelog-staleness gate | Not a gate bug — regenerate `CHANGELOG.md` (the local tag already exists), land it on `dev` via a `chore:` PR, then push the tag. Never `--no-verify` |
+| Tag push rejected by a changelog-staleness gate | Not a gate bug — Step 4b's changelog roll was skipped. Regenerate `CHANGELOG.md` (the local tag already exists), land it on `dev` via a `chore:` PR, then push the tag; next release, roll with `-Version` in Step 4b. Never `--no-verify` |
+| A release was tagged without its changelog section (gate red on every branch afterwards) | The tag push bypassed the gate (hooks not activated on that clone, or `--no-verify`). Regenerate on a `chore:` branch off `origin/dev` and PR it; check `git config core.hooksPath` on the machine that tagged |
 | Version-ref stamp (Step 4b) rejected on the PREPARE push ("badge cites v0.9.0, latest tag is v0.8.0") | The gate keys refs to the **current** tag — you cannot stamp before tagging. This is the Step 4b **EXCEPTION**: revert the version-ref edits (keep the changelog roll), release + tag first, then stamp in **Step 6b** |
 | Tag push rejected by a version/docs-truth gate, `dev` already stamped | Step 4b's normal path was right but a file was missed. The tag exists, so refs really are stale: stamp the flagged file on `dev` via a `chore:` PR, re-push the tag, and add it to Step 4b's detection list |
 | Tag already exists | AskUserQuestion: new version or abort |
