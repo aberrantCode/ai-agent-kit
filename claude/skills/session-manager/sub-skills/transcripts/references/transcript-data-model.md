@@ -104,3 +104,41 @@ returns `[]` and `os.path.exists()` returns `False` for a path you can `ls` just
 from bash. Fix: use `cc_transcripts.projects_root()` (or `os.path.expanduser("~/.claude/projects")`) inside the script (this
 resolves correctly under native Windows Python regardless of the calling shell), or pass
 paths in as CLI arguments rather than hardcoding them in inline `-c` code.
+
+## Joining a child session back to the prompt that spawned it
+
+Needed by the handoff correlation registry (`handoff/references/handoff-registry.md`) and its
+backfill script (`handoff/scripts/backfill_handoff_registry.py`) — recorded here because it is a
+transcript-reading gotcha like the others on this page, not something specific to the registry.
+
+**Dead end: do not join on the prompt's title heading or its de-dated filename slug.** The first
+attempt at this join matched a prompt's first `#` heading (and its slug) against session openers
+and measured a **0% match rate**, for two compounding reasons:
+
+1. **Window asymmetry.** Prompts and candidate child sessions were both filtered by the same
+   90-day mtime cutoff. A prompt file sitting in `docs/PROMPTS/` gets touched (and its mtime
+   bumped) far more casually than its one-shot child session does, so prompts from outside the
+   window stayed visible while their children fell out of it — comparing two differently-biased
+   samples.
+2. **The child's opener does not contain the prompt's title at all.** It contains the *launcher's*
+   fixed string — `launch-claude-session.ps1` always writes the child's first message as `Read
+   and follow the instructions in the file at <absolute path> exactly. Its full contents are your
+   task; treat them as your first message.` — not a paraphrase or summary of the prompt's content.
+
+**What actually works:** match the child's first non-injected, non-sidechain user turn
+(`iter_messages(path, role="user", skip_sidechains=True)`, same filtering as everywhere else on
+this page) against that exact opener string, and compare the **captured path** to each known
+prompt's path — exact match first, basename-only as a lower-confidence fallback. A loose substring
+grep for the prompt's basename anywhere in a transcript is not sufficient on its own: it also
+matches the authoring session (which read or listed the file) and any subagent transcript that
+quoted it, neither of which is the child. Requiring the match to be the first qualifying user turn
+of that specific transcript removes both false-positive classes.
+
+**Measured precision (2026-10-23, this repo's workstation):** of 90 discoverable
+`docs/PROMPTS/*.md` files across every repo with transcripts, exactly **1** had a session whose
+first turn was the exact launcher opener. A looser check — the prompt's basename appearing in any
+genuine (non-injected, non-tool-result) user turn anywhere in any other transcript — found only 2.
+Both numbers are far below an earlier survey's 73%, which had measured basename matches against
+*any* text in the transcript (including tool-result echoes, `Read`/`Grep` output, and the
+authoring session's own file listings) — exactly the noisy signal this section warns against.
+Treat "a prompt's filename shows up somewhere in the corpus" as supply, never as a join.

@@ -63,12 +63,21 @@ checkout:
 pwsh -File <skill-dir>/scripts/launch-claude-session.ps1 `
     -PromptPath 'C:\repo\docs\PROMPTS\2026-07-21-thing.md' `
     -WorkingDirectory 'C:\repo\.worktrees\reset-move-queue' `
-    -Title 'repo-reset-move-queue'
+    -Title 'repo-reset-move-queue' `
+    -HandoffId 'd1-corr-26a'
 ```
 
 The prompt is read from a file inside a `-File` script, so no prompt text crosses a shell-quoting
 layer. (Passing it inline through `wt` -> `pwsh -Command` crosses two parsers, and a title with a
 space makes `wt` treat the remainder as a command.) Keep titles hyphenated anyway.
+
+**Correlation.** Pass `-HandoffId` with the same id the generated prompt's frontmatter carries
+(`handoff` mints it in Step 3 of its own flow) -- the launcher appends a dispatch-time row to the
+[handoff registry](../handoff/references/handoff-registry.md) (`~/.claude/telemetry/handoffs.jsonl`,
+`source: live`, `child_sid: null` until the child's own first-turn self-report completes it).
+Omitting it still works -- the launcher mints its own id -- but then nothing in the prompt can
+reference it, so the self-report step has no id to reuse. Always pass it when launching from
+`handoff`.
 
 The launcher is a thin Claude-specific layer over the generic `spawn-terminal` skill, which owns
 the tab spawn, colour, WT fallback and PID verification. It finds `spawn-terminal.ps1` with the
