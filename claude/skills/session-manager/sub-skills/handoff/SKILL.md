@@ -184,9 +184,21 @@ second phase that must not start until the first merges).
    ordering rationale from Step 2. Prefer pointing at existing scripts and flags over describing
    procedures. All tasks run on the one branch unless the work genuinely splits into independently
    reviewable PRs, in which case say so and name the extra branches.
-7. **Finishing.** Merge into the base branch, sync local to `origin/<base>`, report — then stop.
-   It must not delete its own prompt file: the `retire` gate includes a human confirmation it
-   cannot evaluate on its own behalf.
+7. **Finishing — risk-based (do NOT blanket self-merge).** Classify the PR's own diff before
+   deciding whether to merge it:
+   - **Docs-only (low risk) → may self-merge.** The diff touches *only* `docs/**` (reports,
+     prompts) and other non-executable artifacts (generated slide HTML, markdown) — no skill
+     definition, script, command, `manifest.json`, config, or CI/`validate.ps1` change. Then the
+     session may merge into the base branch with a merge commit and sync local to `origin/<base>`.
+   - **Anything executable or behavioral → review required, do NOT merge.** The diff touches a skill
+     definition (`claude/**`, `codex/**`, `gemini/**`), a script (`*.ps1`/`*.py`/`*.sh`), a command,
+     config, `manifest.json`, or a CI/hook/`validate.ps1` gate. Then open the PR, **launch it for the
+     human (`gh pr view <n> --web`)**, report the PR number, and stop — a person reviews and merges.
+     Launching is not optional: an un-launched PR is one the reviewer never sees. When unsure which
+     bucket a diff is in, treat it as review-required.
+
+   Either bucket: **never delete the prompt file** (the `retire` gate needs a human confirmation it
+   cannot make on its own behalf), and report — then stop.
 8. **Delegation.** Spawn subagents for mechanical work with `model: "haiku"` passed explicitly — a
    subagent with no model set silently inherits the parent's expensive model, so the cheap default
    must be stated. Name real candidates in this repo's work: locating call sites, extracting counts
