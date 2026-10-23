@@ -16,9 +16,9 @@ releases.
 
 ### Worktrees
 
-Per-task worktrees live at `<repo>-wt/.worktrees/<task>` — a **sibling** directory, outside
-this repository. That is why they never appear in `git status`. `.worktrees/` and
-`.claude/worktrees/` are gitignored defensively, for worktrees other tooling creates in-repo.
+Per-task worktrees live in-repo at `.worktrees/<task>` (git-ignored, so they never appear in
+`git status`). Claude Code's `EnterWorktree` uses `.claude/worktrees/`, which is ignored too.
+Never create a sibling `<repo>-wt/` directory.
 
 Run destructive git operations (merge, branch delete) from the **primary checkout**, never
 from inside a secondary worktree: `cd "$(git rev-parse --show-toplevel)"`.

@@ -1,7 +1,7 @@
 ---
 name: github
 mirror-of: claude/skills/github
-source-version: 2026-10-21
+source-version: 2026-10-23
 category: Foundations & Workflow
 description: >
   Use for any git or GitHub repository operation in the terminal, even when "git" isn't said:
@@ -15,7 +15,7 @@ description: >
 
 # GitHub
 
-> **Codex mirror.** Source of truth is `claude/skills/github` (`source-version: 2026-10-21`,
+> **Codex mirror.** Source of truth is `claude/skills/github` (`source-version: 2026-10-23`,
 > charter §5). Change the Claude copy first, then re-mirror and bump the stamp — never edit
 > this file in isolation.
 
@@ -111,7 +111,7 @@ One sub-skill has **no command of its own** and triggers directly on worktree ph
 |---|---|---|
 
 `worktree-task-lifecycle` is the **single lifecycle authority** for per-task worktrees —
-creation under `<repo>-wt/.worktrees/`, post-merge idempotent removal, Windows file-lock
+creation under the in-repo `.worktrees/`, post-merge idempotent removal, Windows file-lock
 recovery, and credential rules. `merge` and `prune` delegate their worktree handling to it;
 so do multi-agent harnesses (agent-manager) that run one worktree per agent.
 
@@ -206,7 +206,7 @@ These hold for every operation, present or future:
 - **Cleanup order is worktree → local branch → remote.** Removing a worktree does not delete
   its backing branch; delete that separately.
 - **Worktree create/remove goes through `sub-skills/worktree-task-lifecycle`.** It owns the
-  canonical location (`<repo>-wt/.worktrees/`), the Windows lock-recovery sequence
+  canonical location (in-repo `.worktrees/<task>`), the Windows lock-recovery sequence
   (`git worktree prune` + force-remove; if the directory still resists, leave it and say so
   in the summary rather than looping), and the credentials-stay-in-primary-checkout rule.
 - **Commit conventions.** Conventional-commit format `<type>: <description>` with types

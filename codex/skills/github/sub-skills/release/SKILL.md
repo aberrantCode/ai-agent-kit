@@ -1,7 +1,7 @@
 ---
 name: github-release
 mirror-of: claude/skills/github/sub-skills/release
-source-version: 2026-10-21
+source-version: 2026-10-23
 description: >
   Sub-skill of `github`. Promote dev to main as a versioned production release — sync dev from
   main via PR if behind, auto-derive the next semantic version from conventional commits, stamp
@@ -14,7 +14,7 @@ description: >
 # Operation: release
 
 > **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/release`
-> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> (`source-version: 2026-10-23`, charter §5). Change the Claude copy first, then re-mirror and
 > bump the stamp — never edit this file in isolation.
 
 **Goal.** Promote `dev` → `main` as a versioned release. Obey the parent **Output Contract**:
@@ -376,7 +376,7 @@ The tag now exists, so the version refs can finally equal it. Do it once, then c
 ```bash
 # 1. Create the tag LOCALLY first (Step 6 already did this) so the gate's
 #    `git tag --sort=-v:refname` sees $VERSION as latest while you stamp.
-git worktree add "<repo>-wt/.worktrees/chore-stamp-$VERSION" -b "chore/stamp-$VERSION" origin/dev
+git worktree add ".worktrees/chore-stamp-$VERSION" -b "chore/stamp-$VERSION" origin/dev
 #    ...in that worktree: bump README badge + manifest version to $VERSION, then rebuild
 #    (python scripts/build_tokens.py, etc.). Gate now passes: refs == latest local tag.
 #    Push the TAG and the branch FROM that worktree (its working tree matches the tag):
