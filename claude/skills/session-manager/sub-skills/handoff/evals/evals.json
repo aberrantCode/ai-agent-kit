@@ -77,6 +77,33 @@
         "Offers a handoff in a single sentence",
         "Does not write a prompt file or launch anything without the user's go-ahead"
       ]
+    },
+    {
+      "id": 6,
+      "eval_name": "correlation-chain-complete",
+      "prompt": "/handoff   (my last response ended with: 1. finish the parser refactor, 2. open a PR. Launch it in a new session.)",
+      "expected_output": "A launch-mode prompt whose Correlation section instructs the child to self-report its child_sid to ~/.claude/telemetry/handoffs.jsonl on its first turn, AND whose dispatch hand-off passes the frontmatter handoff_id to launch-claude-session.ps1 via -HandoffId — so the live registry join can actually complete. This is the F2+F3 regression: the 2026-10-23 handoff-tuner run found 0/92 prompts had a Correlation section and the one live dispatch row was orphaned by a synthesized lv- id.",
+      "files": [],
+      "expectations": [
+        "Generated prompt contains a Correlation section that tells the child to append its own row (with its real child_sid / $CLAUDE_CODE_SESSION_ID, source live, confidence 1.0) to the handoff registry on its first turn",
+        "The frontmatter handoff_id is a real stable id, not a placeholder, and the same id appears in the Correlation instruction",
+        "Step 4 passes that handoff_id through to dispatch / launch-claude-session.ps1 -HandoffId, not leaving the launcher to synthesize an lv-<title>-<unixms> id",
+        "The prompt instructs -HandoffId on the child's log-delegation-outcome.ps1 calls",
+        "Does not treat the Correlation section as optional or drop it under task-focus pressure"
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "state-claims-all-tagged",
+      "prompt": "/handoff   (last response: 1. the migration touches 214 files under src/, 2. commit a1b2c3d already landed the schema change, 3. PR #318 is open and green, 4. re-run scripts/validate.ps1 then merge. Hand this off.)",
+      "expected_output": "A prompt whose State already established section tags EVERY concrete claim (the 214-file count, the commit a1b2c3d, PR #318, the green status) with [V] or [?] — [V] only where verified this session by a named tool call, [?] otherwise. This is the F4 regression: the 2026-10-23 run found 76/92 prompts carried at least one untagged state claim.",
+      "files": [],
+      "expectations": [
+        "Every bulleted state claim containing a count, path, id, SHA, or PR number carries a [V] or [?] tag — none left bare",
+        "Claims verified this session by a nameable tool call are [V]; recalled or carried-over claims are [?]",
+        "The file count, the commit SHA, and the PR number are each individually tagged, not covered by a single blanket note",
+        "No untagged number or backticked token survives in the State section"
+      ]
     }
   ]
 }
