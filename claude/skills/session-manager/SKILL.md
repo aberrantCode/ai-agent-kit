@@ -24,7 +24,10 @@ description: >
   transcripts for violations of Z", "/hand-off-audit", compliance audit; mine history — "what keeps going wrong",
   "find issues we've hit more than once", "audit our conversation history", "what should we
   change so this stops happening", or mine prior transcripts for domain knowledge when building
-  a skill or doc for an existing service; report delegated-subagent outcomes; and token cost —
+  a skill or doc for an existing service; tune handoffs — "tune the handoff skill", "how efficient
+  are our handoffs", "analyze handoff token cost / new-session churn", "score our handoff prompts",
+  "/tune-handoff": measure past handoffs and propose evidence-backed handoff enhancements plus a
+  versioned rubric refinement; report delegated-subagent outcomes; and token cost —
   "hit my limit", "running out of tokens", "usage limit", "save tokens", "reduce usage", "am I
   wasting tokens", "how do I use fewer tokens", "this chat is getting long", "which model should
   I use", "why does a new session start with tokens", "what's in my context window at launch",
@@ -53,6 +56,7 @@ The session lifecycle, end to end, plus the one parser every stage shares:
 | end | [`dispatch`](sub-skills/dispatch/SKILL.md) | Create a per-task worktree and launch any prompt file in a new terminal tab; verify the launch |
 | end | [`retire`](sub-skills/retire/SKILL.md) | Post-merge cleanup gate (five checks; `-Confirmed` is human-only) |
 | after | [`audit`](sub-skills/audit/SKILL.md) | Read-only check of past sessions against a stated rule |
+| after | [`handoff-tuner`](sub-skills/handoff-tuner/SKILL.md) | Measure past handoffs (join coverage, prompt-rubric score, child-session churn, token cost) and propose evidence-backed `handoff` enhancements + a versioned rubric refinement, as a reviewed PR |
 | after | [`mine`](sub-skills/mine/SKILL.md) | Friction mode (recurring mistakes → proposed patches) and knowledge mode (domain knowledge from history) |
 | after | [`delegation-ledger`](sub-skills/delegation-ledger/SKILL.md) | Record and report delegated-subagent outcomes (`~/.claude/telemetry/delegation-outcomes.jsonl`) |
 | after | [`usage`](sub-skills/usage/SKILL.md) | Token cost: historical burn and the per-session startup baseline |
@@ -86,6 +90,7 @@ Every command is a thin file in `commands/` that loads exactly one sub-skill.
 | `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | resume | |
 | `/session-audit` | audit | |
 | `/hand-off-audit` | audit | alias |
+| `/tune-handoff` | handoff-tuner | measure handoffs → propose handoff enhancements + self-tune (reviewed PR) |
 | `/analyze-conversations` | mine | friction mode |
 | `/mine-sessions` | mine | knowledge mode |
 | `/delegation-report` | delegation-ledger | |
