@@ -12,6 +12,10 @@ __pycache__/
 # Local adversarial review reports and verification output
 .reviews/
 
+# Transcript-mining scratch output (episode slices carry private-repo state —
+# never committed; the committed deliverable is docs/reports/ + scripts/analysis/)
+.analysis-out/
+
 # Local per-task git worktrees
 .worktrees/
 
