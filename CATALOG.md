@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-22, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-23, schemaVersion: 1)
 -->
 
 # Catalog
@@ -59,23 +59,13 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`chrome-extension-builder`](claude/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | codex, gemini |
 | [`composition-patterns`](claude/skills/composition-patterns/SKILL.md) |  | codex |
 | [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/SKILL.md) | Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to "reskin" or "retheme" an existing interface without touching its structure or interaction logic. | — |
-| [`flutter`](claude/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | codex |
 | [`pwa-development`](claude/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | codex |
 | [`react-best-practices`](claude/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | codex |
-| [`react-native`](claude/skills/react-native/SKILL.md) | React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code | codex |
 | [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/SKILL.md) | Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser. | — |
 | [`react-web`](claude/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | codex |
 | [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/SKILL.md) | Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-col... | — |
 | [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/SKILL.md) | Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests — no CDNs, no relative-path assets, ... | — |
 | [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/SKILL.md) | Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes — to avoid mask... | — |
-
-### Mobile (Native)
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`android-java`](claude/skills/android-java/SKILL.md) | Android Java development with MVVM, ViewBinding, and Espresso testing | codex |
-| [`android-kotlin`](claude/skills/android-kotlin/SKILL.md) | Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing | codex |
-| [`ui-mobile`](claude/skills/ui-mobile/SKILL.md) | Mobile UI patterns - React Native, iOS/Android, touch targets | codex |
 
 ### UI & Design
 
@@ -97,16 +87,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aws-aurora`](claude/skills/aws-aurora/SKILL.md) | AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling | codex |
-| [`aws-dynamodb`](claude/skills/aws-dynamodb/SKILL.md) | AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python | codex |
-| [`azure-cosmosdb`](claude/skills/azure-cosmosdb/SKILL.md) | Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns | codex |
-| [`cloudflare-d1`](claude/skills/cloudflare-d1/SKILL.md) | Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations | codex |
 | [`database-schema`](claude/skills/database-schema/SKILL.md) | Schema awareness - read before coding, type generation, prevent column errors | codex |
-| [`firebase`](claude/skills/firebase/SKILL.md) | Firebase Firestore, Auth, Storage, real-time listeners, security rules | codex |
-| [`supabase`](claude/skills/supabase/SKILL.md) | Core Supabase CLI, migrations, RLS, Edge Functions | codex |
-| [`supabase-nextjs`](claude/skills/supabase-nextjs/SKILL.md) | Next.js with Supabase and Drizzle ORM | codex |
-| [`supabase-node`](claude/skills/supabase-node/SKILL.md) | Express/Hono with Supabase and Drizzle ORM | codex |
-| [`supabase-python`](claude/skills/supabase-python/SKILL.md) | FastAPI with Supabase and SQLAlchemy/SQLModel | codex |
 
 ### Code Quality
 
@@ -142,30 +123,10 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`llm-patterns`](claude/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | codex |
 | [`project-manager`](claude/skills/project-manager/SKILL.md) | Feature-driven project orchestrator whose shared state is markdown in docs/ (REQUIREMENTS.md, feature specs, plans, task files with completion sentinels). Use to bootstrap the workflow on a repo, capture feature specs... | codex, gemini |
 
-### Commerce & Payments
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`medusa`](claude/skills/medusa/SKILL.md) | Medusa headless commerce - modules, workflows, API routes, admin UI | codex |
-| [`shopify-apps`](claude/skills/shopify-apps/SKILL.md) | Shopify app development - Remix, Admin API, checkout extensions | codex |
-| [`web-payments`](claude/skills/web-payments/SKILL.md) | Stripe Checkout, subscriptions, webhooks, customer portal | codex |
-| [`woocommerce`](claude/skills/woocommerce/SKILL.md) | WooCommerce REST API - products, orders, customers, webhooks | codex |
-
-### Third-Party Integrations
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`klaviyo`](claude/skills/klaviyo/SKILL.md) | Klaviyo email/SMS marketing - profiles, events, flows, segmentation | codex |
-| [`ms-teams-apps`](claude/skills/ms-teams-apps/SKILL.md) | Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API | codex |
-| [`posthog-analytics`](claude/skills/posthog-analytics/SKILL.md) | PostHog analytics, event tracking, feature flags, dashboards | codex |
-| [`reddit-ads`](claude/skills/reddit-ads/SKILL.md) | Reddit Ads API - campaigns, targeting, conversions, agentic optimization | codex |
-| [`reddit-api`](claude/skills/reddit-api/SKILL.md) | Reddit API with PRAW (Python) and Snoowrap (Node.js) | codex |
-
 ### SEO & Web Presence
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aeo-optimization`](claude/skills/aeo-optimization/SKILL.md) | AI Engine Optimization - semantic triples, page templates, content clusters for AI citations | codex |
 | [`site-architecture`](claude/skills/site-architecture/SKILL.md) | Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals | codex |
 | [`web-content`](claude/skills/web-content/SKILL.md) | SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization | codex |
 
@@ -183,7 +144,6 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
 | [`start-app`](claude/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | codex |
 | [`statusline`](claude/skills/statusline/SKILL.md) | Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line — the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on... | — |
-| [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
 
 ### Infrastructure & Ops
@@ -218,8 +178,6 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`frame-extraction`](claude/skills/frame-extraction/SKILL.md) | Domain expertise for slicing a downloaded YouTube video into image frames using ffmpeg — with sampling strategies tuned to the downstream task (file reconstruction, PRD evidence, diagram capture). Sub-skill of `youtub... | — |
 | [`transcript-acquisition`](claude/skills/transcript-acquisition/SKILL.md) | Domain expertise for obtaining a timestamped transcript of a YouTube video — first via YouTube's own auto-subs/CC, falling back to local Whisper transcription of the downloaded video. Sub-skill of `youtube-extraction`... | — |
 | [`video-acquisition`](claude/skills/video-acquisition/SKILL.md) | Domain expertise for downloading a YouTube video locally at a resolution suitable for later frame OCR. Sub-skill of `youtube-extraction`. Use when the parent skill needs to acquire the source video file before any fra... | — |
-| [`worldview-layer-scaffold`](claude/skills/worldview-layer-scaffold/SKILL.md) | Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldVi... | codex |
-| [`worldview-shader-preset`](claude/skills/worldview-shader-preset/SKILL.md) | Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, ex... | codex |
 | [`youtube-extraction`](claude/skills/youtube-extraction/SKILL.md) | Reconstruct locally the solution depicted in a YouTube video — files, configurations, commands, transcripts, and supporting artifacts. Use whenever the user wants to extract, recreate, mirror, scrape, harvest, or rebu... | — |
 | [`youtube-prd-forensics`](claude/skills/youtube-prd-forensics/SKILL.md) | Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments,... | codex |
 
@@ -256,19 +214,9 @@ count (G5, `docs/requirements/canonical-repo.md`).
 |---|---|---|
 | [`chrome-extension-builder`](codex/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | claude, gemini |
 | [`composition-patterns`](codex/skills/composition-patterns/SKILL.md) |  | claude |
-| [`flutter`](codex/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | claude |
 | [`pwa-development`](codex/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | claude |
 | [`react-best-practices`](codex/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | claude |
-| [`react-native`](codex/skills/react-native/SKILL.md) | React Native mobile patterns, platform-specific code | claude |
 | [`react-web`](codex/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | claude |
-
-### Mobile (Native)
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`android-java`](codex/skills/android-java/SKILL.md) | Android Java development with MVVM, ViewBinding, and Espresso testing | claude |
-| [`android-kotlin`](codex/skills/android-kotlin/SKILL.md) | Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing | claude |
-| [`ui-mobile`](codex/skills/ui-mobile/SKILL.md) | Mobile UI patterns - React Native, iOS/Android, touch targets | claude |
 
 ### UI & Design
 
@@ -288,16 +236,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aws-aurora`](codex/skills/aws-aurora/SKILL.md) | AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling | claude |
-| [`aws-dynamodb`](codex/skills/aws-dynamodb/SKILL.md) | AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python | claude |
-| [`azure-cosmosdb`](codex/skills/azure-cosmosdb/SKILL.md) | Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns | claude |
-| [`cloudflare-d1`](codex/skills/cloudflare-d1/SKILL.md) | Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations | claude |
 | [`database-schema`](codex/skills/database-schema/SKILL.md) | Schema awareness - read before coding, type generation, prevent column errors | claude |
-| [`firebase`](codex/skills/firebase/SKILL.md) | Firebase Firestore, Auth, Storage, real-time listeners, security rules | claude |
-| [`supabase`](codex/skills/supabase/SKILL.md) | Core Supabase CLI, migrations, RLS, Edge Functions | claude |
-| [`supabase-nextjs`](codex/skills/supabase-nextjs/SKILL.md) | Next.js with Supabase and Drizzle ORM | claude |
-| [`supabase-node`](codex/skills/supabase-node/SKILL.md) | Express/Hono with Supabase and Drizzle ORM | claude |
-| [`supabase-python`](codex/skills/supabase-python/SKILL.md) | FastAPI with Supabase and SQLAlchemy/SQLModel | claude |
 
 ### Code Quality
 
@@ -325,30 +264,10 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`llm-patterns`](codex/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | claude |
 | [`project-manager`](codex/skills/project-manager/SKILL.md) | Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Manages the full lifecycle: extracting feature specs via interview, generati... | claude, gemini |
 
-### Commerce & Payments
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`medusa`](codex/skills/medusa/SKILL.md) | Medusa headless commerce - modules, workflows, API routes, admin UI | claude |
-| [`shopify-apps`](codex/skills/shopify-apps/SKILL.md) | Shopify app development - Remix, Admin API, checkout extensions | claude |
-| [`web-payments`](codex/skills/web-payments/SKILL.md) | Stripe Checkout, subscriptions, webhooks, customer portal | claude |
-| [`woocommerce`](codex/skills/woocommerce/SKILL.md) | WooCommerce REST API - products, orders, customers, webhooks | claude |
-
-### Third-Party Integrations
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`klaviyo`](codex/skills/klaviyo/SKILL.md) | Klaviyo email/SMS marketing - profiles, events, flows, segmentation | claude |
-| [`ms-teams-apps`](codex/skills/ms-teams-apps/SKILL.md) | Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API | claude |
-| [`posthog-analytics`](codex/skills/posthog-analytics/SKILL.md) | PostHog analytics, event tracking, feature flags, dashboards | claude |
-| [`reddit-ads`](codex/skills/reddit-ads/SKILL.md) | Reddit Ads API - campaigns, targeting, conversions, agentic optimization | claude |
-| [`reddit-api`](codex/skills/reddit-api/SKILL.md) | Reddit API with PRAW (Python) and Snoowrap (Node.js) | claude |
-
 ### SEO & Web Presence
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aeo-optimization`](codex/skills/aeo-optimization/SKILL.md) | AI Engine Optimization - semantic triples, page templates, content clusters for AI citations | claude |
 | [`site-architecture`](codex/skills/site-architecture/SKILL.md) | Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals | claude |
 | [`web-content`](codex/skills/web-content/SKILL.md) | SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization | claude |
 
@@ -361,15 +280,12 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`remote-installer`](codex/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | claude |
 | [`skills-manager`](codex/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | claude, gemini |
 | [`start-app`](codex/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | claude |
-| [`vercel-deploy-claimable`](codex/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | claude |
 | [`workspace`](codex/skills/workspace/SKILL.md) | Dynamic multi-repo and monorepo awareness - analyze workspace topology, track API contracts, and maintain cross-repo context | claude |
 
 ### Research & OSINT
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`worldview-layer-scaffold`](codex/skills/worldview-layer-scaffold/SKILL.md) | Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldVi... | claude |
-| [`worldview-shader-preset`](codex/skills/worldview-shader-preset/SKILL.md) | Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, ex... | claude |
 | [`youtube-prd-forensics`](codex/skills/youtube-prd-forensics/SKILL.md) | Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments,... | claude |
 
 ## Gemini Skills
