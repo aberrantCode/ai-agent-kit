@@ -41,6 +41,15 @@
          This is the STALE CHANGELOG condition defined by the Release-Automation
          Standard (claude/skills/github/sub-skills/release-init/SKILL.md). [error]
 
+      4. Python unit tests — the stdlib `unittest` suite under `scripts/tests`
+         (the `cc_transcripts` library and the github inspect-skill invariants)
+         is discovered and run as a child `python` process; a test failure is an
+         [error] finding ('unit-tests'). Skipped only if `scripts/tests` is
+         absent. This is the regression gate for the analysis tooling and the
+         skill-content invariants that nothing else in this script checks. [error]
+         (The opt-in template smoke test, -IncludeSmoke, is numbered separately
+         below as it predates this check in the code.)
+
     Working tree safety: CATALOG.md is regenerated in place (via -Force) purely
     to obtain byte-for-byte output identical to what a committed regeneration
     would produce, then its original bytes (captured before the regeneration,
@@ -83,9 +92,11 @@
 
 .NOTES
     Exit codes (requirements §6, mirrors audit.ps1's refinement):
-      0  clean — CATALOG.md and CHANGELOG.md are fresh and audit.ps1 exited 0
+      0  clean — CATALOG.md and CHANGELOG.md are fresh, audit.ps1 exited 0, and
+         the scripts/tests unittest suite passed
       1  findings — CATALOG.md is stale, CHANGELOG.md is missing a released
-         section, and/or audit.ps1 exited 1 (error-severity findings present)
+         section, audit.ps1 exited 1 (error-severity findings present), and/or
+         the scripts/tests unittest suite failed
       2  execution failure — could not complete validation (missing
          prerequisite script, no pwsh/python on PATH, unexpected exception, or
          audit.ps1 itself exited 2)
@@ -144,6 +155,15 @@ function Get-PwshExe {
     throw "No pwsh (PowerShell 7+) executable found on PATH."
 }
 
+# Resolve python explicitly — mirrors audit.ps1's internal resolver (python then python3).
+function Get-PythonExe {
+    foreach ($name in @('python', 'python3')) {
+        $cmd = Get-Command $name -ErrorAction SilentlyContinue
+        if ($cmd) { return $cmd.Source }
+    }
+    throw "No python/python3 executable found on PATH."
+}
+
 function Test-BytesEqual {
     param([byte[]]$A, [byte[]]$B)
     if ($null -eq $A -and $null -eq $B) { return $true }
@@ -169,6 +189,12 @@ $auditResult = $null
 $auditExitCode = $null
 $smokeResult = $null
 $smokeExitCode = $null
+$testsResult = [ordered]@{
+    checked = $false
+    failed  = $false
+    message = ''
+}
+$testsExitCode = $null
 
 $catalogPath = Join-Path $RepoRoot 'CATALOG.md'
 $originalCatalogBytes = $null
@@ -279,6 +305,33 @@ try {
         $smokeExitCode = $LASTEXITCODE
         $smokeResult = ($smokeJsonRaw -join "`n") | ConvertFrom-Json
     }
+
+    # -----------------------------------------------------------------------
+    # Check 5: Python unit tests under scripts/tests (stdlib unittest). Covers
+    # the cc_transcripts library and the github inspect-skill invariants. Runs
+    # only when the suite directory exists; a missing python executable is an
+    # execution failure (exit 2), consistent with audit.ps1's own python need.
+    # unittest exits 0 on success, 1 on any failure/error.
+    # -----------------------------------------------------------------------
+    $testsDir = Join-Path $RepoRoot 'scripts/tests'
+    if (Test-Path -LiteralPath $testsDir) {
+        $pythonExe = Get-PythonExe
+        # No -t: the suite's top-level dir defaults to the start dir. Each test file
+        # manages its own sys.path (inserting the cc_transcripts / skill locations it
+        # needs), so scripts/tests does NOT need to be an importable package — passing
+        # -t <RepoRoot> would demand an __init__.py it has never had and hard-fail with
+        # "Start directory is not importable". Absolute -s keeps it cwd-independent.
+        $testsOutput = & $pythonExe @('-m', 'unittest', 'discover', '-s', $testsDir, '-p', 'test_*.py') 2>&1
+        $testsExitCode = $LASTEXITCODE
+        $testsResult.checked = $true
+        $testsResult.failed = ($testsExitCode -ne 0)
+        $ranLine = @($testsOutput | Select-String -Pattern '^Ran \d+ test' | ForEach-Object { $_.Line }) | Select-Object -Last 1
+        $verdict = if ($testsExitCode -eq 0) { 'OK' } else { 'FAILED' }
+        $testsResult.message = if ($ranLine) { "$ranLine — $verdict" } else { "unittest exited $testsExitCode ($verdict)" }
+    }
+    else {
+        $testsResult.message = 'no scripts/tests directory — nothing to run.'
+    }
 }
 catch {
     $script:ExecError = $_
@@ -299,7 +352,7 @@ if ($exitCode -ne 2) {
         $exitCode = 2
     }
     elseif ($catalogResult.stale -or $changelogResult.stale -or $auditExitCode -eq 1 -or
-            ($IncludeSmoke -and $smokeExitCode -eq 1)) {
+            $testsResult.failed -or ($IncludeSmoke -and $smokeExitCode -eq 1)) {
         $exitCode = 1
     }
     else {
@@ -323,6 +376,8 @@ if ($Json) {
             auditWarnings   = if ($auditResult) { $auditResult.summary.warnings } else { $null }
             auditInfo       = if ($auditResult) { $auditResult.summary.info } else { $null }
             smokeExitCode   = $smokeExitCode
+            testsFailed     = $testsResult.failed
+            testsExitCode   = $testsExitCode
             exitCode        = $exitCode
             runtimeSeconds  = $runtimeSeconds
             executionError  = if ($script:ExecError) { "$($script:ExecError)" } else { $null }
@@ -331,6 +386,7 @@ if ($Json) {
         changelog = $changelogResult
         audit     = $auditResult
         smoke     = $smokeResult
+        tests     = $testsResult
     } | ConvertTo-Json -Depth 8
 }
 else {
@@ -353,6 +409,11 @@ else {
                     $auditResult.summary.errors, $auditResult.summary.warnings, `
                     $auditResult.summary.info, $auditExitCode
             } else { 'not run' }
+        }
+        [pscustomobject]@{
+            Check  = 'unit-tests'
+            Status = if (-not $testsResult.checked) { 'SKIPPED' } elseif ($testsResult.failed) { 'FAIL' } else { 'PASS' }
+            Detail = $testsResult.message
         }
     )
     if ($IncludeSmoke) {

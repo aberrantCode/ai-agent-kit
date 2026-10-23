@@ -48,7 +48,13 @@ class Base(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.tmp = self._tmp.name
+        # realpath, not .name: on Windows, tempfile can hand back an 8.3 SHORT path
+        # (e.g. C:\Users\ERIK~1.OPB\...) when the username exceeds 8 chars, while git
+        # resolves worktree paths to their LONG form (C:\Users\erik.OPBTA\...).
+        # os.path.abspath does NOT reconcile the two, so the shared-container worktree
+        # test would spuriously fail. Canonicalising the fixture root here makes every
+        # derived path match what git reports.
+        self.tmp = os.path.realpath(self._tmp.name)
         self.root = os.path.join(self.tmp, "projects")
         os.makedirs(self.root)
 
