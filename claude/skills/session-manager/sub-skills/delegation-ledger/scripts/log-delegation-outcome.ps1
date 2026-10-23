@@ -47,6 +47,13 @@
         -FailureMode wrong-answer -EscalatedTo sonnet `
         -Evidence 'reported 46,929 approved rows; actual journal count was 55,644' `
         -Repo dropbox_audit -Branch refactor/reset-move-queue
+
+.PARAMETER HandoffId
+    The handoff this delegation happened under (the id in the generating prompt's own
+    frontmatter — see session-manager's handoff registry,
+    sub-skills/handoff/references/handoff-registry.md). Optional: only sessions dispatched
+    through the `handoff` sub-skill have one. When given, it correlates this ledger row back to
+    that handoff without needing to join on `-PromptPath`/`-Branch` text matching.
 #>
 [CmdletBinding()]
 param(
@@ -70,6 +77,7 @@ param(
     [string]$Repo,
     [string]$Branch,
     [string]$PromptPath,
+    [string]$HandoffId,
     [int]$Dispatches = 1,
     [string]$LedgerPath = (Join-Path $env:USERPROFILE '.claude\telemetry\delegation-outcomes.jsonl')
 )
@@ -82,8 +90,8 @@ if ($Outcome -ne 'ok' -and -not $FailureMode) {
 if ($Outcome -ne 'ok' -and -not $Evidence) {
     Write-Warning 'No -Evidence given. Future-you will not be able to tell whether this was a real model limitation or a bad prompt.'
 }
-if ($Outcome -eq 'ok' -and -not ($PromptPath -or $Branch -or $Task)) {
-    Write-Warning 'This tally has no -PromptPath/-Branch/-Task tag, so retire/scripts/complete-task-session.ps1 cannot correlate it to a session and the retirement gate will not credit it. Tag totals rows with -PromptPath (the handoff prompt).'
+if ($Outcome -eq 'ok' -and -not ($PromptPath -or $Branch -or $Task -or $HandoffId)) {
+    Write-Warning 'This tally has no -HandoffId/-PromptPath/-Branch/-Task tag, so retire/scripts/complete-task-session.ps1 cannot correlate it to a session and the retirement gate will not credit it. Tag totals rows with -HandoffId when the prompt has one (see the handoff registry), else -PromptPath.'
 }
 
 $dir = Split-Path -Parent $LedgerPath
@@ -102,6 +110,7 @@ $record = [ordered]@{
     repo         = $Repo
     branch       = $Branch
     prompt       = $PromptPath
+    handoff_id   = $HandoffId
 }
 
 # One JSON object per line: append-only, survives concurrent sessions, greppable without a parser.

@@ -58,9 +58,23 @@
 .PARAMETER DryRun
     Print the claude runner and the delegated launch plan without launching anything.
 
+.PARAMETER HandoffId
+    The handoff's correlation id (see the generated prompt's own frontmatter — the `handoff`
+    sub-skill mints this once and reuses it everywhere). Written into the dispatch-time row this
+    script appends to the handoff registry. If omitted (a launch outside the `handoff` sub-skill
+    flow), one is generated so the registry row is never left without a join key.
+
+.PARAMETER RegistryPath
+    Override for the handoff registry JSONL path. Defaults to
+    `~/.claude/telemetry/handoffs.jsonl`. Exists mainly so tests can point this at a scratch file.
+
+.PARAMETER NoRegistry
+    Skip appending the dispatch-time registry row. For callers that manage their own correlation
+    (none today) or a launch that should not be tracked.
+
 .EXAMPLE
     pwsh -File launch-claude-session.ps1 -PromptPath C:\repo\docs\PROMPTS\task.md `
-        -WorkingDirectory C:\repo\.worktrees\my-task -Title repo-my-task
+        -WorkingDirectory C:\repo\.worktrees\my-task -Title repo-my-task -HandoffId d1-corr-26a
 
 .EXAMPLE
     pwsh -File launch-claude-session.ps1 -PromptPath C:\repo\prompt.md `
@@ -75,8 +89,53 @@ param(
     [string[]]$SetEnv = @(),
     [string]$TabColor,
     [string]$ColorScheme,
-    [switch]$DryRun
+    [switch]$DryRun,
+    [string]$HandoffId,
+    [string]$RegistryPath = (Join-Path $env:USERPROFILE '.claude\telemetry\handoffs.jsonl'),
+    [switch]$NoRegistry
 )
+
+# Captured before anything below touches $env: — this process IS the parent session (the launch
+# happens from inside it), and $script:InheritedSessionVariables is only cleared for the CHILD's
+# copy of the environment (via spawn-terminal's -ClearEnv), never for this process's own. Reading
+# it later would still work today, but capturing it up front removes any dependency on that not
+# changing.
+$script:ParentSessionId = $env:CLAUDE_CODE_SESSION_ID
+
+if (-not $HandoffId) {
+    # Launch invoked outside the `handoff` sub-skill's frontmatter flow (e.g. a manual run) — mint
+    # an id so the registry row this script writes is never without a join key.
+    $HandoffId = "lv-$($Title)-$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())"
+}
+
+# Pulled out as a pure function (no I/O) so it can be unit-tested by lifting it out of this
+# script's AST, the same way scripts/tests/install-skills.Tests.ps1 tests install-skills.ps1 --
+# this script has mandatory top-level parameters, so it cannot be dot-sourced directly in a test.
+function New-HandoffRegistryRecord {
+    param(
+        [Parameter(Mandatory = $true)][string]$HandoffId,
+        [string]$ParentSessionId,
+        [Parameter(Mandatory = $true)][string]$PromptPath,
+        [string]$Branch,
+        [string]$Repo,
+        [datetime]$Timestamp = (Get-Date)
+    )
+    # Dispatch-time row: child_sid is unknowable here (the CLI assigns it once the child's own
+    # transcript exists) -- never guessed. The Correlation section of the generated prompt
+    # instructs the child to append the completing row itself on its first turn (see
+    # handoff/references/handoff-registry.md).
+    [ordered]@{
+        handoff_id = $HandoffId
+        ts         = $Timestamp.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+        parent_sid = if ($ParentSessionId) { $ParentSessionId } else { $null }
+        child_sid  = $null
+        prompt     = $PromptPath
+        branch     = $Branch
+        repo       = $Repo
+        source     = 'live'
+        confidence = 1.0
+    }
+}
 
 # Defaults for a session that nobody is sitting in front of. A spawned session inherits nothing
 # from the interactive shell, so anything that matters has to be stated here.
@@ -214,4 +273,32 @@ if ($DryRun) {
 
 if (-not $DryRun) {
     Write-Host "Prompt: $PromptPath"
+
+    if (-not $NoRegistry) {
+        # Branch/repo come from git, not a caller-supplied string: WorkingDirectory is the
+        # worktree dispatch just launched into, and its checked-out branch plus its common dir's
+        # parent (the MAIN checkout, not this worktree) are ground truth — see
+        # cc_transcripts.common_dir for the same git-authoritative pattern on the read side.
+        $branch = (& git -C $WorkingDirectory rev-parse --abbrev-ref HEAD 2>$null)
+        if ($LASTEXITCODE -ne 0) { $branch = $null }
+        $repo = $null
+        $commonDir = (& git -C $WorkingDirectory rev-parse --git-common-dir 2>$null)
+        if ($LASTEXITCODE -eq 0 -and $commonDir) {
+            if (-not [System.IO.Path]::IsPathRooted($commonDir)) {
+                $commonDir = Join-Path $WorkingDirectory $commonDir
+            }
+            $repo = Split-Path -Parent (Resolve-Path -LiteralPath $commonDir).Path
+        }
+
+        $registryRecord = New-HandoffRegistryRecord -HandoffId $HandoffId `
+            -ParentSessionId $script:ParentSessionId -PromptPath $PromptPath `
+            -Branch $branch -Repo $repo
+        $registryDir = Split-Path -Parent $RegistryPath
+        if (-not (Test-Path -LiteralPath $registryDir)) {
+            New-Item -ItemType Directory -Path $registryDir -Force | Out-Null
+        }
+        ($registryRecord | ConvertTo-Json -Compress -Depth 3) |
+            Add-Content -LiteralPath $RegistryPath -Encoding UTF8
+        Write-Host "Handoff registry: $HandoffId -> $RegistryPath (child_sid pending child self-report)"
+    }
 }

@@ -24,13 +24,19 @@
 .PARAMETER Since
     Only consider records at or after this UTC date (yyyy-MM-dd). Useful after a model upgrade,
     when older evidence describes a model that no longer exists.
+
+.PARAMETER HandoffId
+    Restrict the report to rows tagged with this handoff id (see the handoff registry,
+    sub-skills/handoff/references/handoff-registry.md). Only rows logged with `-HandoffId` match
+    — older rows predating that tag are excluded, not silently counted in.
 #>
 [CmdletBinding()]
 param(
     [string]$LedgerPath = (Join-Path $env:USERPROFILE '.claude\telemetry\delegation-outcomes.jsonl'),
     [int]$MinSample = 10,
     [double]$FailureThreshold = 0.2,
-    [string]$Since
+    [string]$Since,
+    [string]$HandoffId
 )
 
 $ErrorActionPreference = 'Stop'
@@ -46,6 +52,9 @@ $records = Get-Content -LiteralPath $LedgerPath | Where-Object { $_.Trim() } | F
 if ($Since) {
     $cutoff = [datetime]::Parse($Since).ToUniversalTime()
     $records = $records | Where-Object { [datetime]::Parse($_.timestamp) -ge $cutoff }
+}
+if ($HandoffId) {
+    $records = $records | Where-Object { $_.handoff_id -eq $HandoffId }
 }
 if (-not $records) { Write-Host 'No records in range.'; return }
 
@@ -110,6 +119,7 @@ if ($examples) {
         # ConvertFrom-Json turns the ISO string into a DateTime and would otherwise print it in
         # local culture format, which does not match what is actually stored in the ledger.
         $stamp = if ($e.timestamp -is [datetime]) { $e.timestamp.ToUniversalTime().ToString('yyyy-MM-dd HH:mmZ') } else { $e.timestamp }
-        Write-Host ("  [{0}] {1}/{2} {3}: {4}" -f $stamp, $e.category, $e.model, $e.failure_mode, $e.evidence)
+        $tag = if ($e.handoff_id) { " ($($e.handoff_id))" } else { '' }
+        Write-Host ("  [{0}] {1}/{2} {3}: {4}{5}" -f $stamp, $e.category, $e.model, $e.failure_mode, $e.evidence, $tag)
     }
 }

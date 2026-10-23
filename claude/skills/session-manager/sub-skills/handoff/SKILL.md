@@ -113,6 +113,29 @@ worktree convention will dutifully create a second one and split its work across
 > globally). Never emit a bare `scripts/…` path: the receiving session resolves it against *its
 > own* repo root, where the script does not exist, and reads the miss as "never scaffolded."
 
+### Required frontmatter
+
+Every generated prompt opens with a YAML frontmatter block — this is also the input `dispatch`
+reads for the worktree/launch call, so it has to exist before Step 4, not be added after:
+
+```yaml
+---
+handoff_id: <short-stable-id, e.g. d1-corr-26a>
+title: <one-line title>
+model: <pinned model id, see "Choosing the model" below>
+base_branch: <usually dev>
+branch: <type/slug>
+repo: <absolute repo path>
+---
+```
+
+`handoff_id` is the join key the [registry](references/handoff-registry.md) correlates this
+handoff on — generate it once here (short, stable, grep-friendly; collisions are cheap to avoid
+since you control the slug) and reuse it everywhere below: the Correlation section, the
+`dispatch` call, and any `log-delegation-outcome.ps1 -HandoffId` calls the prompt instructs. Add
+`depends_on: <other handoff_id>` when this handoff is a deliberate follow-on to another (e.g. a
+second phase that must not start until the first merges).
+
 ### Required sections
 
 1. **Orientation.** Point at the repo's own `CLAUDE.md`/`AGENTS.md` and tell it to follow that
@@ -123,25 +146,35 @@ worktree convention will dutifully create a second one and split its work across
    a forbidden action, stop and ask rather than improvise. This matters most under
    `--dangerously-skip-permissions` (the `dispatch` default), where this text is the *only*
    guardrail left — write it as the last line of defence.
-3. **State already established.** Verified facts — counts, IDs, file paths, what is already
+3. **Correlation (required).** Tell the child session to, on its own first turn, append its own
+   row to the [handoff registry](references/handoff-registry.md)
+   (`~/.claude/telemetry/handoffs.jsonl`): same `handoff_id` as the frontmatter, `source: live`,
+   `confidence: 1.0`, and its own session id as `child_sid` (available to it as
+   `$env:CLAUDE_CODE_SESSION_ID` / the equivalent session-identity read for its platform). Also
+   tell it to pass `-HandoffId <handoff_id>` on every
+   `log-delegation-outcome.ps1` call it makes, so delegation outcomes correlate back to this
+   handoff. This closes the loop the dispatch-time row (written by `launch-claude-session.ps1`,
+   `child_sid: null`) leaves open — without the self-report, `child_sid` stays null forever for a
+   live handoff.
+4. **State already established.** Verified facts — counts, IDs, file paths, what is already
    merged, what is already green — each tagged `[V]`/`[?]`, and marked "already done, do not redo".
-4. **What we tried / dead ends (required).** Approaches attempted and abandoned, with the concrete
+5. **What we tried / dead ends (required).** Approaches attempted and abandoned, with the concrete
    reason (error text, wrong assumption, measured result). Prevents the new session re-walking
    them. If genuinely none, write "None — first attempt" rather than omitting the section.
-5. **Tasks, in order.** Per task: what to do, what "done" looks like, what to report, plus the
+6. **Tasks, in order.** Per task: what to do, what "done" looks like, what to report, plus the
    ordering rationale from Step 2. Prefer pointing at existing scripts and flags over describing
    procedures. All tasks run on the one branch unless the work genuinely splits into independently
    reviewable PRs, in which case say so and name the extra branches.
-6. **Finishing.** Merge into the base branch, sync local to `origin/<base>`, report — then stop.
+7. **Finishing.** Merge into the base branch, sync local to `origin/<base>`, report — then stop.
    It must not delete its own prompt file: the `retire` gate includes a human confirmation it
    cannot evaluate on its own behalf.
-7. **Delegation.** Spawn subagents for mechanical work with `model: "haiku"` passed explicitly — a
+8. **Delegation.** Spawn subagents for mechanical work with `model: "haiku"` passed explicitly — a
    subagent with no model set silently inherits the parent's expensive model, so the cheap default
    must be stated. Name real candidates in this repo's work: locating call sites, extracting counts
    from journals, reading a doc and pulling out a value, drafting a summary script, cross-checking
    docs against code. Equally name what stays in the main session — design decisions, sequencing,
    anything adversarial. Remind it to dispatch independent lookups in parallel in one message.
-8. **Delegation logging.** The cheap-model default is a bet, and bets need a scoreboard. Instruct
+9. **Delegation logging.** The cheap-model default is a bet, and bets need a scoreboard. Instruct
    the session to record outcomes with the `delegation-ledger` scripts
    ([`log-delegation-outcome.ps1`](../delegation-ledger/scripts/log-delegation-outcome.ps1),
    reviewed with [`delegation-report.ps1`](../delegation-ledger/scripts/delegation-report.ps1)):
@@ -156,14 +189,14 @@ worktree convention will dutifully create a second one and split its work across
    When `delegation-report.ps1` has flagged a category, name that category in the *next* prompt as
    one to keep in the main session — today's failures become tomorrow's routing rules. Rationale
    and vocabulary live in `delegation-ledger`; do not restate them here.
-9. **Polling, only when something must be watched.** If a task waits on state the harness cannot
-   notify about (CI, a deploy, a long external job, a draining queue), instruct `/loop` with an
-   interval matched to how fast the state changes (`/loop 10m <task>`), or bare `/loop` to
-   self-pace. Not for work that merely takes a while — backgrounded commands already notify, and a
-   polling loop around them burns tokens. If nothing waits on external state, omit this.
-10. **Reporting.** Terse output, ending each turn with a single numbered list of items needing a
+10. **Polling, only when something must be watched.** If a task waits on state the harness cannot
+    notify about (CI, a deploy, a long external job, a draining queue), instruct `/loop` with an
+    interval matched to how fast the state changes (`/loop 10m <task>`), or bare `/loop` to
+    self-pace. Not for work that merely takes a while — backgrounded commands already notify, and a
+    polling loop around them burns tokens. If nothing waits on external state, omit this.
+11. **Reporting.** Terse output, ending each turn with a single numbered list of items needing a
     decision; verify counts before stating them; correct earlier wrong claims in one line.
-11. **Model note.** State which model you pinned and why (see below).
+12. **Model note.** State which model you pinned and why (see below).
 
 ### Choosing the model
 
