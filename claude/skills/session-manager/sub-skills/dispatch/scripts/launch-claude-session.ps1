@@ -109,6 +109,19 @@ $script:DefaultEnvironment = @{
     CLAUDE_CODE_ARTIFACT_AUTO_OPEN           = '0'
 }
 
+# Identity of the session doing the launching. A new wt window inherits the launcher's environment,
+# so without clearing these the spawned claude starts up believing it is a child of the session that
+# handed off — sharing its session id and messaging socket instead of being a session of its own.
+# Cleared inside the runner (via spawn-terminal -ClearEnv) before claude starts.
+$script:InheritedSessionVariables = @(
+    'CLAUDE_CODE_CHILD_SESSION'
+    'CLAUDE_CODE_SESSION_ID'
+    'CLAUDE_CODE_MESSAGING_SOCKET'
+    'CLAUDE_CODE_MESSAGING_TOKEN'
+    'CLAUDE_PID'
+    'CLAUDECODE'
+)
+
 $ErrorActionPreference = 'Stop'
 
 if (-not (Test-Path -LiteralPath $PromptPath)) {
@@ -184,6 +197,7 @@ $spawnParams = @{
     WorkingDirectory = $WorkingDirectory
     Title            = $Title
     SetEnv           = $mergedSetEnv
+    ClearEnv         = $script:InheritedSessionVariables
     VerifyProcess    = 'claude'
 }
 if ($TabColor) { $spawnParams.TabColor = $TabColor }
