@@ -204,7 +204,10 @@ $unreleased = Get-CommitsInRange $unreleasedRange
 $sections.Add((Format-Section -Heading 'Unreleased' -DateIso '' -Commits $unreleased))
 
 # Walk tags newest-first so the changelog reads top-down like a blog feed
-$reversed = $tags | Sort-Object -Property @{Expression = { [version]($_.TrimStart('v')) }} -Descending
+# @(...) forces an array even when there's exactly one tag: Sort-Object unwraps
+# a single-element pipeline to a scalar [string], and string-indexing
+# $reversed[0] then returns the first CHARACTER ('v'), not the tag.
+$reversed = @($tags | Sort-Object -Property @{Expression = { [version]($_.TrimStart('v')) }} -Descending)
 
 for ($i = 0; $i -lt $reversed.Count; $i++) {
     $current = $reversed[$i]
