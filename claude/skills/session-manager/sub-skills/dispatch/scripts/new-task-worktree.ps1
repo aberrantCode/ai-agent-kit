@@ -59,6 +59,10 @@ $script:RepoRoot = (& git -C $RepoPath rev-parse --show-toplevel 2>&1)
 if ($LASTEXITCODE -ne 0) { throw "Not a git repository: $RepoPath" }
 $script:RepoRoot = $script:RepoRoot.Trim()
 
+# core.bare guard (pre): a prior op may have left the primary flipped to bare; detect/repair/log
+# before we touch worktrees. See guard-core-bare.ps1 for why this exists.
+& (Join-Path $PSScriptRoot 'guard-core-bare.ps1') -RepoPath $script:RepoRoot -Op 'new-task-worktree' -Phase 'pre' | Out-Null
+
 $Slug = ($Slug -replace '[^\w\-]+', '-').Trim('-').ToLowerInvariant()
 if (-not $Slug) { throw 'Slug reduced to empty after normalisation.' }
 $branch = "$Type/$Slug"
@@ -121,6 +125,9 @@ if ($SyncDeps) {
         if ($LASTEXITCODE -ne 0) { Write-Warning 'npm ci failed; the new session will need to sort dependencies out itself.' }
     }
 }
+
+# core.bare guard (post): catch a flip caused by THIS op's worktree creation before we hand back.
+& (Join-Path $PSScriptRoot 'guard-core-bare.ps1') -RepoPath $script:RepoRoot -Op 'new-task-worktree' -Phase 'post' | Out-Null
 
 [pscustomobject]@{
     WorktreePath = $worktreePath

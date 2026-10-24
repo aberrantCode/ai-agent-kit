@@ -197,6 +197,10 @@ $PromptPath = (Resolve-Path -LiteralPath $PromptPath).Path
 $WorkingDirectory = (Resolve-Path -LiteralPath $WorkingDirectory).Path
 $Title = $Title -replace '\s+', '-'
 
+# core.bare guard (pre): the launch target's repo must not be bare; detect/repair/log if a prior
+# op flipped it. See guard-core-bare.ps1 (the primary repeatedly went bare during dispatch/merge).
+& (Join-Path $PSScriptRoot 'guard-core-bare.ps1') -RepoPath $WorkingDirectory -Op 'launch-claude-session' -Phase 'pre' | Out-Null
+
 # Locate the generic launcher. The installed global profile mirrors the archive's directory layout
 # — spawn-terminal and session-manager are siblings under skills/ in both — so one $PSScriptRoot-
 # relative path resolves in dev and in production alike (scripts -> dispatch -> sub-skills -> session-manager -> skills: four levels up).
