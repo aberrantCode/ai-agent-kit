@@ -352,8 +352,35 @@ class TestWorktrees(Base):
     def test_git_registered_worktree_in_shared_container(self):
         repo = os.path.join(self.tmp, "repo")
         os.makedirs(repo)
-        env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t",
-                   GIT_COMMITTER_EMAIL="t@t")
+        # Isolate from any git context the test process itself is running inside.
+        # A git hook (e.g. this repo's pre-push -> validate.ps1 -> this suite)
+        # invokes its children with GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE etc. set
+        # in the environment, pointing at the REAL repository. GIT_DIR overrides
+        # cwd-based discovery (it even overrides `-C <path>`), so starting env
+        # from os.environ (as a prior version of this test did) made "git init"/
+        # "commit"/"worktree add" below operate on the real repo instead of this
+        # fixture -- it actually happened, landing stray `t <t@t>` "init" commits
+        # and a `wtbranch` branch that reached origin/dev.
+        #
+        # Clearing inherited GIT_* vars from os.environ itself (not just the
+        # subprocess env below) also matters for the *assertions*: cct.common_dir
+        # / cct.registered_worktrees shell out via cc_transcripts._git(), which
+        # does not take an explicit env and so inherits this process's os.environ.
+        # Under the same hook, an inherited GIT_DIR made those read calls silently
+        # resolve the real repo too -- which is how this test's writes and reads
+        # ended up agreeing with each other while both were quietly hitting the
+        # real repo instead of the fixture.
+        removed = {k: os.environ.pop(k) for k in list(os.environ) if k.startswith("GIT_")}
+        self.addCleanup(os.environ.update, removed)
+
+        env = dict(os.environ)
+        env.update(
+            GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t",
+            GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t",
+            GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+            GIT_CEILING_DIRECTORIES=self.tmp,
+            HOME=self.tmp, USERPROFILE=self.tmp,
+        )
 
         def git(*a, cwd=repo):
             return subprocess.run(["git", *a], cwd=cwd, env=env, capture_output=True, text=True)
