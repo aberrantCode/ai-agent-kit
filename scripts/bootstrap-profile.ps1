@@ -242,7 +242,7 @@ try {
 
     $skillsTarget = if ($TargetDir) { $TargetDir } else { Join-Path $HomeDir (Join-Path ".$Vendor" 'skills') }
     foreach ($skill in $ordered) {
-        $pushArgs = @('-NoProfile', '-File', $PushScript, '-Name', $skill, '-Vendor', $Vendor, '-TargetDir', $skillsTarget, '-Json')
+        $pushArgs = @('-NoProfile', '-File', $PushScript, '-Name', $skill, '-Vendor', $Vendor, '-TargetDir', $skillsTarget, '-NoDeps', '-Json')
         if ($Force) { $pushArgs += '-Force' }
         $out  = & pwsh @pushArgs 2>&1 | Out-String
         $code = $LASTEXITCODE
