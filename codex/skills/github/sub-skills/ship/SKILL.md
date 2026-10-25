@@ -249,7 +249,7 @@ gh pr view "$BRANCH" --json isDraft,mergeable,mergeStateStatus,reviewDecision
 - Poll `mergeable == UNKNOWN` up to 5× / 15s before treating it as real.
 - `isDraft` (only if you opened it draft) → `gh pr ready`.
 - `mergeStateStatus == BLOCKED` + pending checks → if
-  `gh repo view --json autoMergeAllowed -q .autoMergeAllowed` is `true`, set `AUTO=--auto` for
+  `gh api "repos/{owner}/{repo}" -q .allow_auto_merge` is `true`, set `AUTO=--auto` for
   Step 7's merge; else watch `gh pr checks "$BRANCH" --watch` to green (leave `AUTO` empty),
   then merge. A *failing* check stops the ship — surface it (Error-Recovery already covers this).
 

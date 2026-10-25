@@ -102,7 +102,7 @@ Gate, in order — each blocker stops *this target* only (record it, continue to
 5. `mergeStateStatus == BEHIND` → the base moved; note it. `BLOCKED`, or any failing/pending
    `gh pr checks` line → required checks are in play:
    - Detect whether the repo even allows auto-merge:
-     `gh repo view --json autoMergeAllowed -q .autoMergeAllowed`.
+     `gh api "repos/{owner}/{repo}" -q .allow_auto_merge`.
    - `true` and checks are merely *pending* → `gh pr merge <n> --merge --auto --delete-branch`
      and record "queued on auto-merge" for the summary.
    - `false`, or a check is *failing* → stop this target and print the failing check. Never

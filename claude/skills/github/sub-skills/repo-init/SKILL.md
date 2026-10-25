@@ -113,7 +113,7 @@ deleteBranchOnMerge: true
 Squash and rebase are disabled at the repo level so the UI is physically unable to violate
 the bundle's merge-commit rule. `deleteBranchOnMerge` complements `/prune`.
 
-**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`autoMergeAllowed`) is
+**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`allow_auto_merge`) is
 a **per-repo choice, not part of the standard**: `repo-init` *reports* its current state so you
 know whether `/ship` and `/merge` can take the `--auto` preflight path, but it never enables it
 and never flags it as drift. `/ship` and `/merge` detect it live at preflight and fall back to
@@ -418,7 +418,8 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
 gh repo view --json visibility,defaultBranchRef,description,homepageUrl,repositoryTopics,\
 hasWikiEnabled,hasProjectsEnabled,deleteBranchOnMerge,mergeCommitAllowed,squashMergeAllowed,\
-rebaseMergeAllowed,autoMergeAllowed
+rebaseMergeAllowed
+gh api "/repos/$REPO" --jq .allow_auto_merge          # auto-merge: not a gh repo view field
 gh api "/repos/$REPO/rulesets"
 gh api "/repos/$REPO/actions/permissions/workflow"
 gh api "/repos/$REPO" --jq '.security_and_analysis'
@@ -451,7 +452,7 @@ Build the drift list group by group (Groups 1–9). Each item is one of:
 | **new-in-standard** | repo's `standardVersion` predates this rule | actionable, labelled `(new)` |
 | **blocked** | cannot be applied here (plan/permission) | reported with the reason, not offered |
 
-Auto-merge (`autoMergeAllowed`, probed in Step 2) is reported here as **informational status,
+Auto-merge (`allow_auto_merge`, probed in Step 2) is reported here as **informational status,
 never drift** — a per-repo choice (Group 2). Surface whether it is on or off so the operator
 knows the `--auto` path is available to `/ship` and `/merge`; never offer to change it.
 
