@@ -18,6 +18,15 @@ This skill implements a self-driving project pipeline. Markdown files in `docs/`
 source of truth — they persist across sessions and coordinate between the orchestrator (you) and
 worker agents.
 
+## Ownership Boundary
+
+Verbatim per the ai-agent-kit reorg charter §3 (`docs/reorg/charter.md`), sentence 1:
+
+> project-manager owns single-agent multi-turn loop composition; agent-manager owns multi-agent dispatch and recovery; session-manager owns session handoff, durable session state, and session-JSONL infrastructure.
+
+Session handoff ("give me a prompt for the next session"), checkpoints, and resume live in the
+`session-manager` bundle — route those requests there.
+
 ## Directory Conventions
 
 ```
@@ -283,17 +292,10 @@ the user that the runner list should be confirmed via `/reinit` for deterministi
 
 ### `/continue-new-session` — Generate a Session-Handoff Prompt
 
-Use when the user wants to pause this session and resume the recommended next action in a brand new
-session (typically because the current context is getting long or they want to switch runtime — e.g.,
-hand off from Claude Code to Codex or Gemini).
-
-Reads this session's own most recent recap to extract the "next step" recommendation, resolves the
-relevant feature spec / plan / active task paths, and prints a single copy-ready Markdown code block
-containing the handoff prompt. Reference-style — paths plus 2–3 line excerpts, no large inline
-content. Read-only: never modifies project state. If no recap recommendation exists (e.g., first
-turn of the session), falls back to `docs/STATUS.md` §1 (`docs/workflow/FOCUS.md` is a retired stub
-pointing there), then `pm-next.ps1`, then the highest-priority unblocked `todo` task. Detailed flow
-lives in `sub-skills/continue-new-session/SKILL.md`.
+Owned by the `session-manager` bundle (`handoff` sub-skill, copy mode; `/continue-new-session` is a
+session-manager alias). It reads this session's most recent recap, falls back to `docs/STATUS.md` §1
+(`docs/workflow/FOCUS.md` is a retired stub pointing there), then `pm-next.ps1`, then the
+highest-priority unblocked `todo` task, and prints a copy-ready handoff prompt. Read-only.
 
 ---
 
@@ -303,7 +305,7 @@ Use when the user wants the pipeline to keep advancing one atomic unit at a time
 having to hand-write the next prompt each turn. Each invocation handles **exactly one** iteration:
 
 1. **Reads this session's prior turn** for the recap-recommended next action (same primitive as
-   `/continue-new-session` Step 1) and any pending PR signal.
+   `session-manager` `handoff` copy-mode Step 1) and any pending PR signal.
 2. **Optionally merges a pending PR** via the global `ship-to-dev` skill. Always confirmed via
    `AskUserQuestion` first — per the global `git-workflow.md`, a one-time skill invocation does
    not authorize unattended destructive merges. PRs with red CI or conflicts are surfaced as the

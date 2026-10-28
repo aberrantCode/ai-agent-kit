@@ -187,7 +187,7 @@
         <li><code>&lt;skill-dir&gt;</code> is this bundle's own directory, not the receiving repo's root.</li>
         <li>Verify from the script's <strong>printed output</strong> (PID or launch note), not from the call merely returning.</li>
         <li>This is the <strong>generic terminal-launch core</strong> — no Claude-specific or tool-specific logic lives here.</li>
-        <li><code>session-handoff:handoff</code> builds its Claude-session launcher on top of this skill, not beside it.</li>
+        <li><code>session-manager</code> <code>dispatch</code> builds its Claude-session launcher on top of this skill, not beside it.</li>
       </ul>
     </div>
   </div>

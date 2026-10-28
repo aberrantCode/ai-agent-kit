@@ -1,48 +1,28 @@
 ---
 name: session-handoff
 description: >
-  Umbrella for two related but distinct session-lifecycle operations: handing off open work to a
-  fresh Claude Code session, and auditing whether past session behavior actually followed a stated
-  rule. Use this skill when the ask is about "session-handoff" without a clear sub-operation, or
-  when unsure which of the two applies. Otherwise route directly to the specific sub-skill by
-  loading this bundle (`Skill(session-handoff)`) and reading its file: `sub-skills/handoff/SKILL.md`
-  for continuing/dispatching work in a new terminal session ("continue in a new session", "hand this
-  off", "spawn a new terminal and keep going", "/handoff", "/dispatch-session-prompt"), or
-  `sub-skills/audit/SKILL.md` for checking whether a stated policy was
-  actually followed in past session transcripts ("did I actually follow rule X", "audit my last N
-  hours for compliance", "/hand-off-audit"). Do not confuse the two: handoff moves work forward into
-  a new session; audit looks backward at what already happened.
+  Deprecated alias — use `session-manager`. Routes any request that still names
+  "session-handoff" (handing off open work to a fresh session, or auditing whether past sessions
+  followed a stated rule) to the `session-manager` bundle: `handoff` for "continue in a new
+  session" / "hand this off" / "/handoff", and `audit` for "did I actually follow rule X" /
+  "/hand-off-audit". Remove in the next release.
 category: Foundations & Workflow
-requires: []
+status: deprecated
+requires: [session-manager]
 ---
 
-# Session Handoff
+# Session Handoff (deprecated alias)
 
-This is a router, not a workflow — it exists so a request that names "session-handoff" without
-specifying which half it means still finds the right place. The two sub-skills are independent and
-you should almost always be able to route to one of them directly instead of stopping here.
+> **Deprecated 2026-10-21 — remove in the next release.** Everything this bundle did now lives in
+> [`session-manager`](../session-manager/SKILL.md). This file only routes; it has no sub-skills,
+> scripts, or commands.
 
-## Which one do I want?
+| You want to… | Go to |
+|---|---|
+| Hand off open work to a fresh session (`/handoff`, `/dispatch-session-prompt`) | `session-manager` → `sub-skills/handoff/SKILL.md` |
+| Create a worktree and launch a prompt file | `session-manager` → `sub-skills/dispatch/SKILL.md` |
+| Retire a finished session (`complete-task-session.ps1`) | `session-manager` → `sub-skills/retire/SKILL.md` |
+| Log or report delegation outcomes | `session-manager` → `sub-skills/delegation-ledger/SKILL.md` |
+| Audit past sessions against a rule (`/hand-off-audit`) | `session-manager` → `sub-skills/audit/SKILL.md` |
 
-- **Moving work forward** — you have open decisions, unfinished tasks, or a scope that needs to run
-  unattended in a fresh session with no conversation history. See
-  [`sub-skills/handoff/SKILL.md`](sub-skills/handoff/SKILL.md) (read this file directly — there is
-  no dispatchable `session-handoff:handoff` skill).
-  Commands: `/handoff`, `/dispatch-session-prompt` (the launcher delegates tab spawning to the
-  `spawn-terminal` skill, which now owns `/repo-color`).
-
-- **Looking backward** — you want to know whether a stated rule was actually followed by past agent
-  behavior (this session or an earlier one), not whether code currently complies with a rule right
-  now. See [`sub-skills/audit/SKILL.md`](sub-skills/audit/SKILL.md) (read this file directly — there
-  is no dispatchable `session-handoff:audit` skill).
-  Command: `/hand-off-audit`.
-
-If the request is genuinely ambiguous between the two, ask — don't guess. "Hand off this audit to a
-new session" is a handoff *of* an audit task (`handoff`, with the audit as its scope), not an
-invocation of `audit` itself.
-
-## Scope
-
-This file intentionally carries no procedural content of its own. All actual logic — entry modes,
-steps, hard constraints, report formats — lives in the sub-skill it belongs to. Keep it that way:
-if you find yourself adding a step here, it probably belongs in one of the two sub-skills instead.
+Load `Skill(session-manager)` and read the sub-skill named above.

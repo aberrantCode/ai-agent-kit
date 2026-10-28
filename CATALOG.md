@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-21, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-23, schemaVersion: 1)
 -->
 
 # Catalog
@@ -19,38 +19,28 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`accumulated-feature-branch-workflow`](claude/skills/accumulated-feature-branch-workflow/SKILL.md) | Use when implementing multiple related enhancements, or a large feature that must be split across risk boundaries, and you need to decide branch/PR structure. Covers accumulating related work on one shared branch with... | — |
 | [`add-feature`](claude/skills/add-feature/SKILL.md) | Use when the user wants to spec out, plan, or document a new feature. Triggers on /add-feature, /create-feature-spec, or when the user says things like "I want to add a feature", "spec out a feature", "create a featur... | codex |
 | [`additive-merge-conflict-resolution`](claude/skills/additive-merge-conflict-resolution/SKILL.md) | Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the... | — |
-| [`analyze-conversations`](claude/skills/analyze-conversations/SKILL.md) | Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting — "what keeps going wrong", "find issues we've hit more than once", "aud... | — |
 | [`base`](claude/skills/base/SKILL.md) | Universal coding patterns, constraints, TDD workflow, atomic todos | codex |
 | [`claim-discipline`](claude/skills/claim-discipline/SKILL.md) | Use when about to state a checkable claim as fact — a file path, a line number, a count ("appears N times", "2 stale branches"), a quote ("the rule says X"), or "file Y contains / lacks Z". Verify it with a tool call ... | — |
 | [`code-deduplication`](claude/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | codex |
 | [`commit-hygiene`](claude/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | codex |
-| [`conversation-history-mining-for-domain-knowledge`](claude/skills/conversation-history-mining-for-domain-knowledge/SKILL.md) | Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps — mine prior Claude conversation transcripts instead... | — |
 | [`existing-repo`](claude/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | codex |
-| [`feature-start`](claude/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | codex |
 | [`finishing-a-development-branch`](claude/skills/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the br... | codex |
-| [`fix-start`](claude/skills/fix-start/SKILL.md) | Use when starting any HomeRadar bug fix or regression investigation, before writing any code | codex |
 | [`github`](claude/skills/github/SKILL.md) | Use for any git or GitHub repository operation in the terminal, even when "git" isn't said: commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev, cut a dev→main release or provi... | codex |
 | [`guide-assistant`](claude/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | codex |
 | [`iterative-audit-gate-with-streak-reset`](claude/skills/iterative-audit-gate-with-streak-reset/SKILL.md) | Use when a deliverable, backlog closure, or shipped change must be verified against a spec/gate before being considered done, and a single clean pass isn't trustworthy enough. Runs independent auditors or verification... | — |
 | [`iterative-development`](claude/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | codex |
 | [`one-job-test`](claude/skills/one-job-test/SKILL.md) | Test an installed agent skill against one real job to decide whether to keep it, fork it, or delete it. Use this whenever the user mentions installing, evaluating, auditing, trusting, pruning, or being disappointed by... | — |
 | [`parallel-subagent-fanout`](claude/skills/parallel-subagent-fanout/SKILL.md) | Use when a task splits into independent lenses or disjoint-file subtasks — multi-layer system audits, large documentation backfills (10+ specs), batch state-transition decisions, or code/security review of a feature b... | — |
-| [`pre-pr`](claude/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | codex |
 | [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/SKILL.md) | Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, a... | — |
-| [`recursive-batch-handoff`](claude/skills/recursive-batch-handoff/SKILL.md) | Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations — each batch runs a discovery command to find what's left, executes one coherent chunk, and emits ... | — |
 | [`requesting-code-review`](claude/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | codex |
-| [`retro-fit-spec`](claude/skills/retro-fit-spec/SKILL.md) | Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section | codex |
 | [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/SKILL.md) | Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, com... | — |
-| [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Umbrella for two related but distinct session-lifecycle operations: handing off open work to a fresh Claude Code session, and auditing whether past session behavior actually followed a stated rule. Use this skill when... | — |
-| [`session-management`](claude/skills/session-management/SKILL.md) | Context preservation, tiered summarization, resumability | codex |
+| [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Deprecated alias — use `session-manager`. Routes any request that still names "session-handoff" (handing off open work to a fresh session, or auditing whether past sessions followed a stated rule) to the `session-mana... | — |
+| [`session-manager`](claude/skills/session-manager/SKILL.md) | Owns the whole Claude Code session lifecycle plus the shared transcript (JSONL) parser. Start: resume where you left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish... | — |
 | [`spawn-terminal`](claude/skills/spawn-terminal/SKILL.md) | Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script — independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to "o... | — |
-| [`spec-align`](claude/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | codex |
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/SKILL.md) | Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scop... | — |
 | [`stale-symbolic-ref-detection-and-repair`](claude/skills/stale-symbolic-ref-detection-and-repair/SKILL.md) | Use when a script, agent, or session is about to act on a remembered reference — a git default branch, a cached IP/credential, an "SSH is broken" note in memory — before any destructive or high-stakes operation. Verif... | — |
-| [`state-file-driven-multi-turn-resumption`](claude/skills/state-file-driven-multi-turn-resumption/SKILL.md) | Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them — a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one s... | — |
 | [`subagent-driven-development`](claude/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | codex |
 | [`team-coordination`](claude/skills/team-coordination/SKILL.md) | Multi-person projects - shared state, todo claiming, handoffs | codex |
-| [`work-resume`](claude/skills/work-resume/SKILL.md) | Use when the operator wants to pick up where they left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish that", "what's next here", "I forgot where I left off". Scans... | — |
 
 ### Languages & Runtimes
 
@@ -69,23 +59,13 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`chrome-extension-builder`](claude/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | codex, gemini |
 | [`composition-patterns`](claude/skills/composition-patterns/SKILL.md) |  | codex |
 | [`css-variables-for-multi-theme-reskin`](claude/skills/css-variables-for-multi-theme-reskin/SKILL.md) | Use when a mockup, dashboard, or app needs light/dark modes and/or multiple brand palettes, or when asked to "reskin" or "retheme" an existing interface without touching its structure or interaction logic. | — |
-| [`flutter`](claude/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | codex |
 | [`pwa-development`](claude/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | codex |
 | [`react-best-practices`](claude/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | codex |
-| [`react-native`](claude/skills/react-native/SKILL.md) | React Native and Expo patterns — project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code | codex |
 | [`react-virtualization-with-jsdom-measurement`](claude/skills/react-virtualization-with-jsdom-measurement/SKILL.md) | Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser. | — |
 | [`react-web`](claude/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | codex |
 | [`reactive-ui-state-with-delegated-event-routing`](claude/skills/reactive-ui-state-with-delegated-event-routing/SKILL.md) | Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-col... | — |
 | [`self-contained-html-artifact-with-inline-assets`](claude/skills/self-contained-html-artifact-with-inline-assets/SKILL.md) | Use when building a portable HTML deliverable (dashboard mockup, presentation, static data browser, branded page) that must open directly in any browser with zero external requests — no CDNs, no relative-path assets, ... | — |
 | [`ui-redesign-with-snapshot-regeneration`](claude/skills/ui-redesign-with-snapshot-regeneration/SKILL.md) | Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes — to avoid mask... | — |
-
-### Mobile (Native)
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`android-java`](claude/skills/android-java/SKILL.md) | Android Java development with MVVM, ViewBinding, and Espresso testing | codex |
-| [`android-kotlin`](claude/skills/android-kotlin/SKILL.md) | Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing | codex |
-| [`ui-mobile`](claude/skills/ui-mobile/SKILL.md) | Mobile UI patterns - React Native, iOS/Android, touch targets | codex |
 
 ### UI & Design
 
@@ -107,16 +87,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aws-aurora`](claude/skills/aws-aurora/SKILL.md) | AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling | codex |
-| [`aws-dynamodb`](claude/skills/aws-dynamodb/SKILL.md) | AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python | codex |
-| [`azure-cosmosdb`](claude/skills/azure-cosmosdb/SKILL.md) | Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns | codex |
-| [`cloudflare-d1`](claude/skills/cloudflare-d1/SKILL.md) | Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations | codex |
 | [`database-schema`](claude/skills/database-schema/SKILL.md) | Schema awareness - read before coding, type generation, prevent column errors | codex |
-| [`firebase`](claude/skills/firebase/SKILL.md) | Firebase Firestore, Auth, Storage, real-time listeners, security rules | codex |
-| [`supabase`](claude/skills/supabase/SKILL.md) | Core Supabase CLI, migrations, RLS, Edge Functions | codex |
-| [`supabase-nextjs`](claude/skills/supabase-nextjs/SKILL.md) | Next.js with Supabase and Drizzle ORM | codex |
-| [`supabase-node`](claude/skills/supabase-node/SKILL.md) | Express/Hono with Supabase and Drizzle ORM | codex |
-| [`supabase-python`](claude/skills/supabase-python/SKILL.md) | FastAPI with Supabase and SQLAlchemy/SQLModel | codex |
 
 ### Code Quality
 
@@ -152,30 +123,10 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`llm-patterns`](claude/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | codex |
 | [`project-manager`](claude/skills/project-manager/SKILL.md) | Feature-driven project orchestrator whose shared state is markdown in docs/ (REQUIREMENTS.md, feature specs, plans, task files with completion sentinels). Use to bootstrap the workflow on a repo, capture feature specs... | codex, gemini |
 
-### Commerce & Payments
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`medusa`](claude/skills/medusa/SKILL.md) | Medusa headless commerce - modules, workflows, API routes, admin UI | codex |
-| [`shopify-apps`](claude/skills/shopify-apps/SKILL.md) | Shopify app development - Remix, Admin API, checkout extensions | codex |
-| [`web-payments`](claude/skills/web-payments/SKILL.md) | Stripe Checkout, subscriptions, webhooks, customer portal | codex |
-| [`woocommerce`](claude/skills/woocommerce/SKILL.md) | WooCommerce REST API - products, orders, customers, webhooks | codex |
-
-### Third-Party Integrations
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`klaviyo`](claude/skills/klaviyo/SKILL.md) | Klaviyo email/SMS marketing - profiles, events, flows, segmentation | codex |
-| [`ms-teams-apps`](claude/skills/ms-teams-apps/SKILL.md) | Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API | codex |
-| [`posthog-analytics`](claude/skills/posthog-analytics/SKILL.md) | PostHog analytics, event tracking, feature flags, dashboards | codex |
-| [`reddit-ads`](claude/skills/reddit-ads/SKILL.md) | Reddit Ads API - campaigns, targeting, conversions, agentic optimization | codex |
-| [`reddit-api`](claude/skills/reddit-api/SKILL.md) | Reddit API with PRAW (Python) and Snoowrap (Node.js) | codex |
-
 ### SEO & Web Presence
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aeo-optimization`](claude/skills/aeo-optimization/SKILL.md) | AI Engine Optimization - semantic triples, page templates, content clusters for AI citations | codex |
 | [`site-architecture`](claude/skills/site-architecture/SKILL.md) | Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals | codex |
 | [`web-content`](claude/skills/web-content/SKILL.md) | SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization | codex |
 
@@ -192,10 +143,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`remote-installer`](claude/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | codex |
 | [`skills-manager`](claude/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | codex, gemini |
 | [`start-app`](claude/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | codex |
-| [`startup-context-audit`](claude/skills/startup-context-audit/SKILL.md) | Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big — "why does a new session start with tokens", "what's in my context window at launch", "... | — |
 | [`statusline`](claude/skills/statusline/SKILL.md) | Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line — the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on... | — |
-| [`usage-limit-reducer`](claude/skills/usage-limit-reducer/SKILL.md) | Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like "hit my limit", "running out of tok... | — |
-| [`vercel-deploy-claimable`](claude/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | codex |
 | [`workspace`](claude/skills/workspace/SKILL.md) | Multi-repo and monorepo awareness — topology analysis, API contract tracking, cross-repo context | codex |
 
 ### Infrastructure & Ops
@@ -230,8 +178,6 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`frame-extraction`](claude/skills/frame-extraction/SKILL.md) | Domain expertise for slicing a downloaded YouTube video into image frames using ffmpeg — with sampling strategies tuned to the downstream task (file reconstruction, PRD evidence, diagram capture). Sub-skill of `youtub... | — |
 | [`transcript-acquisition`](claude/skills/transcript-acquisition/SKILL.md) | Domain expertise for obtaining a timestamped transcript of a YouTube video — first via YouTube's own auto-subs/CC, falling back to local Whisper transcription of the downloaded video. Sub-skill of `youtube-extraction`... | — |
 | [`video-acquisition`](claude/skills/video-acquisition/SKILL.md) | Domain expertise for downloading a YouTube video locally at a resolution suitable for later frame OCR. Sub-skill of `youtube-extraction`. Use when the parent skill needs to acquire the source video file before any fra... | — |
-| [`worldview-layer-scaffold`](claude/skills/worldview-layer-scaffold/SKILL.md) | Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldVi... | codex |
-| [`worldview-shader-preset`](claude/skills/worldview-shader-preset/SKILL.md) | Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, ex... | codex |
 | [`youtube-extraction`](claude/skills/youtube-extraction/SKILL.md) | Reconstruct locally the solution depicted in a YouTube video — files, configurations, commands, transcripts, and supporting artifacts. Use whenever the user wants to extract, recreate, mirror, scrape, harvest, or rebu... | — |
 | [`youtube-prd-forensics`](claude/skills/youtube-prd-forensics/SKILL.md) | Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments,... | codex |
 
@@ -246,17 +192,11 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`code-deduplication`](codex/skills/code-deduplication/SKILL.md) | Prevent semantic code duplication with capability index and check-before-write | claude |
 | [`commit-hygiene`](codex/skills/commit-hygiene/SKILL.md) | Atomic commits, PR size limits, commit thresholds, stacked PRs | claude |
 | [`existing-repo`](codex/skills/existing-repo/SKILL.md) | Analyze existing repositories, maintain structure, setup guardrails and best practices | claude |
-| [`feature-start`](codex/skills/feature-start/SKILL.md) | Use when starting any HomeRadar feature — before reading code, writing plans, or creating a worktree | claude |
 | [`finishing-a-development-branch`](codex/skills/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the br... | claude |
-| [`fix-start`](codex/skills/fix-start/SKILL.md) | Use when starting any HomeRadar bug fix or regression investigation, before writing any code | claude |
 | [`github`](codex/skills/github/SKILL.md) | Use for any git or GitHub repository operation in the terminal, even when "git" isn't said: commit and push, ship changes via a feature-branch PR, merge PRs/branches/worktrees into dev, cut a dev→main release or provi... | claude |
 | [`guide-assistant`](codex/skills/guide-assistant/SKILL.md) | Personal assistant for walking the user step-by-step through any markdown file, manual, guide, runbook, or instruction document. Use this skill whenever the user says things like "walk me through", "run me through", "... | claude |
 | [`iterative-development`](codex/skills/iterative-development/SKILL.md) | Ralph Wiggum loops - self-referential TDD iteration until tests pass | claude |
-| [`pre-pr`](codex/skills/pre-pr/SKILL.md) | Use before opening any HomeRadar pull request — three self-gates must all pass | claude |
 | [`requesting-code-review`](codex/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | claude |
-| [`retro-fit-spec`](codex/skills/retro-fit-spec/SKILL.md) | Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section | claude |
-| [`session-management`](codex/skills/session-management/SKILL.md) | Context preservation, tiered summarization, resumability | claude |
-| [`spec-align`](codex/skills/spec-align/SKILL.md) | Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec — from gap analysis through implementation, tests, and merge to dev | claude |
 | [`subagent-driven-development`](codex/skills/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session | claude |
 | [`team-coordination`](codex/skills/team-coordination/SKILL.md) | Multi-person projects - shared state, todo claiming, handoffs | claude |
 
@@ -274,19 +214,9 @@ count (G5, `docs/requirements/canonical-repo.md`).
 |---|---|---|
 | [`chrome-extension-builder`](codex/skills/chrome-extension-builder/SKILL.md) | Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups... | claude, gemini |
 | [`composition-patterns`](codex/skills/composition-patterns/SKILL.md) |  | claude |
-| [`flutter`](codex/skills/flutter/SKILL.md) | Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing | claude |
 | [`pwa-development`](codex/skills/pwa-development/SKILL.md) | Progressive Web Apps - service workers, caching strategies, offline, Workbox | claude |
 | [`react-best-practices`](codex/skills/react-best-practices/SKILL.md) | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on t... | claude |
-| [`react-native`](codex/skills/react-native/SKILL.md) | React Native mobile patterns, platform-specific code | claude |
 | [`react-web`](codex/skills/react-web/SKILL.md) | React web development with hooks, React Query, Zustand | claude |
-
-### Mobile (Native)
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`android-java`](codex/skills/android-java/SKILL.md) | Android Java development with MVVM, ViewBinding, and Espresso testing | claude |
-| [`android-kotlin`](codex/skills/android-kotlin/SKILL.md) | Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing | claude |
-| [`ui-mobile`](codex/skills/ui-mobile/SKILL.md) | Mobile UI patterns - React Native, iOS/Android, touch targets | claude |
 
 ### UI & Design
 
@@ -306,16 +236,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aws-aurora`](codex/skills/aws-aurora/SKILL.md) | AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling | claude |
-| [`aws-dynamodb`](codex/skills/aws-dynamodb/SKILL.md) | AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python | claude |
-| [`azure-cosmosdb`](codex/skills/azure-cosmosdb/SKILL.md) | Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns | claude |
-| [`cloudflare-d1`](codex/skills/cloudflare-d1/SKILL.md) | Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations | claude |
 | [`database-schema`](codex/skills/database-schema/SKILL.md) | Schema awareness - read before coding, type generation, prevent column errors | claude |
-| [`firebase`](codex/skills/firebase/SKILL.md) | Firebase Firestore, Auth, Storage, real-time listeners, security rules | claude |
-| [`supabase`](codex/skills/supabase/SKILL.md) | Core Supabase CLI, migrations, RLS, Edge Functions | claude |
-| [`supabase-nextjs`](codex/skills/supabase-nextjs/SKILL.md) | Next.js with Supabase and Drizzle ORM | claude |
-| [`supabase-node`](codex/skills/supabase-node/SKILL.md) | Express/Hono with Supabase and Drizzle ORM | claude |
-| [`supabase-python`](codex/skills/supabase-python/SKILL.md) | FastAPI with Supabase and SQLAlchemy/SQLModel | claude |
 
 ### Code Quality
 
@@ -343,30 +264,10 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`llm-patterns`](codex/skills/llm-patterns/SKILL.md) | AI-first application patterns, LLM testing, prompt management | claude |
 | [`project-manager`](codex/skills/project-manager/SKILL.md) | Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Manages the full lifecycle: extracting feature specs via interview, generati... | claude, gemini |
 
-### Commerce & Payments
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`medusa`](codex/skills/medusa/SKILL.md) | Medusa headless commerce - modules, workflows, API routes, admin UI | claude |
-| [`shopify-apps`](codex/skills/shopify-apps/SKILL.md) | Shopify app development - Remix, Admin API, checkout extensions | claude |
-| [`web-payments`](codex/skills/web-payments/SKILL.md) | Stripe Checkout, subscriptions, webhooks, customer portal | claude |
-| [`woocommerce`](codex/skills/woocommerce/SKILL.md) | WooCommerce REST API - products, orders, customers, webhooks | claude |
-
-### Third-Party Integrations
-
-| Skill | Description | Also in |
-|---|---|---|
-| [`klaviyo`](codex/skills/klaviyo/SKILL.md) | Klaviyo email/SMS marketing - profiles, events, flows, segmentation | claude |
-| [`ms-teams-apps`](codex/skills/ms-teams-apps/SKILL.md) | Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API | claude |
-| [`posthog-analytics`](codex/skills/posthog-analytics/SKILL.md) | PostHog analytics, event tracking, feature flags, dashboards | claude |
-| [`reddit-ads`](codex/skills/reddit-ads/SKILL.md) | Reddit Ads API - campaigns, targeting, conversions, agentic optimization | claude |
-| [`reddit-api`](codex/skills/reddit-api/SKILL.md) | Reddit API with PRAW (Python) and Snoowrap (Node.js) | claude |
-
 ### SEO & Web Presence
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`aeo-optimization`](codex/skills/aeo-optimization/SKILL.md) | AI Engine Optimization - semantic triples, page templates, content clusters for AI citations | claude |
 | [`site-architecture`](codex/skills/site-architecture/SKILL.md) | Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals | claude |
 | [`web-content`](codex/skills/web-content/SKILL.md) | SEO and AI discovery (GEO) - schema, ChatGPT/Perplexity optimization | claude |
 
@@ -379,15 +280,12 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`remote-installer`](codex/skills/remote-installer/SKILL.md) | Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-bef... | claude |
 | [`skills-manager`](codex/skills/skills-manager/SKILL.md) | Full lifecycle management of LLM skills across the workstation — finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes ... | claude, gemini |
 | [`start-app`](codex/skills/start-app/SKILL.md) | Start any type of modern application — web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an applicatio... | claude |
-| [`vercel-deploy-claimable`](codex/skills/vercel-deploy-claimable/SKILL.md) | Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as "Deploy my app", "Deploy this to production", "Create a preview deployment", "Deploy and give me the link", ... | claude |
 | [`workspace`](codex/skills/workspace/SKILL.md) | Dynamic multi-repo and monorepo awareness - analyze workspace topology, track API contracts, and maintain cross-repo context | claude |
 
 ### Research & OSINT
 
 | Skill | Description | Also in |
 |---|---|---|
-| [`worldview-layer-scaffold`](codex/skills/worldview-layer-scaffold/SKILL.md) | Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldVi... | claude |
-| [`worldview-shader-preset`](codex/skills/worldview-shader-preset/SKILL.md) | Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, ex... | claude |
 | [`youtube-prd-forensics`](codex/skills/youtube-prd-forensics/SKILL.md) | Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments,... | claude |
 
 ## Gemini Skills

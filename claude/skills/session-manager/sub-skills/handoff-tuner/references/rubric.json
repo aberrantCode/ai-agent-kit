@@ -1,0 +1,44 @@
+{
+  "version": "2",
+  "derived_from": "claude/skills/session-manager/sub-skills/handoff/SKILL.md (Required frontmatter + Required sections)",
+  "note": "Machine-checkable projection of the handoff rubric. The scorer (scripts/score_rubric.py) reads THIS file, never hard-codes the rubric. Bump `version` and add a sibling rubric.vN.md whenever a check, weight, or threshold changes; record the why in references/tuning-log.md.",
+  "home_repo_markers": ["ai-agent-kit"],
+  "v2_changes": "See references/rubric.v2.md. (1) Items that ~100% of the 2026-10-23 corpus failed are marked `floor: true` (correlation, dead_ends, all frontmatter fields + frontmatter_complete): they flag a universal post-convention gap but do not RANK prompts, so the craft composite is computed over NON-floor weight only, and a `convention_composite` over everything is reported alongside. (2) no_bare_cross_bundle_script_paths is skipped when the handoff targets a home_repo (archive-local scripts are legitimately repo-relative there) — removes the false positives on the 4 launcher-era prompts.",
+  "frontmatter_fields": [
+    {"key": "handoff_id", "weight": 2, "floor": true, "rationale": "registry join key; without it the handoff cannot be correlated to its child"},
+    {"key": "title", "weight": 1, "floor": true, "rationale": "human-readable label"},
+    {"key": "model", "weight": 2, "floor": true, "rationale": "pinned model; drives dispatch -SetEnv and the child's /model decision"},
+    {"key": "base_branch", "weight": 1, "floor": true, "rationale": "dispatch reads it for the worktree base"},
+    {"key": "branch", "weight": 1, "floor": true, "rationale": "dispatch reads it for the worktree branch"},
+    {"key": "repo", "weight": 1, "floor": true, "rationale": "dispatch reads it for the repo path"}
+  ],
+  "sections": [
+    {"id": "orientation", "weight": 2, "heading_patterns": ["orientation"], "body_patterns": ["claude\\.md", "agents\\.md"], "rationale": "point at repo conventions; do not restate them"},
+    {"id": "hard_constraints", "weight": 3, "heading_patterns": ["hard constraint", "constraint"], "body_patterns": ["stop and ask", "stop and report", "guardrail", "never"], "rationale": "only guardrail under --dangerously-skip-permissions"},
+    {"id": "correlation", "weight": 3, "floor": true, "heading_patterns": ["correlation"], "body_patterns": ["handoffs\\.jsonl", "self-report", "child_sid", "append its own row", "registry"], "rationale": "without the child self-report, child_sid stays null forever and dynamic measurement is impossible"},
+    {"id": "state_established", "weight": 2, "heading_patterns": ["state already established", "state established", "state w", "already established"], "body_patterns": [], "rationale": "verified facts the child must not re-derive"},
+    {"id": "dead_ends", "weight": 3, "floor": true, "heading_patterns": ["dead end", "what we tried", "tried / dead", "tried/dead"], "body_patterns": [], "rationale": "prevents the child re-walking abandoned approaches"},
+    {"id": "tasks_in_order", "weight": 2, "heading_patterns": ["tasks, in order", "tasks in order", "tasks"], "body_patterns": ["order", "rationale", "before"], "rationale": "dependency sequence plus the why, so the child holds the line"},
+    {"id": "finishing", "weight": 2, "heading_patterns": ["finishing", "finish"], "body_patterns": ["pr", "merge", "rebase", "report"], "rationale": "merge/report/stop; must not self-delete the prompt"},
+    {"id": "delegation", "weight": 1, "heading_patterns": ["delegation"], "body_patterns": ["haiku", "subagent", "model:"], "rationale": "explicit cheap-model default for mechanical fan-out"},
+    {"id": "delegation_logging", "weight": 2, "heading_patterns": ["delegation logging", "logging"], "body_patterns": ["log-delegation-outcome", "delegation-ledger", "-handoffid", "-category"], "rationale": "the cheap-model bet needs a scoreboard; required last step before finishing"},
+    {"id": "reporting", "weight": 1, "heading_patterns": ["reporting"], "body_patterns": ["terse", "numbered", "decision list", "verify count"], "rationale": "terse, single decision list, verified counts"},
+    {"id": "model_note", "weight": 2, "heading_patterns": ["model note", "model"], "body_patterns": ["opus", "sonnet", "haiku", "pinned"], "rationale": "state which model was pinned and why, so the child can /model switch sensibly"}
+  ],
+  "checks": [
+    {"id": "frontmatter_complete", "weight": 3, "floor": true, "kind": "frontmatter", "rationale": "dispatch and the registry both read these fields"},
+    {"id": "state_claims_tagged", "weight": 4, "kind": "tagged_claims", "scope_section": "state_established", "tag_patterns": ["\\[V\\]", "\\[\\?\\]"], "rationale": "an untagged state claim is a defect; a confidently-wrong untagged count sends the child down a false path with no one to catch it"},
+    {"id": "no_bare_cross_bundle_script_paths", "weight": 3, "kind": "bare_script_path", "skip_if_home_repo": true, "cross_bundle_scripts": ["log-delegation-outcome.ps1", "delegation-report.ps1", "new-task-worktree.ps1", "launch-claude-session.ps1", "backfill_handoff_registry.py", "cc_transcripts.py", "mine_dispatches.py", "complete-task-session.ps1"], "absolute_markers": ["~/", "~\\", "C:\\\\", "C:/", "/c/", "/home/", "/users/"], "rationale": "a bare scripts/ path to a sibling bundle resolves against the child's OWN repo root, where it does not exist, and reads as never-scaffolded"},
+    {"id": "worktree_already_exists_warning", "weight": 2, "kind": "regex_any", "patterns": ["already exist", "worktree.{0,40}exist", "do not create another", "work there"], "rationale": "a child that reads the repo's worktree convention will create a SECOND worktree and split its work unless told the tree already exists"}
+  ],
+  "scoring": {
+    "method": "weighted_coverage",
+    "note": "composite = 100 * (earned weight / total weight). A section earns full weight when its heading is present AND at least one body_pattern matches (body_patterns empty => heading presence alone). Checks earn by their own kind. Composite is a coverage proxy, not a quality guarantee.",
+    "bands": [
+      {"min": 90, "label": "strong"},
+      {"min": 70, "label": "adequate"},
+      {"min": 50, "label": "weak"},
+      {"min": 0, "label": "poor"}
+    ]
+  }
+}

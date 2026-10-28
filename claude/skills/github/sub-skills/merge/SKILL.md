@@ -102,7 +102,7 @@ Gate, in order — each blocker stops *this target* only (record it, continue to
 5. `mergeStateStatus == BEHIND` → the base moved; note it. `BLOCKED`, or any failing/pending
    `gh pr checks` line → required checks are in play:
    - Detect whether the repo even allows auto-merge:
-     `gh repo view --json autoMergeAllowed -q .autoMergeAllowed`.
+     `gh api "repos/{owner}/{repo}" -q .allow_auto_merge`.
    - `true` and checks are merely *pending* → `gh pr merge <n> --merge --auto --delete-branch`
      and record "queued on auto-merge" for the summary.
    - `false`, or a check is *failing* → stop this target and print the failing check. Never
@@ -196,6 +196,28 @@ git pull origin dev
 If the user has uncommitted work on their primary `dev` checkout, do not clobber it — the
 remote-tracking ref is updated regardless; note in the summary that they can `git pull` when
 ready.
+
+### `core.bare` sanity check (required after worktree removal)
+
+On this workstation the primary checkout has twice been found flipped to `core.bare=true` after a
+worktree-removing merge (git 2.55 Windows; trigger unidentified — three controlled repros could not
+reproduce it). A bare primary makes git refuse all work-tree ops (`fatal: this operation must be run
+in a work tree`) and the `cd "$REPO_ROOT"` above silently lands in a null directory. So after
+cleanup, verify and self-heal — this is a recoverable error, fix it silently and fold one line into
+the summary:
+
+```bash
+if [ "$(git -C "$REPO_ROOT" config --get core.bare)" = "true" ]; then
+  git -C "$REPO_ROOT" config core.bare false            # repair
+  # record the evidence so the trigger can eventually be found
+  printf '{"ts":"%s","repo":"%s","op":"merge","phase":"post","detected":"core.bare=true"}\n' \
+    "$(date -u +%FT%TZ)" "$REPO_ROOT" >> ~/.claude/telemetry/core-bare-events.jsonl
+fi
+```
+
+If after repair `git -C "$REPO_ROOT" status` still shows tracked files missing/rolled back, the
+working tree was also rolled back — `git -C "$REPO_ROOT" reset --hard origin/dev` restores it
+(untracked files are preserved; `origin/dev` is the source of truth post-merge).
 
 ---
 

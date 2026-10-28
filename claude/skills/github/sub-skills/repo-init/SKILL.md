@@ -113,7 +113,7 @@ deleteBranchOnMerge: true
 Squash and rebase are disabled at the repo level so the UI is physically unable to violate
 the bundle's merge-commit rule. `deleteBranchOnMerge` complements `/prune`.
 
-**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`autoMergeAllowed`) is
+**Auto-merge is surfaced, not enforced.** Repo-level "Allow auto-merge" (`allow_auto_merge`) is
 a **per-repo choice, not part of the standard**: `repo-init` *reports* its current state so you
 know whether `/ship` and `/merge` can take the `--auto` preflight path, but it never enables it
 and never flags it as drift. `/ship` and `/merge` detect it live at preflight and fall back to
@@ -219,24 +219,21 @@ Templates: `./templates/artifacts/`.
 #### Worktree ignore entries — required, but never created
 
 `repo-init` **does not create a worktree directory.** Per charter §4 the worktree lifecycle is
-owned by `worktree-task-lifecycle`, and its canonical location is the **sibling**
-`<repo>-wt/.worktrees/<task>` — deliberately outside the repo, which is precisely why a
-correctly-placed worktree needs no ignore rule at all.
+owned by `worktree-task-lifecycle`, and its canonical location is in-repo
+`.worktrees/<task>`.
 
-The ignore entries are nonetheless required, because they are **defensive**: they cover
-in-repo worktree paths created by *other* tooling. Claude Code's `EnterWorktree` creates
-`.claude/worktrees/` inside the repo, and ad-hoc `git worktree add .worktrees/x` is common.
-Without these lines, a worktree created by either route shows up as a mountain of untracked
+The ignore entries are required because both worktree paths live inside the repo:
+`.worktrees/` is the canonical location, and Claude Code's `EnterWorktree` creates
+`.claude/worktrees/`. Without these lines, a worktree created by either route shows up as a mountain of untracked
 files in `git status` and can be swept into a commit by `git add -A`.
 
 Ensure this block exists in `.gitignore`, comment included — the comment is what stops a
 future reader from "cleaning up" entries whose purpose isn't obvious:
 
 ```gitignore
-# Git worktrees. The canonical location is the SIBLING <repo>-wt/.worktrees/
-# (outside this repo). These entries are defensive: Claude Code's EnterWorktree
-# creates .claude/worktrees/ in-repo, and ad-hoc `git worktree add .worktrees/x`
-# is common. Without them a worktree becomes untracked noise in git status.
+# Git worktrees. Per-task worktrees live in-repo at .worktrees/<task>; Claude
+# Code's EnterWorktree uses .claude/worktrees/. Both must stay ignored, or a
+# worktree becomes untracked noise in git status and gets swept into commits.
 .worktrees/
 .claude/worktrees/
 ```
@@ -297,7 +294,7 @@ Rules, all load-bearing:
   would produce two competing scaffolds.
 
 Content of the block (`./templates/artifacts/claude-md-block.md`) covers the branch model,
-merge strategy, the sibling worktree location, and hook activation.
+merge strategy, the in-repo worktree location, and hook activation.
 
 ### Group 9 — Large assets (detect only)
 
@@ -421,7 +418,8 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
 gh repo view --json visibility,defaultBranchRef,description,homepageUrl,repositoryTopics,\
 hasWikiEnabled,hasProjectsEnabled,deleteBranchOnMerge,mergeCommitAllowed,squashMergeAllowed,\
-rebaseMergeAllowed,autoMergeAllowed
+rebaseMergeAllowed
+gh api "/repos/$REPO" --jq .allow_auto_merge          # auto-merge: not a gh repo view field
 gh api "/repos/$REPO/rulesets"
 gh api "/repos/$REPO/actions/permissions/workflow"
 gh api "/repos/$REPO" --jq '.security_and_analysis'
@@ -454,7 +452,7 @@ Build the drift list group by group (Groups 1–9). Each item is one of:
 | **new-in-standard** | repo's `standardVersion` predates this rule | actionable, labelled `(new)` |
 | **blocked** | cannot be applied here (plan/permission) | reported with the reason, not offered |
 
-Auto-merge (`autoMergeAllowed`, probed in Step 2) is reported here as **informational status,
+Auto-merge (`allow_auto_merge`, probed in Step 2) is reported here as **informational status,
 never drift** — a per-repo choice (Group 2). Surface whether it is on or off so the operator
 knows the `--auto` path is available to `/ship` and `/merge`; never offer to change it.
 

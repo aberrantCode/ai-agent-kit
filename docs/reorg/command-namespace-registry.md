@@ -80,27 +80,54 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | `/repo-status` | github | github | **new** (2026-08-02) — read-only repo-state inspection: working tree, branch tracking, worktrees, open PRs, and merged-stale branches, ending with a recommendation for which of ship/merge/release/prune applies next. Never mutates state; object-first name per the Generic-Verb Rule, sibling of `/repo-color` and `/init-repo`. |
 | `/sync-dev` | github | github | **new** (2026-08-13) — [PR #160](https://github.com/aberrantCode/ai-agent-kit/pull/160) — local-only fast-forward of the current checkout to its upstream (typically `dev` ↔ `origin/dev`): fetch, verify behind-only, clear byte-identical untracked-file collisions, then `git merge --ff-only`. Never pushes, rebases, merges divergent history, or discards work; stops and defers to `/ship` on any non-fast-forward. Ships the name reserved for github at iter 3 (row below); object-first verb pair per the Generic-Verb Rule. `/branch-sync-audit` was folded into prune + `/sync-dev`. |
 | `/add-feature` `/analyze-features` `/analyze-parallelism` `/continue-tasks` `/init-features` `/init-project` `/iterate-tasks` `/reinit` `/review-tasks` `/sync-status` `/sync-tracker` `/update-tasks` | project-manager | project-manager | unchanged (standalone add-feature skill merges into the bundle sub-skill, iter 9) |
-| `/continue-new-session` | project-manager | project-manager | kept as back-compat **alias** of new `/handoff` (iter 6) |
+| `/continue-new-session` | session-manager | session-manager | back-compat **alias** of `/handoff` copy mode — moved from project-manager 2026-10-21 (its `continue-new-session` sub-skill was absorbed into `session-manager` `handoff`); see the Session-Manager table below |
 | `/audit-skills` `/find-skills` `/import-skill` `/install-skill` `/push-skill` `/search-skill` `/sync-skill` `/update-skill` | skills-manager | skills-manager | extended in place (iters 4–5), names unchanged |
 | `/backfill-diagrams` | skills-manager | skills-manager | **retired** into skill-parity-guard fix mode (iter 4) |
 | `/find-logo` `/generate-logo` `/reskin-logo` `/archive-logo` | ac-logo | design-manager `logo-pipeline` | move with bundle absorption, **names unchanged** (iter 21); `/reskin-logo` gains logo-restylizer's variant engine |
 | `/what-next` `/what-next-update` | what-next | project-manager | move into bundle unchanged (iter 9) |
-| `/fix-start` | fix-start | quality-manager | moves with generalization (iter 15) |
-| `/feature-start` | feature-start | — | **cut**: merges into `/add-feature` (iter 9) |
-| `/pre-pr` | pre-pr | — | **cut**: generic gates fold into github `ship` (iter 2) |
-| `/retro-fit-spec` | retro-fit-spec | — | **cut**: absorbed by project-manager `backfill-features` → `/backfill-features` (iter 9) |
-| `/spec-align` | spec-align | — | **cut**: absorbed by `backfill-features` gap-analysis mode (iter 9) |
+| `/fix-start` | fix-start | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/feature-start` | feature-start | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/pre-pr` | pre-pr | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/retro-fit-spec` | retro-fit-spec | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
+| `/spec-align` | spec-align | — | **cut**: HomeRadar-specific skill deleted outright (2026-10-22) |
 | `/recreate-files` | youtube-extraction | youtube-extraction | unchanged |
 | `/add-remote-installer` | add-remote-installer (skill) | utilities-manager | skill demoted to bundle command (iter 25) |
-| `/handoff` `/dispatch-session-prompt` `/hand-off-audit` | session-handoff | session-handoff | **retired + merged** (2026-08-03) — `continue-new-session-prompt` and `compliance-audit` (the latter never previously archived) merged into one umbrella bundle `session-handoff`, addressed via the harness's `parent:child` sub-skill naming: `session-handoff:handoff` (was `continue-new-session-prompt`, owns `/handoff`, `/dispatch-session-prompt`) and `session-handoff:audit` (was `compliance-audit`, still owns `/hand-off-audit`). Both predecessor skills retired from the global profile the same day; see [PR #148](https://github.com/aberrantCode/ai-agent-kit/pull/148). **Command renamed 2026-08-04**: `/continue-new-session-prompt` → `/handoff` (the slash-command file itself was never renamed in the earlier merge, only the skill invocation, so `/handoff` was unrecognized until this rename). **`/repo-color` extracted 2026-08-05** to the new `spawn-terminal` bundle (row below), together with the tab-color scripts and the generic terminal-launch core `handoff` now delegates to. |
+| `/handoff` `/dispatch-session-prompt` `/hand-off-audit` | session-manager | session-manager | **moved 2026-10-21 to `session-manager`** (see the Session-Manager table below; `session-handoff` survives one release as a deprecated router alias with no commands). History: **retired + merged** (2026-08-03) — `continue-new-session-prompt` and `compliance-audit` (the latter never previously archived) merged into one umbrella bundle `session-handoff`, addressed via the harness's `parent:child` sub-skill naming: `session-handoff:handoff` (was `continue-new-session-prompt`, owns `/handoff`, `/dispatch-session-prompt`) and `session-handoff:audit` (was `compliance-audit`, still owns `/hand-off-audit`). Both predecessor skills retired from the global profile the same day; see [PR #148](https://github.com/aberrantCode/ai-agent-kit/pull/148). **Command renamed 2026-08-04**: `/continue-new-session-prompt` → `/handoff` (the slash-command file itself was never renamed in the earlier merge, only the skill invocation, so `/handoff` was unrecognized until this rename). **`/repo-color` extracted 2026-08-05** to the new `spawn-terminal` bundle (row below), together with the tab-color scripts and the generic terminal-launch core `handoff` now delegates to. |
 | `/spawn-terminal` `/repo-color` | spawn-terminal | spawn-terminal | **new** (2026-08-05) — generic Windows-Terminal spawn core extracted from `session-handoff:handoff`'s launcher: opens a new tab running an arbitrary command or script, in a chosen folder, colored per-repo, optionally full-screen. `/spawn-terminal` is an object-first verb pair per the Generic-Verb Rule. `/repo-color` moved here from `session-handoff` (it drives the per-repo tab-color registry, which now lives with this bundle's `resolve-repo-color.ps1` / `manage-repo-colors.ps1` / `demo-repo-tabs.ps1`). `handoff`'s `launch-claude-session.ps1` is now a thin Claude specialization that delegates to `spawn-terminal.ps1`. |
-| `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | work-resume | work-resume | **new** (2026-07-30) — conversation-resumption bundle; scans a repo's recent sessions across all worktree conventions, reconstructs what each expected next, reconciles against git, and proposes the next action. Object-first names each carry a specific verb (resume/report/scan) per the Generic-Verb Rule. Distinct from project-manager's plan-oriented `/what-next` and the cut `/search-sessions` (this is resume-scoped, not a generic history search). |
-| `/startup-cost` | startup-context-audit | startup-context-audit | **new** (2026-08-07) — read-only measurement of a session's startup (first-turn) context cost: decomposes the current repo's fresh baseline into readable on-disk instructions vs. the non-visible harness, then tables recent repos. Specific compound-noun name (a sibling of `/repo-status`), not a bare generic verb per the Generic-Verb Rule. Distinct from `usage-limit-reducer`'s planned agent-manager `/token-report` (that reports *historical* burn; this reports the *per-session baseline*). |
+| `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | session-manager | session-manager | **moved 2026-10-21** to `session-manager` `resume`, names unchanged. History: **new** (2026-07-30) — conversation-resumption bundle; scans a repo's recent sessions across all worktree conventions, reconstructs what each expected next, reconciles against git, and proposes the next action. Object-first names each carry a specific verb (resume/report/scan) per the Generic-Verb Rule. Distinct from project-manager's plan-oriented `/what-next` and the cut `/search-sessions` (this is resume-scoped, not a generic history search). |
+| `/startup-cost` | session-manager | session-manager | **moved 2026-10-21** to `session-manager` `usage`, name unchanged. History: **new** (2026-08-07) — read-only measurement of a session's startup (first-turn) context cost: decomposes the current repo's fresh baseline into readable on-disk instructions vs. the non-visible harness, then tables recent repos. Specific compound-noun name (a sibling of `/repo-status`), not a bare generic verb per the Generic-Verb Rule. Distinct from `usage-limit-reducer`'s planned agent-manager `/token-report` (that reports *historical* burn; this reports the *per-session baseline*). |
 | `/update-service` (alias `/opbta-update`) | opbta-service | ops-manager | **new** (2026-08-02) — global command dispatching the `opbta-service` skill's **update** operation; cwd is the source-repo context, resolved via the `.opbta-service` breadcrumb. Ships the planned ops-manager `/update-service` (iter 17 row below) early through the precursor `opbta-service` skill as **interim owner**; `/opbta-update` is a back-compat alias matching the skill's documented `/opbta-*` family. Absorbed by ops-manager at reorg iter 17. |
 | `/install-statusline` `/remove-statusline` `/inspect-statusline` `/modify-statusline` `/audit-statusline` | statusline | statusline | **new** (2026-08-26) — Claude Code status-line lifecycle bundle; owns the canonical worktree/handoff-safe `assets/statusline.sh` and the install/remove/inspect/modify/audit operations around it. Absorbs the retired `claude/statuslines/` asset dir (single-ownership per charter §3). Each name is an object-first verb pair (`<verb>-statusline`) per the Generic-Verb Rule, deliberately namespaced around Claude Code's built-in `/statusline` command (a built-in wins any bare collision, so none of these reuse the bare name). |
 
 Repo-local `.claude/commands/` copies of the skills-manager commands are installed
 duplicates, not separate names.
+
+## Session-Manager bundle (2026-10-21)
+
+Owner: **session-manager** ([charter §3/§4 amendment](charter.md#3-boundary-sentences-verbatim)).
+Every command is a thin file under `claude/skills/session-manager/commands/` that loads one
+sub-skill. Aliases are back-compat names kept so existing muscle memory and installed
+references keep working; none collides with another bundle's command.
+
+| Command | Sub-skill | Kind | Notes |
+|---|---|---|---|
+| `/handoff` | handoff | primary | launch mode (default) — writes the prompt, then hands it to `dispatch` |
+| `/dispatch-session-prompt` | handoff | **alias** | scope mode; was `session-handoff` |
+| `/continue-new-session` | handoff | **alias** | copy mode; was `project-manager` |
+| `/dispatch-session` | dispatch | primary | launch any prompt file in a new worktree + terminal tab. Bare `/dispatch` rejected by the Generic-Verb Rule ("dispatch an agent per task" is everyday project-manager phrasing) |
+| `/retire-session` | retire | primary | post-merge cleanup gate; `-Confirmed` is human-only |
+| `/checkpoint-session` | checkpoint | primary | durable session state file. Bare `/checkpoint` rejected by the Generic-Verb Rule (also shadows the harness's own checkpoint/rewind vocabulary) |
+| `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | resume | primary | names unchanged from `work-resume` |
+| `/session-audit` | audit | primary | read-only compliance audit of past sessions |
+| `/hand-off-audit` | audit | **alias** | was `session-handoff` |
+| `/analyze-conversations` | mine | primary | friction mode; name unchanged from `analyze-conversations` |
+| `/mine-sessions` | mine | primary | knowledge mode + proposed rule patches |
+| `/delegation-report` | delegation-ledger | primary | aggregates `~/.claude/telemetry/delegation-outcomes.jsonl` |
+| `/token-report` | usage | primary | historical burn (was planned for agent-manager) |
+| `/startup-cost` | usage | primary | startup baseline; name unchanged from `startup-context-audit` |
+
+The three aliases (`/dispatch-session-prompt`, `/continue-new-session`, `/hand-off-audit`) are
+removed in the release after 2026-10-21, together with the `session-handoff` alias bundle.
 
 ## Planned New Commands (by owning bundle and iteration)
 
@@ -110,13 +137,15 @@ duplicates, not separate names.
 | `/changelog-preview` | github | 3 |
 | `/sweep-installed-copies` | skills-manager | 4 |
 | `/skill-rollout`, `/scout-external-skills`, `/claude-md-skill-list-sync` | skills-manager | 5 |
-| `/handoff` (alias `/continue-new-session`) | project-manager | 6 |
+| ~~`/handoff` (alias `/continue-new-session`)~~ | ~~project-manager~~ → **session-manager** (shipped 2026-10-21) | 6 |
 | `/burndown`, `/loop-prompt` | project-manager | 7 |
 | `/log-learning` | project-manager | 8 |
 | `/backfill-features` | project-manager | 9 |
-| `/search-sessions`, `/token-report` | agent-manager | 11 |
+| `/search-sessions` | agent-manager | 11 |
+| ~~`/token-report`~~ | → **session-manager** `usage` (shipped 2026-10-21) | 11 |
 | `/fleet-fanout`, `/recover-agent` | agent-manager | 12 |
-| `/launch-workstreams`, `/mine-history`, `/verify-mcp` | agent-manager | 13 |
+| `/launch-workstreams`, `/verify-mcp` | agent-manager | 13 |
+| ~~`/mine-history`~~ | superseded by **session-manager** `/mine-sessions` (2026-10-21) — history mining moved with the charter §4 amendment | 13 |
 | `/dependency-security-review` | quality-manager | 14 |
 | `/smoke-test`, `/compliance-gate`, `/diagnose-runbook` | quality-manager | 15 |
 | `/apply-script`, `/probe-incident` | ops-manager | 16 |

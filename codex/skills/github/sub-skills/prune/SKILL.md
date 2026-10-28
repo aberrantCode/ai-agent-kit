@@ -1,7 +1,7 @@
 ---
 name: github-prune
 mirror-of: claude/skills/github/sub-skills/prune
-source-version: 2026-10-21
+source-version: 2026-10-23
 description: >
   Sub-skill of `github`. Audit and remove stale git worktrees, local branches, and remote
   (origin) branches that are already merged into dev, protecting anything with uncommitted
@@ -12,7 +12,7 @@ description: >
 # Operation: prune
 
 > **Codex mirror.** Source of truth is `claude/skills/github/sub-skills/prune`
-> (`source-version: 2026-10-21`, charter §5). Change the Claude copy first, then re-mirror and
+> (`source-version: 2026-10-23`, charter §5). Change the Claude copy first, then re-mirror and
 > bump the stamp — never edit this file in isolation.
 
 **Goal.** Remove stale worktrees and branches (local + origin) already merged into `dev`,
@@ -95,8 +95,8 @@ Parse `git worktree list --porcelain` (skip the first/main entry). Exclude `dev`
 Categorize: merged + clean → stale (deletion candidate); merged + dirty → blocked (never
 delete); not merged → active (ignore).
 
-**Orphaned worktree directories.** A directory under the canonical `<repo>-wt/.worktrees/`
-(or a legacy in-repo `.worktrees/`) that is **not** listed in `git worktree list` is an orphan
+**Orphaned worktree directories.** A directory under the in-repo `.worktrees/`
+that is **not** listed in `git worktree list` is an orphan
 — left behind when a previous teardown removed the git metadata but a locked handle kept the
 directory. Offer each orphan for deletion alongside the stale worktrees (same dirty-check
 guard: never delete one with uncommitted changes without confirmation).

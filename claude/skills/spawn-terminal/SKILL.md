@@ -9,7 +9,7 @@ description: >
   fresh terminal rather than the current one. The new tab starts in a folder you choose (a main
   checkout, a worktree, or an unrelated folder), is colored to match the repo of the invoking
   session, and can open full-screen or maximized. This is the generic terminal-launch core;
-  `session-handoff:handoff` builds its Claude-session launch on top of it.
+  `session-manager` `dispatch` builds its Claude-session launch on top of it.
 category: Foundations & Workflow
 requires: []
 ---
@@ -18,7 +18,7 @@ requires: []
 
 Launch a new Windows Terminal tab that runs a command or script you supply, in a working directory
 you choose, without any of it passing through shell quoting. This is the reusable core extracted
-from the session-handoff launcher: the value is not the `wt` invocation — that part is a few lines —
+from the session-manager launcher: the value is not the `wt` invocation — that part is a few lines —
 it is that spawning a session reliably means solving tab-color grouping, environment injection,
 Windows-Terminal-absent fallback, and *verifying the tab actually came up* every single time, and
 this skill solves them once.
@@ -34,7 +34,7 @@ this skill solves them once.
   `wt`/color/fallback/verify plumbing handled for you.
 
 If what you actually want is to hand *this session's* open work to a fresh **Claude** session with
-captured state, that is `session-handoff:handoff` — it uses this skill underneath but adds the
+captured state, that is `session-manager` `dispatch` — it uses this skill underneath but adds the
 prompt authoring, worktree, and delegation ledger around it.
 
 ## The script
@@ -82,8 +82,10 @@ Exactly one of the two is required.
   whose tab should vanish when they complete.
 - **Environment** — a spawned tab inherits nothing from the shell you launched it from. Add
   variables with `-SetEnv "KEY=VALUE","OTHER=VALUE"`, and drop one you set earlier with a bare
-  `KEY=`. The generic core carries **no** default environment — it stays neutral; tool-specific
-  launchers layer their own defaults on top.
+  `KEY=`. Remove inherited variables before the command starts with `-ClearEnv "NAME","OTHER"` — a
+  new window can inherit the launching process's environment. The generic core carries **no**
+  default environment and clears nothing by default — it stays neutral; tool-specific launchers
+  layer their own defaults on top.
 - **`-VerifyProcess '<name>'`** — poll for a new process of that name to confirm the launch came up
   (a tab that opens and dies immediately looks identical to success otherwise). Omit it to just
   confirm the terminal itself started.

@@ -1,0 +1,94 @@
+{
+  "group": "start-app",
+  "commands_scanned": ["start-app"],
+  "opportunities": [
+    {
+      "command": "start-app",
+      "id": "sa-1",
+      "title": "Skill tool reports the skill as loaded but never injects SKILL.md content — 3/3 sessions fall back to manual file hunting",
+      "category": "missing-guardrail",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session 6272da95/99fef80f/f0ae5e0a: \"Skill /start-app is already loaded above; instructions unchanged\"",
+      "detail": "In all three sampled sessions, `Skill(skill: \"start-app\")` returns \"Launching skill\" then immediately \"already loaded above; instructions unchanged\" without ever displaying SKILL.md body text. The assistant then runs 3-5 extra Bash/Glob/Read calls per session (`cat ~/.claude/skills/start-app/SKILL.md`, `find ... -iname SKILL.md`, `Glob **/start-app/**/*.md`, `find / -iname SKILL.md`) trying to locate the real instructions, and in every case comes up empty because no `~/.claude/skills/start-app/SKILL.md` exists on disk — only the thin companion command file does. The entire Step 0-3 cache/probe/stack-detection logic in the archived SKILL.md has therefore never executed in any of the 3 real invocations.",
+      "proposed_change": "Verify the start-app skill bundle is actually deployed to the global profile (push-to-profile.ps1 -Name start-app -Force) and confirm the Skill tool injects body content, not just a loaded-marker, before shipping further SKILL.md features."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-2",
+      "title": "Installed global command is a third, older revision — missing cache, pre-flight probe, and --restart entirely",
+      "category": "definition-drift",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session transcripts cat: \"discovers startup scripts, selects the right one, executes it, and handles failures\" (no cache/probe mention)",
+      "detail": "The archive has two copies: `claude/skills/start-app/commands/start-app.md` (probe + --restart + cache, newest) and `claude/commands/start-app.md` (cache but no probe/--restart, one generation behind). The copy actually installed at `~/.claude/commands/start-app.md` and read in all 3 transcripts is a third, even older text that mentions neither the cache nor any flag — it is the bare description with no `docs/framework/start-app.md` reference at all. The deployed command lags the archive by two full feature generations.",
+      "proposed_change": "Run /update-skill (or push-to-profile.ps1) against the global start-app command/skill bundle to sync the installed copy with the current archive version."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-3",
+      "title": "Discovery cache (docs/framework/start-app.md) and runtime sidecar were never written in any of the 3 sampled repos",
+      "category": "avoidable-tool-calls",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "ls docs/framework/ in all 3 repos: \"No such file or directory\"",
+      "detail": "Checked `docs/framework/` in paperless_win_client, telegram_url_tracker, and win_profiles directly on disk — absent in all three. Because the cache is never created, every one of the 3 runs pays the full Step 1/2 discovery cost (ls, find .sln/.csproj, cat package manifests, grep source) that the skill was designed to amortize after the first run.",
+      "proposed_change": "Confirm Mode 2 (Generate) actually fires and writes the cache on a successful start — likely blocked by sa-1 (skill body never loads, so the write-cache instruction is never seen)."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-4",
+      "title": "GUI app launched as a detached background Bash task reports exit 0 success without the window ever appearing",
+      "category": "confusing-recommendation",
+      "severity": "high",
+      "tag": "[V]",
+      "evidence": "session f0ae5e0a: \"Background exit 0 is suspicious for a modal ShowDialog app\"",
+      "detail": "For the WinForms win_profiles app, the assistant ran `cmd.exe /c Launch.cmd` with `run_in_background: true`; the process exited 0 but the window never rendered because the background task has no interactive desktop. The assistant only caught this because the user interrupted and pointed at prior session logs showing the real working pattern (`Start-Process ... -STA` detached into the interactive session). SKILL.md's \"Success indicators\" list (exit 0, no error text) does not distinguish headless/CLI success from a GUI app that must attach to an interactive desktop, so it approved a false-positive success.",
+      "proposed_change": "Add a GUI/WinForms/WPF-specific success check to Step 3 (verify a window handle/title appears, not just process exit code) and recommend Start-Process over a background Bash task for interactive desktop apps."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-5",
+      "title": "Prerequisite check dumps the full .env file contents, including a secret, into the transcript",
+      "category": "missing-guardrail",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 99fef80f: \"TELEGRAM_API_HASH=9b9c416ecfe46251c65b08c9fcb1208e\"",
+      "detail": "While verifying prerequisites for the telegram_url_tracker app, the assistant ran `cat .env`, printing all env values — including `TELEGRAM_API_HASH` — in cleartext into the tool result and session transcript. The skill's \"Environment\" guidance only says to locate the `.env` file and required keys; it does not instruct checking key *presence* only (e.g. `grep -c '=' .env` or masked output) rather than dumping values.",
+      "proposed_change": "Instruct Step 2/Environment checks to verify required keys are non-empty without printing their values (e.g. grep for key names only, or mask the value side)."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-6",
+      "title": "No guidance for one-shot CLI apps that need interactive first-run auth — forces a disambiguation question every time",
+      "category": "preempt-followup",
+      "severity": "med",
+      "tag": "[V]",
+      "evidence": "session 99fef80f: AskUserQuestion \"starting the real tracker needs interactive phone+SMS-code auth\"",
+      "detail": "The telegram tracker required interactive phone/SMS auth on first run with no existing session file; nothing in SKILL.md's Stack Detection or Case A/B/C flow anticipates \"app needs one-time interactive auth before it can run headless,\" so the assistant had to improvise an AskUserQuestion mid-run, which the user then rejected/interrupted.",
+      "proposed_change": "Add a recognized pattern to Step 2 (or the cache's Notes section) for first-run interactive-auth apps, with a standard question template instead of an ad hoc one."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-7",
+      "title": "Mojibake in the command description when read back through Bash/cat",
+      "category": "unclear-output",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "all 3 sessions: \"Start the application � discovers startup scripts\"",
+      "detail": "All three transcripts show the command file's em dash rendering as a replacement character (`�`) when read via `cat`/`Read`, an encoding mismatch between the file's UTF-8 em dash and the shell/console code page. Cosmetic, but it recurs on every single invocation and slightly degrades readability of the one piece of guidance that did load.",
+      "proposed_change": "Verify the installed command file is saved as UTF-8 without BOM and that the read path forces UTF-8 decoding."
+    },
+    {
+      "command": "start-app",
+      "id": "sa-8",
+      "title": "Launch-method lesson learned was hand-recorded into the repo's CLAUDE.md instead of the skill's own cache",
+      "category": "missing-guardrail",
+      "severity": "low",
+      "tag": "[V]",
+      "evidence": "session f0ae5e0a: \"update this repo's claude.md such that you'll know this automatically\"",
+      "detail": "After the GUI false-success in sa-4, the user had to explicitly ask the assistant to grep its own past session logs and persist the correct launch method into the project's CLAUDE.md. This is precisely the job the SKILL.md cache's \"Known failure recoveries\" / \"Startup variants\" sections are designed to do automatically on a successful run — but because the skill body never loads (sa-1), the knowledge landed in the wrong artifact via manual intervention instead of the designed mechanism.",
+      "proposed_change": "Once sa-1/sa-2 are fixed, confirm Step 3a/3b's cache-write path actually captures this kind of discovered launch-method fix without requiring the user to ask for it."
+    }
+  ]
+}

@@ -17,7 +17,7 @@
       - Confirming the launch actually came up, rather than trusting that Start-Process returned.
 
     It carries NO default environment and knows nothing about any specific CLI. Callers that need a
-    tool-specific default set (e.g. launch-claude-session.ps1) layer that on top via -SetEnv.
+    tool-specific default set (e.g. session-manager's sub-skills/dispatch/scripts/launch-claude-session.ps1) layer that on top via -SetEnv.
 
 .PARAMETER Command
     A command line to run in the new tab, e.g. 'git status' or 'npm run dev'. Mutually exclusive
@@ -38,14 +38,21 @@
     Tab title. Spaces are collapsed to hyphens — see the quoting failure documented above.
 
 .PARAMETER SetEnv
-    Environment variables for the new session, as KEY=VALUE strings. A spawned session inherits
-    nothing from the shell you launched it from, so anything that matters has to be stated. Windows
+    Environment variables for the new session, as KEY=VALUE strings. Don't count on the shell you
+    launched from passing anything through to the spawned session; state whatever matters. Windows
     Terminal has no mechanism for this — the variables are set inside the runner script, and the
     command inherits them as a child process.
 
     KEY=VALUE rather than a hashtable because `pwsh -File` passes every argument as a string, so a
     hashtable literal fails type conversion at the parameter binder. Strings work under both -File
     and -Command.
+
+.PARAMETER ClearEnv
+    Names of environment variables the runner removes before it applies -SetEnv and starts the
+    command. The new tab can inherit the launching process's environment (a new wt window does), so
+    a caller that is itself running inside a tool session uses this to keep that session's identity
+    variables from leaking into the child. Removing a variable that is not set is a no-op.
+    Comma-separated in a single string works too, for the same `pwsh -File` reason as -SetEnv.
 
 .PARAMETER TabColor
     Windows Terminal tab color as #RGB or #RRGGBB. Omit it to auto-resolve a stable per-repo color
@@ -98,6 +105,7 @@ param(
     [string]$WorkingDirectory = (Get-Location).Path,
     [string]$Title = 'spawn-terminal',
     [string[]]$SetEnv = @(),
+    [string[]]$ClearEnv = @(),
     [string]$TabColor,
     [string]$ColorScheme,
     [switch]$NoColor,
@@ -166,6 +174,15 @@ $envLines = $environment.Keys | Sort-Object | ForEach-Object {
     "`$env:$_ = '" + ($environment[$_] -replace "'", "''") + "'"
 }
 
+# Clears run before the sets, so a variable named in both ends up with the -SetEnv value. Names are
+# validated rather than quoted because they land in an Env: provider path.
+$clearNames = $ClearEnv | ForEach-Object { ($_ -replace "[`"']", '') -split ',' } |
+    ForEach-Object { $_.Trim() } | Where-Object { $_ } | Sort-Object -Unique
+foreach ($name in $clearNames) {
+    if ($name -notmatch '^[A-Za-z_][A-Za-z0-9_]*$') { throw "Invalid -ClearEnv name '$name'." }
+}
+$clearLines = $clearNames | ForEach-Object { "Remove-Item -LiteralPath 'Env:$_' -ErrorAction SilentlyContinue" }
+
 # The command line the runner ultimately executes. For -ScriptPath we use the call operator so the
 # script runs in the runner's own process (env vars set above stay in scope); args are single-quoted
 # individually. For -Command the caller's line is emitted verbatim.
@@ -182,6 +199,7 @@ else {
 $runner = Join-Path ([System.IO.Path]::GetTempPath()) "spawn-terminal-$Title-$PID.ps1"
 @"
 Set-Location -LiteralPath '$WorkingDirectory'
+$($clearLines -join "`n")
 $($envLines -join "`n")
 $invocation
 "@ | Set-Content -LiteralPath $runner -Encoding UTF8

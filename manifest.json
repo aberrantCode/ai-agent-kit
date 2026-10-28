@@ -1,10 +1,11 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-10-21",
+  "generated": "2026-10-23",
   "standard_skills": [
     "base",
     "github",
     "project-manager",
+    "session-manager",
     "skills-manager",
     "statusline"
   ],
@@ -60,10 +61,6 @@
           "description": "Use when a rebase or merge reports conflicts on a file where both branches only appended or inserted new content (append-only logs, registries, holding-pen documents) rather than editing the same lines. Recognizes the conflict as a false signal and resolves it as a union-keep-both operation instead of a real semantic merge.",
           "category": "Foundations & Workflow"
         },
-        "aeo-optimization": {
-          "description": "AI Engine Optimization - semantic triples, page templates, content clusters for AI citations",
-          "category": "SEO & Web Presence"
-        },
         "agentic-development": {
           "description": "Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js)",
           "category": "AI & LLM"
@@ -71,30 +68,6 @@
         "ai-models": {
           "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
           "category": "AI & LLM"
-        },
-        "analyze-conversations": {
-          "description": "Use when the operator wants to review recent Claude Code sessions for recurring mistakes, repeated friction, or patterns the agent keeps hitting \u2014 \"what keeps going wrong\", \"find issues we've hit more than once\", \"audit our conversation history\", \"what should we change so this stops happening\". Mines the JSONL transcripts for repeated tool errors, rejections, and operator corrections, then proposes concrete prevention patches.",
-          "category": "Foundations & Workflow"
-        },
-        "android-java": {
-          "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
-          "category": "Mobile (Native)"
-        },
-        "android-kotlin": {
-          "description": "Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing",
-          "category": "Mobile (Native)"
-        },
-        "aws-aurora": {
-          "description": "AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling",
-          "category": "Databases & Storage"
-        },
-        "aws-dynamodb": {
-          "description": "AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python",
-          "category": "Databases & Storage"
-        },
-        "azure-cosmosdb": {
-          "description": "Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns",
-          "category": "Databases & Storage"
         },
         "base": {
           "description": "Universal coding patterns, constraints, TDD workflow, atomic todos",
@@ -111,10 +84,6 @@
         "claim-discipline": {
           "description": "Use when about to state a checkable claim as fact \u2014 a file path, a line number, a count (\"appears N times\", \"2 stale branches\"), a quote (\"the rule says X\"), or \"file Y contains / lacks Z\". Verify it with a tool call in the same turn, or hedge it (\"I believe\", \"likely\") or omit it \u2014 never assert it flat. Separates verifiable facts from judgment calls so assertions about a user's own config, code, or repo state are not fabricated. Triggers whenever a response cites a location, count, or quote the user could check.",
           "category": "Foundations & Workflow"
-        },
-        "cloudflare-d1": {
-          "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
-          "category": "Databases & Storage"
         },
         "code-deduplication": {
           "description": "Prevent semantic code duplication with capability index and check-before-write",
@@ -143,10 +112,6 @@
         "content-aware-file-renaming": {
           "description": "Use when renaming files into a structured naming formula based on their contents \u2014 especially batches of downloaded documents (statements, invoices, tax forms, receipts, contracts, confirmations), generic-named files (document.pdf, document (1).pdf, IMG_*.jpg, scan*.pdf, untitled.*), bulk extracts from broker/bank portals or email attachments, or zip archives that must be extracted before processing. Triggers when the existing filename does not carry the document's identity and the file's content must be inspected to determine who, what, where, and when. The canonical naming formula is `%who% - %what% - %where% - %when% - %extra%`. Always prompt the user via AskUserQuestion only \u2014 never as plain text.",
           "category": "Tooling & DevOps"
-        },
-        "conversation-history-mining-for-domain-knowledge": {
-          "description": "Use when building a skill, doc, or knowledge base for an existing internal service or codebase, or when asked to audit past sessions for recurring failures and gaps \u2014 mine prior Claude conversation transcripts instead of reverse-engineering from logs or current code alone.",
-          "category": "Foundations & Workflow"
         },
         "credentials": {
           "description": "Centralized API key management from Access.txt",
@@ -204,11 +169,6 @@
           "description": "Domain expertise for generating the final markdown report that summarises a YouTube extraction operation \u2014 files reconstructed, evidence trail, gaps, and follow-ups. Sub-skill of `youtube-extraction`.",
           "category": "Research & OSINT"
         },
-        "feature-start": {
-          "description": "Use when starting any HomeRadar feature \u2014 before reading code, writing plans, or creating a worktree",
-          "category": "Foundations & Workflow",
-          "has_commands": true
-        },
         "file-reconstruction": {
           "description": "Domain expertise for stitching multi-frame OCR evidence into canonical source files on disk \u2014 without duplicating overlapping lines \u2014 and for placing each file at a sensible path inside the calling repo. Sub-skill of `youtube-extraction`.",
           "category": "Research & OSINT"
@@ -217,18 +177,9 @@
           "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the branch, or discarding it. Integration into dev is delegated to the github bundle's ship operation.",
           "category": "Foundations & Workflow"
         },
-        "firebase": {
-          "description": "Firebase Firestore, Auth, Storage, real-time listeners, security rules",
-          "category": "Databases & Storage"
-        },
         "firewall-alias-as-indirection": {
           "description": "Use when designing or editing firewall rules for a group of devices (e.g. cameras, IoT clusters) \u2014 reference a named alias instead of hardcoded IPs so device-set changes never require rule edits, and use config-tracing (not assumption) to decide whether a public endpoint is actually load-bearing before retiring it.",
           "category": "Infrastructure & Ops"
-        },
-        "fix-start": {
-          "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
-          "category": "Foundations & Workflow",
-          "has_commands": true
         },
         "fleet-cp1252-mojibake-fix": {
           "description": "Use when shell scripts (bash/PowerShell) print non-ASCII glyphs like checkmarks, X marks, or box-drawing rules that render as mojibake under Git Bash / Windows cp1252 terminals \u2014 replace runtime output with ASCII equivalents while leaving comments and remote heredocs untouched.",
@@ -237,10 +188,6 @@
         "fleet-llm": {
           "description": "Talk to the operator's self-hosted Open WebUI / ollama fleet from the terminal \u2014 list local models, run a prompt on the GPU box, chat with a local LLM, get embeddings, pull or remove models, or hit any fleet endpoint raw. Triggers on \"ask the fleet\", \"ask my local LLM\", \"run this on ollama / open webui\", \"run a prompt on my GPU box\", \"list local models\", \"pull a model\", \"embed with nomic\", \"which models are on the fleet\", and similar.",
           "category": "AI & LLM"
-        },
-        "flutter": {
-          "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
-          "category": "Frontend"
         },
         "frame-content-recognition": {
           "description": "Domain expertise for visually inspecting extracted video frames to identify which ones show file content (IDE panes, terminal cat, slides, READMEs) and capture path, language, and visible line ranges. Sub-skill of `youtube-extraction`.",
@@ -305,10 +252,6 @@
           "description": "Ralph Wiggum loops - self-referential TDD iteration until tests pass",
           "category": "Foundations & Workflow"
         },
-        "klaviyo": {
-          "description": "Klaviyo email/SMS marketing - profiles, events, flows, segmentation",
-          "category": "Third-Party Integrations"
-        },
         "llm-patterns": {
           "description": "AI-first application patterns, LLM testing, prompt management",
           "category": "AI & LLM"
@@ -324,14 +267,6 @@
         "marko": {
           "description": "Marko is a grumpy senior code reviewer who critiques code with zero praise inflation and never suggests fixes. Invoke Marko whenever the user addresses him by name to ask for a code opinion \u2014 \"marko?\", \"what do you think marko?\", \"hey marko\", \"marko review this\", \"marko take a look\", \"marko thoughts?\", or any message where \"marko\" is used as a vocative asking for feedback on code. Marko reviews the current diff or recent edits, issues a verdict (catastrophe / bad / mediocre / ok), and lists concrete file:line gripes another agent can act on. Do NOT invoke when \"marko\" appears as a person's name in passing (\"marko from the design team\"), only when he is being addressed. Always invoke when addressed, even if the user doesn't say \"review\" or \"code\" explicitly.",
           "category": "Languages & Runtimes"
-        },
-        "medusa": {
-          "description": "Medusa headless commerce - modules, workflows, API routes, admin UI",
-          "category": "Commerce & Payments"
-        },
-        "ms-teams-apps": {
-          "description": "Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API",
-          "category": "Third-Party Integrations"
         },
         "multi-perspective-dns-diagnostic-ladder": {
           "description": "Use when DNS resolution is failing, inconsistent, or NXDOMAIN, or when any \"mysterious\" networked-service failure needs root-causing \u2014 apply a layered probing ladder (multiple resolver perspectives, or dependency-chain tracing) to pinpoint which layer broke, and always verify a fix by re-checking logs after applying it.",
@@ -356,15 +291,6 @@
         "playwright-testing": {
           "description": "E2E testing with Playwright - Page Objects, cross-browser, CI/CD",
           "category": "Code Quality"
-        },
-        "posthog-analytics": {
-          "description": "PostHog analytics, event tracking, feature flags, dashboards",
-          "category": "Third-Party Integrations"
-        },
-        "pre-pr": {
-          "description": "Use before opening any HomeRadar pull request \u2014 three self-gates must all pass",
-          "category": "Foundations & Workflow",
-          "has_commands": true
         },
         "project-manager": {
           "description": "Feature-driven project orchestrator whose shared state is markdown in docs/ (REQUIREMENTS.md, feature specs, plans, task files with completion sentinels). Use to bootstrap the workflow on a repo, capture feature specs, plan, dispatch an agent per task, and archive finished work. Trigger proactively when docs/REQUIREMENTS.md exists and the user says \"what's next\", \"keep building\", \"continue the implementation\", \"set up project management\", or \"make sure agents follow the project plan\".",
@@ -392,10 +318,6 @@
           "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
           "category": "Frontend"
         },
-        "react-native": {
-          "description": "React Native and Expo patterns \u2014 project structure, list performance (FlashList), Reanimated animations, navigation, React Compiler compatibility, native UI primitives, and platform-specific code",
-          "category": "Frontend"
-        },
         "react-virtualization-with-jsdom-measurement": {
           "description": "Use when implementing or testing row/item virtualization (react-window, TanStack Virtual) for large lists (1000-10k+ rows) in a React app whose test suite runs under jsdom rather than a real browser.",
           "category": "Frontend"
@@ -408,18 +330,6 @@
           "description": "Use when building or reviewing a single-page/component UI that re-renders on state change and needs a clean way to wire click/interaction handlers, or when a component must react to system preferences like prefers-color-scheme/prefers-reduced-motion in a testable way.",
           "category": "Frontend"
         },
-        "recursive-batch-handoff": {
-          "description": "Use when a large migration, refactor, or long-running batch operation must be split across many sessions or iterations \u2014 each batch runs a discovery command to find what's left, executes one coherent chunk, and emits a self-similar handoff prompt so the next session (or run) continues without a central master plan.",
-          "category": "Foundations & Workflow"
-        },
-        "reddit-ads": {
-          "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
-          "category": "Third-Party Integrations"
-        },
-        "reddit-api": {
-          "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
-          "category": "Third-Party Integrations"
-        },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
           "category": "Tooling & DevOps"
@@ -427,11 +337,6 @@
         "requesting-code-review": {
           "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
           "category": "Foundations & Workflow"
-        },
-        "retro-fit-spec": {
-          "description": "Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section",
-          "category": "Foundations & Workflow",
-          "has_commands": true
         },
         "scanner-plugin-integration": {
           "description": "Use when importing, fixing, or adding a new provider/scanner plugin (e.g. OSINT lookup services, external-API integrations) into an existing Go-style package tree \u2014 merge orphaned scaffolds into the real package, preserve the plugin interface pattern, keep gating in DryRun not Run, and verify live endpoints before coding against docs.",
@@ -454,14 +359,14 @@
           "category": "Foundations & Workflow"
         },
         "session-handoff": {
-          "description": "Umbrella for two related but distinct session-lifecycle operations: handing off open work to a fresh Claude Code session, and auditing whether past session behavior actually followed a stated rule. Use this skill when the ask is about \"session-handoff\" without a clear sub-operation, or when unsure which of the two applies. Otherwise route directly to the specific sub-skill by loading this bundle (`Skill(session-handoff)`) and reading its file: `sub-skills/handoff/SKILL.md` for continuing/dispatching work in a new terminal session (\"continue in a new session\", \"hand this off\", \"spawn a new terminal and keep going\", \"/handoff\", \"/dispatch-session-prompt\"), or `sub-skills/audit/SKILL.md` for checking whether a stated policy was actually followed in past session transcripts (\"did I actually follow rule X\", \"audit my last N hours for compliance\", \"/hand-off-audit\"). Do not confuse the two: handoff moves work forward into a new session; audit looks backward at what already happened.",
+          "description": "Deprecated alias \u2014 use `session-manager`. Routes any request that still names \"session-handoff\" (handing off open work to a fresh session, or auditing whether past sessions followed a stated rule) to the `session-manager` bundle: `handoff` for \"continue in a new session\" / \"hand this off\" / \"/handoff\", and `audit` for \"did I actually follow rule X\" / \"/hand-off-audit\". Remove in the next release.",
+          "category": "Foundations & Workflow"
+        },
+        "session-manager": {
+          "description": "Owns the whole Claude Code session lifecycle plus the shared transcript (JSONL) parser. Start: resume where you left off \u2014 \"what was I working on\", \"continue my last session\", \"resume work in this repo\", \"did I finish that\", \"what's next here\", \"I forgot where I left off\". During: checkpoint durable state so work survives context resets, /loop iterations and multi-session tasks (tiered summaries, one step per turn, a copy-ready resume prompt). End: hand off open work \u2014 \"continue in a new session\", \"spawn a new terminal and keep going\", \"hand this off\", \"open a new window and work through those items\", \"go do all that in a new session\", \"/handoff\", \"/dispatch-session-prompt\" \u2014 as a launched session, a scope prompt, a copy-ready prompt for Claude, Codex or Gemini, or a self-similar chain for a large migration split across many sessions; dispatch any prompt file into a new worktree and terminal tab; retire it after merge. After: audit past sessions against a stated rule \u2014 \"did I actually follow rule X\", \"did we already follow rule X\", \"did I actually follow the haiku-delegation rule\", \"audit my last N hours/days of sessions for X compliance\", \"audit my last N hours for compliance\", \"were any subagents spawned without the required isolation\", \"check whether we've been using AskUserQuestion instead of inline questions\", \"did you actually use AskUserQuestion just now instead of asking inline?\", \"did any session push directly to dev/main despite the PR-only rule\", \"was CHANGELOG.md actually regenerated before that release, or hand-edited\", \"mine my transcripts for violations of Z\", \"/hand-off-audit\", compliance audit; mine history \u2014 \"what keeps going wrong\", \"find issues we've hit more than once\", \"audit our conversation history\", \"what should we change so this stops happening\", or mine prior transcripts for domain knowledge when building a skill or doc for an existing service; tune handoffs \u2014 \"tune the handoff skill\", \"how efficient are our handoffs\", \"analyze handoff token cost / new-session churn\", \"score our handoff prompts\", \"/tune-handoff\": measure past handoffs and propose evidence-backed handoff enhancements plus a versioned rubric refinement; report delegated-subagent outcomes; and token cost \u2014 \"hit my limit\", \"running out of tokens\", \"usage limit\", \"save tokens\", \"reduce usage\", \"am I wasting tokens\", \"how do I use fewer tokens\", \"this chat is getting long\", \"which model should I use\", \"why does a new session start with tokens\", \"what's in my context window at launch\", \"startup context cost\", \"per-repo baseline token audit\", \"why is this repo's fresh session so heavy\", \"what am I paying before I type anything\". Routes to one sub-skill per stage; replaces the deprecated \"session-handoff\" umbrella.",
           "category": "Foundations & Workflow",
           "has_commands": true,
           "has_sub_skills": true
-        },
-        "session-management": {
-          "description": "Context preservation, tiered summarization, resumability",
-          "category": "Foundations & Workflow"
         },
         "shell-helper-migration": {
           "description": "Use when refactoring bash scripts to delegate to a centralized helper library (e.g. output.sh) \u2014 extracting local log/ok/fail/die/section/info/warn helper definitions, replacing them with a single source line, and preserving exact exit-code and output-contract semantics across a batch of scripts.",
@@ -470,10 +375,6 @@
         "shell-migration-skip-taxonomy": {
           "description": "Use when deciding whether a shell script can safely be migrated to source a centralized helper library \u2014 classifies scripts by execution context (repo checkout vs. remote payload vs. on-host) to identify the categories that must be permanently skipped or only partially migrated.",
           "category": "Infrastructure & Ops"
-        },
-        "shopify-apps": {
-          "description": "Shopify app development - Remix, Admin API, checkout extensions",
-          "category": "Commerce & Payments"
         },
         "side-effect-free-helper-library": {
           "description": "Use when centralizing duplicated presentation/logging helpers (log, ok, fail, section, etc.) scattered across many shell scripts in a fleet, so consumers can safely source the shared module regardless of their own validation or exit-code conventions.",
@@ -494,12 +395,7 @@
           "has_commands": true
         },
         "spawn-terminal": {
-          "description": "Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script \u2014 independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to \"open a new terminal running X\", \"spawn a terminal\", \"launch a script in a new window\", \"kick off <command> in its own tab\", \"open a wt tab in this worktree\", \"run this in a separate terminal\", \"/spawn-terminal\", or otherwise asks for a command or script to start in a fresh terminal rather than the current one. The new tab starts in a folder you choose (a main checkout, a worktree, or an unrelated folder), is colored to match the repo of the invoking session, and can open full-screen or maximized. This is the generic terminal-launch core; `session-handoff:handoff` builds its Claude-session launch on top of it.",
-          "category": "Foundations & Workflow",
-          "has_commands": true
-        },
-        "spec-align": {
-          "description": "Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec \u2014 from gap analysis through implementation, tests, and merge to dev",
+          "description": "Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script \u2014 independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to \"open a new terminal running X\", \"spawn a terminal\", \"launch a script in a new window\", \"kick off <command> in its own tab\", \"open a wt tab in this worktree\", \"run this in a separate terminal\", \"/spawn-terminal\", or otherwise asks for a command or script to start in a fresh terminal rather than the current one. The new tab starts in a folder you choose (a main checkout, a worktree, or an unrelated folder), is colored to match the repo of the invoking session, and can open full-screen or maximized. This is the generic terminal-launch core; `session-manager` `dispatch` builds its Claude-session launch on top of it.",
           "category": "Foundations & Workflow",
           "has_commands": true
         },
@@ -516,15 +412,6 @@
           "category": "Tooling & DevOps",
           "has_commands": true
         },
-        "startup-context-audit": {
-          "description": "Use when a newly launched Claude Code session already shows a token count greater than zero and you want to know why and how big \u2014 \"why does a new session start with tokens\", \"what's in my context window at launch\", \"startup context cost\", \"per-repo baseline token audit\", \"why is this repo's fresh session so heavy\", \"what am I paying before I type anything\". Measures the first-turn (pre-work) context each repo loads and decomposes it into readable on-disk instructions versus the non-visible harness. Complements usage-limit-reducer, which reports historical burn over time rather than the per-session baseline.",
-          "category": "Tooling & DevOps",
-          "has_commands": true
-        },
-        "state-file-driven-multi-turn-resumption": {
-          "description": "Use when a task spans multiple sessions, context resets, or `/loop` iterations and progress must survive them \u2014 a durable state file (e.g. docs/progress.md) becomes the single source of truth, each turn advances one step, records evidence, and ends with a copy-ready resume prompt.",
-          "category": "Foundations & Workflow"
-        },
         "statusline": {
           "description": "Use when the user wants to customize, fix, install, remove, inspect, or audit the Claude Code status line \u2014 the bottom-of-terminal line that can show token/context consumption, model, git branch, and cost. Triggers on \"fix my status line\", \"my status line doesn't show tokens\", \"no token count in spawned/worktree tabs\", \"status line shows the wrong token number\", \"add context percentage to my status line\", \"install a status line\", \"remove my status line\", \"why is my status line blank\", \"audit my status line\", \"status line shows 100k on a fresh session\", \"statusline.sh\", and any mention of the `statusLine` block in settings.json or the built-in `/statusline` command. This skill owns the canonical, worktree- and /handoff-safe status-line script and the install/remove/inspect/modify/audit operations around it. Prefer it over hand-editing settings.json or the script directly, because those ad-hoc edits are exactly what caused this to regress three times.",
           "category": "Tooling & DevOps",
@@ -534,22 +421,6 @@
         "subagent-driven-development": {
           "description": "Use when executing implementation plans with independent tasks in the current session",
           "category": "Foundations & Workflow"
-        },
-        "supabase": {
-          "description": "Core Supabase CLI, migrations, RLS, Edge Functions",
-          "category": "Databases & Storage"
-        },
-        "supabase-nextjs": {
-          "description": "Next.js with Supabase and Drizzle ORM",
-          "category": "Databases & Storage"
-        },
-        "supabase-node": {
-          "description": "Express/Hono with Supabase and Drizzle ORM",
-          "category": "Databases & Storage"
-        },
-        "supabase-python": {
-          "description": "FastAPI with Supabase and SQLAlchemy/SQLModel",
-          "category": "Databases & Storage"
         },
         "tdd-workflow": {
           "description": "Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.",
@@ -571,10 +442,6 @@
           "description": "TypeScript strict mode with eslint and jest",
           "category": "Languages & Runtimes"
         },
-        "ui-mobile": {
-          "description": "Mobile UI patterns - React Native, iOS/Android, touch targets",
-          "category": "Mobile (Native)"
-        },
         "ui-redesign-with-snapshot-regeneration": {
           "description": "Use when performing a multi-phase UI redesign (e.g. a Next.js/React 19 reskin) that has existing snapshot tests, or any time `vitest -u`/snapshot regeneration is needed after intentional visual changes \u2014 to avoid masking real regressions as \"just snapshot drift.",
           "category": "Frontend"
@@ -587,17 +454,9 @@
           "description": "Web UI - glassmorphism, Tailwind, dark mode, accessibility",
           "category": "UI & Design"
         },
-        "usage-limit-reducer": {
-          "description": "Use when the user is hitting Claude usage limits, burning through tokens fast, running a long conversation, or asks how to use Claude Code more efficiently. Triggers on phrases like \"hit my limit\", \"running out of tokens\", \"usage limit\", \"save tokens\", \"reduce usage\", \"am I wasting tokens\", \"this chat is getting long\", \"which model should I use\". Diagnoses the current session, runs a real token-usage report from local JSONL logs, and applies Dubi's 11 rules for reducing Claude usage.",
-          "category": "Tooling & DevOps"
-        },
         "user-journeys": {
           "description": "User experience flows - journey mapping, UX validation, error recovery",
           "category": "UI & Design"
-        },
-        "vercel-deploy-claimable": {
-          "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",
-          "category": "Tooling & DevOps"
         },
         "video-acquisition": {
           "description": "Domain expertise for downloading a YouTube video locally at a resolution suitable for later frame OCR. Sub-skill of `youtube-extraction`. Use when the parent skill needs to acquire the source video file before any frame, transcript, or content analysis.",
@@ -615,32 +474,10 @@
           "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
           "category": "UI & Design"
         },
-        "web-payments": {
-          "description": "Stripe Checkout, subscriptions, webhooks, customer portal",
-          "category": "Commerce & Payments"
-        },
-        "woocommerce": {
-          "description": "WooCommerce REST API - products, orders, customers, webhooks",
-          "category": "Commerce & Payments"
-        },
-        "work-resume": {
-          "description": "Use when the operator wants to pick up where they left off \u2014 \"what was I working on\", \"continue my last session\", \"resume work in this repo\", \"did I finish that\", \"what's next here\", \"I forgot where I left off\". Scans this repo's recent Claude Code sessions (including its git worktrees) newest-first, reads the last turn of each to reconstruct what was expected next, reconciles that against local/remote git state and approved plans, and proposes the single best thing to pick up \u2014 either stopping for approval or auto-resuming. Trigger this whenever the operator returns to a repo and asks where things stand or what to do next, even if they don't say the word \"resume\".",
-          "category": "Foundations & Workflow",
-          "has_commands": true,
-          "has_sub_skills": true
-        },
         "workspace": {
           "description": "Multi-repo and monorepo awareness \u2014 topology analysis, API contract tracking, cross-repo context",
           "category": "Tooling & DevOps",
           "has_commands": true
-        },
-        "worldview-layer-scaffold": {
-          "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
-          "category": "Research & OSINT"
-        },
-        "worldview-shader-preset": {
-          "description": "Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, exposes adjustable parameters in the right panel, persists its settings per mode, and integrates with the SCENES shot-sequencer.",
-          "category": "Research & OSINT"
         },
         "youtube-extraction": {
           "description": "Reconstruct locally the solution depicted in a YouTube video \u2014 files, configurations, commands, transcripts, and supporting artifacts. Use whenever the user wants to extract, recreate, mirror, scrape, harvest, or rebuild content from a YouTube video, even if they don't say \"extract\" \u2014 phrases like \"recreate the project from this video\", \"pull the files out of this tutorial\", \"rebuild what they showed\", or \"scrape this YouTube walkthrough\" all qualify. Each thin command in this bundle requires a YouTube URL and a free-text request describing what to extract; if either is missing, this skill MUST use the AskUserQuestion tool to elicit the missing parameters before proceeding.",
@@ -723,10 +560,6 @@
           "description": "Use when the user wants to add a remote install script (install.ps1) and self-update capability to the current PowerShell repository. Detects the GitHub remote, locates the primary app script, asks for the install directory, then applies the remote-installer skill to implement both artifacts correctly.",
           "category": "Tooling & DevOps"
         },
-        "aeo-optimization": {
-          "description": "AI Engine Optimization - semantic triples, page templates, content clusters for AI citations",
-          "category": "SEO & Web Presence"
-        },
         "agentic-development": {
           "description": "Build AI agents with Pydantic AI (Python) and Claude SDK (Node.js)",
           "category": "AI & LLM"
@@ -735,26 +568,6 @@
           "description": "Latest AI models reference - Claude, OpenAI, Gemini, Eleven Labs, Replicate",
           "category": "AI & LLM"
         },
-        "android-java": {
-          "description": "Android Java development with MVVM, ViewBinding, and Espresso testing",
-          "category": "Mobile (Native)"
-        },
-        "android-kotlin": {
-          "description": "Android Kotlin development with Coroutines, Jetpack Compose, Hilt, and MockK testing",
-          "category": "Mobile (Native)"
-        },
-        "aws-aurora": {
-          "description": "AWS Aurora Serverless v2, RDS Proxy, Data API, connection pooling",
-          "category": "Databases & Storage"
-        },
-        "aws-dynamodb": {
-          "description": "AWS DynamoDB single-table design, GSI patterns, SDK v3 TypeScript/Python",
-          "category": "Databases & Storage"
-        },
-        "azure-cosmosdb": {
-          "description": "Azure Cosmos DB partition keys, consistency levels, change feed, SDK patterns",
-          "category": "Databases & Storage"
-        },
         "base": {
           "description": "Universal coding patterns, constraints, TDD workflow, atomic todos",
           "category": "Foundations & Workflow"
@@ -762,10 +575,6 @@
         "chrome-extension-builder": {
           "description": "Scaffold and setup Chrome MV3 extensions using WXT framework with React, TypeScript, and shadcn-UI. Use when creating new browser extensions, setting up content scripts, background service workers, side panels, popups, or configuring native messaging. Supports Google Docs/Overleaf integrations, DOM extraction, and cross-context communication patterns.",
           "category": "Frontend"
-        },
-        "cloudflare-d1": {
-          "description": "Cloudflare D1 SQLite database with Workers, Drizzle ORM, migrations",
-          "category": "Databases & Storage"
         },
         "code-deduplication": {
           "description": "Prevent semantic code duplication with capability index and check-before-write",
@@ -807,25 +616,9 @@
           "description": "Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks \"how does this work?",
           "category": "UI & Design"
         },
-        "feature-start": {
-          "description": "Use when starting any HomeRadar feature \u2014 before reading code, writing plans, or creating a worktree",
-          "category": "Foundations & Workflow"
-        },
         "finishing-a-development-branch": {
           "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for shipping to dev via PR, keeping the branch, or discarding it. Integration into dev is delegated to the github bundle's ship operation.",
           "category": "Foundations & Workflow"
-        },
-        "firebase": {
-          "description": "Firebase Firestore, Auth, Storage, real-time listeners, security rules",
-          "category": "Databases & Storage"
-        },
-        "fix-start": {
-          "description": "Use when starting any HomeRadar bug fix or regression investigation, before writing any code",
-          "category": "Foundations & Workflow"
-        },
-        "flutter": {
-          "description": "Flutter development with Riverpod state management, Freezed, go_router, and mocktail testing",
-          "category": "Frontend"
         },
         "frontend-design": {
           "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Combines conceptual design direction with prescriptive senior UI/UX engineering rules \u2014 metric-based design dials, strict component architecture, CSS hardware acceleration, and balanced design engineering that overrides default LLM biases. Generates creative, polished code and UI design that avoids generic AI aesthetics.",
@@ -848,10 +641,6 @@
           "description": "Ralph Wiggum loops - self-referential TDD iteration until tests pass",
           "category": "Foundations & Workflow"
         },
-        "klaviyo": {
-          "description": "Klaviyo email/SMS marketing - profiles, events, flows, segmentation",
-          "category": "Third-Party Integrations"
-        },
         "llm-patterns": {
           "description": "AI-first application patterns, LLM testing, prompt management",
           "category": "AI & LLM"
@@ -860,14 +649,6 @@
           "description": "Restylize, retheme, or transform an existing logo or icon into a new visual variant. Use this skill whenever the user wants to: create a variation of an existing logo, change logo colors or style, apply a new theme or effect to an icon, make a dark/light/neon/flat/outlined version, apply new branding to an existing mark, generate a restyled copy of any SVG or image file, or modify a logo's visual treatment. Triggers on phrases like \"restyle logo\", \"transform icon\", \"make a dark version\", \"change the colors on\", \"apply X style to\", \"create a variant of\", or any request that combines an existing image with a desired visual outcome. Always invoke before attempting to modify an image file manually.",
           "category": "UI & Design"
         },
-        "medusa": {
-          "description": "Medusa headless commerce - modules, workflows, API routes, admin UI",
-          "category": "Commerce & Payments"
-        },
-        "ms-teams-apps": {
-          "description": "Microsoft Teams bots and AI agents - Claude/OpenAI, Adaptive Cards, Graph API",
-          "category": "Third-Party Integrations"
-        },
         "nodejs-backend": {
           "description": "Node.js backend patterns with Express/Fastify, repositories",
           "category": "Languages & Runtimes"
@@ -875,14 +656,6 @@
         "playwright-testing": {
           "description": "E2E testing with Playwright - Page Objects, cross-browser, CI/CD",
           "category": "Code Quality"
-        },
-        "posthog-analytics": {
-          "description": "PostHog analytics, event tracking, feature flags, dashboards",
-          "category": "Third-Party Integrations"
-        },
-        "pre-pr": {
-          "description": "Use before opening any HomeRadar pull request \u2014 three self-gates must all pass",
-          "category": "Foundations & Workflow"
         },
         "project-manager": {
           "description": "Automated project implementation orchestrator that drives feature-driven development from a single initial prompt through to completed code. Manages the full lifecycle: extracting feature specs via interview, generating phased implementation plans, delegating tasks to worker agents, monitoring completion sentinels, recovering from failures, and archiving finished work \u2014 all driven by markdown files that act as shared state.",
@@ -904,21 +677,9 @@
           "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
           "category": "Frontend"
         },
-        "react-native": {
-          "description": "React Native mobile patterns, platform-specific code",
-          "category": "Frontend"
-        },
         "react-web": {
           "description": "React web development with hooks, React Query, Zustand",
           "category": "Frontend"
-        },
-        "reddit-ads": {
-          "description": "Reddit Ads API - campaigns, targeting, conversions, agentic optimization",
-          "category": "Third-Party Integrations"
-        },
-        "reddit-api": {
-          "description": "Reddit API with PRAW (Python) and Snoowrap (Node.js)",
-          "category": "Third-Party Integrations"
         },
         "remote-installer": {
           "description": "Domain expertise for implementing a remote PowerShell install script (install.ps1) and self-update check for a GitHub-hosted repository. Covers auto-elevation, GitHub Releases API version resolution, safe download-before-delete ordering, .env backup/merge, module dependency installation, and an in-app update-check block. Use when asked to add remote install or self-update capability to a PowerShell-based repo.",
@@ -928,21 +689,9 @@
           "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
           "category": "Foundations & Workflow"
         },
-        "retro-fit-spec": {
-          "description": "Use when editing a HomeRadar feature spec that has no CAP-IDs in its Capabilities section",
-          "category": "Foundations & Workflow"
-        },
         "security": {
           "description": "OWASP security patterns, secrets management, and security testing, plus a comprehensive security review checklist. Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features.",
           "category": "Security & Credentials"
-        },
-        "session-management": {
-          "description": "Context preservation, tiered summarization, resumability",
-          "category": "Foundations & Workflow"
-        },
-        "shopify-apps": {
-          "description": "Shopify app development - Remix, Admin API, checkout extensions",
-          "category": "Commerce & Payments"
         },
         "site-architecture": {
           "description": "Technical SEO - robots.txt, sitemap, meta tags, Core Web Vitals",
@@ -952,10 +701,6 @@
           "description": "Full lifecycle management of LLM skills across the workstation \u2014 finding, archiving, installing, updating, and importing skills with their complete bundles (sub-skills + companion commands). Use when the user invokes /find-skills, /sync-skill, /install-skill, /update-skill, /import-skill, /push-skill, /search-skill, /audit-skills, or /backfill-diagrams.",
           "category": "Tooling & DevOps"
         },
-        "spec-align": {
-          "description": "Use when the user provides a HomeRadar feature spec name, filename, or topic and wants the codebase brought into full alignment with that spec \u2014 from gap analysis through implementation, tests, and merge to dev",
-          "category": "Foundations & Workflow"
-        },
         "start-app": {
           "description": "Start any type of modern application \u2014 web apps, APIs, full-stack projects, Docker-based stacks, microservices, and more. Use this skill whenever the user wants to run, launch, start, execute, or spin up an application or service. Trigger it even when the user says \"start the app\", \"run it\", \"boot it up\", \"kick it off\", \"get it running\", \"spin it up\", or any similar phrase. Also trigger when the user asks how to run the project, which command starts the UI, how to get the dev environment going, or when a prompt includes a technology name alongside a run/start intent (e.g. \"start the Next.js app\", \"run the FastAPI server\", \"launch the Docker stack\").",
           "category": "Tooling & DevOps"
@@ -963,22 +708,6 @@
         "subagent-driven-development": {
           "description": "Use when executing implementation plans with independent tasks in the current session",
           "category": "Foundations & Workflow"
-        },
-        "supabase": {
-          "description": "Core Supabase CLI, migrations, RLS, Edge Functions",
-          "category": "Databases & Storage"
-        },
-        "supabase-nextjs": {
-          "description": "Next.js with Supabase and Drizzle ORM",
-          "category": "Databases & Storage"
-        },
-        "supabase-node": {
-          "description": "Express/Hono with Supabase and Drizzle ORM",
-          "category": "Databases & Storage"
-        },
-        "supabase-python": {
-          "description": "FastAPI with Supabase and SQLAlchemy/SQLModel",
-          "category": "Databases & Storage"
         },
         "tdd-workflow": {
           "description": "Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.",
@@ -992,10 +721,6 @@
           "description": "TypeScript strict mode with eslint and jest",
           "category": "Languages & Runtimes"
         },
-        "ui-mobile": {
-          "description": "Mobile UI patterns - React Native, iOS/Android, touch targets",
-          "category": "Mobile (Native)"
-        },
         "ui-testing": {
           "description": "Visual testing - catch invisible buttons, broken layouts, contrast",
           "category": "UI & Design"
@@ -1007,10 +732,6 @@
         "user-journeys": {
           "description": "User experience flows - journey mapping, UX validation, error recovery",
           "category": "UI & Design"
-        },
-        "vercel-deploy-claimable": {
-          "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as \"Deploy my app\", \"Deploy this to production\", \"Create a preview deployment\", \"Deploy and give me the link\", or \"Push this live\". No authentication required - returns preview URL and claimable deployment link.",
-          "category": "Tooling & DevOps"
         },
         "visual-explainer": {
           "description": "Generate beautiful, self-contained HTML pages that visually explain systems, code changes, plans, and data. Use when the user asks for a diagram, architecture overview, diff review, plan review, project recap, comparison table, or any visual explanation of technical concepts. Also use proactively when you are about to render a complex ASCII table (4+ rows or 3+ columns) \u2014 present it as a styled HTML page instead.",
@@ -1024,26 +745,10 @@
           "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
           "category": "UI & Design"
         },
-        "web-payments": {
-          "description": "Stripe Checkout, subscriptions, webhooks, customer portal",
-          "category": "Commerce & Payments"
-        },
-        "woocommerce": {
-          "description": "WooCommerce REST API - products, orders, customers, webhooks",
-          "category": "Commerce & Payments"
-        },
         "workspace": {
           "description": "Dynamic multi-repo and monorepo awareness - analyze workspace topology, track API contracts, and maintain cross-repo context",
           "category": "Tooling & DevOps",
           "has_commands": true
-        },
-        "worldview-layer-scaffold": {
-          "description": "Scaffold a new real-time data layer for the WorldView GEOINT dashboard. Use when a developer wants to add a new independently-toggleable data source (flights, sensors, feeds, etc.) that follows the established WorldView layer pattern \u2014 DATA LAYERS panel row, health/freshness tracking, CesiumJS entity rendering, and compositing with existing layers.",
-          "category": "Research & OSINT"
-        },
-        "worldview-shader-preset": {
-          "description": "Scaffold a new post-processing visual style preset for the WorldView GEOINT dashboard. Use when a developer wants to add a new rendering mode (CRT, NVG, FLIR, etc.) that appears in the bottom STYLE PRESETS toolbar, exposes adjustable parameters in the right panel, persists its settings per mode, and integrates with the SCENES shot-sequencer.",
-          "category": "Research & OSINT"
         },
         "youtube-prd-forensics": {
           "description": "Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments, keyframe evidence, and embedded screenshots persisted in the project.",

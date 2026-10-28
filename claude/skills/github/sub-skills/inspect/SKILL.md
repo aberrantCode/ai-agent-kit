@@ -39,11 +39,35 @@ side-effect of it. Adapt the contract accordingly:
 **Banned output.** Never write interpretive or self-congratulatory asides ("worth noting", "the
 interesting part is"), teaching moments or root-cause essays mid-run, narration of your own
 reasoning ("let me verify", "I'll check next"), or a restatement of a section the report already
-shows. If a sentence is neither report content, a degraded-section note, nor the closing
-question, delete it instead.
+shows. **This includes the self-cancelling "I'll gather silently" preamble** — a turn such as
+*"I'll gather the repo state silently, then emit one report."* or *"I'll gather repo state through
+the read-only probes."* is itself the preamble the contract forbids: announcing that you will be
+silent is not being silent. Run the first probe with no preceding text. If a sentence is neither
+report content, a degraded-section note, nor the closing question, delete it instead.
 
 This overrides any conversational or explanatory default, **including a harness-level output
 style that asks for educational commentary**, for the duration of the operation.
+
+---
+
+## Gathering discipline (how to run Steps 1–7)
+
+Gathering is **two phases**, and the steps below are a command reference, not a mandate to run
+seven separate round-trips:
+
+1. **Snapshot** (Steps 1, 2, 3, 5, 7): one deterministic sweep of repo-wide state — working tree,
+   branch tracking, `fetch --prune`, merges on `dev`, local refs, worktree list, open PRs,
+   `dev` vs `main`. Bundle these into a small number of composite commands.
+2. **Drill-down** (Steps 3, 4, 6): per-branch / per-worktree / per-PR checks that *depend on the
+   snapshot's output* (which branches exist, which worktrees, which PRs are open) — run only after
+   Phase 1 returns.
+
+**Separator rule (binding).** When you bundle probes into one composite command, separate the
+sections with `;` or guard each independently (`<probe> 2>&1 || echo "section unavailable: <why>"`).
+**Never chain gathering probes with `&&`** — under `&&` a single failed probe (e.g. `git fetch`
+with no network) aborts every probe after it, which would breach the contract rule above that *a
+failed probe degrades its own section, never the whole report*. A real report needs 3–6 gathering
+commands; if you are past ~10, you are re-gathering state you already have.
 
 ---
 
@@ -95,18 +119,33 @@ git worktree list --porcelain
 ```
 
 For each entry besides the primary checkout: its branch, dirty/clean
-(`git -C <path> status --porcelain`), ahead/behind its remote (Step 2's method, run against
-`<path>`), whether the branch has been pushed at all (`git ls-remote --heads origin <branch>`),
-and merged-into-`dev` status (Step 3's method). Flag **pushed but not yet merged** explicitly —
-that is the `/merge` signal.
+(`git -C <path> -c safe.directory='*' status --porcelain`), ahead/behind its remote (Step 2's
+method, run against `<path>`), whether the branch has been pushed at all
+(`git ls-remote --heads origin <branch>`), and merged-into-`dev` status (Step 3's method). Flag
+**pushed but not yet merged** explicitly — that is the `/merge` signal.
+
+The `-c safe.directory='*'` is deliberate: a worktree whose `.git` is owned by a different user
+(a cross-profile / cross-SID checkout) otherwise fails the dirty probe with
+`fatal: detected dubious ownership`, and a bare `git -C <path> status` would degrade the worktree's
+section for an ownership quirk that has nothing to do with repo state. The override applies only to
+this read-only `status` read — it reads the index, cannot mutate, and masks no genuine repo-state
+problem. If a worktree probe *still* fails for another reason, degrade that worktree's line with a
+one-line reason (per the Output Contract) rather than dropping it.
 
 ---
 
 ## Step 5 — Open pull requests
 
 ```bash
-gh pr list --json number,title,headRefName,state,isDraft,mergeStateStatus,reviewDecision
+gh pr list --json number,title,headRefName,state,isDraft,mergeStateStatus,mergeable,reviewDecision
 ```
+
+`mergeable` is included deliberately: this one list call already yields everything the report needs
+to recommend `/merge` — `state`, `isDraft`, `mergeStateStatus`, `mergeable`, `reviewDecision` for
+**every** open PR. Do **not** follow it with per-PR `gh pr view <n>` round-trips to re-fetch
+mergeability (an N+1 query for data you already have), and do **not** run `gh pr checks` or fetch
+commit/diff stats here — CI-check gating and diff inspection belong to the `/merge` preflight and
+`/diff-review`, not to a read-only status report.
 
 If this fails (no `gh`, not authenticated, no network), mark the section unavailable with the
 one-line reason and continue — do not treat it as fatal to the rest of the report.
@@ -149,3 +188,10 @@ If one or more rows apply, close with a single `AskUserQuestion` offering to lau
 highest-priority recommendation (ship/merge > prune > release, since landing work outranks
 cleanup and releasing). If the user declines or the report is clean, stop — `inspect` never
 launches a follow-up operation on its own initiative.
+
+**Do not re-inspect after a launched op.** When the user accepts the follow-up and `/ship`,
+`/merge`, `/prune`, or `/release` runs to completion, that operation's own summary already reflects
+the post-op state. Do **not** auto-invoke `/repo-status` again to "confirm" — re-gathering the full
+snapshot moments after a mutation you just made re-pays the entire gathering cost for state you
+already know changed. Re-inspect only when the user explicitly asks, or after out-of-band changes
+you did not make.

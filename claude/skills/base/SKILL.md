@@ -121,7 +121,7 @@ project/
 │   │   ├── active.md          # Current sprint/focus
 │   │   ├── backlog.md         # Future work
 │   │   └── completed.md       # Done items (for reference)
-│   ├── session/               # Session state (see session-management.md)
+│   ├── session/               # Session state (see session-manager checkpoint sub-skill)
 │   │   ├── current-state.md   # Live session state
 │   │   ├── decisions.md       # Key decisions log
 │   │   ├── code-landmarks.md  # Important code locations
@@ -462,7 +462,7 @@ This catches issues before they hit CI, saving time and keeping the main branch 
 
 ## Session Management (Non-Negotiable)
 
-Maintain context for resumability. See `session-management.md` for full details.
+Maintain context for resumability. See the `session-manager` bundle's checkpoint sub-skill (`sub-skills/checkpoint/SKILL.md`) for full details.
 
 ### Core Rule: Checkpoint at Natural Breakpoints
 
