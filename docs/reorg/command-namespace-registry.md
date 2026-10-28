@@ -127,7 +127,8 @@ references keep working; none collides with another bundle's command.
 | `/startup-cost` | usage | primary | startup baseline; name unchanged from `startup-context-audit` |
 
 The three aliases (`/dispatch-session-prompt`, `/continue-new-session`, `/hand-off-audit`) are
-removed in the release after 2026-10-21, together with the `session-handoff` alias bundle.
+due for removal now that the release after 2026-10-21 (v0.16.0) has shipped. The `session-handoff`
+alias bundle itself was removed after v0.16.0.
 
 ## Planned New Commands (by owning bundle and iteration)
 
