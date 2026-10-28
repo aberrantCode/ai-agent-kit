@@ -33,7 +33,7 @@ description: >
   I use", "why does a new session start with tokens", "what's in my context window at launch",
   "startup context cost", "per-repo baseline token audit", "why is this repo's fresh session so
   heavy", "what am I paying before I type anything". Routes to one sub-skill per stage; replaces the
-  deprecated "session-handoff" umbrella.
+  retired "session-handoff" umbrella.
 ---
 
 # Session Manager
@@ -97,8 +97,9 @@ Every command is a thin file in `commands/` that loads exactly one sub-skill.
 | `/token-report` | usage | historical burn |
 | `/startup-cost` | usage | startup baseline |
 
-The three aliases are kept for one release after the `session-handoff` retirement (2026-10-21)
-and are removed together with the deprecated `session-handoff` alias bundle.
+The three aliases were kept for one release after the `session-handoff` retirement (2026-10-21);
+that release was v0.16.0, so they are now due for removal. The `session-handoff` alias bundle
+itself was removed after v0.16.0.
 
 ## Routing
 

@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-23, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-10-28, schemaVersion: 1)
 -->
 
 # Catalog
@@ -34,7 +34,6 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`project-plan-task-reconciliation`](claude/skills/project-plan-task-reconciliation/SKILL.md) | Use when reconciling a completed worker task against the project plan and backlog — appending a parseable completion block, updating plan status and archives, verifying subagent claims against actual git/repo state, a... | — |
 | [`requesting-code-review`](claude/skills/requesting-code-review/SKILL.md) | Use when completing tasks, implementing major features, or before merging to verify work meets requirements | codex |
 | [`self-paced-loop-iteration`](claude/skills/self-paced-loop-iteration/SKILL.md) | Use when draining a multi-task backlog, feature plan, or long-running operational workload via Claude Code's /loop command without a fixed interval — each iteration completes one bounded unit of work, verifies it, com... | — |
-| [`session-handoff`](claude/skills/session-handoff/SKILL.md) | Deprecated alias — use `session-manager`. Routes any request that still names "session-handoff" (handing off open work to a fresh session, or auditing whether past sessions followed a stated rule) to the `session-mana... | — |
 | [`session-manager`](claude/skills/session-manager/SKILL.md) | Owns the whole Claude Code session lifecycle plus the shared transcript (JSONL) parser. Start: resume where you left off — "what was I working on", "continue my last session", "resume work in this repo", "did I finish... | — |
 | [`spawn-terminal`](claude/skills/spawn-terminal/SKILL.md) | Spawn a new Windows Terminal tab (or window) that runs an arbitrary command or PowerShell script — independent of the session that launches it, and not tied to Claude Code. Use this skill whenever the user wants to "o... | — |
 | [`spec-consistency-doc-refactoring-pattern`](claude/skills/spec-consistency-doc-refactoring-pattern/SKILL.md) | Use when resolving inconsistencies between design/spec documents and deployed reality, or repairing structural drift in large markdown docs (mangled backlogs, misaligned specs, redundant catalog fields) — atomic, scop... | — |
