@@ -234,14 +234,13 @@
     <div class="section-label"><span class="dot"></span> Commands · each loads one sub-skill</div>
     <div class="cmd-grid">
       <div><code>/handoff</code></div><div><span class="arrow">&rarr;</span> handoff &middot; launch mode (default)</div>
-      <div><code>/dispatch-session-prompt</code></div><div><span class="arrow">&rarr;</span> handoff &middot; scope mode <span class="tag">alias</span></div>
-      <div><code>/continue-new-session</code></div><div><span class="arrow">&rarr;</span> handoff &middot; copy mode <span class="tag">alias</span></div>
+      <div><code>/handoff scope &lt;task&gt;</code></div><div><span class="arrow">&rarr;</span> handoff &middot; scope mode</div>
+      <div><code>/handoff copy [cli]</code></div><div><span class="arrow">&rarr;</span> handoff &middot; copy mode</div>
       <div><code>/dispatch-session</code></div><div><span class="arrow">&rarr;</span> dispatch &middot; launch any prompt file</div>
       <div><code>/retire-session</code></div><div><span class="arrow">&rarr;</span> retire</div>
       <div><code>/checkpoint-session</code></div><div><span class="arrow">&rarr;</span> checkpoint</div>
       <div><code>/work-resume</code> <code>/work-resume-auto</code> <code>/work-report</code> <code>/work-scan</code></div><div><span class="arrow">&rarr;</span> resume</div>
       <div><code>/session-audit</code></div><div><span class="arrow">&rarr;</span> audit</div>
-      <div><code>/hand-off-audit</code></div><div><span class="arrow">&rarr;</span> audit <span class="tag">alias</span></div>
       <div><code>/analyze-conversations</code></div><div><span class="arrow">&rarr;</span> mine &middot; friction mode</div>
       <div><code>/mine-sessions</code></div><div><span class="arrow">&rarr;</span> mine &middot; knowledge mode</div>
       <div><code>/delegation-report</code></div><div><span class="arrow">&rarr;</span> delegation-ledger</div>
@@ -249,7 +248,7 @@
       <div><code>/startup-cost</code></div><div><span class="arrow">&rarr;</span> usage &middot; startup baseline</div>
     </div>
     <div class="callout" style="margin-top:14px">
-      The three aliases are kept for one release after the <code>session-handoff</code> retirement (2026-10-21) and are removed together with the deprecated <code>session-handoff</code> alias bundle.
+      The former aliases <code>/dispatch-session-prompt</code>, <code>/continue-new-session</code> and <code>/hand-off-audit</code> were removed after v0.16.0; use <code>/handoff scope</code>, <code>/handoff copy</code> and <code>/session-audit</code>.
     </div>
   </div>
 

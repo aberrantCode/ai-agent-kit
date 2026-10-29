@@ -11,7 +11,7 @@ description: >
   multi-session tasks (tiered summaries, one step per turn, a copy-ready resume prompt). End:
   hand off open work — "continue in a new session", "spawn a new terminal and keep going", "hand
   this off", "open a new window and work through those items", "go do all that in a new
-  session", "/handoff", "/dispatch-session-prompt" — as a launched session, a scope prompt, a copy-ready prompt for Claude,
+  session", "/handoff", "/handoff copy", "/handoff scope" — as a launched session, a scope prompt, a copy-ready prompt for Claude,
   Codex or Gemini, or a self-similar chain for a large migration split across many sessions;
   dispatch any prompt file into a new worktree and terminal tab; retire it after merge. After:
   audit past sessions against a stated rule — "did I actually follow rule X", "did we already
@@ -21,7 +21,7 @@ description: >
   AskUserQuestion instead of inline questions", "did you actually use AskUserQuestion just now
   instead of asking inline?", "did any session push directly to dev/main despite the PR-only
   rule", "was CHANGELOG.md actually regenerated before that release, or hand-edited", "mine my
-  transcripts for violations of Z", "/hand-off-audit", compliance audit; mine history — "what keeps going wrong",
+  transcripts for violations of Z", "/session-audit", compliance audit; mine history — "what keeps going wrong",
   "find issues we've hit more than once", "audit our conversation history", "what should we
   change so this stops happening", or mine prior transcripts for domain knowledge when building
   a skill or doc for an existing service; tune handoffs — "tune the handoff skill", "how efficient
@@ -33,7 +33,7 @@ description: >
   I use", "why does a new session start with tokens", "what's in my context window at launch",
   "startup context cost", "per-repo baseline token audit", "why is this repo's fresh session so
   heavy", "what am I paying before I type anything". Routes to one sub-skill per stage; replaces the
-  deprecated "session-handoff" umbrella.
+  retired "session-handoff" umbrella.
 ---
 
 # Session Manager
@@ -81,15 +81,12 @@ Every command is a thin file in `commands/` that loads exactly one sub-skill.
 
 | Command | Sub-skill | Notes |
 |---|---|---|
-| `/handoff` | handoff | launch mode (default) |
-| `/dispatch-session-prompt` | handoff | alias — scope mode |
-| `/continue-new-session` | handoff | alias — copy mode |
+| `/handoff` | handoff | launch mode (default); `/handoff copy [cli]` → copy mode, `/handoff scope <task>` (or any task text) → scope mode, `/handoff chain` → chain mode |
 | `/dispatch-session` | dispatch | launch any prompt file |
 | `/retire-session` | retire | |
 | `/checkpoint-session` | checkpoint | |
 | `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | resume | |
 | `/session-audit` | audit | |
-| `/hand-off-audit` | audit | alias |
 | `/tune-handoff` | handoff-tuner | measure handoffs → propose handoff enhancements + self-tune (reviewed PR) |
 | `/analyze-conversations` | mine | friction mode |
 | `/mine-sessions` | mine | knowledge mode |
@@ -97,8 +94,8 @@ Every command is a thin file in `commands/` that loads exactly one sub-skill.
 | `/token-report` | usage | historical burn |
 | `/startup-cost` | usage | startup baseline |
 
-The three aliases are kept for one release after the `session-handoff` retirement (2026-10-21)
-and are removed together with the deprecated `session-handoff` alias bundle.
+The former aliases `/dispatch-session-prompt`, `/continue-new-session` and `/hand-off-audit` were
+removed after v0.16.0; use `/handoff scope <task>`, `/handoff copy [cli]` and `/session-audit`.
 
 ## Routing
 

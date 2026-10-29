@@ -40,7 +40,7 @@ None. The command derives everything from session state and the repo:
 
 ## Step 1 — Read the recap for the recommended next action
 
-Mirror `session-manager` `handoff` (copy mode, `/continue-new-session`) Step 1 exactly. Scan your own most recent
+Mirror `session-manager` `handoff` (copy mode, `/handoff copy`) Step 1 exactly. Scan your own most recent
 assistant turn for:
 
 - An explicit "next step" / "next" / "follow-up" recommendation
@@ -56,7 +56,7 @@ Capture:
    from the previous iteration
 
 If the previous turn had no recap-recommended action, use the **Fallback** section
-from `session-manager` `handoff` (copy mode, `/continue-new-session`) (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority
+from `session-manager` `handoff` (copy mode, `/handoff copy`) (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority
 unblocked todo). Prefix the action with `(derived from {source})`.
 
 ## Step 2 — Handle any pending PR
@@ -176,7 +176,7 @@ Look for a `## Next-session prompt` fenced block in the subagent's returned summ
 **If present**: re-emit that block verbatim as this command's final output, inside its
 own fenced markdown code block so the user can copy it as one unit.
 
-**If absent**: derive a substitute using the `/continue-new-session` fallback chain
+**If absent**: derive a substitute using the `/handoff copy` fallback chain
 (`docs/STATUS.md` §1 → `pm-next.ps1` → highest-priority unblocked todo) and emit it in the same
 shape as the contract in Step 3. Prefix the recommended-action line with
 `(derived from {source})` so the next session understands the provenance.
@@ -262,7 +262,7 @@ chore task that touches `product_scope` hard-fails at the guard.
 
 - `/continue-tasks` — the synchronous orchestration loop a dispatched subagent
   may invoke when its action is "run one full pipeline turn"
-- `/continue-new-session` — the recap-reading primitive this command reuses for
+- `/handoff copy` — the recap-reading primitive this command reuses for
   Steps 1 and 6 fallbacks
 - `/update-tasks` — invoked in Step 5 for reconciliation
 - `/ship-to-dev` — invoked in Step 2 for PR merge

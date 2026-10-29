@@ -13,6 +13,70 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.16.0] - 2026-10-28
+
+### Added
+
+- core.bare guard + instrumentation for the dispatch/merge flow (`d669488`)
+- tune from first handoff-tuner run (enhancements + report) (`155ad35`)
+- add self-improving handoff-tuner sub-skill (`7150f4c`)
+- sharpen /repo-status inspect from real-usage mining (`ad69cbb`)
+- add handoff-child correlation registry (D1) (`c10e0d7`)
+
+### Changed
+
+- rewrite references to absorbed session skills (`e1b767c`)
+- delete skills absorbed into session-manager (`adc25bb`)
+- shrink session-handoff to a deprecated alias (`e757199`)
+- add session-manager retire sub-skill (`da81fb8`)
+- add session-manager resume sub-skill (`cf09f25`)
+- add session-manager mine sub-skill (`4bfe353`)
+- add session-manager usage sub-skill (`2438971`)
+- add session-manager handoff sub-skill (`0b0a222`)
+- add session-manager audit sub-skill (`e6223e6`)
+- add session-manager delegation-ledger sub-skill (`4233560`)
+- add session-manager dispatch sub-skill (`1144e79`)
+- add session-manager transcripts library (`264da6c`)
+- add session-manager checkpoint sub-skill (`874a13d`)
+- add session-manager bundle skeleton (`07f0492`)
+
+### Fixed
+
+- read auto-merge from the REST API, not gh repo view (`d958fc3`)
+- push requires: dependencies with the bundle (`3607d6a`)
+- isolate git fixture from inherited GIT_DIR, preventing repo pollution (`63f0761`)
+- avoid single-tag scalar unwrap crash in Generate-Changelog.ps1 (`afd5b63`)
+- risk-based handoff Finishing — stop skill/code PRs for review (`7c4216f`)
+- scrub inherited Claude session env before launching claude (`9319c8f`)
+
+### Documentation
+
+- archive the session-manager bundle handoff prompt and checklist (`ef07d2a`)
+- command-usage opportunity audit (report + slide deck) (`f301f18`)
+- make in-repo .worktrees the only worktree location (`f813ab7`)
+- roll a generated changelog in the release PR with -Version (`79c1ae6`)
+- de-brand logo-restylizer examples (`c07dce2`)
+- keep Codex/Gemini mirror section parity after session-manager move (`97c8206`)
+- add session-manager diagram (`07e075c`)
+- amend reorg charter for session-manager ownership (`a199c0d`)
+
+### Internal
+
+- run the scripts/tests unittest suite as a pre-PR gate check (`a833e78`)
+- drop 27 unused vendor/stack skills from the archive (`a8cbf1e`)
+- remove HomeRadar-specific skills from the archive (`bb625c0`)
+- add session-manager to the standard skill set (`ce6bd93`)
+- archive session-manager bundle task (`35ab6d2`)
+- regenerate manifest and catalog for session-manager (`f112e17`)
+- add session-manager bundle task (`19c03e2`)
+- regenerate CHANGELOG for v0.15.0 (`5de98ac`)
+
+### Other
+
+- init (`fcd2a15`)
+- init (`0cf4992`)
+- init (`4a02be7`)
+
 ## [0.15.0] - 2026-10-21
 
 ### Added

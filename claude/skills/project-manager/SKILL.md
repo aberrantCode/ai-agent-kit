@@ -290,10 +290,10 @@ the user that the runner list should be confirmed via `/reinit` for deterministi
 
 ---
 
-### `/continue-new-session` — Generate a Session-Handoff Prompt
+### `/handoff copy` — Generate a Session-Handoff Prompt
 
-Owned by the `session-manager` bundle (`handoff` sub-skill, copy mode; `/continue-new-session` is a
-session-manager alias). It reads this session's most recent recap, falls back to `docs/STATUS.md` §1
+Owned by the `session-manager` bundle (`handoff` sub-skill, copy mode; invoked as `/handoff copy`,
+which replaced the retired `/continue-new-session` alias). It reads this session's most recent recap, falls back to `docs/STATUS.md` §1
 (`docs/workflow/FOCUS.md` is a retired stub pointing there), then `pm-next.ps1`, then the
 highest-priority unblocked `todo` task, and prints a copy-ready handoff prompt. Read-only.
 
@@ -541,7 +541,7 @@ spec. Never spawn an agent for a task that isn't in a plan. The pipeline flows i
 /add-feature         →  add a new spec at any later point
 /analyze-features    →  audit specs for template/CAP-ID/plan-coverage gaps
 /continue-tasks      →  generate plans, spawn agents, iterate (handles both feature and chore tasks)
-/continue-new-session →  emit a copy-ready prompt to resume the recap's next action in a fresh session
+/handoff copy        →  emit a copy-ready prompt to resume the recap's next action in a fresh session
 /iterate-tasks       →  one self-perpetuating iteration: merge pending PR, dispatch next action as fresh subagent, emit next-next prompt
 /update-tasks        →  reconcile active task files with plan statuses (regenerates docs/STATUS.md)
 /review-tasks        →  read-only progress snapshot (persisted form is docs/STATUS.md)
