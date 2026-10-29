@@ -408,6 +408,22 @@ function Add-Provenance {
     }
 }
 
+# Same record scripts/push-to-profile.ps1 keeps: the commands this install relocated,
+# name -> SHA-256, in <skill>/.deployed-commands.json, so a later push or removal can tell
+# which commands it owns.
+
+function Write-CommandRecord {
+    param([string]$SkillDir, [string]$CommandsDir, [string[]]$Names)
+
+    $commands = [ordered]@{}
+    foreach ($n in ($Names | Sort-Object)) {
+        $path = Join-Path $CommandsDir $n
+        if (Test-Path -LiteralPath $path) { $commands[$n] = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash }
+    }
+    $json = ([ordered]@{ commands = $commands } | ConvertTo-Json -Depth 3) + "`n"
+    [System.IO.File]::WriteAllText((Join-Path $SkillDir '.deployed-commands.json'), $json, (New-Object System.Text.UTF8Encoding($false)))
+}
+
 function Install-SkillBundle {
     param([string]$SkillName, [string]$Platform, [string]$InstallDir)
 
@@ -420,6 +436,7 @@ function Install-SkillBundle {
     $skillDir    = Join-Path $InstallDir $SkillName
     $commandsDir = Join-Path (Split-Path -Parent $InstallDir) 'commands'
     $ok = $true
+    $commandNames = @()
 
     foreach ($rel in $files) {
         $dest = Resolve-BundleTarget -RelPath $rel -SkillDir $skillDir -CommandsDir $commandsDir
@@ -432,12 +449,14 @@ function Install-SkillBundle {
         try {
             Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -ErrorAction Stop
             if ((Split-Path -Leaf $rel) -eq 'SKILL.md') { Add-Provenance $dest }
+            if ((Split-Path -Parent $dest) -eq $commandsDir) { $commandNames += (Split-Path -Leaf $dest) }
         } catch {
             Write-Warning "    Could not download $SkillName/$rel"
             $ok = $false
         }
     }
 
+    if (Test-Path -LiteralPath $skillDir) { Write-CommandRecord -SkillDir $skillDir -CommandsDir $commandsDir -Names $commandNames }
     return $ok
 }
 
@@ -451,6 +470,18 @@ function Remove-SkillBundle {
         if ($rel -notlike 'commands/*') { continue }
         $dest = Resolve-BundleTarget -RelPath $rel -SkillDir $skillDir -CommandsDir $commandsDir
         if ($dest -and (Test-Path -LiteralPath $dest)) { Remove-Item -LiteralPath $dest -Force }
+    }
+    # Commands an earlier install recorded but the archive no longer ships; an edited one is kept.
+    $recordPath = Join-Path $skillDir '.deployed-commands.json'
+    if (Test-Path -LiteralPath $recordPath) {
+        $recorded = (Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json).commands
+        foreach ($prop in @($recorded.PSObject.Properties)) {
+            if ($prop.Name -notmatch '^[A-Za-z0-9._-]+\.md$') { continue }
+            $path = Join-Path $commandsDir $prop.Name
+            if ((Test-Path -LiteralPath $path) -and (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -eq $prop.Value) {
+                Remove-Item -LiteralPath $path -Force
+            }
+        }
     }
     if (Test-Path -LiteralPath $skillDir) { Remove-Item -LiteralPath $skillDir -Recurse -Force }
 }

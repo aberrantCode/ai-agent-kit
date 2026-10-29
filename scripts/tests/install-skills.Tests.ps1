@@ -145,6 +145,13 @@ Describe 'Install-SkillBundle' {
         Should -Invoke Invoke-RestMethod -ParameterFilter { $Uri -like '*/contents/*' }
     }
 
+    It 'records the deployed commands with their hashes, in the push-to-profile format' {
+        Install-SkillBundle -SkillName 'demo' -Platform 'claude' -InstallDir $skillsDir | Should -BeTrue
+        $record = Get-Content (Join-Path $skillsDir 'demo\.deployed-commands.json') -Raw | ConvertFrom-Json
+        @($record.commands.PSObject.Properties.Name) | Should -Be @('demo-cmd.md')
+        $record.commands.'demo-cmd.md' | Should -Be (Get-FileHash (Join-Path $commandsDir 'demo-cmd.md') -Algorithm SHA256).Hash
+    }
+
     It 'returns false and writes nothing when the bundle has no SKILL.md' {
         Install-SkillBundle -SkillName 'missing' -Platform 'claude' -InstallDir $skillsDir -WarningAction SilentlyContinue |
             Should -BeFalse
@@ -171,5 +178,29 @@ Describe 'Remove-SkillBundle' {
         Join-Path $skillsDir 'demo'          | Should -Not -Exist
         Join-Path $commandsDir 'demo-cmd.md' | Should -Not -Exist
         Join-Path $commandsDir 'other.md'    | Should -Exist
+    }
+
+    It 'also removes recorded commands the archive no longer ships, unless edited since' {
+        $script:RepoTree = $null
+        $script:Truncated = $false
+        Mock Invoke-RestMethod { New-TreeResponse } -ParameterFilter { $Uri -like '*/git/trees/*' }
+
+        $root = Join-Path $TestDrive 'remove-recorded'
+        $skillsDir   = Join-Path $root 'skills'
+        $commandsDir = Join-Path $root 'commands'
+        New-Item -ItemType Directory -Force (Join-Path $skillsDir 'demo'), $commandsDir | Out-Null
+        Set-Content (Join-Path $skillsDir 'demo\SKILL.md') 'x'
+        Set-Content (Join-Path $commandsDir 'dropped.md') 'old'
+        Set-Content (Join-Path $commandsDir 'edited.md') 'old'
+        $record = [ordered]@{ commands = [ordered]@{
+            'dropped.md' = (Get-FileHash (Join-Path $commandsDir 'dropped.md') -Algorithm SHA256).Hash
+            'edited.md'  = (Get-FileHash (Join-Path $commandsDir 'edited.md') -Algorithm SHA256).Hash } }
+        Set-Content (Join-Path $skillsDir 'demo\.deployed-commands.json') ($record | ConvertTo-Json)
+        Add-Content (Join-Path $commandsDir 'edited.md') 'local change'
+
+        Remove-SkillBundle -SkillName 'demo' -Platform 'claude' -InstallDir $skillsDir
+
+        Join-Path $commandsDir 'dropped.md' | Should -Not -Exist
+        Join-Path $commandsDir 'edited.md'  | Should -Exist
     }
 }
