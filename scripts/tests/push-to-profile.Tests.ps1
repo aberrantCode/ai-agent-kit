@@ -82,3 +82,74 @@ Describe 'push-to-profile requires: handling' {
         Test-Path (Join-Path $r.Target 'solo\SKILL.md') | Should -BeTrue
     }
 }
+
+Describe 'push-to-profile stale command cleanup' {
+    BeforeAll {
+        function Set-Commands {
+            param([string]$Root, [string]$Skill, [string[]]$Names)
+            $dir = Join-Path $Root "claude\skills\$Skill\commands"
+            if (Test-Path $dir) { Remove-Item -LiteralPath $dir -Recurse -Force }
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            foreach ($n in $Names) { [System.IO.File]::WriteAllText((Join-Path $dir "$n.md"), "---`ndescription: $n`n---`nbody of $n`n") }
+        }
+        function Get-CommandsDir([string]$Root) { Join-Path $Root 'profile\commands' }
+    }
+
+    It 'records the commands it deploys' {
+        $root = New-FakeArchive @{ app = '' }
+        Set-Commands $root 'app' @('one', 'two')
+        $r = Invoke-Push $root @('-Name', 'app', '-Force')
+        $r.Code | Should -Be 0
+        $record = Get-Content -Raw (Join-Path $r.Target 'app\.deployed-commands.json') | ConvertFrom-Json
+        @($record.commands.PSObject.Properties.Name | Sort-Object) | Should -Be @('one.md', 'two.md')
+    }
+
+    It 'removes a previously deployed command the bundle no longer ships, and backs it up' {
+        $root = New-FakeArchive @{ app = '' }
+        Set-Commands $root 'app' @('keep', 'gone')
+        (Invoke-Push $root @('-Name', 'app', '-Force')).Code | Should -Be 0
+        Set-Commands $root 'app' @('keep')
+        $r = Invoke-Push $root @('-Name', 'app', '-Force')
+        $r.Code | Should -Be 0
+        Test-Path (Join-Path (Get-CommandsDir $root) 'gone.md') | Should -BeFalse
+        Test-Path (Join-Path (Get-CommandsDir $root) 'keep.md') | Should -BeTrue
+        @($r.Result.commandsRemoved) | Should -Be @('gone.md')
+        Test-Path (Join-Path $r.Result.backedUpTo 'removed-commands\gone.md') | Should -BeTrue
+    }
+
+    It 'keeps a stale command that was edited after deployment' {
+        $root = New-FakeArchive @{ app = '' }
+        Set-Commands $root 'app' @('keep', 'edited')
+        (Invoke-Push $root @('-Name', 'app', '-Force')).Code | Should -Be 0
+        Add-Content -LiteralPath (Join-Path (Get-CommandsDir $root) 'edited.md') -Value 'local change'
+        Set-Commands $root 'app' @('keep')
+        $r = Invoke-Push $root @('-Name', 'app', '-Force')
+        $r.Code | Should -Be 0
+        Test-Path (Join-Path (Get-CommandsDir $root) 'edited.md') | Should -BeTrue
+        @($r.Result.commandsKept) | Should -Be @('edited.md')
+        @($r.Result.commandsRemoved).Count | Should -Be 0
+    }
+
+    It 'previews stale commands without removing them' {
+        $root = New-FakeArchive @{ app = '' }
+        Set-Commands $root 'app' @('keep', 'gone')
+        (Invoke-Push $root @('-Name', 'app', '-Force')).Code | Should -Be 0
+        Set-Commands $root 'app' @('keep')
+        $r = Invoke-Push $root @('-Name', 'app')
+        $r.Code | Should -Be 0
+        @($r.Result.commandsRemoved) | Should -Be @('gone.md')
+        Test-Path (Join-Path (Get-CommandsDir $root) 'gone.md') | Should -BeTrue
+    }
+
+    It 'leaves commands alone when the installed bundle has no record (legacy install)' {
+        $root = New-FakeArchive @{ app = '' }
+        Set-Commands $root 'app' @('keep', 'gone')
+        $first = Invoke-Push $root @('-Name', 'app', '-Force')
+        Remove-Item -LiteralPath (Join-Path $first.Target 'app\.deployed-commands.json')
+        Set-Commands $root 'app' @('keep')
+        $r = Invoke-Push $root @('-Name', 'app', '-Force')
+        $r.Code | Should -Be 0
+        Test-Path (Join-Path (Get-CommandsDir $root) 'gone.md') | Should -BeTrue
+        @($r.Result.commandsRemoved).Count | Should -Be 0
+    }
+}

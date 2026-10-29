@@ -13,6 +13,17 @@ proper version header.
 
 _No user-facing changes recorded._
 
+## [0.16.1] - 2026-10-29
+
+### Changed
+
+- fold the handoff command aliases into /handoff modes (`7c5110e`)
+- remove the deprecated session-handoff alias bundle (`00ee9b6`)
+
+### Internal
+
+- regenerate CHANGELOG for v0.16.0 (`04414ed`)
+
 ## [0.16.0] - 2026-10-28
 
 ### Added
