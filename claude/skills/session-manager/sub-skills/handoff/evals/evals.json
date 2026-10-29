@@ -21,7 +21,7 @@
     {
       "id": 2,
       "eval_name": "scope-mode-argument",
-      "prompt": "/dispatch-session-prompt Rename the foo() helper to bar() across the 40 files under src/ in repo X, update tests, and open a PR.",
+      "prompt": "/handoff scope Rename the foo() helper to bar() across the 40 files under src/ in repo X, update tests, and open a PR.",
       "expected_output": "A prompt file built from the supplied scope (no recovery from prior conversation), handed to dispatch.",
       "files": [],
       "expectations": [
@@ -36,7 +36,7 @@
     {
       "id": 3,
       "eval_name": "copy-mode-codex",
-      "prompt": "/continue-new-session  - I want to paste it into Codex. (Last recap ended: 'Next: implement P2-T3 for auth-flow, use TDD.')",
+      "prompt": "/handoff copy codex - I want to paste it into Codex. (Last recap ended: 'Next: implement P2-T3 for auth-flow, use TDD.')",
       "expected_output": "A single fenced markdown block printed to chat for Codex; no file written, nothing launched.",
       "files": [],
       "expectations": [

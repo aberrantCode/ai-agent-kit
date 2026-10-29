@@ -6,8 +6,8 @@ description: >
   through those items", "go do all that in a new session", "/handoff". Writes a self-contained,
   claim-tagged handoff prompt (state established, dead ends, tasks in dependency order, hard
   constraints, delegation, model choice) in launch mode (default; hands the file to dispatch),
-  scope mode ("/dispatch-session-prompt"), copy mode (copy-ready prompt for Claude, Codex or
-  Gemini; "/continue-new-session"; launches nothing) or chain mode (self-similar batch handoff for
+  scope mode ("/handoff scope <task>"), copy mode (copy-ready prompt for Claude, Codex or
+  Gemini; "/handoff copy"; launches nothing) or chain mode (self-similar batch handoff for
   a large migration split across many sessions). Formerly `session-handoff/handoff`,
   `continue-new-session` and `recursive-batch-handoff`.
 ---
@@ -34,8 +34,8 @@ re-document them. For the state-file convention a copy or chain prompt may point
 | Mode | Invoked by | Scope comes from | Output | Launches? |
 |---|---|---|---|---|
 | **launch** (default) | `/handoff` | recovered from this conversation | prompt file under `docs/PROMPTS/` | yes, via `dispatch` |
-| **scope** | `/dispatch-session-prompt <task>` | the invocation's arguments | prompt file under `docs/PROMPTS/` | yes, via `dispatch` |
-| **copy** | `/continue-new-session` | this session's latest recap | one fenced block printed to chat | **never** |
+| **scope** | `/handoff scope <task>` (or `/handoff <task text>`) | the invocation's arguments | prompt file under `docs/PROMPTS/` | yes, via `dispatch` |
+| **copy** | `/handoff copy [claude\|codex\|gemini]` | this session's latest recap | one fenced block printed to chat | **never** |
 | **chain** | "split this migration across sessions", batch/recursive handoff | a discovery command | self-similar prompt file | yes (via `dispatch`) or printed, per the user |
 
 Launch and scope share every step; only how Step 1 is satisfied differs. Copy and chain have their
@@ -260,7 +260,7 @@ otherwise gone. If Windows Terminal is unavailable, `dispatch` covers the fallba
 fails, report the prompt file path and the exact command the user can run — the prompt, the
 expensive part, is already written.
 
-## Copy mode (`/continue-new-session`)
+## Copy mode (`/handoff copy`)
 
 Print a prompt the user pastes into a fresh **Claude, Codex or Gemini** session. **Launches
 nothing, writes no file, modifies no project state.**
