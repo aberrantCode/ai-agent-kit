@@ -26,6 +26,15 @@
     points and MUST land in `~/.<vendor>/commands/` to be discoverable, not nested under
     the bundle.
 
+    STALE COMMANDS. Each push records the commands it deployed, with a SHA-256 of each,
+    in `<bundle>/.deployed-commands.json`. On the next push, a recorded command the
+    bundle no longer ships is removed from `~/.<vendor>/commands/` (moved into the
+    bundle's backup under `removed-commands/`), so dropped or renamed commands do not
+    pile up in the profile. A stale command whose file no longer matches the recorded
+    hash (edited locally, or since overwritten by another bundle's command of the same
+    name) is kept and reported instead. An install with no record (deployed before
+    this existed) gets one on its next push; nothing is removed on that push.
+
     PROVENANCE. Every copied SKILL.md — the parent and each nested sub-skill — is stamped
     `installed-from: ai-agent-kit` so /audit-skills, /find-skills, /sync-skill, and
     sync-installed.ps1 recognize the copy as an archive deployment (a downstream target,
@@ -91,7 +100,8 @@
 .OUTPUTS
     Console report (default) or JSON object (-Json) describing the bundle members that
     were, or would be, copied; the sub-skill SKILL.md files stamped; the companion
-    commands relocated; and any backup taken.
+    commands relocated; stale commands removed (or kept because they were edited); and
+    any backup taken.
 
 .NOTES
     Exit codes:
@@ -199,6 +209,9 @@ function Get-FmList {
 $MemberFile = 'SKILL.md'
 $ExcludedMembers = @('commands', 'diagram.html')
 
+# Written into the deployed bundle: the commands this push relocated, name -> SHA-256.
+$CommandRecord = '.deployed-commands.json'
+
 $archiveRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 
 $result = [ordered]@{
@@ -212,6 +225,8 @@ $result = [ordered]@{
     subSkillsNested = 0
     stampedCount  = 0
     commandCount  = 0
+    commandsRemoved = @()
+    commandsKept  = @()
     wouldWrite    = (-not $Force)
     skippedDraft  = $false
     backedUpTo    = $null
@@ -339,6 +354,27 @@ try {
     $result.commandCount = $commandFiles.Count
     $result.fileCount = $files.Count + $commandFiles.Count
 
+    # --- Stale commands: recorded by the previous push, no longer shipped ----
+    # Only a command whose file still matches the recorded hash is ours to remove.
+    $staleCommands = [System.Collections.Generic.List[string]]::new()
+    $recordPath = Join-Path $destDir $CommandRecord
+    if (Test-Path -LiteralPath $recordPath -PathType Leaf) {
+        $previous = (Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json).commands
+        $shipped  = @($commandFiles | ForEach-Object { $_.Name })
+        foreach ($prop in @($previous.PSObject.Properties | Sort-Object Name -Culture ([cultureinfo]::InvariantCulture))) {
+            $cmdName = $prop.Name
+            if ($shipped -contains $cmdName -or $cmdName -notmatch '^[A-Za-z0-9._-]+\.md$') { continue }
+            $cmdPath = Join-Path $commandsRoot $cmdName
+            if (-not (Test-Path -LiteralPath $cmdPath -PathType Leaf)) { continue }
+            if ((Get-FileHash -LiteralPath $cmdPath -Algorithm SHA256).Hash -eq $prop.Value) {
+                $staleCommands.Add($cmdName)
+            } else {
+                $result.commandsKept += $cmdName
+            }
+        }
+    }
+    $result.commandsRemoved = @($staleCommands)
+
     # --- Write (only under -Force and ShouldProcess) -----------------------
     $doWrite = $Force -and $PSCmdlet.ShouldProcess($destDir, "push bundle '$Name' ($($result.fileCount) files)")
     if ($doWrite) {
@@ -382,14 +418,34 @@ try {
             }
         }
 
+        # Remove stale commands into the backup (a record implies one was taken).
+        if ($staleCommands.Count -gt 0) {
+            $removedDir = Join-Path $result.backedUpTo 'removed-commands'
+            New-Item -ItemType Directory -Path $removedDir -Force | Out-Null
+            foreach ($cmdName in $staleCommands) {
+                Move-Item -LiteralPath (Join-Path $commandsRoot $cmdName) -Destination (Join-Path $removedDir $cmdName) -Force
+            }
+        }
+
+        # Record what this push deployed, for the next push's stale check.
+        $record = [ordered]@{}
+        foreach ($c in ($commandFiles | Sort-Object Name -Culture ([cultureinfo]::InvariantCulture))) {
+            $record[$c.Name] = (Get-FileHash -LiteralPath (Join-Path $commandsRoot $c.Name) -Algorithm SHA256).Hash
+        }
+        Write-Utf8NoBom (Join-Path $destDir $CommandRecord) (([ordered]@{ commands = $record } | ConvertTo-Json -Depth 3) + "`n")
+
         $result.wouldWrite = $false
         $result.message = "Pushed '$Name' ($($result.fileCount) files: $($result.stampedCount) stamped SKILL.md, $($result.subSkillsNested) sub-skills nested, $($result.commandCount) commands) to $destDir." +
-            $(if ($result.backedUpTo) { " Previous copy backed up to $($result.backedUpTo)." } else { '' })
+            $(if ($result.backedUpTo) { " Previous copy backed up to $($result.backedUpTo)." } else { '' }) +
+            $(if ($staleCommands.Count -gt 0) { " Removed $($staleCommands.Count) stale command(s): $($staleCommands -join ', ')." } else { '' }) +
+            $(if (@($result.commandsKept).Count -gt 0) { " Kept edited stale command(s): $(@($result.commandsKept) -join ', ')." } else { '' })
     }
     else {
         $result.wouldWrite = $true
         $reason = if (-not $Force) { 'preview (pass -Force to write)' } else { 'preview (-WhatIf)' }
-        $result.message = "Would push '$Name' ($($result.fileCount) files) to $destDir - $reason."
+        $result.message = "Would push '$Name' ($($result.fileCount) files) to $destDir - $reason." +
+            $(if ($staleCommands.Count -gt 0) { " Would remove $($staleCommands.Count) stale command(s): $($staleCommands -join ', ')." } else { '' }) +
+            $(if (@($result.commandsKept).Count -gt 0) { " Would keep edited stale command(s): $(@($result.commandsKept) -join ', ')." } else { '' })
     }
 }
 catch {
