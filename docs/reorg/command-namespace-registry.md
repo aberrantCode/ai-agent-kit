@@ -80,7 +80,7 @@ Verb-first names ratified: `/handoff`, `/burndown`, `/loop-prompt`, `/apply-scri
 | `/repo-status` | github | github | **new** (2026-08-02) — read-only repo-state inspection: working tree, branch tracking, worktrees, open PRs, and merged-stale branches, ending with a recommendation for which of ship/merge/release/prune applies next. Never mutates state; object-first name per the Generic-Verb Rule, sibling of `/repo-color` and `/init-repo`. |
 | `/sync-dev` | github | github | **new** (2026-08-13) — [PR #160](https://github.com/aberrantCode/ai-agent-kit/pull/160) — local-only fast-forward of the current checkout to its upstream (typically `dev` ↔ `origin/dev`): fetch, verify behind-only, clear byte-identical untracked-file collisions, then `git merge --ff-only`. Never pushes, rebases, merges divergent history, or discards work; stops and defers to `/ship` on any non-fast-forward. Ships the name reserved for github at iter 3 (row below); object-first verb pair per the Generic-Verb Rule. `/branch-sync-audit` was folded into prune + `/sync-dev`. |
 | `/add-feature` `/analyze-features` `/analyze-parallelism` `/continue-tasks` `/init-features` `/init-project` `/iterate-tasks` `/reinit` `/review-tasks` `/sync-status` `/sync-tracker` `/update-tasks` | project-manager | project-manager | unchanged (standalone add-feature skill merges into the bundle sub-skill, iter 9) |
-| `/continue-new-session` | session-manager | session-manager | back-compat **alias** of `/handoff` copy mode — moved from project-manager 2026-10-21 (its `continue-new-session` sub-skill was absorbed into `session-manager` `handoff`); see the Session-Manager table below |
+| ~~`/continue-new-session`~~ | session-manager | session-manager | **removed after v0.16.0**, replaced by `/handoff copy`. Was a back-compat **alias** of `/handoff` copy mode — moved from project-manager 2026-10-21 (its `continue-new-session` sub-skill was absorbed into `session-manager` `handoff`); see the Session-Manager table below |
 | `/audit-skills` `/find-skills` `/import-skill` `/install-skill` `/push-skill` `/search-skill` `/sync-skill` `/update-skill` | skills-manager | skills-manager | extended in place (iters 4–5), names unchanged |
 | `/backfill-diagrams` | skills-manager | skills-manager | **retired** into skill-parity-guard fix mode (iter 4) |
 | `/find-logo` `/generate-logo` `/reskin-logo` `/archive-logo` | ac-logo | design-manager `logo-pipeline` | move with bundle absorption, **names unchanged** (iter 21); `/reskin-logo` gains logo-restylizer's variant engine |
@@ -112,23 +112,23 @@ references keep working; none collides with another bundle's command.
 | Command | Sub-skill | Kind | Notes |
 |---|---|---|---|
 | `/handoff` | handoff | primary | launch mode (default) — writes the prompt, then hands it to `dispatch` |
-| `/dispatch-session-prompt` | handoff | **alias** | scope mode; was `session-handoff` |
-| `/continue-new-session` | handoff | **alias** | copy mode; was `project-manager` |
+| ~~`/dispatch-session-prompt`~~ | handoff | **removed** | scope mode, now `/handoff scope <task>`; was `session-handoff` |
+| ~~`/continue-new-session`~~ | handoff | **removed** | copy mode, now `/handoff copy [cli]`; was `project-manager` |
 | `/dispatch-session` | dispatch | primary | launch any prompt file in a new worktree + terminal tab. Bare `/dispatch` rejected by the Generic-Verb Rule ("dispatch an agent per task" is everyday project-manager phrasing) |
 | `/retire-session` | retire | primary | post-merge cleanup gate; `-Confirmed` is human-only |
 | `/checkpoint-session` | checkpoint | primary | durable session state file. Bare `/checkpoint` rejected by the Generic-Verb Rule (also shadows the harness's own checkpoint/rewind vocabulary) |
 | `/work-resume` `/work-resume-auto` `/work-report` `/work-scan` | resume | primary | names unchanged from `work-resume` |
 | `/session-audit` | audit | primary | read-only compliance audit of past sessions |
-| `/hand-off-audit` | audit | **alias** | was `session-handoff` |
+| ~~`/hand-off-audit`~~ | audit | **removed** | use `/session-audit`; was `session-handoff` |
 | `/analyze-conversations` | mine | primary | friction mode; name unchanged from `analyze-conversations` |
 | `/mine-sessions` | mine | primary | knowledge mode + proposed rule patches |
 | `/delegation-report` | delegation-ledger | primary | aggregates `~/.claude/telemetry/delegation-outcomes.jsonl` |
 | `/token-report` | usage | primary | historical burn (was planned for agent-manager) |
 | `/startup-cost` | usage | primary | startup baseline; name unchanged from `startup-context-audit` |
 
-The three aliases (`/dispatch-session-prompt`, `/continue-new-session`, `/hand-off-audit`) are
-due for removal now that the release after 2026-10-21 (v0.16.0) has shipped. The `session-handoff`
-alias bundle itself was removed after v0.16.0.
+The three aliases (`/dispatch-session-prompt`, `/continue-new-session`, `/hand-off-audit`) were
+removed after v0.16.0, together with the `session-handoff` alias bundle. `/handoff` now selects
+scope and copy mode from its first argument (`/handoff scope <task>`, `/handoff copy [cli]`).
 
 ## Planned New Commands (by owning bundle and iteration)
 
