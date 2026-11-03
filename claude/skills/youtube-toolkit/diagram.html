@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Toolkit — Skill Diagram</title>
+<style>
+  :root {
+    --bg: #0c0c0c; --surface: #141414; --border: rgba(255,80,80,0.25);
+    --text: #f5f5f5; --dim: #8a8a8a; --red: #ff4444; --amber: #ffb300;
+    --green: #44cc88; --blue: #4da6ff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
+         padding: 48px 24px 80px; }
+  .page { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 30px; letter-spacing: -0.02em; text-align: center; margin-bottom: 10px; }
+  .sub { color: var(--dim); font-size: 14px; line-height: 1.7; text-align: center;
+         max-width: 620px; margin: 0 auto 40px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim);
+       margin: 32px 0 14px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  .step { flex: 1 1 150px; background: var(--surface); border: 1px solid var(--border);
+          border-radius: 12px; padding: 14px; font-size: 13px; line-height: 1.5; }
+  .step b { display: block; font-size: 14px; margin-bottom: 4px; }
+  .step code { color: var(--amber); font-size: 12px; }
+  .arrow { align-self: center; color: var(--dim); font-size: 18px; }
+  .new { border-color: var(--green); }
+  .new b::after { content: " NEW"; color: var(--green); font-size: 10px; letter-spacing: 0.1em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+          padding: 16px; font-size: 13px; line-height: 1.6; }
+  .card h3 { font-size: 14px; margin-bottom: 6px; }
+  .red { color: var(--red); } .blue { color: var(--blue); } .green { color: var(--green); }
+  .mix { font-family: Consolas, monospace; font-size: 12px; color: var(--amber);
+         background: #000; border-radius: 8px; padding: 12px; margin-top: 8px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>YouTube Toolkit</h1>
+  <p class="sub">Drop a YouTube link, pick actions from an AskUserQuestion menu, and run them through a
+  hardened yt-dlp + ffmpeg pipeline. Split a video by chapters, then splice clips from several
+  split videos into one mix.</p>
+
+  <h2>Workflow</h2>
+  <div class="flow">
+    <div class="step"><b>0 Preflight</b><code>preflight.sh</code><br>yt-dlp / ffmpeg / node, curl_cffi</div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>1 Probe</b><code>probe.sh</code><br>title, duration, chapters, slug</div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>2 Ask</b>multiSelect menu: video, subs, metadata, split; follow-ups for quality / method</div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>3 Download</b><code>download.sh</code><br>video + meta first, subtitles in a second pass</div>
+  </div>
+  <div class="flow" style="margin-top:10px">
+    <div class="step"><b>4 Split by chapters</b><code>generate-cuts.py</code><br>info.json &rarr; <code>chapters.txt</code> + <code>cut-chapters.sh</code><br>MODE=reencode (precise 1080p) or copy (keyframe)</div>
+    <div class="arrow">&rarr;</div>
+    <div class="step new"><b>5 Splice clips</b><code>splice_clips.py</code><br>groups &rarr; exclude &rarr; pick &rarr; interleave &rarr; one ffmpeg concat re-encode</div>
+  </div>
+
+  <h2>Splice at a glance</h2>
+  <div class="grid">
+    <div class="card"><h3 class="blue">Inputs</h3>
+      <code>--group LABEL=DIR</code> (repeatable), a <code>sections/</code> folder each.
+      <code>--exclude</code> substrings, <code>--pick N|LABEL=N</code>, <code>--seed</code>.</div>
+    <div class="card"><h3 class="green">Interleave</h3>
+      Round-robin across groups; the longer group's leftovers follow in order.
+      <div class="mix">A1 B1 C1 A2 B2 C2 A3 ...</div></div>
+    <div class="card"><h3 class="red">Normalise + encode</h3>
+      scale/pad 1080p, SAR 1, 30 fps, 48 kHz stereo, then one libx264 / AAC concat pass.
+      <code>--dry-run</code> previews the command.</div>
+  </div>
+</div>
+</body>
+</html>

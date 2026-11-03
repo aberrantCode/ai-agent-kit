@@ -1,6 +1,6 @@
 <!-- GENERATED FILE — DO NOT HAND-EDIT.
      Run: pwsh ./scripts/generate-catalog.ps1 -Force
-     Source: manifest.json (generated: 2026-10-29, schemaVersion: 1)
+     Source: manifest.json (generated: 2026-11-03, schemaVersion: 1)
 -->
 
 # Catalog
@@ -179,6 +179,7 @@ count (G5, `docs/requirements/canonical-repo.md`).
 | [`video-acquisition`](claude/skills/video-acquisition/SKILL.md) | Domain expertise for downloading a YouTube video locally at a resolution suitable for later frame OCR. Sub-skill of `youtube-extraction`. Use when the parent skill needs to acquire the source video file before any fra... | — |
 | [`youtube-extraction`](claude/skills/youtube-extraction/SKILL.md) | Reconstruct locally the solution depicted in a YouTube video — files, configurations, commands, transcripts, and supporting artifacts. Use whenever the user wants to extract, recreate, mirror, scrape, harvest, or rebu... | — |
 | [`youtube-prd-forensics`](claude/skills/youtube-prd-forensics/SKILL.md) | Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments,... | codex |
+| [`youtube-toolkit`](claude/skills/youtube-toolkit/SKILL.md) | Download, transcribe, clip, split-by-chapter, and splice YouTube videos. ALWAYS use this whenever the user pastes a YouTube or youtu.be link, or asks to download / save / rip / grab / clip / trim / cut / split / trans... | — |
 
 ## Codex Skills
 
