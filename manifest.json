@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-10-29",
+  "generated": "2026-11-03",
   "standard_skills": [
     "base",
     "github",
@@ -483,6 +483,10 @@
         },
         "youtube-prd-forensics": {
           "description": "Create or update a detailed Product Requirements Document from a YouTube demo video using evidence-first analysis. Use when the user wants reproducible requirements tied to timestamps, transcript/description/comments, keyframe evidence, and embedded screenshots persisted in the project.",
+          "category": "Research & OSINT"
+        },
+        "youtube-toolkit": {
+          "description": "Download, transcribe, clip, split-by-chapter, and splice YouTube videos. ALWAYS use this whenever the user pastes a YouTube or youtu.be link, or asks to download / save / rip / grab / clip / trim / cut / split / transcribe / caption a YouTube video, or to pull its description, chapters, or metadata, or to splice / stitch / interleave / mix clips from several chapter-split videos into one video \u2014 even if they don't say which of those they want. The skill's whole job is to take a link and ask, via the AskUserQuestion tool, which action(s) to perform, then run them with a hardened yt-dlp + ffmpeg pipeline that survives YouTube's rate limits and format defenses.",
           "category": "Research & OSINT"
         }
       },
